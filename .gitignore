@@ -1,0 +1,9 @@
+nonpareil/
+archive/
+emulator/
+*.tar*
+*.log
+*.zip
+*.txt
+*.geany
+
