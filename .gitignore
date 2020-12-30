@@ -1,7 +1,5 @@
-*.tar*
-*.txt
-*.log
-*.geany
-*/
-
-
+*
+!*.c
+!.h
+!LICENSE
+!README.md
