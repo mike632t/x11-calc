@@ -1,9 +1,7 @@
-nonpareil/
-archive/
-emulator/
 *.tar*
-*.log
-*.zip
 *.txt
+*.log
 *.geany
+*/
+
 
