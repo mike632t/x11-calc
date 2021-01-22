@@ -12,8 +12,4 @@ both VAX and Alpha processors.
   24 -bit colour - may get round to this be one day...
 * Rewite the display code in a more structured form (like the button and LED
   segment code).
-
-* Everything else!
-
-## Later
-
+* Add CPU emulation.
