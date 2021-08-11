@@ -27,6 +27,7 @@
  *                     association with the display module - MT
  * 30 Aug 20         - Base  the number of display segments on the  maximum 
  *                     number of digits in the display - MT
+ * 08 Aug 21         - Tidied up spelling errors in the comments - MT
  *
  */
  
@@ -51,8 +52,6 @@
 #define DISPLAY_o          0x005c
 #define DISPLAY_TEST       0x01ff
  
-#include "x11-calc.h"
- 
 typedef struct { /* Calculator display structure. */
    int index;
    o_segment* segment[DIGITS];
@@ -71,4 +70,4 @@ o_display* h_display_create(int i_index,
    
 int i_display_draw(Display* x_display, int x_application_window, int i_screen,o_display* h_display);
 
-
+int i_display_update(Display* x_display, int x_application_window, int i_screen, o_display* h_display);

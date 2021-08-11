@@ -3,10 +3,10 @@
  *
  * Copyright(C) 2019 - MT
  *
- * Simulation of vairous models of HP calculator for X11.
+ * Emulation of various models of HP calculator for X11.
  * 
- * Deliberatly parses the command line without using 'getopt' or 'argparse'
- * to maximize portability.
+ * Deliberately parses the command line without using 'getopt' or 'argparse'
+ * to maximise portability.
  *
  * This  program is free software: you can redistribute it and/or modify it
  * under  the terms of the GNU General Public License as published  by  the
@@ -32,15 +32,15 @@
  *                     pointer to the new structure - MT
  *                   - Changed button_draw now extracts parameters from the
  *                     button structure - MT
- *                   - Modified  string  constants in  key  definations  to
+ *                   - Modified  string  constants  in  key  definitions  to
  *                     define any hex character codes properly - MT
  * 27 Jun 13         - Any error opening the display are now handled in the
  *                     same way as other errors - MT
  * 30 Jun 13         - Defined text colours as constants - MT
  * 01 Jul 13         - Buttons now move when pressed - MT
- * 02 Jul 13         - Seperated  code  and headers for button  and  colour
- *                     manipulation into seperate files - MT
- * 07 Jul 13         - Made  all  global vairables local vairables  (except
+ * 02 Jul 13         - Separated  code  and  headers for button  and  colour
+ *                     manipulation into separate files - MT
+ * 07 Jul 13         - Made  all  global variables local  variables  (except
  *                     fonts) - MT
  *                   - Use window size hints to set window size - MT
  *                   - Changed  display of inverse trig functions  so  that
@@ -52,7 +52,7 @@
  * 14 Aug 13         - Tidied up comments - MT
  * 17 Aug 13         - Window is now redrawn automatically when application
  *                     loads - MT  
- * 09 Mar 14   0.1   - Created seperate files for code that is dependent on
+ * 09 Mar 14   0.1   - Created  separate files for code that is dependent on
  *                     calculator the model - MT
  * 10 Mar 14         - Changed key code indexes to BCD hex values - MT
  *                   - Changed  names  of display masks to highlight  their
@@ -61,9 +61,9 @@
  *                     the  message loop so the application exits  properly
  *                     when the user closes the application window - MT
  *                   - When a key is 'pressed' the display goes blank for a
- *                     breif interval (just like the real thing) - MT
+ *                     brief interval (just like the real thing) - MT
  * 10 Dec 18         - Alternate  function key now LIGHT_BLUE, allowing  it
- *                     to be a different color to the alternate text - MT
+ *                     to be a different colour to the alternate text - MT
  * 11 Dec 28         - Tidied up comments again - MT 
  * 23 Aug 20         - Modified the debug code (again), optional debug code
  *                     executed using the debug() macro, with print() being
@@ -71,42 +71,102 @@
  * 30 Aug 20         - Added number formatting routines - MT
  * 31 Aug 20         - Made  version(), about(), and error() model specific 
  *                     so that the name reflects the model number - MT
- * 31 Aug 20         - Resolved dependancies between header files by moving
- *                     common function definitions to a sperate file - MT
- *
+ * 31 Aug 20         - Resolved dependencies between header files by moving
+ *                     common function definitions to a separate file - MT
+ * 08 Aug 21         - Tidied up spelling errors in the comments - MT
+ * 09 Aug 21         - The  main program loop now checks for pending  events
+ *                     before  processing  any event messages, so  NextEvent
+ *                     no longer blocks program execution - MT
+ * 10 Aug 21         - Moved  version(), about(), and error() back to  their
+ *                     original position - MT
+ *          
  * TO DO :           - Free up allocated memory on exit.
- *                   - Implement some functions (starting with  basic  math
- *                     operations).
  *                   - Sort out colour mapping.
  * 
  */
  
-#define NAME         "x11-rpncalc"
-#define VERSION      "0.1"
-#define BUILD        "0030"
-#define AUTHOR       "MT"
+#define NAME           "x11-rpncalc"
+#define VERSION        "0.1"
+#define BUILD          "0031"
+#define DATE           "10 Aug 21"
+#define AUTHOR         "MT"
  
-#define DEBUG        1
+#define DEBUG          1
  
-#include <X11/Xlib.h>      /* XOpenDisplay(), etc. */
-#include <X11/Xutil.h>     /* XSizeHints etc. */
+#include <X11/Xlib.h>  /* XOpenDisplay(), etc. */
+#include <X11/Xutil.h> /* XSizeHints etc. */
+#include <time.h>
  
-#include <stdarg.h>        /* strlen(), etc. */
-#include <string.h>        /* strlen(), etc. */
-#include <stdio.h>         /* fprintf(), etc. */
-#include <stdlib.h>        /* getenv(), etc. */
- 
+#include <stdarg.h>    /* strlen(), etc. */
+#include <string.h>    /* strlen(), etc. */
+#include <stdio.h>     /* fprintf(), etc. */
+#include <stdlib.h>    /* getenv(), etc. */
+
+#include "x11-calc-font.h" 
 #include "x11-calc-button.h"
 
 #include "x11-calc.h"
- 
-#include "gcc-debug.h"     /* print() */
-#include "gcc-wait.h"      /* i_wait() */
+
 #include "x11-calc-colour.h"
-#include "x11-calc-font.h" 
 #include "x11-calc-segment.h"
 #include "x11-calc-display.h"
 #include "x11-calc-cpu.h"
+
+#include "gcc-debug.h" /* print() */
+#include "gcc-wait.h"  /* i_wait() */
+
+void v_version(int i_verbose) { /* Display version information */
+   fprintf(stderr, "%s: Version %s", NAME, VERSION);
+   if (__DATE__[4] == ' ') fprintf(stderr, " (0"); else fprintf(stderr, " (%c", __DATE__[4]);
+   fprintf(stderr, "%c %c%c%c %s %s)", __DATE__[5],
+      __DATE__[0], __DATE__[1], __DATE__[2], __DATE__ +9, __TIME__ );
+   fprintf(stderr, " (Build %s)", BUILD );
+   fprintf(stderr,"\n");
+   if (i_verbose) {
+      fprintf(stderr, "Copyright(C) %s %s\n", __DATE__ +7, AUTHOR);
+      fprintf(stderr, "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\n");
+      fprintf(stderr, "This is free software: you are free to change and redistribute it.\n");
+      fprintf(stderr, "There is NO WARRANTY, to the extent permitted by law.\n");
+   }
+} 
+ 
+#ifdef vms /* Use DEC command line options */
+void v_about() { /* Display help text */
+   fprintf(stdout, "Usage: %s [OPTION]... [FILE]...\n", NAME);
+   fprintf(stdout, "Concatenate FILE(s)to standard output.\n\n");
+   fprintf(stdout, "  /delay                   delay 8ms between each byte\n");
+   fprintf(stdout, "  /header                  display filenames\n");
+   fprintf(stdout, "  /number                  number all output lines \n");
+   fprintf(stdout, "  /restart                 line numbers start at zero, implies -n\n");
+   fprintf(stdout, "  /skip                    skip over repeated blank lines\n");
+   fprintf(stdout, "  /version                 output version information and exit\n\n");
+   fprintf(stdout, "  /?, /help                display this help and exit\n");
+   exit(0);
+}
+#else
+void v_about() { /* Display help text */
+   fprintf(stdout, "Usage: %s [OPTION]... [FILE]...\n", NAME);
+   fprintf(stdout, "Concatenate FILE(s)to standard output.\n\n");
+   fprintf(stdout, "  -d, --delay              delay 8ms between each byte\n");
+   fprintf(stdout, "  -f, --filenames          display filenames\n");
+   fprintf(stdout, "  -n, --number             number all output lines \n");
+   fprintf(stdout, "  -r, --restart            line numbers start at zero, implies -n\n");
+   fprintf(stdout, "  -s, --squeeze-blank      suppress repeated blank lines\n");
+   fprintf(stdout, "  -?, --help               display this help and exit\n");
+   fprintf(stdout, "      --version            output version information and exit\n\n");
+   fprintf(stdout, "With no FILE, or when FILE is -, read standard input.\n");
+   exit(0);
+}
+#endif
+
+void v_error(const char *s_fmt, ...) { /* Print formatted error message */
+   va_list t_args;
+   va_start(t_args, s_fmt);
+   fprintf(stderr, "%s : ", NAME);
+   vfprintf(stderr, s_fmt, t_args);
+   va_end(t_args);
+}
+
  
 int main (int argc, char *argv[]){
 
@@ -115,6 +175,7 @@ int main (int argc, char *argv[]){
    XEvent x_event;
    XSizeHints *h_size_hint;
    Atom wm_delete;
+   time_t c_time;
    
    o_button* h_button[BUTTONS]; /* Array to hold pointers to 30 buttons. */
    o_button* h_pressed;
@@ -135,64 +196,70 @@ int main (int argc, char *argv[]){
    int i_count, i_index;
    int b_cont = True;
    
+   long i_time = 0; /* Curent timestamp */
+
+   debug(v_version(False));
+   
 #ifdef vms /* Parse DEC style command line options */
-   for (i_count = 1; i_count < argc; i_count++) {
-      if (argv[i_count][0] == '/') {
-         for (i_index = 0; argv[i_count][i_index]; i_index++) /* Convert option to uppercase */
-            if (argv[i_count][i_index] >= 'a' && argv[i_count][i_index] <= 'z')
-               argv[i_count][i_index] = argv[i_count][i_index] - 32;
-         if (!strncmp(argv[i_count], "/VERSION", i_index)) {
-            v_version(); /* Display version information */
-         } else if (!strncmp(argv[i_count], "/HELP", i_index)) {
+for (i_count = 1; i_count < argc; i_count++) {
+   if (argv[i_count][0] == '/') {
+      for (i_index = 0; argv[i_count][i_index]; i_index++) /* Convert option to uppercase */
+         if (argv[i_count][i_index] >= 'a' && argv[i_count][i_index] <= 'z')
+            argv[i_count][i_index] = argv[i_count][i_index] - 32;
+      if (!strncmp(argv[i_count], "/VERSION", i_index)) {
+         v_version(True); /* Display version information */
+         exit(0);
+      } else if (!strncmp(argv[i_count], "/HELP", i_index)) {
+         v_about();
+      } else if (!strncmp(argv[i_count], "/?", i_index)) {
+         v_about();
+      } else { /* If we get here then the we have an invalid option */
+         v_error("invalid option %s\nTry '%s /help' for more information.\n", argv[i_count] , NAME);
+         exit(-1);
+      }
+      if (argv[i_count][1] != 0) {
+         for (i_index = i_count; i_index < argc - 1; i_index++) argv[i_index] = argv[i_index + 1];
+         argc--; i_count--;
+      }
+   }
+}
+#else /* Parse UNIX style command line options */
+char b_abort; /* Stop processing command line */
+for (i_count = 1; i_count < argc && (b_abort != True); i_count++) {
+   if (argv[i_count][0] == '-') {- Modified register names
+      i_index = 1;
+      while (argv[i_count][i_index] != 0) {
+         switch (argv[i_count][i_index]) {
+         case '?': /* Display help */
             v_about();
-         } else if (!strncmp(argv[i_count], "/?", i_index)) {
-            v_about();
-         } else { /* If we get here then the we have an invalid option */
-            v_error("invalid option %s\nTry '%s /help' for more information.\n", argv[i_count] , NAME);
+         case '-': /* '--' terminates command line processing */
+            i_index = strlen(argv[i_count]);
+            if (i_index == 2)
+              b_abort = True; /* '--' terminates command line processing */
+            else
+               if (!strncmp(argv[i_count], "--version", i_index)) {
+                  v_version(True); /* Display version information */
+                  exit(0);
+               } else if (!strncmp(argv[i_count], "--help", i_index)) {
+                  v_about();
+               } else { /* If we get here then the we have an invalid long option */
+                  v_error("unrecognized option '%s'\nTry '%s --help' for more information.\n", argv[i_count], NAME);
+                  exit(-1);
+               }
+            i_index--; /* Leave index pointing at end of string (so argv[i_count][i_index] = 0) */
+            break;
+         default: /* If we get here the single letter option is unknown */
+            v_error("invalid option -- '%c'\nTry '%s --help' for more information.\n", argv[i_count][i_index], NAME);
             exit(-1);
          }
-         if (argv[i_count][1] != 0) {
-            for (i_index = i_count; i_index < argc - 1; i_index++) argv[i_index] = argv[i_index + 1];
-            argc--; i_count--;
-         }
+         i_index++; /* Parse next letter in options */
+      }
+      if (argv[i_count][1] != 0) {
+         for (i_index = i_count; i_index < argc - 1; i_index++) argv[i_index] = argv[i_index + 1];
+         argc--; i_count--;
       }
    }
-#else /* Parse UNIX style command line options */
-   char b_abort; /* Stop processing command line */
-   for (i_count = 1; i_count < argc && (b_abort != True); i_count++) {
-      if (argv[i_count][0] == '-') {
-         i_index = 1;
-         while (argv[i_count][i_index] != 0) {
-            switch (argv[i_count][i_index]) {
-            case '?': /* Display help */
-               v_about();
-            case '-': /* '--' terminates command line processing */
-               i_index = strlen(argv[i_count]);
-               if (i_index == 2)
-                 b_abort = True; /* '--' terminates command line processing */
-               else
-                  if (!strncmp(argv[i_count], "--version", i_index)) {
-                     v_version(); /* Display version information */
-                  } else if (!strncmp(argv[i_count], "--help", i_index)) {
-                     v_about();
-                  } else { /* If we get here then the we have an invalid long option */
-                     v_error("%s: invalid option %s\nTry '%s --help' for more information.\n", argv[i_count][i_index] , NAME);
-                     exit(-1);
-                  }
-               i_index--; /* Leave index pointing at end of string (so argv[i_count][i_index] = 0) */
-               break;
-            default: /* If we get here the single letter option is unknown */
-               v_error("unknown option -- %c\nTry '%s --help' for more information.\n", argv[i_count][i_index] , NAME);
-               exit(-1);
-            }
-            i_index++; /* Parse next letter in options */
-         }
-         if (argv[i_count][1] != 0) {
-            for (i_index = i_count; i_index < argc - 1; i_index++) argv[i_index] = argv[i_index + 1];
-            argc--; i_count--;
-         }
-      }
-   }
+}
 #endif 
 
    i_wait(200);  /* Sleep for 200 milliseconds to 'debounce' keyboard! */
@@ -284,24 +351,28 @@ int main (int argc, char *argv[]){
    XSync(x_display, False);
    
    /* -1234567890. */
-   i_reg_load(gc_a_reg, 0x9, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0x0, 0xf, 0xf, 0xf);
-   i_reg_load(gc_b_reg, 0x2, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1, 0x0, 0x0, 0x0);
+   i_reg_load(c_Areg, 0x9, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0x0, 0xf, 0xf, 0xf);
+   i_reg_load(c_Breg, 0x2, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1, 0x0, 0x0, 0x0);
+   i_reg_load(c_Creg, 0x9, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0x0, 0xf, 0xf, 0xf);
 
-   /* 1/-1234567890. */
-   i_reg_load(gc_a_reg, 0x9, 0x8, 0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1, 0x9, 0x1, 0x0, 0x0, 0x0);
-   i_reg_load(gc_b_reg, 0x2, 0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x2, 0x0, 0x0, 0x0, 0x0);
- 
    /* Main program event loop. */
    while (b_cont) {
+      i_wait(3);  /* Sleep for 3 milliseconds */
 
-      XNextEvent(x_display, &x_event);
-      
-      /*
-       * debug(fprintf(stderr, "Debug\t: %s line : %d : Event ID : %i.\n", \
-       * __FILE__, __LINE__, x_event.type));      
-       */
-      
-      switch (x_event.type) {
+      time(&c_time); /* c_time now contains seconds since January 1, 1970 */
+      if (!(c_time % 10) && (c_time > i_time)) { /* Print the tiem every 10 seconds */
+         printf("%s", asctime(localtime(&c_time)));
+         i_time = c_time;
+      }
+
+      while (XPending(x_display)) {
+
+         XNextEvent(x_display, &x_event);
+         
+         /* debug(fprintf(stderr, "Debug\t: %s line : %d : Event ID : %i.\n", \
+            __FILE__, __LINE__, x_event.type)); */
+         
+         switch (x_event.type) {
       
          case EnterNotify : 
             debug(fprintf(stderr, "Debug\t: %s line : %d : Notify raised.\n", \
@@ -328,13 +399,8 @@ int main (int argc, char *argv[]){
                   if (!(h_pressed == NULL)) {
                      h_pressed->state = True; 
                      i_button_draw(x_display, x_application_window, i_screen, h_pressed);
-                     
-                     /* 
-                      * debug(fprintf(stderr, "Debug\t: %s line : %d : Button %.2X is %s.\n", \
-                      * __FILE__, __LINE__, h_pressed->index, (h_pressed->state)?"TRUE":"FALSE")); 
-                      */
-                      
-                     debug(fprintf(stderr, "Debug\t: %s line : %d : Button pressed - keycode(%.2X).\n", \
+ 
+                      debug(fprintf(stderr, "Debug\t: %s line : %d : Button pressed - keycode(%.2X).\n", \
                      __FILE__, __LINE__, h_pressed->index)); 
 
                      /* Clear display. */ 
@@ -367,12 +433,7 @@ int main (int argc, char *argv[]){
                if (!(h_pressed == NULL)) {
                   h_pressed->state = False;
                   i_button_draw(x_display, x_application_window, i_screen, h_pressed);
-                  
-                  /*
-                   * debug(fprintf(stderr, "Debug\t: %s line : %d : Button %.2X is %s.\n", \
-                   * __FILE__, __LINE__, h_pressed->index, (h_pressed->state)?"TRUE":"FALSE")); 
-                   */
-
+ 
                   debug(fprintf(stderr, "Debug\t: %s line : %d : Button released.\n", \
                   __FILE__, __LINE__)); 
 
@@ -395,7 +456,9 @@ int main (int argc, char *argv[]){
             if (x_event.xclient.data.l[0] == wm_delete) b_cont = False;
             break;
 
+         }
       }
+      
    }
 
    /* Close connection to server. */

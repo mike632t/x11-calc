@@ -21,9 +21,11 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * 02 Jul 13         - Initial version - MT
+ * 08 Aug 21         - Tidied up spelling errors in the comments - MT
  *
  */
- 
+
+#ifndef BUTTON
 typedef struct { /* Calculator button structure. */
    int index;
    char* text;
@@ -48,3 +50,4 @@ o_button* h_button_create(int i_index, char* s_text,char* s_label ,char* s_alter
    unsigned int i_colour);
    
 int i_button_draw(Display* h_display, int x_application_window, int i_screen,o_button* h_button);
+#endif

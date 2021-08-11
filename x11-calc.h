@@ -19,20 +19,13 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
  * 31 Aug 20   0.1   - Initial version - MT
- * 31 Aug 20         - Resolved dependancies between header files by moving
- *                     common function definitions to a sperate file - MT
+ * 31 Aug 20         - Resolved dependencies between header files by  moving
+ *                     common function definitions to a separate file - MT
+ * 08 Aug 21         - Tidied up spelling errors in the comments - MT
  *                      
  * TO DO :           - 
  */
-  
+
 #include "x11-calc-21.h"
 
-#ifndef TITLE
 enum t_mode{FIX, SCI, ENG};
-void v_version();
-void v_about();
-void v_error(const char *s_fmt, ...);
- 
-void v_init_calc();
-void v_init_keypad(o_button* h_button[]);
-#endif

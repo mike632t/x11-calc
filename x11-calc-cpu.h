@@ -1,11 +1,11 @@
 /*
- * x11-calc-display.h - RPN (Reverse Polish) calculator simulator. 
+ * x11-calc-cpu.h - RPN (Reverse Polish) calculator simulator. 
  *
  * Copyright(C) 2020   MT
  * 
- * Emulates woodstock processor.
+ * Emulates processor operation.
  * 
- * Contains  the type definations and functions definitions used to emulate
+ * Contains  the type definitions and functions definitions used to  emulate
  * the CPU microcode.
  *
  * This  program is free software: you can redistribute it and/or modify it
@@ -24,14 +24,14 @@
  * 10 Sep 20         - Initial version - MT
  *
  */
-  
-extern unsigned char gc_a_reg[14];
-extern unsigned char gc_b_reg[14];
-extern unsigned char gc_c_reg[14];
-extern unsigned char gc_d_reg[14];
-extern unsigned char gc_e_reg[14];
-extern unsigned char gc_f_reg[14];
-extern unsigned char gc_m1_reg[14];
-extern unsigned char gc_m2_reg[14];
-extern unsigned char gc_s_reg[16]; /* Processor status word */
 
+#define REG_SIZE 14
+  
+extern unsigned char c_Areg[REG_SIZE], c_Breg[REG_SIZE], c_Creg[REG_SIZE];
+extern unsigned char c_Dreg[REG_SIZE], c_Ereg[REG_SIZE], c_Freg[REG_SIZE];
+extern unsigned char c_M1reg[REG_SIZE];
+extern unsigned int i_Sreg; /* Processor status word */
+extern unsigned int i_Preg; /* Prgram counter */
+
+int i_cpu_init();
+int i_reg_load(unsigned char *c_reg, ...);

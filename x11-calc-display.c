@@ -30,14 +30,16 @@
  * 23 Aug 20         - Removed the error macro - MT
  * 30 Aug 20         - Base  the number of display segments on the  maximum 
  *                     number of digits in the display - MT
+ * 08 Aug 21         - Tidied up spelling errors in the comments - MT
  *                      
- * TO DO :           - Change display properties
+ * TO DO :           - Changed display properties
  *
  */
 
 #define VERSION        "0.1"
-#define BUILD          "0004"
+#define BUILD          "0005"
 #define DATE           "30 Aug 20"
+#define AUTHOR         "MT"
 
 #define DEBUG 0        /* Enable/disable debug*/
  
@@ -48,13 +50,15 @@
 #include <stdio.h>     /* fprintf(), etc. */
  
 #include "gcc-debug.h"
+
+#include "x11-calc-button.h"
+
+#include "x11-calc.h" 
  
 #include "x11-calc-colour.h"
 #include "x11-calc-segment.h"
 #include "x11-calc-display.h"
-#include "x11-calc-button.h"
 #include "x11-calc-cpu.h" 
-#include "x11-calc.h" 
  
 /*
  * display_create (index, text, left, top, width, height, 
@@ -145,10 +149,10 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
    /* Draw display segments. */
    for (i_count = 0; i_count < DIGITS; i_count++)
       if (!(h_display->segment[i_count] == NULL)) {
-         h_display->segment[i_count]->mask = c_digits[gc_a_reg[i_count]];
-         switch (gc_b_reg[i_count] & 0x07) {
+         h_display->segment[i_count]->mask = c_digits[c_Areg[i_count]];
+         switch (c_Breg[i_count] & 0x07) {
             case 0x02: /* Sign */
-               if (gc_a_reg[i_count]) 
+               if (c_Areg[i_count]) 
                   h_display->segment[i_count]->mask = DISPLAY_MINUS;
                else
                   h_display->segment[i_count]->mask = DISPLAY_SPACE;

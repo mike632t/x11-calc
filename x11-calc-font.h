@@ -20,7 +20,7 @@
  *
  * 
  * 09 Mar 14         - Initial version - MT
- * 10 Dec 18         - Define DEC fonts if compiling on VMS - MT
+ * 10 Dec 18         - Defined DEC fonts if compiling on VMS - MT
  *
  */
 

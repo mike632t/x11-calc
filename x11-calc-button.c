@@ -27,6 +27,7 @@
  * 07 Jul 13         - Tuned position of font - MT
  * 14 Jul 13         - Flush X buffer each time button is drawn - MT
  * 15 Dec 18         - Changed debug macro and added an error macro - MT
+ * 08 Aug 21         - Tidied up spelling errors in the comments - MT
  *
  * TO DO :           - Add additional details to button shading.
  *                   - Use a wider range of colour hints to improve button
@@ -36,8 +37,9 @@
  */
  
 #define VERSION        "0.1"
-#define BUILD          "0004"
+#define BUILD          "0006"
 #define DATE           "14 Jul 13"
+#define AUTHOR         "MT"
  
 #define DEBUG 1 /* Enable/disable debug*/
  
@@ -53,6 +55,9 @@
 #include "x11-calc-colour.h"
 #include "x11-calc-font.h"
 #include "x11-calc-button.h"
+
+#include "x11-calc.h"
+
   
 /*
  * button_pressed (button, x, y)

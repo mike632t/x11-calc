@@ -42,6 +42,7 @@
  *                     drawing all the background elements for every segment 
  *                     before filling in the foreground - MT
  * 15 Dec 18         - Changed debug macro and added an error macro - MT
+ * 08 Aug 21         - Tidied up spelling errors in the comments - MT
  *                      
  * TO DO :           - Optimize drawing of display segment by drawing in 
  ^                     all the darker background regions before the foreground.
@@ -49,8 +50,9 @@
  */
  
 #define VERSION        "0.0"
-#define BUILD          "0004"
+#define BUILD          "0006"
 #define DATE           "19 Jul 13"
+#define AUTHOR         "MT"
 
 #define DEBUG 0        /* Enable/disable debug*/
  
@@ -61,7 +63,12 @@
 #include <stdlib.h>    /* malloc(), etc. */
  
 #include "gcc-debug.h"
- 
+
+#include "x11-calc-button.h"
+
+#include "x11-calc.h" 
+
+#include "x11-calc-colour.h"
 #include "x11-calc-segment.h"
  
 /*

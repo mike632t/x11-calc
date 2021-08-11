@@ -59,6 +59,9 @@
  */
  
 #define DEBUG 1
+
+#include <X11/Xlib.h>      /* XOpenDisplay(), etc. */
+#include <X11/Xutil.h>     /* XSizeHints etc. */
  
 #include <math.h>      /* log10(), etc. */
 #include <string.h>    /* strlen(), etc. */
@@ -67,9 +70,12 @@
  
 #include "gcc-math.h"
 #include "gcc-debug.h"
- 
-#include "x11-calc-21.h"
- 
+
+#include "x11-calc-font.h" 
+#include "x11-calc-button.h"
+
+#include "x11-calc.h"  
+
 char s_string[DIGITS + 3]; /* Allowing for the sign, decimal point and terminator. */
  
 char* s_format(double d_value, int i_precision, int i_mode) {

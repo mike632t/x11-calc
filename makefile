@@ -27,6 +27,8 @@
 #                      a  seperate files (instead of using a single  source 
 #                      file with conditional compilation - MT
 #  27 Sep 20   0.3   - Added make clean option - MT
+#  08 Aug 21   0.4   - Removed x11-calc-format - MT
+#  11 Aug 21	0.5	- Backup created in parent folder - MT
 # 
 #PROGRAM	= x11-calc
 #SOURCES	= x11-calc.c x11-calc-21.c x11-calc-cpu.c x11-calc-display.c x11-calc-segment.c x11-calc-button.c x11-calc-colour.c gcc-wait.c
@@ -36,7 +38,7 @@
 #CC			= gcc
 
 PROGRAM 	= x11-calc
-SOURCES 	= x11-calc.c x11-calc-21.c x11-calc-cpu.c x11-calc-display.c x11-calc-segment.c x11-calc-button.c x11-calc-colour.c x11-calc-format.c gcc-wait.c
+SOURCES 	= x11-calc.c x11-calc-21.c x11-calc-cpu.c x11-calc-display.c x11-calc-segment.c x11-calc-button.c x11-calc-colour.c gcc-wait.c
 FILES		= *.c *.h LICENSE makefile .gitignore
 OBJECTS	= $(SOURCES:.c=.o)
 OUTPUT	= $(PROGRAM).out
@@ -47,20 +49,25 @@ CC			= gcc
 #
 $(PROGRAM): $(OBJECTS) 
 #  link 
+#	@echo ' Linking $(OBJECTS)'
 	@$(CC) $(FLAGS) $(OBJECTS) -o $@ $(LIBS)
 #	Tidy up by deleting ALL object files - this will force all the sources
 #	to be recompiled every time so may not be a good idea on slow machines
-	@rm $(OBJECTS)
+#	@rm $(OBJECTS)
 #
 #  compile - doesn't attempt to be selective just recompiles everything!
 $(OBJECTS) : $(SOURCES)
-#	@echo '*** Compiling $(SOURCES)'
+#	@echo ' Compiling $(SOURCES)'
 	@$(CC) $(FLAGS) -c $(SOURCES) -I $(INCLUDE)
 #
 #  make clean - Clean up the executable and any object files.
+all: clean $(PROGRAM) $(OBJECTS) 
+
 clean:
+#	@echo ' Removing $(OBJECTS)'
 	@rm -f $(OBJECTS)
+#	@echo ' Removing $(PROGRAM)'
 	@rm -f $(PROGRAM)
 backup:
-	@tar -czvpf $(PROGRAM)-`date +'%Y%m%d%H%M'`.tar.gz $(FILES)
+	@tar -czvpf ..\/$(PROGRAM)-`date +'%Y%m%d%H%M'`.tar.gz $(FILES)
 

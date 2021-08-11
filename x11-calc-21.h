@@ -19,11 +19,13 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * 09 Mar 14   0.1   - Initial version - MT
- * 30 Aug 20         - Moved functions to sperate source file - MT
+ * 30 Aug 20         - Moved functions to separate source file - MT
+ * 08 Aug 21         - Tidied up spelling errors in the comments - MT
  *                      
  * TO DO :           - 
  */
 
+#ifndef TITLE
 #define TITLE          "RPN calc 21"
 #define HEIGHT         385
 #define WIDTH          201   /* Yes really! */
@@ -34,5 +36,13 @@
 #define True           1
 #define False          0
 
+extern int i_rom [1] [04000];
 
+void v_version(int i_verbose);
+void v_about();
+void v_error(const char *s_fmt, ...);
+
+void v_init_calc();
+int v_init_keypad(o_button* h_button[]);
+#endif
 
