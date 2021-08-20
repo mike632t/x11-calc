@@ -53,7 +53,7 @@
 #define DISPLAY_TEST       0x01ff
  
 typedef struct { /* Calculator display structure. */
-   int index;
+   int index; 
    o_segment* segment[DIGITS];
    int left;
    int top; 
@@ -68,6 +68,6 @@ o_display* h_display_create(int i_index,
    int i_left, int i_top, int i_width, int i_height, 
    unsigned int i_foreground, unsigned int i_background, unsigned int i_border);
    
-int i_display_draw(Display* x_display, int x_application_window, int i_screen,o_display* h_display);
+int i_display_draw(Display* x_display, int x_application_window, int i_screen, o_display* h_display);
 
 int i_display_update(Display* x_display, int x_application_window, int i_screen, o_display* h_display);

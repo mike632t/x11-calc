@@ -25,13 +25,37 @@
  *
  */
 
-#define REG_SIZE 14
-  
-extern unsigned char c_Areg[REG_SIZE], c_Breg[REG_SIZE], c_Creg[REG_SIZE];
-extern unsigned char c_Dreg[REG_SIZE], c_Ereg[REG_SIZE], c_Freg[REG_SIZE];
-extern unsigned char c_M1reg[REG_SIZE];
-extern unsigned int i_Sreg; /* Processor status word */
-extern unsigned int i_Preg; /* Prgram counter */
+#define REG_SIZE     14
+#define REGISTERS    9     /* A, B ,C , D, E, F, M1, PSW, PC */
 
-int i_cpu_init();
+
+#define A_REG        0
+#define B_REG        1
+#define C_REG        2
+#define D_REG        3
+#define E_REG        4
+#define F_REG        5
+#define M_REG        6
+#define M2_REG       7
+
+typedef struct {
+   unsigned char nibble[REG_SIZE];
+} o_register;
+
+typedef struct { 
+   int index; 
+   o_register* processor_register[REGISTERS];
+   unsigned int processor_status; /* Processor status word */
+   unsigned int program_counter; /* Program counter */
+   unsigned int current_rom_bank; /* ROM bank number */
+   int trace_flag; /* Controls CPU trace output */ 
+   int* rom; /* Pointer to the ROM contents */
+} o_processor;  
+
+o_processor* h_processor_create(int i_index, int *h_rom);
+   
+//int i_processor_init(o_processor* h_procesor);
+
+int i_processor_tick(o_processor* h_procesor);
+
 int i_reg_load(unsigned char *c_reg, ...);

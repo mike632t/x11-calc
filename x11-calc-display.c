@@ -32,8 +32,6 @@
  *                     number of digits in the display - MT
  * 08 Aug 21         - Tidied up spelling errors in the comments - MT
  *                      
- * TO DO :           - Changed display properties
- *
  */
 
 #define VERSION        "0.1"
@@ -43,22 +41,23 @@
 
 #define DEBUG 0        /* Enable/disable debug*/
  
-#include <X11/Xlib.h>  /* XOpenDisplay(), etc. */
-#include <X11/Xutil.h> /* XSizeHints etc. */
- 
 #include <stdlib.h>    /* malloc(), etc. */
 #include <stdio.h>     /* fprintf(), etc. */
  
-#include "gcc-debug.h"
-
+#include <X11/Xlib.h>  /* XOpenDisplay(), etc. */
+#include <X11/Xutil.h> /* XSizeHints etc. */
+ 
 #include "x11-calc-button.h"
 
 #include "x11-calc.h" 
  
 #include "x11-calc-colour.h"
 #include "x11-calc-segment.h"
-#include "x11-calc-display.h"
 #include "x11-calc-cpu.h" 
+#include "x11-calc-display.h"
+
+#include "gcc-debug.h"
+
  
 /*
  * display_create (index, text, left, top, width, height, 
@@ -79,7 +78,7 @@ o_display* h_display_create(int i_index, int i_left, int i_top, int i_width,
    o_display* h_display; /* Ponter to display. */
    int i_count;
 
-   /* Attempt to allcoate memory for a display. */
+   /* Attempt to allocate memory for a display. */
    if ((h_display = malloc (sizeof(*h_display)))==NULL) v_error("Memory allocation failed!");
    h_display->index = i_index; 
    h_display->left = i_left;
@@ -122,44 +121,44 @@ int i_display_draw(Display* x_display, int x_application_window, int i_screen, o
 /*
  * display_update (display, window, screen, display)
  *
- * Updates the display based on the contents of the A nad B registers.
+ * Updates the display based on the contents of the A and B registers.
  *
  */
 
-int i_display_update(Display* x_display, int x_application_window, int i_screen, o_display* h_display){
+//int i_display_update(Display* x_display, int x_application_window, int i_screen, o_display* h_display){
    
-   static int c_digits [] = { DISPLAY_ZERO,
-                              DISPLAY_ONE,
-                              DISPLAY_TWO,
-                              DISPLAY_THREE,
-                              DISPLAY_FOUR,
-                              DISPLAY_FIVE,
-                              DISPLAY_SIX,
-                              DISPLAY_SEVEN,
-                              DISPLAY_EIGHT,
-                              DISPLAY_NINE,
-                              DISPLAY_SPACE,
-                              DISPLAY_SPACE,
-                              DISPLAY_SPACE,
-                              DISPLAY_SPACE,
-                              DISPLAY_SPACE,
-                              DISPLAY_SPACE };
-   int i_offset, i_count;
+   //static int c_digits [] = { DISPLAY_ZERO,
+                              //DISPLAY_ONE,
+                              //DISPLAY_TWO,
+                              //DISPLAY_THREE,
+                              //DISPLAY_FOUR,
+                              //DISPLAY_FIVE,
+                              //DISPLAY_SIX,
+                              //DISPLAY_SEVEN,
+                              //DISPLAY_EIGHT,
+                              //DISPLAY_NINE,
+                              //DISPLAY_SPACE,
+                              //DISPLAY_SPACE,
+                              //DISPLAY_SPACE,
+                              //DISPLAY_SPACE,
+                              //DISPLAY_SPACE,
+                              //DISPLAY_SPACE };
+   //int i_offset, i_count;
  
-   /* Draw display segments. */
-   for (i_count = 0; i_count < DIGITS; i_count++)
-      if (!(h_display->segment[i_count] == NULL)) {
-         h_display->segment[i_count]->mask = c_digits[c_Areg[i_count]];
-         switch (c_Breg[i_count] & 0x07) {
-            case 0x02: /* Sign */
-               if (c_Areg[i_count]) 
-                  h_display->segment[i_count]->mask = DISPLAY_MINUS;
-               else
-                  h_display->segment[i_count]->mask = DISPLAY_SPACE;
-               break;
-            case 0x01: /* Number and decimal point */
-               h_display->segment[i_count]->mask = h_display->segment[i_count]->mask | DISPLAY_DECIMAL;
-         }
-      }
-  return (True);
-}
+   ///* Draw display segments. */
+   //for (i_count = 0; i_count < DIGITS; i_count++)
+      //if (!(h_display->segment[i_count] == NULL)) {
+         //h_display->segment[i_count]->mask = c_digits[c_reg[A_REG][i_count]];
+         //switch (c_reg[B_REG][i_count] & 0x07) {
+            //case 0x02: /* Sign */
+               //if (c_reg[A_REG][i_count]) 
+                  //h_display->segment[i_count]->mask = DISPLAY_MINUS;
+               //else
+                  //h_display->segment[i_count]->mask = DISPLAY_SPACE;
+               //break;
+            //case 0x01: /* Number and decimal point */
+               //h_display->segment[i_count]->mask = h_display->segment[i_count]->mask | DISPLAY_DECIMAL;
+         //}
+      //}
+  //return (True);
+//}

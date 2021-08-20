@@ -56,14 +56,12 @@
 
 #define DEBUG 0        /* Enable/disable debug*/
  
-#include <X11/Xlib.h>  /* XOpenDisplay(), etc. */
-#include <X11/Xutil.h> /* XSizeHints etc. */
- 
 #include <stdio.h>     /* fprintf(), etc. */
 #include <stdlib.h>    /* malloc(), etc. */
  
-#include "gcc-debug.h"
-
+#include <X11/Xlib.h>  /* XOpenDisplay(), etc. */
+#include <X11/Xutil.h> /* XSizeHints etc. */
+ 
 #include "x11-calc-button.h"
 
 #include "x11-calc.h" 
@@ -71,6 +69,8 @@
 #include "x11-calc-colour.h"
 #include "x11-calc-segment.h"
  
+#include "gcc-debug.h"
+
 /*
  * segment_create (index, text, left, top, width, height, state,
  *                colour)

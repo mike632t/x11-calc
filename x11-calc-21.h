@@ -26,19 +26,20 @@
  */
 
 #ifndef TITLE
-#define TITLE          "RPN calc 21"
-#define HEIGHT         385
-#define WIDTH          201   /* Yes really! */
-#define BUTTONS        30
+#define TITLE        "RPN calc 21"
+#define HEIGHT       385
+#define WIDTH        201   /* Yes really! */
+#define BUTTONS      30
 
-#define DIGITS         12
+#define DIGITS       12
+#define ROM_SIZE     02000  
 
-#define True           1
-#define False          0
+#define True         1
+#define False        0
 
-extern int i_rom [1] [04000];
+int i_rom [ROM_SIZE];
 
-void v_version(int i_verbose);
+void v_version(int b_verbose);
 void v_about();
 void v_error(const char *s_fmt, ...);
 

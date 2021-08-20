@@ -43,21 +43,20 @@
  
 #define DEBUG 1 /* Enable/disable debug*/
  
-#include <X11/Xlib.h>  /* XOpenDisplay(), etc. */
-#include <X11/Xutil.h> /* XSizeHints etc. */
- 
 #include <string.h>    /* strlen(), etc. */
 #include <stdio.h>     /* fprintf(), etc. */
 #include <stdlib.h>    /* malloc(), etc. */
  
-#include "gcc-debug.h"
+#include <X11/Xlib.h>  /* XOpenDisplay(), etc. */
+#include <X11/Xutil.h> /* XSizeHints etc. */
  
-#include "x11-calc-colour.h"
 #include "x11-calc-font.h"
 #include "x11-calc-button.h"
 
 #include "x11-calc.h"
 
+#include "x11-calc-colour.h"
+#include "gcc-debug.h"
   
 /*
  * button_pressed (button, x, y)

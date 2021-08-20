@@ -52,7 +52,7 @@
  * 14 Aug 13         - Tidied up comments - MT
  * 17 Aug 13         - Window is now redrawn automatically when application
  *                     loads - MT  
- * 09 Mar 14   0.1   - Created  separate files for code that is dependent on
+ * 09 Mar 14         - Created  separate files for code that is dependent on
  *                     calculator the model - MT
  * 10 Mar 14         - Changed key code indexes to BCD hex values - MT
  *                   - Changed  names  of display masks to highlight  their
@@ -79,35 +79,44 @@
  *                     no longer blocks program execution - MT
  * 10 Aug 21         - Moved  version(), about(), and error() back to  their
  *                     original position - MT
- *          
- * TO DO :           - Free up allocated memory on exit.
+ * 16 Aug 21         - Now calls tick() to execute  a single instruction for
+ *                     each iteration of the main event loop - MT
+ * 19 Aug 21         - Modified  processor simulation to make it more object
+ *                     orientated - MT
+ * 21 Aug            - Fixed up help text (should have done that a long time
+ *                     ago!) - MT
+ *           
+ * TO DO :           - Detect Ctrl and Shift keys
+ *                   - Don't blank display when a key is pressed (as it will
+ *                     be blanked by the firmware automatically).
+ *                   - Free up allocated memory on exit.
  *                   - Sort out colour mapping.
  * 
  */
  
 #define NAME           "x11-rpncalc"
 #define VERSION        "0.1"
-#define BUILD          "0031"
-#define DATE           "10 Aug 21"
+#define BUILD          "0037"
+#define DATE           "21 Aug 21"
 #define AUTHOR         "MT"
  
 #define DEBUG          1
- 
-#include <X11/Xlib.h>  /* XOpenDisplay(), etc. */
-#include <X11/Xutil.h> /* XSizeHints etc. */
-#include <time.h>
- 
+
 #include <stdarg.h>    /* strlen(), etc. */
 #include <string.h>    /* strlen(), etc. */
 #include <stdio.h>     /* fprintf(), etc. */
 #include <stdlib.h>    /* getenv(), etc. */
+#include <time.h>
 
+#include <X11/Xlib.h>  /* XOpenDisplay(), etc. */
+#include <X11/Xutil.h> /* XSizeHints etc. */
+ 
 #include "x11-calc-font.h" 
 #include "x11-calc-button.h"
+#include "x11-calc-colour.h"
 
 #include "x11-calc.h"
 
-#include "x11-calc-colour.h"
 #include "x11-calc-segment.h"
 #include "x11-calc-display.h"
 #include "x11-calc-cpu.h"
@@ -115,14 +124,14 @@
 #include "gcc-debug.h" /* print() */
 #include "gcc-wait.h"  /* i_wait() */
 
-void v_version(int i_verbose) { /* Display version information */
+void v_version(int b_verbose) { /* Display version information */
    fprintf(stderr, "%s: Version %s", NAME, VERSION);
    if (__DATE__[4] == ' ') fprintf(stderr, " (0"); else fprintf(stderr, " (%c", __DATE__[4]);
    fprintf(stderr, "%c %c%c%c %s %s)", __DATE__[5],
       __DATE__[0], __DATE__[1], __DATE__[2], __DATE__ +9, __TIME__ );
    fprintf(stderr, " (Build %s)", BUILD );
    fprintf(stderr,"\n");
-   if (i_verbose) {
+   if (b_verbose) {
       fprintf(stderr, "Copyright(C) %s %s\n", __DATE__ +7, AUTHOR);
       fprintf(stderr, "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\n");
       fprintf(stderr, "This is free software: you are free to change and redistribute it.\n");
@@ -130,34 +139,18 @@ void v_version(int i_verbose) { /* Display version information */
    }
 } 
  
-#ifdef vms /* Use DEC command line options */
 void v_about() { /* Display help text */
-   fprintf(stdout, "Usage: %s [OPTION]... [FILE]...\n", NAME);
-   fprintf(stdout, "Concatenate FILE(s)to standard output.\n\n");
-   fprintf(stdout, "  /delay                   delay 8ms between each byte\n");
-   fprintf(stdout, "  /header                  display filenames\n");
-   fprintf(stdout, "  /number                  number all output lines \n");
-   fprintf(stdout, "  /restart                 line numbers start at zero, implies -n\n");
-   fprintf(stdout, "  /skip                    skip over repeated blank lines\n");
+   fprintf(stdout, "Usage: %s [OPTION]... \n", NAME);
+   fprintf(stdout, "An RPN Calculator simulation for X11.\n\n");
+#ifdef vms /* Use DEC command line options */
    fprintf(stdout, "  /version                 output version information and exit\n\n");
    fprintf(stdout, "  /?, /help                display this help and exit\n");
-   exit(0);
-}
 #else
-void v_about() { /* Display help text */
-   fprintf(stdout, "Usage: %s [OPTION]... [FILE]...\n", NAME);
-   fprintf(stdout, "Concatenate FILE(s)to standard output.\n\n");
-   fprintf(stdout, "  -d, --delay              delay 8ms between each byte\n");
-   fprintf(stdout, "  -f, --filenames          display filenames\n");
-   fprintf(stdout, "  -n, --number             number all output lines \n");
-   fprintf(stdout, "  -r, --restart            line numbers start at zero, implies -n\n");
-   fprintf(stdout, "  -s, --squeeze-blank      suppress repeated blank lines\n");
    fprintf(stdout, "  -?, --help               display this help and exit\n");
    fprintf(stdout, "      --version            output version information and exit\n\n");
-   fprintf(stdout, "With no FILE, or when FILE is -, read standard input.\n");
+#endif
    exit(0);
 }
-#endif
 
 void v_error(const char *s_fmt, ...) { /* Print formatted error message */
    va_list t_args;
@@ -180,6 +173,8 @@ int main (int argc, char *argv[]){
    o_button* h_button[BUTTONS]; /* Array to hold pointers to 30 buttons. */
    o_button* h_pressed;
    o_display* h_display; /* Pointer to display strudture. */
+   o_processor* h_processor; 
+   
    char *s_display_name = ""; /* Just use the default display. */
    char *s_font; /* Font description. */
 
@@ -195,11 +190,10 @@ int main (int argc, char *argv[]){
    
    int i_count, i_index;
    int b_cont = True;
+   int b_ctrl = False, b_shift= False; /* State of the ctrl and shift keys */
    
-   long i_time = 0; /* Curent timestamp */
+   long i_time = 0; /* Current timestamp */ 
 
-   debug(v_version(False));
-   
 #ifdef vms /* Parse DEC style command line options */
 for (i_count = 1; i_count < argc; i_count++) {
    if (argv[i_count][0] == '/') {
@@ -226,7 +220,7 @@ for (i_count = 1; i_count < argc; i_count++) {
 #else /* Parse UNIX style command line options */
 char b_abort; /* Stop processing command line */
 for (i_count = 1; i_count < argc && (b_abort != True); i_count++) {
-   if (argv[i_count][0] == '-') {- Modified register names
+   if (argv[i_count][0] == '-') {
       i_index = 1;
       while (argv[i_count][i_index] != 0) {
          switch (argv[i_count][i_index]) {
@@ -243,7 +237,7 @@ for (i_count = 1; i_count < argc && (b_abort != True); i_count++) {
                } else if (!strncmp(argv[i_count], "--help", i_index)) {
                   v_about();
                } else { /* If we get here then the we have an invalid long option */
-                  v_error("unrecognized option '%s'\nTry '%s --help' for more information.\n", argv[i_count], NAME);
+                  v_error("unrecognised option '%s'\nTry '%s --help' for more information.\n", argv[i_count], NAME);
                   exit(-1);
                }
             i_index--; /* Leave index pointing at end of string (so argv[i_count][i_index] = 0) */
@@ -263,6 +257,8 @@ for (i_count = 1; i_count < argc && (b_abort != True); i_count++) {
 #endif 
 
    i_wait(200);  /* Sleep for 200 milliseconds to 'debounce' keyboard! */
+   
+   debug(v_version(False));
                      
    /* Open the display and create a new window. */
    if (!(x_display = XOpenDisplay(s_display_name))) v_error ("Cannot connect to X server '%s'.\n", s_display_name); 
@@ -350,10 +346,16 @@ for (i_count = 1; i_count < argc && (b_abort != True); i_count++) {
    /* Flush all pending requests to the X server, and wait until they are processed by the X server. */
    XSync(x_display, False);
    
+   debug(fprintf(stderr, "Debug\t: %s line : %d : ", __FILE__, __LINE__);
+      fprintf(stderr, "ROM Size : %4u words \n", sizeof(i_rom) / sizeof i_rom[0]));   
+   h_processor = h_processor_create(0, i_rom); 
+   
+   h_processor->trace_flag = True;
+   
    /* -1234567890. */
-   i_reg_load(c_Areg, 0x9, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0x0, 0xf, 0xf, 0xf);
-   i_reg_load(c_Breg, 0x2, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1, 0x0, 0x0, 0x0);
-   i_reg_load(c_Creg, 0x9, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0x0, 0xf, 0xf, 0xf);
+   //i_reg_load(c_reg[A_REG], 0x9, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0x0, 0xf, 0xf, 0xf);
+   //i_reg_load(c_reg[B_REG], 0x2, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1, 0x0, 0x0, 0x0);
+   //i_reg_load(c_reg[C_REG], 0x9, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0x0, 0xf, 0xf, 0xf);
 
    /* Main program event loop. */
    while (b_cont) {
@@ -364,6 +366,13 @@ for (i_count = 1; i_count < argc && (b_abort != True); i_count++) {
          printf("%s", asctime(localtime(&c_time)));
          i_time = c_time;
       }
+
+      /* Update and redraw the display. */ 
+      //i_display_update(x_display, x_application_window, i_screen, h_display);
+      i_display_draw(x_display, x_application_window, i_screen, h_display);
+      XFlush(x_display);
+      
+      i_processor_tick(h_processor);
 
       while (XPending(x_display)) {
 
@@ -403,25 +412,13 @@ for (i_count = 1; i_count < argc && (b_abort != True); i_count++) {
                       debug(fprintf(stderr, "Debug\t: %s line : %d : Button pressed - keycode(%.2X).\n", \
                      __FILE__, __LINE__, h_pressed->index)); 
 
-                     /* Clear display. */ 
+                     /* Clear the display segments and redraw it. */ 
                      for (i_count = 0; i_count < DIGITS ; i_count++)
                         h_display->segment[i_count]->mask = DISPLAY_SPACE;
-                     
-                     /* Redraw display. */
                      i_display_draw(x_display, x_application_window, i_screen, h_display);
                      XFlush(x_display);
 
                      i_wait(100);  /* Show blank display */
-
-                     /* Update display. */ 
-                     h_display->segment[1]->mask = DISPLAY_ZERO | DISPLAY_DECIMAL;
-                     h_display->segment[2]->mask = DISPLAY_ZERO;
-                     h_display->segment[3]->mask = DISPLAY_ZERO;
-                     
-                     i_display_update(x_display, x_application_window, i_screen, h_display);
-
-                     /* Redraw display. */
-                     i_display_draw(x_display, x_application_window, i_screen, h_display);
                      break;
                   }                 
                }
@@ -436,9 +433,6 @@ for (i_count = 1; i_count < argc && (b_abort != True); i_count++) {
  
                   debug(fprintf(stderr, "Debug\t: %s line : %d : Button released.\n", \
                   __FILE__, __LINE__)); 
-
-                  /* Redraw display. */
-                  i_display_draw(x_display, x_application_window, i_screen, h_display);
                }
             }
             break;

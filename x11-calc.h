@@ -25,7 +25,4 @@
  *                      
  * TO DO :           - 
  */
-
 #include "x11-calc-21.h"
-
-enum t_mode{FIX, SCI, ENG};
