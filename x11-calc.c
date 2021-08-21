@@ -83,9 +83,10 @@
  *                     each iteration of the main event loop - MT
  * 19 Aug 21         - Modified  processor simulation to make it more object
  *                     orientated - MT
- * 21 Aug            - Fixed up help text (should have done that a long time
- *                     ago!) - MT
- *           
+ * 21 Aug            - Removed -? help option and fixed help text and (which
+ *                     I should have done that a long time ago!) - MT
+ *                   - Added a command line option to enable tracing - MT
+ *
  * TO DO :           - Detect Ctrl and Shift keys
  *                   - Don't blank display when a key is pressed (as it will
  *                     be blanked by the firmware automatically).
@@ -96,7 +97,7 @@
  
 #define NAME           "x11-rpncalc"
 #define VERSION        "0.1"
-#define BUILD          "0037"
+#define BUILD          "0038"
 #define DATE           "21 Aug 21"
 #define AUTHOR         "MT"
  
@@ -143,13 +144,14 @@ void v_about() { /* Display help text */
    fprintf(stdout, "Usage: %s [OPTION]... \n", NAME);
    fprintf(stdout, "An RPN Calculator simulation for X11.\n\n");
 #ifdef vms /* Use DEC command line options */
+   fprintf(stdout, "  /trace                   trace execution\n");
    fprintf(stdout, "  /version                 output version information and exit\n\n");
    fprintf(stdout, "  /?, /help                display this help and exit\n");
 #else
-   fprintf(stdout, "  -?, --help               display this help and exit\n");
+   fprintf(stdout, "  -t, --trace              trace execution\n");
+   fprintf(stdout, "      --help               display this help and exit\n");
    fprintf(stdout, "      --version            output version information and exit\n\n");
 #endif
-   exit(0);
 }
 
 void v_error(const char *s_fmt, ...) { /* Print formatted error message */
@@ -190,71 +192,86 @@ int main (int argc, char *argv[]){
    
    int i_count, i_index;
    int b_cont = True;
+   int b_trace = False; /* Trace flag */
    int b_ctrl = False, b_shift= False; /* State of the ctrl and shift keys */
    
    long i_time = 0; /* Current timestamp */ 
 
 #ifdef vms /* Parse DEC style command line options */
-for (i_count = 1; i_count < argc; i_count++) {
-   if (argv[i_count][0] == '/') {
-      for (i_index = 0; argv[i_count][i_index]; i_index++) /* Convert option to uppercase */
-         if (argv[i_count][i_index] >= 'a' && argv[i_count][i_index] <= 'z')
-            argv[i_count][i_index] = argv[i_count][i_index] - 32;
-      if (!strncmp(argv[i_count], "/VERSION", i_index)) {
-         v_version(True); /* Display version information */
-         exit(0);
-      } else if (!strncmp(argv[i_count], "/HELP", i_index)) {
-         v_about();
-      } else if (!strncmp(argv[i_count], "/?", i_index)) {
-         v_about();
-      } else { /* If we get here then the we have an invalid option */
-         v_error("invalid option %s\nTry '%s /help' for more information.\n", argv[i_count] , NAME);
-         exit(-1);
-      }
-      if (argv[i_count][1] != 0) {
-         for (i_index = i_count; i_index < argc - 1; i_index++) argv[i_index] = argv[i_index + 1];
-         argc--; i_count--;
-      }
-   }
-}
-#else /* Parse UNIX style command line options */
-char b_abort; /* Stop processing command line */
-for (i_count = 1; i_count < argc && (b_abort != True); i_count++) {
-   if (argv[i_count][0] == '-') {
-      i_index = 1;
-      while (argv[i_count][i_index] != 0) {
-         switch (argv[i_count][i_index]) {
-         case '?': /* Display help */
+   for (i_count = 1; i_count < argc; i_count++) {
+      if (argv[i_count][0] == '/') {
+         for (i_index = 0; argv[i_count][i_index]; i_index++) /* Convert option to uppercase */
+            if (argv[i_count][i_index] >= 'a' && argv[i_count][i_index] <= 'z')
+               argv[i_count][i_index] = argv[i_count][i_index] - 32;
+         if (!strncmp(argv[i_count], "/TRACE", i_index)) {
+            b_trace = True); /* Enable tracing */
+         if (!strncmp(argv[i_count], "/VERSION", i_index)) {
+            v_version(True); /* Display version information */
+            exit(0);
+         } else if ((!strncmp(argv[i_count], "/HELP", i_index)) | (!strncmp(argv[i_count], "/?", i_index))) {
             v_about();
-         case '-': /* '--' terminates command line processing */
-            i_index = strlen(argv[i_count]);
-            if (i_index == 2)
-              b_abort = True; /* '--' terminates command line processing */
-            else
-               if (!strncmp(argv[i_count], "--version", i_index)) {
-                  v_version(True); /* Display version information */
-                  exit(0);
-               } else if (!strncmp(argv[i_count], "--help", i_index)) {
-                  v_about();
-               } else { /* If we get here then the we have an invalid long option */
-                  v_error("unrecognised option '%s'\nTry '%s --help' for more information.\n", argv[i_count], NAME);
-                  exit(-1);
-               }
-            i_index--; /* Leave index pointing at end of string (so argv[i_count][i_index] = 0) */
-            break;
-         default: /* If we get here the single letter option is unknown */
-            v_error("invalid option -- '%c'\nTry '%s --help' for more information.\n", argv[i_count][i_index], NAME);
+            exit(0);
+         } else { /* If we get here then the we have an invalid option */
+            v_error("invalid option %s\nTry '%s /help' for more information.\n", argv[i_count] , NAME);
             exit(-1);
          }
-         i_index++; /* Parse next letter in options */
-      }
-      if (argv[i_count][1] != 0) {
-         for (i_index = i_count; i_index < argc - 1; i_index++) argv[i_index] = argv[i_index + 1];
-         argc--; i_count--;
+         if (argv[i_count][1] != 0) {
+            for (i_index = i_count; i_index < argc - 1; i_index++) argv[i_index] = argv[i_index + 1];
+            argc--; i_count--;
+         }
       }
    }
-}
+#else /* Parse UNIX style command line options */
+   char b_abort; /* Stop processing command line */
+   for (i_count = 1; i_count < argc && (b_abort != True); i_count++) {
+      if (argv[i_count][0] == '-') {
+         i_index = 1;
+         while (argv[i_count][i_index] != 0) {
+            switch (argv[i_count][i_index]) {
+            case 't': /* Enable tracing */
+               b_trace = True;
+               break;
+            case '-': /* '--' terminates command line processing */
+               i_index = strlen(argv[i_count]);
+               if (i_index == 2)
+                 b_abort = True; /* '--' terminates command line processing */
+               else
+                  if (!strncmp(argv[i_count], "--trace", i_index)) {
+                     b_trace = True; /* Enable tracing */
+                  } else if (!strncmp(argv[i_count], "--version", i_index)) {
+                     v_version(True); /* Display version information */
+                     exit(0);
+                  } else if (!strncmp(argv[i_count], "--help", i_index)) {
+                     v_about();
+                     exit(0);
+                  } else { /* If we get here then the we have an invalid long option */
+                     v_error("unrecognized option '%s'\nTry '%s --help' for more information.\n", argv[i_count], NAME);
+                     exit(-1);
+                  }
+               i_index--; /* Leave index pointing at end of string (so argv[i_count][i_index] = 0) */
+               break;
+            default: /* If we get here the single letter option is unknown */
+               v_error("invalid option -- '%c'\nTry '%s --help' for more information.\n", argv[i_count][i_index], NAME);
+               exit(-1);
+            }
+            i_index++; /* Parse next letter in options */
+         }
+         if (argv[i_count][1] != 0) {
+            for (i_index = i_count; i_index < argc - 1; i_index++) argv[i_index] = argv[i_index + 1];
+            argc--; i_count--;
+         }
+      }
+   }
 #endif 
+
+   if (argc > 1 ) {  /* Check command lime parameters - there shouldn't be any! */
+#ifdef vms
+      v_error("invalid parameter(s)\nTry '%s /help' for more information.\n", NAME);
+#else
+      v_error("invalid operand(s)\nTry '%s --help' for more information.\n", NAME);
+#endif 
+      exit(-1);
+   }
 
    i_wait(200);  /* Sleep for 200 milliseconds to 'debounce' keyboard! */
    
@@ -350,7 +367,7 @@ for (i_count = 1; i_count < argc && (b_abort != True); i_count++) {
       fprintf(stderr, "ROM Size : %4u words \n", sizeof(i_rom) / sizeof i_rom[0]));   
    h_processor = h_processor_create(0, i_rom); 
    
-   h_processor->trace_flag = True;
+   h_processor->trace_flag = b_trace;
    
    /* -1234567890. */
    //i_reg_load(c_reg[A_REG], 0x9, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0x0, 0xf, 0xf, 0xf);
