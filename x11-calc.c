@@ -85,11 +85,11 @@
  *                     orientated - MT
  * 21 Aug 21         - Removed -? help option and fixed help text and (which
  *                     I should have done that a long time ago!) - MT
- *                   - Added a command line option to enable tracing - MT
- *                   - Detects Ctrl and Shift keys keeping track of multiple
- *                     key presses which is demonstrated allowing the use of
- *                     Ctrl-C to exit - MT
- *                   - Added a flag for the Alt key - MT
+ *                   - Added a flags for the Shift, Ctrl and Alt keys - MT
+ *                   - Added  single step and trace command line options and
+ *                     the ability to control the processor using ctrl-s and
+ *                     ctrl-q  for single stepping, and ctrl-t to enable  or
+ *                     disable tracing - MT
  *
  * TO DO :           - Don't blank display when a key is pressed (as it will
  *                     be blanked by the firmware automatically).
