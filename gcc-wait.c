@@ -57,27 +57,25 @@
  */
 int i_wait(long l_delay) { /* wait for milliseconds */
 #if defined(linux) /* Use usleep() function */
-debug(fprintf(stderr, "Debug\t: %s line : %d : Pausing using usleep() for  %d ms.\n", __FILE__, __LINE__, l_delay)); 
+debug(fprintf(stderr, "Pausing using usleep() for  %d ms.\n", l_delay)); 
 return (usleep(l_delay * 1000));
 #elif defined(WIN32) /* Use usleep() function */
-debug(fprintf(stderr, "Debug\t: %s line : %d : Pausing using sleep() for %d ms.\n", __FILE__, __LINE__, l_delay)); 
+debug(fprintf(stderr, "Pausing using sleep() for %d ms.\n", l_delay)); 
 Sleep(l_delay);
 return (0);
 #elif defined(VMS) /* Use VMS LIB$WAIT */
 float f_seconds;
-debug(fprintf(stderr, "Debug\t: %s line : %d : Pausing using LIB$WAIT for %d ms.\n", __FILE__, __LINE__, l_delay)); 
+debug(fprintf(stderr, "Pausing using LIB$WAIT for %d ms.\n", l_delay)); 
 f_seconds = l_delay / 1000.0;
 return (lib$wait(&f_seconds));
 #else /* Use a portable but very inefficent busy loop */
 struct timeb o_start, o_end;
-debug(fprintf(stderr, "Debug\t: %s line : %d : Pausing for %d ms.\n", __FILE__, __LINE__, l_delay)); 
+debug(fprintf(stderr, "Pausing for %d ms.\n", l_delay)); 
 ftime(&o_start);
 ftime(&o_end);
 while ((1000 * (o_end.time - o_start.time) + o_end.millitm - o_start.millitm) < l_delay) {
    ftime(&o_end);
 }
-debug(fprintf(stderr, "Debug\t: %s line : %d : Resuming.\n", \
-__FILE__, __LINE__));
 return(0);
 #endif
 }

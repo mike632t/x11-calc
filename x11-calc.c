@@ -83,12 +83,15 @@
  *                     each iteration of the main event loop - MT
  * 19 Aug 21         - Modified  processor simulation to make it more object
  *                     orientated - MT
- * 21 Aug            - Removed -? help option and fixed help text and (which
+ * 21 Aug 21         - Removed -? help option and fixed help text and (which
  *                     I should have done that a long time ago!) - MT
  *                   - Added a command line option to enable tracing - MT
+ *                   - Detects Ctrl and Shift keys keeping track of multiple
+ *                     key presses which is demonstrated allowing the use of
+ *                     Ctrl-C to exit - MT
+ *                   - Added a flag for the Alt key - MT
  *
- * TO DO :           - Detect Ctrl and Shift keys
- *                   - Don't blank display when a key is pressed (as it will
+ * TO DO :           - Don't blank display when a key is pressed (as it will
  *                     be blanked by the firmware automatically).
  *                   - Free up allocated memory on exit.
  *                   - Sort out colour mapping.
@@ -97,7 +100,7 @@
  
 #define NAME           "x11-rpncalc"
 #define VERSION        "0.1"
-#define BUILD          "0038"
+#define BUILD          "0039"
 #define DATE           "21 Aug 21"
 #define AUTHOR         "MT"
  
@@ -107,7 +110,6 @@
 #include <string.h>    /* strlen(), etc. */
 #include <stdio.h>     /* fprintf(), etc. */
 #include <stdlib.h>    /* getenv(), etc. */
-#include <time.h>
 
 #include <X11/Xlib.h>  /* XOpenDisplay(), etc. */
 #include <X11/Xutil.h> /* XSizeHints etc. */
@@ -127,10 +129,10 @@
 
 void v_version(int b_verbose) { /* Display version information */
    fprintf(stderr, "%s: Version %s", NAME, VERSION);
-   if (__DATE__[4] == ' ') fprintf(stderr, " (0"); else fprintf(stderr, " (%c", __DATE__[4]);
-   fprintf(stderr, "%c %c%c%c %s %s)", __DATE__[5],
+   if (__DATE__[4] == ' ') fprintf(stderr, " 0"); else fprintf(stderr, " %c", __DATE__[4]);
+   fprintf(stderr, "%c %c%c%c %s %s", __DATE__[5],
       __DATE__[0], __DATE__[1], __DATE__[2], __DATE__ +9, __TIME__ );
-   fprintf(stderr, " (Build %s)", BUILD );
+   fprintf(stderr, " (Build: %s)", BUILD );
    fprintf(stderr,"\n");
    if (b_verbose) {
       fprintf(stderr, "Copyright(C) %s %s\n", __DATE__ +7, AUTHOR);
@@ -148,6 +150,7 @@ void v_about() { /* Display help text */
    fprintf(stdout, "  /version                 output version information and exit\n\n");
    fprintf(stdout, "  /?, /help                display this help and exit\n");
 #else
+   fprintf(stdout, "  -s, --step               start in single step\n");
    fprintf(stdout, "  -t, --trace              trace execution\n");
    fprintf(stdout, "      --help               display this help and exit\n");
    fprintf(stdout, "      --version            output version information and exit\n\n");
@@ -170,7 +173,6 @@ int main (int argc, char *argv[]){
    XEvent x_event;
    XSizeHints *h_size_hint;
    Atom wm_delete;
-   time_t c_time;
    
    o_button* h_button[BUTTONS]; /* Array to hold pointers to 30 buttons. */
    o_button* h_pressed;
@@ -191,11 +193,11 @@ int main (int argc, char *argv[]){
    int i_screen; /* Default screen number. */  
    
    int i_count, i_index;
-   int b_cont = True;
-   int b_trace = False; /* Trace flag */
-   int b_ctrl = False, b_shift= False; /* State of the ctrl and shift keys */
-   
-   long i_time = 0; /* Current timestamp */ 
+   char b_trace = False; /* Trace flag */
+   char b_step = False; /* Single step flag flag */
+   char b_run = True; /* Run flag controls CPU instruction execution in main loop */
+   char b_abort = False; /*Abort flag controls execution of main loop */
+   char b_ctrl = 0, b_alt = 0, b_shift= 0; /* State of the ctrl, alt and shift keys */
 
 #ifdef vms /* Parse DEC style command line options */
    for (i_count = 1; i_count < argc; i_count++) {
@@ -222,7 +224,7 @@ int main (int argc, char *argv[]){
       }
    }
 #else /* Parse UNIX style command line options */
-   char b_abort; /* Stop processing command line */
+   b_abort = False; /* Stop processing command line */
    for (i_count = 1; i_count < argc && (b_abort != True); i_count++) {
       if (argv[i_count][0] == '-') {
          i_index = 1;
@@ -349,7 +351,7 @@ int main (int argc, char *argv[]){
    XSync(x_display, False);
 
    /* Select kind of events we are interested in. */
-   XSelectInput(x_display, x_application_window, ExposureMask | 
+   XSelectInput(x_display, x_application_window, FocusChangeMask | ExposureMask | 
       KeyPressMask | KeyReleaseMask | ButtonPressMask | 
       ButtonReleaseMask | StructureNotifyMask | SubstructureNotifyMask);
       
@@ -363,11 +365,10 @@ int main (int argc, char *argv[]){
    /* Flush all pending requests to the X server, and wait until they are processed by the X server. */
    XSync(x_display, False);
    
-   debug(fprintf(stderr, "Debug\t: %s line : %d : ", __FILE__, __LINE__);
-      fprintf(stderr, "ROM Size : %4u words \n", sizeof(i_rom) / sizeof i_rom[0]));   
+   debug(fprintf(stderr, "ROM Size : %4u words \n", (unsigned)(sizeof(i_rom) / sizeof i_rom[0])));   
    h_processor = h_processor_create(0, i_rom); 
    
-   h_processor->trace_flag = b_trace;
+   h_processor->trace = b_trace;
    
    /* -1234567890. */
    //i_reg_load(c_reg[A_REG], 0x9, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0x0, 0xf, 0xf, 0xf);
@@ -375,47 +376,77 @@ int main (int argc, char *argv[]){
    //i_reg_load(c_reg[C_REG], 0x9, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0x0, 0xf, 0xf, 0xf);
 
    /* Main program event loop. */
-   while (b_cont) {
+   b_abort = False;
+   while (!b_abort) {
       i_wait(3);  /* Sleep for 3 milliseconds */
-
-      time(&c_time); /* c_time now contains seconds since January 1, 1970 */
-      if (!(c_time % 10) && (c_time > i_time)) { /* Print the tiem every 10 seconds */
-         printf("%s", asctime(localtime(&c_time)));
-         i_time = c_time;
-      }
 
       /* Update and redraw the display. */ 
       //i_display_update(x_display, x_application_window, i_screen, h_display);
       i_display_draw(x_display, x_application_window, i_screen, h_display);
       XFlush(x_display);
       
-      i_processor_tick(h_processor);
+      if (b_run) i_processor_tick(h_processor);
+      if (b_step) b_run = False;
 
       while (XPending(x_display)) {
 
          XNextEvent(x_display, &x_event);
          
-         /* debug(fprintf(stderr, "Debug\t: %s line : %d : Event ID : %i.\n", \
-            __FILE__, __LINE__, x_event.type)); */
+         /* debug(fprintf(stderr, "Event ID : %i.\n", x_event.type)); */
          
          switch (x_event.type) {
       
          case EnterNotify : 
-            debug(fprintf(stderr, "Debug\t: %s line : %d : Notify raised.\n", \
-            __FILE__, __LINE__)); 
+            debug(fprintf(stderr, "Enter Notify Event\n")); 
             break;
 
+         case FocusOut : 
+            b_ctrl = b_alt = b_shift = 0; /* Clear keyboard modifiers */
+            break;
+         
          case KeyPress : 
-            debug(fprintf(stderr, "Debug\t: %s line : %d : Key pressed - keycode(%d).\n", \
-            __FILE__, __LINE__, x_event.xkey.keycode));
-            if (x_event.xkey.keycode == XKeysymToKeycode(x_display, XStringToKeysym("Escape"))) { 
-               b_cont = False;
+            debug(fprintf(stderr, "Key pressed - keycode(%d).\n", x_event.xkey.keycode));
+            
+            if ((x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_Control_L)) || \
+               (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_Control_R))) { 
+               b_ctrl++;
+            }
+            else if (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_Alt_L)) { 
+               b_alt++;
+            }
+            else if ((x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_Shift_L)) || \
+               (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_Shift_R))) { 
+               b_shift++;
+            }
+            else if (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_Q))  { /* Check for Ctrl-Q */
+               if ((b_ctrl == 1) && (b_shift == 0)) b_step = !(b_run  = True);
+            }
+            else if (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_S))  { /* Check for Ctrl-S */
+               if ((b_ctrl == 1) && (b_shift == 0)) b_step = b_run =  True; 
+            }
+            else if (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_T))  { /* Check for Ctrl-T */
+               if ((b_ctrl == 1) && (b_shift == 0)) {
+                  h_processor->trace  = !(h_processor->trace); /* Toggle CPU tracing */
+               }
+            }
+            else if (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_Escape)) { /* Check for Escape */
+               b_abort = True;
             }
             break;
 
          case KeyRelease :
-            debug(fprintf(stderr, "Debug\t: %s line : %d : Key released.\n", \
-            __FILE__, __LINE__)); 
+            debug(fprintf(stderr, "Key released - keycode(%d).\n", x_event.xkey.keycode));
+            if ((x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_Control_L)) || \
+               (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_Control_R))) { 
+               b_ctrl--;
+            }
+            else if (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_Alt_L)) { 
+               b_alt--;
+            }
+            else if ((x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_Shift_L)) || \
+               (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_Shift_R))) { 
+               b_shift--;
+            }
             break;
 
          case ButtonPress : 
@@ -426,8 +457,7 @@ int main (int argc, char *argv[]){
                      h_pressed->state = True; 
                      i_button_draw(x_display, x_application_window, i_screen, h_pressed);
  
-                      debug(fprintf(stderr, "Debug\t: %s line : %d : Button pressed - keycode(%.2X).\n", \
-                     __FILE__, __LINE__, h_pressed->index)); 
+                     debug(fprintf(stderr, "Button pressed - keycode(%.2X).\n", h_pressed->index)); 
 
                      /* Clear the display segments and redraw it. */ 
                      for (i_count = 0; i_count < DIGITS ; i_count++)
@@ -448,8 +478,7 @@ int main (int argc, char *argv[]){
                   h_pressed->state = False;
                   i_button_draw(x_display, x_application_window, i_screen, h_pressed);
  
-                  debug(fprintf(stderr, "Debug\t: %s line : %d : Button released.\n", \
-                  __FILE__, __LINE__)); 
+                  debug(fprintf(stderr, "Button released - keycode(%.2X).\n", h_pressed->index)); 
                }
             }
             break;
@@ -464,7 +493,7 @@ int main (int argc, char *argv[]){
                if (!(h_button[i_count] == NULL)) i_button_draw(x_display, x_application_window, i_screen, h_button[i_count]);
             break;
          case ClientMessage : /* Message from window manager */
-            if (x_event.xclient.data.l[0] == wm_delete) b_cont = False;
+            if (x_event.xclient.data.l[0] == wm_delete) b_abort = True;
             break;
 
          }

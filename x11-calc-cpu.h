@@ -45,11 +45,11 @@ typedef struct {
 typedef struct { 
    int index; 
    o_register* processor_register[REGISTERS];
-   unsigned int processor_status; /* Processor status word */
-   unsigned int program_counter; /* Program counter */
-   unsigned int current_rom_bank; /* ROM bank number */
-   int trace_flag; /* Controls CPU trace output */ 
+   unsigned int status; /* Processor status word */
+   unsigned int counter; /* Program counter */
+   unsigned int bank; /* ROM bank number */
    int* rom; /* Pointer to the ROM contents */
+   int trace; /* Controls CPU trace output */ 
 } o_processor;  
 
 o_processor* h_processor_create(int i_index, int *h_rom);

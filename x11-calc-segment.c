@@ -121,8 +121,13 @@ int i_segment_draw(Display* h_display, int x_application_window, int i_screen, o
    i_left = h_segment->left + 2;
    i_right = h_segment->left + h_segment->width - 7;
 
-   debug(fprintf(stderr,   "Debug\t: %s line : %d : %4d,%d (%dx%d) %.1X%.1X%.1X%.1X %.1X%.1X%.1X%.1X.\n", \
-   __FILE__, __LINE__, h_segment->left, h_segment->top, h_segment->height, h_segment->width, h_segment->mask & SEG_DECIMAL && 1, h_segment->mask & SEG_G && 1, h_segment->mask & SEG_F && 1, h_segment->mask & SEG_E && 1, h_segment->mask & SEG_D && 1, h_segment->mask & SEG_C && 1, h_segment->mask & SEG_B && 1, h_segment->mask & SEG_A && 1)); 
+   debug(fprintf(stderr, "%4d,%d (%dx%d) %.1X%.1X%.1X%.1X %.1X%.1X%.1X%.1X.\n", \
+      h_segment->left, h_segment->top, h_segment->height, h_segment->width, \
+      h_segment->mask & SEG_DECIMAL && 1, h_segment->mask & SEG_G && 1, \
+      h_segment->mask & SEG_F && 1, h_segment->mask & SEG_E && 1, \
+      h_segment->mask & SEG_D && 1, h_segment->mask & SEG_C && 1, \
+      h_segment->mask & SEG_B && 1, h_segment->mask & SEG_A && 1)); 
+
    /* Draw the display segment background. */ 
    XSetForeground(h_display, DefaultGC(h_display, i_screen), h_segment->background);
    XFillRectangle(h_display, x_application_window, DefaultGC(h_display, i_screen), h_segment->left, h_segment->top, h_segment->width, h_segment->height);

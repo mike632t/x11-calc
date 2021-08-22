@@ -117,13 +117,11 @@ o_processor* h_processor_create(int i_index, int *h_rom)
    if ((h_processor = malloc (sizeof(*h_processor)))==NULL) v_error("Memory allocation failed!"); /* Attempt to allocate memory to hold the processor structure. */
    for (i_count = 0; i_count < REGISTERS; i_count++)
       h_processor->processor_register[i_count] = h_register_create(0);
-   h_processor->processor_status = 0; /* Processor status word */
-   h_processor->program_counter = 0; /* Program counter */
-   h_processor->current_rom_bank = 0; /* ROM bank number */
-   h_processor->trace_flag = False ; /* Controls CPU trace output */ 
+   h_processor->status = 0; /* Processor status word */
+   h_processor->counter = 0; /* Program counter */
+   h_processor->bank = 0; /* ROM bank number */
+   h_processor->trace = False ; /* Controls CPU trace output */ 
    h_processor->rom = h_rom ; /* Controls CPU trace output */ 
-   debug(fprintf(stderr, "Debug\t: %s line : %d : ", __FILE__, __LINE__);
-      fprintf(stderr, "ROM Size **: %4u words (%04o)\n",  sizeof(h_processor->rom), h_processor->rom[0]));
    return (h_processor);
 }
 
@@ -131,25 +129,25 @@ int i_processor_tick(o_processor* h_processor) {
 
    int i_opcode;
    
-   i_opcode = h_processor->rom[h_processor->program_counter];
+   i_opcode = h_processor->rom[h_processor->counter];
 
-   if (h_processor->trace_flag)
-      fprintf(stdout, "%1o-%04o \t %04o \t", 0, h_processor->program_counter, h_processor->rom[h_processor->program_counter]);
+   if (h_processor->trace)
+      fprintf(stdout, "%1o-%04o \t %04o \t", 0, h_processor->counter, h_processor->rom[h_processor->counter]);
    switch (i_opcode) {
       case 00000: /* nop */
-         if (h_processor->trace_flag)
+         if (h_processor->trace)
             fprintf(stdout, "nop");
          break;
       case 01760: /* hi I'm woodstock */
-         if (h_processor->trace_flag)
+         if (h_processor->trace)
             fprintf(stdout, "reserved");
          break;
       default: 
          break;
    }
-      if (h_processor->trace_flag) fprintf(stdout, "\n");
+      if (h_processor->trace) fprintf(stdout, "\n");
    
-   if (h_processor->program_counter++ >= (ROM_SIZE - 1)) h_processor->program_counter = 0; /* Increment program counter */   
+   if (h_processor->counter++ >= (ROM_SIZE - 1)) h_processor->counter = 0; /* Increment program counter */   
    return(0);
 }
  
@@ -164,8 +162,7 @@ int i_processor_tick(o_processor* h_processor) {
 //      unsigned char c_temp = va_arg(t_args, int);
 //      c_reg[i_count]  = c_temp;
 //   }
-//   debug(fprintf(stderr, "Debug\t: %s line : %d : ", __FILE__, __LINE__);
-//      fprintf(stderr, "Load (");
+//   debug(fprintf(stderr, "Load (");
 //      for (i_count = 0; i_count <= t_upb; i_count++) {
 //         fprintf(stderr, "0x%4o", c_reg[i_count]);
 //         if (i_count < t_upb) fprintf(stderr, ", ");

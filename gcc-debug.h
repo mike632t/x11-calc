@@ -21,10 +21,18 @@
  * 17 Aug 13         - Initial version - MT
  * 07 Dec 18         - Updated  allow debugging to be turned on and off  by 
  *                     setting  DEBUG true or false - MT
+ * 22 Aug 21         - Prints Current filename and line number - MT
+ *                   - Added verbose macro - MT
  *
  */
  
 /* Execute code if DEBUG is True */
 #ifndef debug /* Don't redefine macro if already defined. */
-#define debug(code) do {if(DEBUG){code;}} while(0)
+#define debug(code) do {if(DEBUG){fprintf(stderr, "Debug\t: %s line : %d : ", \
+            __FILE__, __LINE__); code;}} while(0)
+#endif
+
+#ifndef verbose /* Don't redefine macro if already defined. */
+#define verbose(code) do {if(VERBOSE){fprintf(stderr, "Verbose\t: %s line : %d : ", \
+            __FILE__, __LINE__); code;}} while(0)
 #endif

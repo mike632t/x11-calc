@@ -37,7 +37,7 @@
 #define True         1
 #define False        0
 
-int i_rom [ROM_SIZE];
+int i_rom [ROM_SIZE * 1];
 
 void v_version(int b_verbose);
 void v_about();

@@ -25,4 +25,6 @@
  *                      
  * TO DO :           - 
  */
+#define  CHECKSUM $Id$
 #include "x11-calc-21.h"
+

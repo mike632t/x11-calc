@@ -30,13 +30,6 @@
 #  08 Aug 21   0.4   - Removed x11-calc-format - MT
 #  11 Aug 21	0.5	- Backup created in parent folder - MT
 # 
-#PROGRAM	= x11-calc
-#SOURCES	= x11-calc.c x11-calc-21.c x11-calc-cpu.c x11-calc-display.c x11-calc-segment.c x11-calc-button.c x11-calc-colour.c gcc-wait.c
-#OBJECTS	= $(SOURCE:.c=.o)
-#FLAGS		= 
-#INCLUDE	= 
-#CC			= gcc
-
 PROGRAM 	= x11-calc
 SOURCES 	= x11-calc.c x11-calc-21.c x11-calc-cpu.c x11-calc-display.c x11-calc-segment.c x11-calc-button.c x11-calc-colour.c gcc-wait.c
 FILES		= *.c *.h LICENSE makefile .gitignore
@@ -44,6 +37,7 @@ OBJECTS	= $(SOURCES:.c=.o)
 OUTPUT	= $(PROGRAM).out
 LIBS		= -lX11 -lm
 INCLUDE	= .
+FLAGS		= -Wall -pedantic -ansi
 FLAGS		= 
 CC			= gcc
 #
@@ -58,6 +52,7 @@ $(PROGRAM): $(OBJECTS)
 #  compile - doesn't attempt to be selective just recompiles everything!
 $(OBJECTS) : $(SOURCES)
 #	@echo ' Compiling $(SOURCES)'
+	@echo ' $(CHECKSUM)'
 	@$(CC) $(FLAGS) -c $(SOURCES) -I $(INCLUDE)
 #
 #  make clean - Clean up the executable and any object files.
