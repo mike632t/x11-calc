@@ -22,9 +22,10 @@
  * 31 Aug 20         - Resolved dependencies between header files by  moving
  *                     common function definitions to a separate file - MT
  * 08 Aug 21         - Tidied up spelling errors in the comments - MT
+ * 22 Aug 21         - Added definition for commit id - MT
  *                      
  * TO DO :           - 
  */
-#define  CHECKSUM $Id$
+#define  COMMIT_ID "[$Format:%h$]"
 #include "x11-calc-21.h"
 

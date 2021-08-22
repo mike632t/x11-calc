@@ -90,6 +90,7 @@
  *                     the ability to control the processor using ctrl-s and
  *                     ctrl-q  for single stepping, and ctrl-t to enable  or
  *                     disable tracing - MT
+ *                   - Added definition for commit id - MT
  *
  * TO DO :           - Don't blank display when a key is pressed (as it will
  *                     be blanked by the firmware automatically).
@@ -100,7 +101,7 @@
  
 #define NAME           "x11-rpncalc"
 #define VERSION        "0.1"
-#define BUILD          "0039"
+#define BUILD          "0041"
 #define DATE           "21 Aug 21"
 #define AUTHOR         "MT"
  
@@ -128,20 +129,20 @@
 #include "gcc-wait.h"  /* i_wait() */
 
 void v_version(int b_verbose) { /* Display version information */
-   fprintf(stderr, "%s: Version %s", NAME, VERSION);
+
+   fprintf(stderr, "%s: Version %s %s", NAME, VERSION, COMMIT_ID);
    if (__DATE__[4] == ' ') fprintf(stderr, " 0"); else fprintf(stderr, " %c", __DATE__[4]);
    fprintf(stderr, "%c %c%c%c %s %s", __DATE__[5],
       __DATE__[0], __DATE__[1], __DATE__[2], __DATE__ +9, __TIME__ );
-   fprintf(stderr, " (Build: %s)", BUILD );
-   fprintf(stderr,"\n");
+   fprintf(stderr, " (Build: %s)\n", BUILD );
    if (b_verbose) {
       fprintf(stderr, "Copyright(C) %s %s\n", __DATE__ +7, AUTHOR);
       fprintf(stderr, "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\n");
       fprintf(stderr, "This is free software: you are free to change and redistribute it.\n");
       fprintf(stderr, "There is NO WARRANTY, to the extent permitted by law.\n");
    }
-} 
- 
+}
+
 void v_about() { /* Display help text */
    fprintf(stdout, "Usage: %s [OPTION]... \n", NAME);
    fprintf(stdout, "An RPN Calculator simulation for X11.\n\n");
