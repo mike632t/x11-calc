@@ -1,6 +1,6 @@
 ## x11-calc - Another RPN (Reverse Polish) calculator.
 
-![HP33](x11-calc-33.png)
+![HP33](./images/x11-calc-33.png)
 
 Written in C using X11. Work in progress, currently just a 'nice' GUI,  with
 animated buttons.  I've created the data structures for the CPU and register
