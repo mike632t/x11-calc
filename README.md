@@ -3,10 +3,13 @@
 ![HP33](x11-calc-33.png)
 
 Written in C using X11. Work in progress, currently just a 'nice' GUI,  with
+animated buttons.  I've created the data structures for the CPU and register
+'objects' but the actual implementation of the processor simulation is still
+work in progress.  
 
 The  intention is for the code to be reasonably portable.  Currently it will
-compiles  and run on Linux using x64, arm, and i386 processors and VMS using
-both VAX and Alpha processors.
+compile on Linux running on an x64, arm, or i386 processor, VMS running on a
+VAX or Alpha processor, and Tru64 Unix running on an Alpha processor.
 
 ## To Do
 
