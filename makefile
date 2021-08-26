@@ -31,7 +31,7 @@
 #  11 Aug 21	0.5	- Backup created in parent folder - MT
 # 
 PROGRAM 	= x11-calc
-SOURCES 	= x11-calc.c x11-calc-33.c x11-calc-cpu.c x11-calc-display.c x11-calc-segment.c x11-calc-button.c x11-calc-colour.c gcc-wait.c
+SOURCES 	= x11-calc.c x11-calc-32.c x11-calc-cpu.c x11-calc-display.c x11-calc-segment.c x11-calc-button.c x11-calc-colour.c gcc-wait.c
 FILES		= *.c *.h LICENSE README.md makefile x11-calc-instruction-set.txt .gitignore .gitattributes
 OBJECTS	= $(SOURCES:.c=.o)
 OUTPUT	= $(PROGRAM).out

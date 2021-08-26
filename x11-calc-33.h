@@ -20,7 +20,7 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
  * 13 Jun 13   0.1   - Initial version - MT
- * 30 Aug 20         - Moved functions to sperate source file - MT
+ * 30 Aug 20         - Moved functions to separate source file - MT
  *                      
  * TO DO :           - 
  */
