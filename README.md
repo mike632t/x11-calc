@@ -15,6 +15,5 @@ VAX or Alpha processor, and Tru64 Unix running on an Alpha processor.
 
 * Sort out colour mapping to allow program to run on display with less  than
   24 -bit colour - may get round to this be one day...
-* Rewite the display code in a more structured form (like the button and LED
-  segment code).
+
 * Add CPU emulation.
