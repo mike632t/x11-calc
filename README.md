@@ -3,9 +3,9 @@
 ![HP21](./images/x11-calc-21.png) ![HP33](./images/x11-calc-33.png)
 
 Written in C using X11. Work in progress, currently just a 'nice' GUI,  with
-animated buttons.  I've created the data structures for the CPU and register
-'objects' but the actual implementation of the processor simulation is still
-work in progress.  
+animated  buttons.  I've created the data structures for the  CPU,  register
+and  display  'objects'  but the  actual  implementation  of  the  processor
+simulation is still work in progress.  
 
 The  intention is for the code to be reasonably portable.  Currently it will
 compile on Linux running on an x64, arm, or i386 processor, VMS running on a
