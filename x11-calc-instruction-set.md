@@ -3,8 +3,8 @@
 ### Registers
 
     A, B, C:   General purpose registers.  The C register is used to access
-              the M register and or memory as well as holding the value of
-              the 'X' register. 
+               the M register and or memory as well as holding the value of
+               the 'X' register. 
     D, E, F:   Stack registers use to hold the values of 'Y', 'Z', and 'T'.
     M, N:      Memory registers.
 
@@ -13,7 +13,7 @@
     DATA:      An 8-bit register holding the memory address used to read or
                write to memory from the C register.
 
-    S0-S11:     Processor status bits.
+    S0-S11:    Processor status bits.
 
       S0       Not used.
       S1       Scientific notation (clear for fixed point notation).
