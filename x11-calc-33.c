@@ -31,80 +31,34 @@
  * TO DO :           - 
  */
  
-#define NAME         "x11-rpncalc33"
-#define VERSION      "0.1"
-#define BUILD        "0034"
-#define AUTHOR       "MT"
- 
-#define DEBUG 1
+#define VERSION        "0.1"
+#define BUILD          "0007"
+#define DATE           "10 Aug 21"
+#define AUTHOR         "MT"
 
-#include <X11/Xlib.h>      /* XOpenDisplay(), etc. */
-#include <X11/Xutil.h>     /* XSizeHints etc. */
+#define DEBUG 1
  
-#include <stdarg.h>        /* strlen(), etc. */
-#include <stdio.h>         /* fprintf(), etc. */
-#include <stdlib.h>        /* getenv(), etc. */
+#include <stdarg.h>    /* strlen(), etc. */
+#include <stdio.h>     /* fprintf(), etc. */
+#include <stdlib.h>    /* getenv(), etc. */
  
-#include "x11-debug.h"
+#include <X11/Xlib.h>  /* XOpenDisplay(), etc. */
+#include <X11/Xutil.h> /* XSizeHints etc. */
  
-#include "x11-calc-colour.h"
-#include "x11-calc-font.h"
+#include "x11-calc-font.h" 
 #include "x11-calc-button.h"
+#include "x11-calc-colour.h"
+#include "x11-calc-cpu.h"
+
+#include "x11-calc.h"
+
+#include "gcc-debug.h"
+
+o_register o_ram[RAM_SIZE];
+
+int i_rom[ROM_SIZE * ROM_BANKS] = {};
  
-#include "x11-calc-33.h"   /* Model specific functions */
- 
-void v_version() { /* Display version information */
-   fprintf(stderr, "%s: Version %s", NAME, VERSION);
-   if (__DATE__[4] == ' ') fprintf(stderr, " (0"); else fprintf(stderr, " (%c", __DATE__[4]);
-   fprintf(stderr, "%c %c%c%c %s %s)", __DATE__[5],
-      __DATE__[0], __DATE__[1], __DATE__[2], __DATE__ +9, __TIME__ );
-   fprintf(stderr, " (Build %s)", BUILD );
-   fprintf(stderr,"\n");
-   fprintf(stderr, "Copyright(C) %s %s\n", __DATE__ +7, AUTHOR);
-   fprintf(stderr, "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\n");
-   fprintf(stderr, "This is free software: you are free to change and redistribute it.\n");
-   fprintf(stderr, "There is NO WARRANTY, to the extent permitted by law.\n");
-   exit(0);
-} 
- 
-#ifdef vms /* Use DEC command line options */
-void v_about() { /* Display help text */
-   fprintf(stdout, "Usage: %s [OPTION]... [FILE]...\n", NAME);
-   fprintf(stdout, "Concatenate FILE(s)to standard output.\n\n");
-   fprintf(stdout, "  /delay                   delay 8ms between each byte\n");
-   fprintf(stdout, "  /header                  display filenames\n");
-   fprintf(stdout, "  /number                  number all output lines \n");
-   fprintf(stdout, "  /restart                 line numbers start at zero, implies -n\n");
-   fprintf(stdout, "  /skip                    skip over repeated blank lines\n");
-   fprintf(stdout, "  /version                 output version information and exit\n\n");
-   fprintf(stdout, "  /?, /help                display this help and exit\n");
-   exit(0);
-}
-#else
-void v_about() { /* Display help text */
-   fprintf(stdout, "Usage: %s [OPTION]... [FILE]...\n", NAME);
-   fprintf(stdout, "Concatenate FILE(s)to standard output.\n\n");
-   fprintf(stdout, "  -d, --delay              delay 8ms between each byte\n");
-   fprintf(stdout, "  -f, --filenames          display filenames\n");
-   fprintf(stdout, "  -n, --number             number all output lines \n");
-   fprintf(stdout, "  -r, --restart            line numbers start at zero, implies -n\n");
-   fprintf(stdout, "  -s, --squeeze-blank      suppress repeated blank lines\n");
-   fprintf(stdout, "  -?, --help               display this help and exit\n");
-   fprintf(stdout, "      --version            output version information and exit\n\n");
-   fprintf(stdout, "With no FILE, or when FILE is -, read standard input.\n");
-   exit(0);
-}
-#endif
- 
-void v_error(const char *s_fmt, ...) { /* Print formatted error message */
-   va_list t_args;
-   va_start(t_args, s_fmt);
-   fprintf(stderr, "%s : ", NAME);
-   vfprintf(stderr, s_fmt, t_args);
-   va_end(t_args);
-}
- 
-void v_init_keypad(o_button* h_button[]){ /* Initialize the keypad buttons. */
+int v_init_keypad(o_button* h_button[]){ /* Initialize the keypad buttons. */
 
    /* Define top row of keys. */ 
    h_button[0] = h_button_create(0x11, "SST", "FIX", "BST", h_normal_font, h_small_font, h_alternate_font, 12, 85, 33, 30, False, BLACK);
@@ -146,7 +100,7 @@ void v_init_keypad(o_button* h_button[]){ /* Initialize the keypad buttons. */
 
    /* Define bottom row of keys. */
    h_button[26] = h_button_create(0x71, "\xf7", "X=Y", "X=0", h_large_font, h_small_font, h_alternate_font, 12, 343, 33, 30, False, LIGHT_GRAY);
-   h_button[27] = h_button_create(0x0, "0", "√\xaf", "x\xb2", h_large_font, h_small_font, h_alternate_font, 52, 343, 41, 30, False, LIGHT_GRAY);
+   h_button[27] = h_button_create(0x0, "0", "/\xaf", "x\xb2", h_large_font, h_small_font, h_alternate_font, 52, 343, 41, 30, False, LIGHT_GRAY);
    h_button[28] = h_button_create(0x73, ".", "LASTx", "\x1c", h_large_font, h_small_font, h_alternate_font, 100, 343, 41, 30, False, LIGHT_GRAY);
    h_button[29] = h_button_create(0x74, "R/S", "PAUSE", "%", h_normal_font, h_small_font, h_alternate_font, 148, 343, 41, 30, False, LIGHT_GRAY);
 

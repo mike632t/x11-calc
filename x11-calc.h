@@ -26,6 +26,10 @@
  *                      
  * TO DO :           - 
  */
-#define  COMMIT_ID "[$Format:%h$]"
-#include "x11-calc-21.h"
+#define  COMMIT_ID "[Commit ID: $Format:%h$]"
+#include "x11-calc-33.h"
+
+void v_version(int b_verbose); /* Display version information */
+void v_about(); /* Display help text */
+void v_error(const char *s_fmt, ...); /* Print formatted error message */
 

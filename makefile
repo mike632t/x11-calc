@@ -22,7 +22,7 @@
 #	
 #	01 May 13   0.1	- Initial version - MT
 #  02 Jul 13         - Seperated code and headers for button and colour
-#                      manipulation into seperate files - MT
+#                      manipulation into separate files - MT
 #  09 Mar 14   0.2   - Seperated  code for different calculator models into
 #                      a  seperate files (instead of using a single  source 
 #                      file with conditional compilation - MT
@@ -31,8 +31,8 @@
 #  11 Aug 21	0.5	- Backup created in parent folder - MT
 # 
 PROGRAM 	= x11-calc
-SOURCES 	= x11-calc.c x11-calc-21.c x11-calc-cpu.c x11-calc-display.c x11-calc-segment.c x11-calc-button.c x11-calc-colour.c gcc-wait.c
-FILES		= *.c *.h LICENSE makefile .gitignore
+SOURCES 	= x11-calc.c x11-calc-33.c x11-calc-cpu.c x11-calc-display.c x11-calc-segment.c x11-calc-button.c x11-calc-colour.c gcc-wait.c
+FILES		= *.c *.h LICENSE README.md makefile x11-calc-instruction-set.txt .gitignore .gitattributes
 OBJECTS	= $(SOURCES:.c=.o)
 OUTPUT	= $(PROGRAM).out
 LIBS		= -lX11 -lm
@@ -42,27 +42,17 @@ FLAGS		=
 CC			= gcc
 #
 $(PROGRAM): $(OBJECTS) 
-#  link 
-#	@echo ' Linking $(OBJECTS)'
 	@$(CC) $(FLAGS) $(OBJECTS) -o $@ $(LIBS)
-#	Tidy up by deleting ALL object files - this will force all the sources
-#	to be recompiled every time so may not be a good idea on slow machines
-#	@rm $(OBJECTS)
 #
-#  compile - doesn't attempt to be selective just recompiles everything!
 $(OBJECTS) : $(SOURCES)
-#	@echo ' Compiling $(SOURCES)'
-	@echo ' $(CHECKSUM)'
 	@$(CC) $(FLAGS) -c $(SOURCES) -I $(INCLUDE)
 #
-#  make clean - Clean up the executable and any object files.
 all: clean $(PROGRAM) $(OBJECTS) 
 
 clean:
-#	@echo ' Removing $(OBJECTS)'
 	@rm -f $(OBJECTS)
-#	@echo ' Removing $(PROGRAM)'
 	@rm -f $(PROGRAM)
+
 backup:
-	@tar -czvpf ..\/$(PROGRAM)-`date +'%Y%m%d%H%M'`.tar.gz $(FILES)
+	@echo "$(PROGRAM)-`date +'%Y%m%d%H%M'`.tar.gz"; tar -czpf ..\/$(PROGRAM)-`date +'%Y%m%d%H%M'`.tar.gz $(FILES)
 

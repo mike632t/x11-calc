@@ -30,6 +30,8 @@
  * 08 Aug 21         - Tidied up spelling errors in the comments - MT
  *
  */
+
+#include "x11-calc-cpu.h"
  
 #define DISPLAY_ONE        0x0030
 #define DISPLAY_TWO        0x006d
@@ -70,4 +72,4 @@ o_display* h_display_create(int i_index,
    
 int i_display_draw(Display* x_display, int x_application_window, int i_screen, o_display* h_display);
 
-int i_display_update(Display* x_display, int x_application_window, int i_screen, o_display* h_display);
+int i_display_update(Display* x_display, int x_application_window, int i_screen, o_display* h_display, o_processor* h_processor);

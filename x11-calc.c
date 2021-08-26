@@ -147,6 +147,7 @@ void v_about() { /* Display help text */
    fprintf(stdout, "Usage: %s [OPTION]... \n", NAME);
    fprintf(stdout, "An RPN Calculator simulation for X11.\n\n");
 #ifdef vms /* Use DEC command line options */
+   fprintf(stdout, "  /step                    trace execution\n");
    fprintf(stdout, "  /trace                   trace execution\n");
    fprintf(stdout, "  /version                 output version information and exit\n\n");
    fprintf(stdout, "  /?, /help                display this help and exit\n");
@@ -206,6 +207,8 @@ int main (int argc, char *argv[]){
          for (i_index = 0; argv[i_count][i_index]; i_index++) /* Convert option to uppercase */
             if (argv[i_count][i_index] >= 'a' && argv[i_count][i_index] <= 'z')
                argv[i_count][i_index] = argv[i_count][i_index] - 32;
+         if (!strncmp(argv[i_count], "/STEP", i_index)) {
+            b_trace = True); /* Start in single step mode */
          if (!strncmp(argv[i_count], "/TRACE", i_index)) {
             b_trace = True); /* Enable tracing */
          if (!strncmp(argv[i_count], "/VERSION", i_index)) {
@@ -231,6 +234,9 @@ int main (int argc, char *argv[]){
          i_index = 1;
          while (argv[i_count][i_index] != 0) {
             switch (argv[i_count][i_index]) {
+            case 's': /* Start in single step mode */
+               b_run = !(b_step = True);
+               break;
             case 't': /* Enable tracing */
                b_trace = True;
                break;
@@ -239,7 +245,9 @@ int main (int argc, char *argv[]){
                if (i_index == 2)
                  b_abort = True; /* '--' terminates command line processing */
                else
-                  if (!strncmp(argv[i_count], "--trace", i_index)) {
+                  if (!strncmp(argv[i_count], "--step", i_index)) {
+                     b_step = True; /* Start in single step mode */
+                  } else if (!strncmp(argv[i_count], "--trace", i_index)) {
                      b_trace = True; /* Enable tracing */
                   } else if (!strncmp(argv[i_count], "--version", i_index)) {
                      v_version(True); /* Display version information */
@@ -369,12 +377,12 @@ int main (int argc, char *argv[]){
    debug(fprintf(stderr, "ROM Size : %4u words \n", (unsigned)(sizeof(i_rom) / sizeof i_rom[0])));   
    h_processor = h_processor_create(0, i_rom); 
    
-   h_processor->trace = b_trace;
+   h_processor->flags[0] = b_trace;
    
    /* -1234567890. */
-   //i_reg_load(c_reg[A_REG], 0x9, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0x0, 0xf, 0xf, 0xf);
-   //i_reg_load(c_reg[B_REG], 0x2, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1, 0x0, 0x0, 0x0);
-   //i_reg_load(c_reg[C_REG], 0x9, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0x0, 0xf, 0xf, 0xf);
+   i_set_register(h_processor->reg[A_REG], 0x9, 0x1, 0x2, 0x3, 0x0, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf);
+   i_set_register(h_processor->reg[B_REG], 0x2, 0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0);
+   i_set_register(h_processor->reg[C_REG], 0x9, 0x1, 0x2, 0x3, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0);
 
    /* Main program event loop. */
    b_abort = False;
@@ -382,7 +390,7 @@ int main (int argc, char *argv[]){
       i_wait(3);  /* Sleep for 3 milliseconds */
 
       /* Update and redraw the display. */ 
-      //i_display_update(x_display, x_application_window, i_screen, h_display);
+      i_display_update(x_display, x_application_window, i_screen, h_display, h_processor);
       i_display_draw(x_display, x_application_window, i_screen, h_display);
       XFlush(x_display);
       
@@ -427,7 +435,7 @@ int main (int argc, char *argv[]){
             }
             else if (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_T))  { /* Check for Ctrl-T */
                if ((b_ctrl == 1) && (b_shift == 0)) {
-                  h_processor->trace  = !(h_processor->trace); /* Toggle CPU tracing */
+                  h_processor->flags[0]  = !(h_processor->flags[0]); /* Toggle CPU tracing */
                }
             }
             else if (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_Escape)) { /* Check for Escape */

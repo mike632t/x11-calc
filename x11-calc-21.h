@@ -1,7 +1,7 @@
 /*
  * x11-calc-21.h - RPN (Reverse Polish) calculator simulator. 
  *
- * Copyright(C) 2018   MT
+ * Copyright(C) 2018    MT
  * 
  * Model specific functions.
  *
@@ -32,18 +32,16 @@
 #define BUTTONS      30
 
 #define DIGITS       12
+
 #define ROM_SIZE     02000  
+#define RAM_SIZE     00000
+#define ROM_BANKS    1
 
 #define True         1
 #define False        0
 
-int i_rom [ROM_SIZE * 1];
+int i_rom [ROM_SIZE * ROM_BANKS];
 
-void v_version(int b_verbose);
-void v_about();
-void v_error(const char *s_fmt, ...);
-
-void v_init_calc();
 int v_init_keypad(o_button* h_button[]);
 #endif
 

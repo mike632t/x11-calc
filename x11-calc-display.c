@@ -31,6 +31,8 @@
  * 30 Aug 20         - Base  the number of display segments on the  maximum 
  *                     number of digits in the display - MT
  * 08 Aug 21         - Tidied up spelling errors in the comments - MT
+ * 26 Aug 21         - Updated the display routines to use the register data
+ *                     stored in the processor data structure - MT
  *                      
  */
 
@@ -125,40 +127,40 @@ int i_display_draw(Display* x_display, int x_application_window, int i_screen, o
  *
  */
 
-//int i_display_update(Display* x_display, int x_application_window, int i_screen, o_display* h_display){
+int i_display_update(Display* x_display, int x_application_window, int i_screen, o_display* h_display, o_processor* h_processor){
    
-   //static int c_digits [] = { DISPLAY_ZERO,
-                              //DISPLAY_ONE,
-                              //DISPLAY_TWO,
-                              //DISPLAY_THREE,
-                              //DISPLAY_FOUR,
-                              //DISPLAY_FIVE,
-                              //DISPLAY_SIX,
-                              //DISPLAY_SEVEN,
-                              //DISPLAY_EIGHT,
-                              //DISPLAY_NINE,
-                              //DISPLAY_SPACE,
-                              //DISPLAY_SPACE,
-                              //DISPLAY_SPACE,
-                              //DISPLAY_SPACE,
-                              //DISPLAY_SPACE,
-                              //DISPLAY_SPACE };
-   //int i_offset, i_count;
+   static int c_digits [] = { DISPLAY_ZERO,
+                              DISPLAY_ONE,
+                              DISPLAY_TWO,
+                              DISPLAY_THREE,
+                              DISPLAY_FOUR,
+                              DISPLAY_FIVE,
+                              DISPLAY_SIX,
+                              DISPLAY_SEVEN,
+                              DISPLAY_EIGHT,
+                              DISPLAY_NINE,
+                              DISPLAY_SPACE,
+                              DISPLAY_SPACE,
+                              DISPLAY_SPACE,
+                              DISPLAY_SPACE,
+                              DISPLAY_SPACE,
+                              DISPLAY_SPACE };
+   int i_offset, i_count;
  
-   ///* Draw display segments. */
-   //for (i_count = 0; i_count < DIGITS; i_count++)
-      //if (!(h_display->segment[i_count] == NULL)) {
-         //h_display->segment[i_count]->mask = c_digits[c_reg[A_REG][i_count]];
-         //switch (c_reg[B_REG][i_count] & 0x07) {
-            //case 0x02: /* Sign */
-               //if (c_reg[A_REG][i_count]) 
-                  //h_display->segment[i_count]->mask = DISPLAY_MINUS;
-               //else
-                  //h_display->segment[i_count]->mask = DISPLAY_SPACE;
-               //break;
-            //case 0x01: /* Number and decimal point */
-               //h_display->segment[i_count]->mask = h_display->segment[i_count]->mask | DISPLAY_DECIMAL;
-         //}
-      //}
-  //return (True);
-//}
+   /* Draw display segments. */
+   for (i_count = 0; i_count < DIGITS; i_count++)
+      if (!(h_display->segment[i_count] == NULL)) {
+         h_display->segment[i_count]->mask = c_digits[h_processor->reg[A_REG]->nibble[i_count]];
+         switch (h_processor->reg[B_REG]->nibble[i_count] & 0x07) {
+            case 0x02: /* Sign */
+               if (h_processor->reg[A_REG]->nibble[i_count]) 
+                  h_display->segment[i_count]->mask = DISPLAY_MINUS;
+               else
+                  h_display->segment[i_count]->mask = DISPLAY_SPACE;
+               break;
+            case 0x01: /* Number and decimal point */
+               h_display->segment[i_count]->mask = h_display->segment[i_count]->mask | DISPLAY_DECIMAL;
+         }
+      }
+  return (True);
+}

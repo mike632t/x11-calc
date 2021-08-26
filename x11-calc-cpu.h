@@ -22,21 +22,28 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * 10 Sep 20         - Initial version - MT
+ * 24 Aug 21         - Added  properties for the p and data registers,  and
+ *                     an  array of flags to keep track of things like  the
+ *                     arithmetic mode and instruction tracing - MT 
  *
  */
 
-#define REG_SIZE     14
-#define REGISTERS    9     /* A, B ,C , D, E, F, M1, PSW, PC */
+#ifndef REGISTERS
+#include "x11-calc.h"
 
+#define REGISTERS    8     /* A, B , C(X), D(Y), E(Z), F(T), M, N(M2) */
+#define REG_SIZE     14   
+#define EXP_SIZE     3     /* Two digit exponent plus a sign digit */
+#define STACK_DEPTH  2
 
 #define A_REG        0
 #define B_REG        1
 #define C_REG        2
-#define D_REG        3
-#define E_REG        4
-#define F_REG        5
+#define Y_REG        3
+#define Z_REG        4
+#define T_REG        5
 #define M_REG        6
-#define M2_REG       7
+#define N_REG        7
 
 typedef struct {
    unsigned char nibble[REG_SIZE];
@@ -44,18 +51,23 @@ typedef struct {
 
 typedef struct { 
    int index; 
-   o_register* processor_register[REGISTERS];
-   unsigned int status; /* Processor status word */
-   unsigned int counter; /* Program counter */
+   o_register* reg[REGISTERS];
+   o_register* ram[RAM_SIZE]; /* Pointer to the ROM contents */
+   unsigned int stack[STACK_DEPTH]; /* Call stack */
+   unsigned int pc;  /* Program counter */
+   unsigned int sp;  /* Stack pointer */
+   unsigned int p;   /* P register */
+   unsigned int data;   /* Data register */
+   unsigned char status[16];  /* Processor status word */
+
+   int flags[4] ; /* Processor flags */ 
    unsigned int bank; /* ROM bank number */
    int* rom; /* Pointer to the ROM contents */
-   int trace; /* Controls CPU trace output */ 
 } o_processor;  
 
 o_processor* h_processor_create(int i_index, int *h_rom);
    
-//int i_processor_init(o_processor* h_procesor);
-
 int i_processor_tick(o_processor* h_procesor);
 
-int i_reg_load(unsigned char *c_reg, ...);
+int i_set_register(o_register* c_reg, ...);
+#endif

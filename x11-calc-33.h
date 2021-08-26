@@ -24,14 +24,25 @@
  *                      
  * TO DO :           - 
  */
- 
+
+#ifndef TITLE
 #define TITLE        "RPN calc 33"
 #define HEIGHT       385
 #define WIDTH        201   /* Yes really! */
 #define BUTTONS      30
 
-#define DIGITS       10
+#define DIGITS       12
+
+#define ROM_SIZE     02000  
+#define RAM_SIZE     00000
+#define ROM_BANKS    1
 
 #define True         1
 #define False        0
- 
+
+int i_rom [ROM_SIZE * ROM_BANKS];
+
+void v_init_calc();
+
+int v_init_keypad(o_button* h_button[]);
+#endif
