@@ -33,6 +33,7 @@
       S15      Set if any key is pressed.
 
 
+
     0 000 000 000  nop
     0 000 001 000  clear regs
     0 000 010 000  keys -> rom address
@@ -85,31 +86,32 @@
 
 ### Arithmetic operations.
 
-     9   8   7   6   5   4   3   2   1   0
-   +---+---+---+---+---+---+---+---+---+---+
-   | n | n | n | n | n | f | f | f | 1 | 0 |
-   +---+---+---+---+---+---+---+---+---+---+
-
+      9   8   7   6   5   4   3   2   1   0
+    +---+---+---+---+---+---+---+---+---+---+
+    | n | n | n | n | n | f | f | f | 1 | 0 |
+    +---+---+---+---+---+---+---+---+---+---+
+    
    Where fff is the field modifier.
 
-    13   12  11  10  9   8   7   6   5   4   3   2   1   0
-   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-   | s | m | m | m | m | m | m | m | m | m | m | s | e | e |
-   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+     13   12  11  10  9   8   7   6   5   4   3   2   1   0
+    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+    | s | m | m | m | m | m | m | m | m | m | m | s | e | e |
+    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
-   000   P  : determined by P register             ([P])
-   001   M  : mantissa                             ([3 .. 12])
-   010   X  : exponent                             ([0 .. 1])
-   011   W  : word                                 ([0 .. 13])
-   100  WP  : word up to and including P register  ([0 .. P])
-   101  MS  : mantissa and sign                    ([3 .. 13])
-   110  XS  : exponent and sign                    ([0 .. 2])
-   111   S  : sign                                 ([13])
+    000   P : determined by P register             ([P])
+    001   M : mantissa                             ([3 .. 12])
+    010   X : exponent                             ([0 .. 1])
+    011   W : word                                 ([0 .. 13])
+    100  WP : word up to and including P register  ([0 .. P])
+    101  MS : mantissa and sign                    ([3 .. 13])
+    110  XS : exponent and sign                    ([0 .. 2])
+    111   S : sign                                 ([13])
+
 
     0 000 0ff f10  0 -> a
     0 000 1ff f10  0 -> b
-    0 001 0ff f10  a exchange b               ???
-    0 001 0ff f10  a -> b                     ???
+    0 001 0ff f10  a exchange b                    ???
+    0 001 0ff f10  a -> b                          ???
     0 001 1ff f10  a exchange c
     0 010 0ff f10  c -> a
     0 010 1ff f10  b -> c
@@ -127,7 +129,7 @@
     1 001 0ff f10  a - 1 -> a
     1 001 1ff f10  c - 1 -> c
     1 010 0ff f10  0 - c -> c
-    1 010 1ff f10  0 - c - 1 -> c             (negate)
+    1 010 1ff f10  0 - c - 1 -> c                  (negate)
     1 011 0ff f10  if b = 0
     1 011 1ff f10  if c = 0
     1 100 0ff f10  if a >= c
