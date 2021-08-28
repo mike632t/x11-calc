@@ -192,11 +192,9 @@ oprocessor *h_processor_create(int *h_rom)
 }
 
 void v_set_register(oregister *h_register, ...) {
-
    int i_count, i_temp;
    unsigned char c_temp;
    va_list t_args;
-
    va_start(t_args, h_register);
    i_temp = sizeof(h_register->nibble) / sizeof(*h_register->nibble) - 1;
    for (i_count = i_temp; i_count >= 0; i_count--) 
