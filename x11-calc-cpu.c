@@ -191,7 +191,7 @@ oprocessor *h_processor_create(int *h_rom)
    return (h_processor);
 }
 
-void v_set_register(oregister *h_register, ...) {
+void v_reg_load(oregister *h_register, ...) {
    int i_count, i_temp;
    unsigned char c_temp;
    va_list t_args;

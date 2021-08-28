@@ -83,5 +83,5 @@ int i_processor_tick(oprocessor *h_procesor);
 
 void v_reg_fprint(FILE *h_file, oregister *h_register);
 
-void v_set_register(oregister *h_register, ...);
+void v_reg_load(oregister *h_register, ...);
 #endif
