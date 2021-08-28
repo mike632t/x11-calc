@@ -24,50 +24,64 @@
  * 10 Sep 20         - Initial version - MT
  * 24 Aug 21         - Added  properties for the p and data registers,  and
  *                     an  array of flags to keep track of things like  the
- *                     arithmetic mode and instruction tracing - MT 
+ *                     arithmetic mode and instruction tracing - MT
  *
  */
 
 #ifndef REGISTERS
 #include "x11-calc.h"
 
-#define REGISTERS    8     /* A, B , C(X), D(Y), E(Z), F(T), M, N(M2) */
-#define REG_SIZE     14   
-#define EXP_SIZE     3     /* Two digit exponent plus a sign digit */
-#define STACK_DEPTH  2
+#define REGISTERS      8     /* A, B , C(X), D(Y), E(Z), F(T), M, N(M2) */
+#define REG_SIZE       14   
+#define EXP_SIZE       3     /* Two digit exponent plus a sign digit */
+#define STACK_DEPTH    2
 
-#define A_REG        0
-#define B_REG        1
-#define C_REG        2
-#define Y_REG        3
-#define Z_REG        4
-#define T_REG        5
-#define M_REG        6
-#define N_REG        7
+#define A_REG          0
+#define B_REG          1
+#define C_REG          2
+#define Y_REG          3
+#define Z_REG          4
+#define T_REG          5
+#define M_REG          6
+#define N_REG          7
+
+#define MODE           0
+#define CARRY          1
+#define PREV_CARRY     2
+#define DELAYED_ROM    3
+#define BANK_SWICH     4
+#define DISPLAY_ENABLE 5
+#define TIMER          8
+#define TRACE          9
 
 typedef struct {
-   unsigned char nibble[REG_SIZE];
-} o_register;
+   char id;
+   unsigned int nibble[REG_SIZE];
+} oregister;
 
 typedef struct { 
-   int index; 
-   o_register* reg[REGISTERS];
-   o_register* ram[RAM_SIZE]; /* Pointer to the ROM contents */
+   oregister *reg[REGISTERS];
+   oregister *ram[RAM_SIZE]; /* Pointer to the ROM contents */
    unsigned int stack[STACK_DEPTH]; /* Call stack */
-   unsigned int pc;  /* Program counter */
-   unsigned int sp;  /* Stack pointer */
-   unsigned int p;   /* P register */
-   unsigned int data;   /* Data register */
+   unsigned int pc;           /* Program counter */
+   unsigned int sp;           /* Stack pointer */
+   unsigned int p;            /* P register */
+   unsigned int f;            /* F register */
+   unsigned int data;         /* Data register */
+   unsigned int base;         /* Data register */
+   unsigned char carry;       /* Carry flag */
    unsigned char status[16];  /* Processor status word */
 
-   int flags[4] ; /* Processor flags */ 
-   unsigned int bank; /* ROM bank number */
-   int* rom; /* Pointer to the ROM contents */
-} o_processor;  
+   int flags[10] ;            /* Flags */ 
+   unsigned int bank;         /* ROM bank number */
+   int* rom;                  /* ROM */
+} oprocessor;  
 
-o_processor* h_processor_create(int i_index, int *h_rom);
+oprocessor *h_processor_create(int *h_rom);
    
-int i_processor_tick(o_processor* h_procesor);
+int i_processor_tick(oprocessor *h_procesor);
 
-int i_set_register(o_register* c_reg, ...);
+void v_reg_fprint(FILE *h_file, oregister *h_register);
+
+void v_set_register(oregister *h_register, ...);
 #endif

@@ -29,7 +29,7 @@
  * 08 Aug 21         - Tidied up spelling errors in the comments - MT
  * 10 Aug 21         - Added HP21 ROM contents - MT
  *                      
- * TO DO :           - 
+ * To Do :           - Modify key colour - MT
  */
  
 #define VERSION        "0.1"
@@ -55,11 +55,15 @@
 
 #include "gcc-debug.h"
 
-o_register o_ram[RAM_SIZE];
+oregister o_ram[RAM_SIZE];
 
 int i_rom[ROM_SIZE * ROM_BANKS] = {
+/* 00672, 00656, 00656, 00656, 00656, 00656, 00656, 00656,
+   00656, 00656, 00656, 00656, 00656, 00656, 00656, 00656,
+   00656, 00656, 00656, 00656, 00656, 00656, 00656, 00656, */
+   
    00672, 00672, 01710, 00410, 00432, 00214, 00110, 00310,
-   01635, 01566, 00014, 00432, 00072, 00445, 01610, 00134,
+   01635, 01566, 00014, 00432, 00072, 00445, 01610, 00134, 
    00120, 01015, 01112, 01512, 00264, 00272, 01363, 00006,
    01645, 01715, 01074, 00706, 01174, 00706, 00174, 01646,
    01646, 00232, 00256, 01352, 00047, 00412, 01216, 01371,
@@ -188,7 +192,7 @@ int i_rom[ROM_SIZE * ROM_BANKS] = {
    01374, 01030, 00630, 00530, 00230, 00430, 01130, 01020
 };
 
-int v_init_keypad(o_button* h_button[]){
+int v_init_keypad(obutton *h_button[]){
 
    /* Define top row of keys. */ 
    h_button[0] = h_button_create(0x11, "1/x", "", "yX", h_normal_font, h_small_font, h_alternate_font, 12, 85, 33, 30, False, BLACK);

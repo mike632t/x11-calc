@@ -48,11 +48,11 @@ typedef struct { /* Calculator segment structure. */
    int height; 
    unsigned int foreground;
    unsigned int background;
-} o_segment;
+} osegment;
 
-o_segment* h_segment_create(int i_index, int i_mask, int i_left, int i_top,
+osegment *h_segment_create(int i_index, int i_mask, int i_left, int i_top,
    int i_width, int i_height, unsigned int i_foreground, unsigned int i_background);
    
-int i_segment_draw(Display* h_display, int x_application_window, int i_screen,o_segment* h_segment);
+int i_segment_draw(Display *h_display, int x_application_window, int i_screen,osegment *h_segment);
 
 

@@ -40,14 +40,14 @@ typedef struct { /* Calculator button structure. */
    int height; 
    int state;
    unsigned int colour;
-} o_button;
+} obutton;
 
-o_button* h_button_pressed(o_button* h_button, int i_xpos, int i_ypos);
+obutton *h_button_pressed(obutton *h_button, int i_xpos, int i_ypos);
 
-o_button* h_button_create(int i_index, char* s_text,char* s_label ,char* s_alternate, 
-   XFontStruct* h_normal_font, XFontStruct* h_shift_font, XFontStruct* h_alternate_font, 
+obutton *h_button_create(int i_index, char* s_text,char* s_label ,char* s_alternate, 
+   XFontStruct *h_normal_font, XFontStruct *h_shift_font, XFontStruct *h_alternate_font, 
    int i_left, int i_top, int i_width, int i_height, int i_state,
    unsigned int i_colour);
    
-int i_button_draw(Display* h_display, int x_application_window, int i_screen,o_button* h_button);
+int i_button_draw(Display *h_display, int x_application_window, int i_screen,obutton *h_button);
 #endif

@@ -33,6 +33,9 @@
  * 08 Aug 21         - Tidied up spelling errors in the comments - MT
  * 26 Aug 21         - Updated the display routines to use the register data
  *                     stored in the processor data structure - MT
+ *                   - Reversed order of nibbles in register to match actual
+ *                     processor  numbering  (when the register format  says
+ *                     the left hand nibble is number 13 it means it!) - MT
  *                      
  */
 
@@ -74,10 +77,10 @@
  *
  */
 
-o_display* h_display_create(int i_index, int i_left, int i_top, int i_width,
+odisplay *h_display_create(int i_index, int i_left, int i_top, int i_width,
    int i_height, unsigned int i_foreground, unsigned int i_background, unsigned int i_border){
 
-   o_display* h_display; /* Ponter to display. */
+   odisplay *h_display; /* Ponter to display. */
    int i_count;
 
    /* Attempt to allocate memory for a display. */
@@ -88,7 +91,7 @@ o_display* h_display_create(int i_index, int i_left, int i_top, int i_width,
    h_display->width = i_width;
    h_display->height = i_height; 
    for (i_count = 0; i_count < DIGITS; i_count++) {
-      /* h_display->segment[i_count] = h_segment_create(0, 0,  7 + 17 * i_count, 21, 17, 29, i_foreground, i_background); /* Spice  - 11 Dight display */
+      /*h_display->segment[i_count] = h_segment_create(0, 0,  7 + 17 * i_count, 21, 17, 29, i_foreground, i_background); /* Spice  - 11 Dight display */
       h_display->segment[i_count] = h_segment_create(0, 0,  5 + 16 * i_count, 21, 14, 29, i_foreground, i_background); /* Woodstock - 12 Dight display */
       h_display->segment[i_count]->mask = DISPLAY_SPACE;
    }
@@ -105,7 +108,7 @@ o_display* h_display_create(int i_index, int i_left, int i_top, int i_width,
  *
  */
 
-int i_display_draw(Display* x_display, int x_application_window, int i_screen, o_display* h_display){
+int i_display_draw(Display* x_display, int x_application_window, int i_screen, odisplay *h_display){
 
    int i_indent, i_extent, i_upper, i_lower;
    int i_offset, i_count;
@@ -127,7 +130,7 @@ int i_display_draw(Display* x_display, int x_application_window, int i_screen, o
  *
  */
 
-int i_display_update(Display* x_display, int x_application_window, int i_screen, o_display* h_display, o_processor* h_processor){
+int i_display_update(Display* x_display, int x_application_window, int i_screen, odisplay *h_display, oprocessor *h_processor){
    
    static int c_digits [] = { DISPLAY_ZERO,
                               DISPLAY_ONE,
@@ -150,10 +153,10 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
    /* Draw display segments. */
    for (i_count = 0; i_count < DIGITS; i_count++)
       if (!(h_display->segment[i_count] == NULL)) {
-         h_display->segment[i_count]->mask = c_digits[h_processor->reg[A_REG]->nibble[i_count]];
-         switch (h_processor->reg[B_REG]->nibble[i_count] & 0x07) {
+         h_display->segment[i_count]->mask = c_digits[h_processor->reg[A_REG]->nibble[REG_SIZE - 1 - i_count]];
+         switch (h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x07) {
             case 0x02: /* Sign */
-               if (h_processor->reg[A_REG]->nibble[i_count]) 
+               if (h_processor->reg[A_REG]->nibble[REG_SIZE -1 - i_count]) 
                   h_display->segment[i_count]->mask = DISPLAY_MINUS;
                else
                   h_display->segment[i_count]->mask = DISPLAY_SPACE;

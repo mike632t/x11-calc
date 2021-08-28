@@ -5,7 +5,7 @@
     A, B, C:   General purpose registers.  The C register is used to access
                the M register and or memory as well as holding the value of
                the 'X' register. 
-    D, E, F:   Stack registers use to hold the values of 'Y', 'Z', and 'T'.
+    D, E, F:   Stack registers used to hold the values of 'Y', 'Z', and 'T'.
     M, N:      Memory registers.
 
     P:         A  4-bit register that is used to select which part of  each
@@ -33,6 +33,7 @@
       S15      Set if any key is pressed.
 
 
+### Special operations.
 
     0 000 000 000  nop
     0 000 001 000  clear regs
@@ -90,7 +91,7 @@
     +---+---+---+---+---+---+---+---+---+---+
     | n | n | n | n | n | f | f | f | 1 | 0 |
     +---+---+---+---+---+---+---+---+---+---+
-    
+
    Where fff is the field modifier.
 
      13   12  11  10  9   8   7   6   5   4   3   2   1   0
@@ -98,14 +99,15 @@
     | s | m | m | m | m | m | m | m | m | m | m | s | e | e |
     +---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
-    000   P : determined by P register             ([P])
-    001   M : mantissa                             ([3 .. 12])
-    010   X : exponent                             ([0 .. 1])
-    011   W : word                                 ([0 .. 13])
-    100  WP : word up to and including P register  ([0 .. P])
-    101  MS : mantissa and sign                    ([3 .. 13])
-    110  XS : exponent and sign                    ([0 .. 2])
-    111   S : sign                                 ([13])
+    000   P  : determined by P register             ([P])
+    001  WP  : word up to and including P register  ([0 .. P])
+    010  XS  : exponent and sign                    ([0 .. 2])
+    011   X  : exponent                             ([0 .. 1])
+    100   S  : sign                                 ([13])
+    101   M  : mantissa                             ([3 .. 12])
+    110   W  : word                                 ([0 .. 13])
+    111  MS  : mantissa and sign                    ([3 .. 13])
+
 
 
     0 000 0ff f10  0 -> a

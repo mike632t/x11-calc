@@ -176,10 +176,10 @@ int main (int argc, char *argv[]){
    XSizeHints *h_size_hint;
    Atom wm_delete;
    
-   o_button* h_button[BUTTONS]; /* Array to hold pointers to 30 buttons. */
-   o_button* h_pressed;
-   o_display* h_display; /* Pointer to display strudture. */
-   o_processor* h_processor; 
+   obutton *h_button[BUTTONS]; /* Array to hold pointers to 30 buttons. */
+   obutton *h_pressed;
+   odisplay *h_display; /* Pointer to display strudture. */
+   oprocessor *h_processor; 
    
    char *s_display_name = ""; /* Just use the default display. */
    char *s_font; /* Font description. */
@@ -375,14 +375,15 @@ int main (int argc, char *argv[]){
    XSync(x_display, False);
    
    debug(fprintf(stderr, "ROM Size : %4u words \n", (unsigned)(sizeof(i_rom) / sizeof i_rom[0])));   
-   h_processor = h_processor_create(0, i_rom); 
+   h_processor = h_processor_create(i_rom); 
    
-   h_processor->flags[0] = b_trace;
+   h_processor->flags[TRACE] = b_trace;
    
-   /* -1234567890. */
-   i_set_register(h_processor->reg[A_REG], 0x9, 0x1, 0x2, 0x3, 0x0, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf);
-   i_set_register(h_processor->reg[B_REG], 0x2, 0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0);
-   i_set_register(h_processor->reg[C_REG], 0x9, 0x1, 0x2, 0x3, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0);
+   /* -1234567890e99e-99. */
+   /* v_set_register(h_processor->reg[A_REG], 0x9, 0x1, 0x2, 0x3, 0xf, 0xf, 0xf, 0xf, 0xf, 0x9, 0x9, 0x9, 0x0, 0x0); */
+   /* v_set_register(h_processor->reg[B_REG], 0x2, 0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x2, 0x0, 0x0, 0x0, 0x0); */
+
+   /* v_set_register(h_processor->reg[C_REG], 0x9, 0x1, 0x2, 0x3, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0); */
 
    /* Main program event loop. */
    b_abort = False;
@@ -435,11 +436,14 @@ int main (int argc, char *argv[]){
             }
             else if (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_T))  { /* Check for Ctrl-T */
                if ((b_ctrl == 1) && (b_shift == 0)) {
-                  h_processor->flags[0]  = !(h_processor->flags[0]); /* Toggle CPU tracing */
+                  h_processor->flags[TRACE]  = !(h_processor->flags[TRACE]); /* Toggle CPU tracing */
                }
             }
             else if (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_Escape)) { /* Check for Escape */
                b_abort = True;
+            }
+            else if (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_space))  { /* Check for space */
+               if ((b_ctrl == 0) && (b_shift == 0)) b_step = b_run =  True; 
             }
             break;
 

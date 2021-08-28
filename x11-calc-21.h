@@ -42,6 +42,6 @@
 
 int i_rom [ROM_SIZE * ROM_BANKS];
 
-int v_init_keypad(o_button* h_button[]);
+int v_init_keypad(obutton *h_button[]);
 #endif
 

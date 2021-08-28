@@ -81,10 +81,10 @@
  *
  */
 
-o_segment* h_segment_create(int i_index, int i_mask, int i_left, int i_top, 
+osegment *h_segment_create(int i_index, int i_mask, int i_left, int i_top, 
    int i_width, int i_height, unsigned int i_foreground, unsigned int i_background){
 
-   o_segment* h_segment; /* Ponter to segment. */
+   osegment *h_segment; /* Ponter to segment. */
 
    /* Attempt to allcoate memory for a segment. */
    if ((h_segment = malloc (sizeof(*h_segment)))==NULL) v_error("Memory allocation failed!");
@@ -109,7 +109,7 @@ o_segment* h_segment_create(int i_index, int i_mask, int i_left, int i_top,
  *
  */
 
-int i_segment_draw(Display* h_display, int x_application_window, int i_screen, o_segment* h_segment){
+int i_segment_draw(Display *h_display, int x_application_window, int i_screen, osegment *h_segment){
 
    int i_left, i_right, i_upper, i_lower;
    int i_offset;

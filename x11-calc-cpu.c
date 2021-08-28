@@ -30,18 +30,34 @@
  * of 14 4-bit nibbles capable of storing a 10 digit mantissa and a 2 digit
  * exponent with separate signs for both the mantissa and exponent. 
  * 
+ * Registers
+ * 
  * A, B, C:    General purpose registers.  The C register is used to access
  *             the M register and or memory as well as holding the value of
  *             the 'X' register. 
- * D, E, F:    Stack registers use to hold the values of 'Y', 'Z', and 'T'.
+ * Y, Z, T:    Stack registers.
  * M, N:       Memory registers.
  * 
+ * F:          F register.
  * P:          A  4-bit register that is used to select which part of  each
  *             register should be used.
  * DATA:       An 8-bit register holding the memory address used to read or
  *             write to memory from the C register.
+ * SP:         Stack pointer
  * 
- * S0-S11:     Processor status bits.
+ * Processor flags
+ * 
+ *    F0       Selects Run / Program mode.
+ *    F1       Carry.
+ *    F2       Prev Carry.
+ *    F3       Delayed ROM select.
+ *    F4       Bank switch
+ *    F5       Display enabled
+ *    F6       ???
+ *    F7       ???
+ *    F8       Timer.
+ * 
+ * Processor status word.
  * 
  *    S0       Not used.
  *    S1       Scientific notation (clear for fixed point notation).
@@ -86,20 +102,22 @@
  * 24 Aug 21         - Added code to decode the field modifier - MT
  * 26 Aug 21         - Re-implemented  load_reg() to use the processor  data
  *                     and renamed it set_register() - MT
+ *                   - Reversed order of nibbles in register to match actual
+ *                     processor  numbering  (when the register format  says
+ *                     the left hand nibble is number 13 it means it!) - MT
+ *                   - Implemented my first real op code (0 -> a[f]) - MT
  * 
  * To Do             - Return status from tick().
  *                   - Finish instruction decoder!! 
  */
 
-#define VERSION      "0.1"
-#define BUILD        "0008"
-#define DATE         "20 Aug 21"
-#define AUTHOR       "MT"
+#define VERSION        "0.1"
+#define BUILD          "0008"
+#define DATE           "20 Aug 21"
+#define AUTHOR         "MT"
 
-#define DEBUG 0      /* Enable/disable debug*/
+#define DEBUG          1   /* Enable/disable debug*/
 
-#define trace(code) do {if(flags[0]){code;}} while(0)
- 
 #include <stdlib.h>    /* malloc(), etc. */
 #include <stdio.h>     /* fprintf(), etc. */
 #include <stdarg.h>
@@ -116,52 +134,123 @@
 #include "gcc-debug.h" /* print() */
 #include "gcc-wait.h"  /* i_wait() */
 
-o_register* h_register_create(int i_index){
-   o_register* h_register; /* Pointer to register. */
+void v_reg_fprint(FILE *h_file, oregister *h_register) {
+   const char c_name[8] = {'A', 'B', 'X', 'Y', 'Z', 'T', 'M', 'N'};
    int i_count;
-   if ((h_register = malloc (sizeof(*h_register)))==NULL) v_error("Memory allocation failed!"); /* Attempt to allocate memory to register. */
-   for (i_count = 0; i_count < REG_SIZE; i_count++)
+   if (h_register != NULL) {
+      fprintf(h_file, "reg[");
+      if (h_register->id < 0) 
+         fprintf(h_file, "*%c", c_name[h_register->id * -1 - 1]);
+      else 
+         fprintf(h_file, "%02d", c_name[h_register->id]);
+      fprintf(h_file, "] = 0x");
+      for (i_count = REG_SIZE - 1; i_count >=0 ; i_count--) {
+         fprintf(h_file, "%1x", h_register->nibble[i_count]);
+      }
+      fprintf(h_file, " ");
+   }
+}
+
+oregister *h_register_create(char c_id){
+   oregister *h_register; /* Pointer to register. */
+   int i_count, i_temp;
+   if ((h_register = malloc (sizeof(*h_register))) == NULL) v_error("Memory allocation failed!"); /* Attempt to allocate memory to register. */
+   i_temp = sizeof(h_register->nibble) / sizeof(*h_register->nibble);
+   h_register->id = c_id;
+   for (i_count = 0; i_count < i_temp; i_count++)
       h_register->nibble[i_count] = 0;
+   debug(v_reg_fprint(stdout, h_register); fprintf(stdout, "\n"));
    return (h_register);
 }
 
-o_processor* h_processor_create(int i_index, int *h_rom)
+oprocessor *h_processor_create(int *h_rom)
 {
-   o_processor* h_processor;
+   oprocessor *h_processor;
    int i_count;
    if ((h_processor = malloc(sizeof(*h_processor)))==NULL) v_error("Memory allocation failed!"); /* Attempt to allocate memory to hold the processor structure. */
    for (i_count = 0; i_count < (sizeof(h_processor->reg) / sizeof(h_processor->reg[0])); i_count++)
-      h_processor->reg[i_count] = h_register_create(0); /* Allocate storage for the registers */
+      h_processor->reg[i_count] = h_register_create(- (i_count + 1)); /* Allocate storage for the registers */
    for (i_count = 0; i_count < (sizeof(h_processor->ram) / sizeof(h_processor->ram[0])); i_count++)
-      h_processor->reg[i_count] = h_register_create(0); /* Allocate storage for the RAM */
+      h_processor->reg[i_count] = h_register_create(i_count); /* Allocate storage for the RAM */
    for (i_count = 0; i_count < (sizeof(h_processor->status) / sizeof(h_processor->status[0]) ); i_count++)
       h_processor->status[i_count] = 0; /* Clear the processor status word */
    for (i_count = 0; i_count < (sizeof(h_processor->stack) / sizeof(h_processor->stack[0]) ); i_count++)
       h_processor->stack[i_count] = 0; /* Clear the processor stack */
-   for (i_count = 0; i_count < (sizeof(h_processor->flags) / sizeof(h_processor->flags[0]) ); i_count++)
+   for (i_count = 0; i_count < (sizeof(h_processor->flags) / sizeof(h_processor->flags[TRACE]) ); i_count++)
       h_processor->flags[i_count] = True; /* Clear the processor flags */
    h_processor->pc = 0; /* Program counter */
    h_processor->sp = 0; /* Stack pointer */
    h_processor->p = 0;  /* Pointer register*/
+   h_processor->f = 0;  /* F register*/
    h_processor->data = 0; /* Data register */
+   h_processor->base = 10; /* Data register */
+   h_processor->carry = 0; /* Carry */
    
    h_processor->bank = 0; /* ROM bank number */
    h_processor->rom = h_rom ; /* Address of ROM */ 
    return (h_processor);
 }
 
-int i_processor_tick(o_processor* h_processor) {
+void v_set_register(oregister *h_register, ...) {
+
+   int i_count, i_temp;
+   unsigned char c_temp;
+   va_list t_args;
+
+   va_start(t_args, h_register);
+   i_temp = sizeof(h_register->nibble) / sizeof(*h_register->nibble) - 1;
+   for (i_count = i_temp; i_count >= 0; i_count--) 
+      h_register->nibble[i_count]  = va_arg(t_args, int);
+}
+
+void v_reg_zero(oregister *h_register, int i_first, int i_last) {
+   int i_count;
+   for (i_count = i_first; i_count <= i_last; i_count++)
+      h_register->nibble[i_count] = 0;
+}
+
+void v_reg_exch (oregister *h_destination, oregister *h_source, int i_first, int i_last) {
+   int i_count, i_temp;
+   for (i_count = i_first; i_count <= i_last; i_count++) {
+      i_temp = h_destination->nibble[i_count];
+      h_destination->nibble[i_count] = h_source->nibble[i_count];
+      h_source->nibble[i_count] = i_temp;
+   }
+}
+
+void v_reg_add (oregister *h_destination, oregister *h_source, int i_first, int i_last, char *carry, unsigned int i_base){
+   int i_count, i_temp;
+   for (i_count = i_first; i_count <= i_last; i_count++){
+      if (h_source != NULL) i_temp = h_source->nibble[i_count]; else i_temp = 0;
+      i_temp = h_destination->nibble[i_count] + i_temp + *carry;
+      if (i_temp >= i_base){
+         i_temp -= i_base;
+         *carry = 1;
+      } else {
+         *carry = 0;
+      }
+      h_destination->nibble[i_count] = i_temp;
+   }
+}
+
+void v_reg_inc (oregister *h_register, int i_first, int i_last, char *carry, unsigned int i_base){
+   *carry = 1; /* Set carry */
+   v_reg_add (h_register, NULL, i_first, i_last, carry, i_base); /* Add carry to register */
+}
+
+int i_processor_tick(oprocessor *h_processor) {
 
    unsigned int i_opcode; 
    unsigned int i_counter; /* New program counter */
    unsigned int i_field; /* Field modifier */
    unsigned int i_first; /* First nibble selected by field modifier */
    unsigned int i_last; /* Last nibble selected by field modifier */
+   const char *s_field; /* Holds pointer to field name */
    
    i_opcode = h_processor->rom[h_processor->pc];
 
-   if (h_processor->flags[0])
-      fprintf(stdout, "%1o-%04o \t %04o \t", h_processor->bank, h_processor->pc, h_processor->rom[h_processor->pc]);
+   if (h_processor->flags[TRACE])
+      fprintf(stdout, "%1o-%04o\t %04o\t ", h_processor->bank, h_processor->pc, h_processor->rom[h_processor->pc]);
 
    switch (i_opcode & 03) {
       case 00:
@@ -176,15 +265,41 @@ int i_processor_tick(o_processor* h_processor) {
           */
          switch (i_opcode) {
             case 00000: /* nop */
-               if (h_processor->flags[0]) fprintf(stdout, "nop");
+               if (h_processor->flags[TRACE]) fprintf(stdout, "nop");
+               break;
+            case 00410: /* m exch c */ 
+               if (h_processor->flags[TRACE]) {
+                  fprintf(stdout, "m exch c \t");
+                  v_reg_fprint(stdout, h_processor->reg[M_REG]);
+                  v_reg_fprint(stdout, h_processor->reg[C_REG]);
+                  fprintf(stdout, "\t");
+               }
+               v_reg_exch(h_processor->reg[M_REG], h_processor->reg[C_REG], 0, sizeof(h_processor->reg[C_REG]->nibble));               
+               if (h_processor->flags[TRACE]) {
+                  fprintf(stdout, "m exch c \t");
+                  v_reg_fprint(stdout, h_processor->reg[M_REG]);
+                  v_reg_fprint(stdout, h_processor->reg[C_REG]);
+               }
+               break;
+            case 01710: /* f exchange a */
+               {
+                  int i_temp;
+                  i_temp = h_processor->reg[A_REG]->nibble[0];
+                  h_processor->reg[A_REG]->nibble[0] = h_processor->f;
+                  h_processor->f = i_temp;
+               }
+               if (h_processor->flags[TRACE]) {
+                  fprintf(stdout, "f exch a \t");
+                  v_reg_fprint(stdout, h_processor->reg[A_REG]);
+               }
                break;
             case 01760: /* hi I'm woodstock */
-               if (h_processor->flags[0]) fprintf(stdout, "reserved");
+               if (h_processor->flags[TRACE]) fprintf(stdout, "hi I'm woodstock");
                break;
             default: 
-               if (h_processor->flags[0]) fprintf(stdout, "special");
                break;
          }
+         if (h_processor->flags[TRACE]) fprintf(stdout, "\n");
          break;
 
       case 01:
@@ -206,7 +321,7 @@ int i_processor_tick(o_processor* h_processor) {
           */
 
          i_counter = i_opcode >> 2; /* Get target address */
-         if (h_processor->flags[0]) fprintf(stdout, "jsb\t %01o-%04o \t", h_processor->bank, i_counter);
+         if (h_processor->flags[TRACE]) fprintf(stdout, "jsb\t %01o-%04o\n", h_processor->bank, i_counter);
          break;
 
       case 02:
@@ -226,64 +341,174 @@ int i_processor_tick(o_processor* h_processor) {
           * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+
           * 
           * 000   P  : determined by P register             ([P])
-          * 001   M  : mantissa                             ([3 .. 12])
-          * 010   X  : exponent                             ([0 .. 1])
-          * 011   W  : word                                 ([0 .. 13])
-          * 100  WP  : word up to and including P register  ([0 .. P])
-          * 101  MS  : mantissa and sign                    ([3 .. 13])
-          * 110  XS  : exponent and sign                    ([0 .. 2])
-          * 111   S  : sign                                 ([13])
+          * 001  WP  : word up to and including P register  ([0 .. P])
+          * 010  XS  : exponent and sign                    ([0 .. 2])
+          * 011   X  : exponent                             ([0 .. 1])
+          * 100   S  : sign                                 ([13])
+          * 101   M  : mantissa                             ([3 .. 12])
+          * 110   W  : word                                 ([0 .. 13])
+          * 111  MS  : mantissa and sign                    ([3 .. 13])
           *
           */
-
-         if (h_processor->flags[0]) fprintf(stdout, "arithmetic");
-         
+          
          i_field = (i_opcode >> 2) & 7;
-         i_opcode = i_opcode >> 5;
-         
+        
          switch (i_field) {
             case 0:  /* 000   P  : determined by P register             ([P]) */
                i_first = h_processor->p; i_last = h_processor->p;
+               s_field = "p";
                if (h_processor->p >= REG_SIZE) {
                   fprintf(stderr, "Run-time error\t: %s line : %d : %s", \
                   __FILE__, __LINE__, "Invalid register pointer\n");
                   i_last = 0;
                }
                break;
-            case 1:  /* 001   M  : mantissa                             ([3 .. 12]) */
-               i_first = EXP_SIZE; i_last = REG_SIZE - 2;
-               break;
-            case 2:  /* 010   X  : exponent                             ([0 .. 1])  */
-               i_first = 0; i_last = EXP_SIZE - 1;
-               break;
-            case 3:  /* 011   W  : word                                 ([0 .. 13]) */
-               i_first = 0; i_last = REG_SIZE - 1;
-               break;
-            case 4:  /* 100  WP  : word up to and including P register  ([0 .. P])  */
+            case 1:  /* 100  WP  : word up to and including P register  ([0 .. P])  */
                i_first =  0; i_last =  h_processor->p; /* break; bug in orig??? */
+               s_field = "wp";
                if (h_processor->p >= REG_SIZE) {
                   fprintf(stderr, "Run-time error\t: %s line : %d : %s", \
                   __FILE__, __LINE__, "Invalid register pointer\n");
                   i_last = REG_SIZE - 1;
                }
                break;
-            case 5:  /* 101  MS  : mantissa and sign                    ([3 .. 13]) */
-               i_first = EXP_SIZE; i_last = REG_SIZE - 1;
-               break;
-            case 6:  /* 110  XS  : exponent and sign                    ([0 .. 2])  */
+            case 2:  /* 110  XS  : exponent and sign                    ([0 .. 2])  */
                i_first = EXP_SIZE - 1; i_last = EXP_SIZE - 1;
+               s_field = "xs";
                break;
-            case 7:  /* 111   S  : sign                                 ([13])      */  
+            case 3:  /* 010   X  : exponent                             ([0 .. 1])  */
+               i_first = 0; i_last = EXP_SIZE - 1;
+               s_field = "x";
+               break;
+            case 4:  /* 111   S  : sign                                 ([13])      */  
                i_first = REG_SIZE - 1; i_last = REG_SIZE - 1;
+               s_field = "s";
+               break;
+            case 5:  /* 001   M  : mantissa                             ([3 .. 12]) */
+               i_first = EXP_SIZE; i_last = REG_SIZE - 2;
+               s_field = "m";
+               break;
+            case 6:  /* 011   W  : word                                 ([0 .. 13]) */
+               i_first = 0; i_last = REG_SIZE - 1;
+               s_field = "w";
+               break;
+            case 7:  /* 101  MS  : mantissa and sign                    ([3 .. 13]) */
+               i_first = EXP_SIZE; i_last = REG_SIZE - 1;
+               s_field = "ms";
                break;
          }         
                 
-         // TO DO : Use lookup table ... (only 32 permutations..)
-             
-         switch (i_opcode) {
-            default: 
+         /* act_flags &= ~F.CARRY; /* is already cleared by execute_instruction */
+         
+         switch (i_opcode >> 5)
+         {
+            case 0000:  /* 0 -> a[f] */
+               v_reg_zero(h_processor->reg[A_REG], i_first, i_last);
+               if (h_processor->flags[TRACE]) {
+                  fprintf(stdout, "0 -> a[%s]\t", s_field);
+                  v_reg_fprint(stdout, h_processor->reg[A_REG]);                  
+               }
+               break;
+            case 0001:  /* 0 -> b[f] */
+               v_reg_zero(h_processor->reg[B_REG], i_first, i_last);
+               if (h_processor->flags[TRACE]) {
+                  fprintf(stdout, "0 -> b[%s]\t", s_field);
+                  v_reg_fprint(stdout, h_processor->reg[B_REG]);                  
+               }
+               break;
+            case 0002:  /* a exch b[f] */
+               v_reg_exch(h_processor->reg[A_REG], h_processor->reg[B_REG], i_first, i_last);
+               if (h_processor->flags[TRACE]) {
+                  fprintf(stdout, "a exch b[%s]\t", s_field);
+                  v_reg_fprint(stdout, h_processor->reg[A_REG]);                  
+                  v_reg_fprint(stdout, h_processor->reg[B_REG]);                  
+               }
+               break;            
+            //case 0003:  /* a -> b[f] */
+               //src = act_a; dest = act_b; reg_copy(); break;
+            //case 0004:  /* a exchange c[f] */
+               v_reg_exch(h_processor->reg[A_REG], h_processor->reg[C_REG], i_first, i_last);
+               if (h_processor->flags[TRACE]) {
+                  fprintf(stdout, "a exch c[%s]\t", s_field);
+                  v_reg_fprint(stdout, h_processor->reg[A_REG]);                  
+                  v_reg_fprint(stdout, h_processor->reg[C_REG]);                  
+               }
+               break;            
+            //case 0005:  /* c -> a[f] */
+               //src = act_c; dest = act_a; reg_copy(); break;
+            //case 0006:  /* b -> c[f] */
+               //src = act_b; dest = act_c; reg_copy(); break;
+            //case 0007:  /* b exchange c[f] */
+               v_reg_exch(h_processor->reg[B_REG], h_processor->reg[C_REG], i_first, i_last);
+               if (h_processor->flags[TRACE]) {
+                  fprintf(stdout, "b exch c[%s]\t", s_field);
+                  v_reg_fprint(stdout, h_processor->reg[B_REG]);                  
+                  v_reg_fprint(stdout, h_processor->reg[C_REG]);                  
+               }
+               break;            
+            case 0010:  /* 0 -> c[f] */
+               v_reg_zero(h_processor->reg[C_REG], i_first, i_last);
+               if (h_processor->flags[TRACE]) {
+                  fprintf(stdout, "0 -> c[%s]\t", s_field);
+                  v_reg_fprint(stdout, h_processor->reg[C_REG]);                  
+               }
+               break;
+            //case 0011:  /* a + b -> a[f] */
+               //dest = act_a; src = act_b; reg_add(); break;
+            //case 0012:  /* a + c -> a[f] */
+               //dest = act_a; src = act_c; reg_add(); break;
+            //case 0013:  /* c + c -> c[f] */
+               //dest = act_c; src = act_c; reg_add(); break;
+            //case 0014:  /* a + c -> c[f] */
+               //dest = act_c; src = act_a; reg_add(); break;
+            case 0015:  /* a + 1 -> a[f] */
+               v_reg_inc (h_processor->reg[A_REG], i_first, i_last, &h_processor->carry, h_processor->base);
+               if (h_processor->flags[TRACE]) {
+                  fprintf(stdout, "a + 1 -> a[%s]\t", s_field);
+                  v_reg_fprint(stdout, h_processor->reg[A_REG]);                  
+               }
+               break;
+            //case 0016:  /* shift left a[f] */
+               //dest = act_a; reg_shift_left(); break;
+            //case 0017:  /* c + 1 -> c[f] */
+               //dest = act_c; reg_inc(); break;
+            //case 0020:  /* a - b -> a[f] */
+               //dest = act_a; src = act_a; src2 = act_b; reg_sub(); break;
+            //case 0021:  /* a - c -> c[f] */
+               //dest = act_c; src = act_a; src2 = act_c; reg_sub(); break;
+            //case 0022:  /* a - 1 -> a[f] */
+               //act_flags |= F.CARRY; dest = act_a; src = act_a; src2 = null; reg_sub(); break;
+            //case 0023:  /* c - 1 -> c[f] */
+               //act_flags |= F.CARRY; dest = act_c; src = act_c; src2 = null; reg_sub(); break;
+            //case 0024:  /* 0 - c -> c[f] */
+               //dest = act_c; src = null; src2 = act_c; reg_sub(); break;
+            //case 0025:  /* 0 - c - 1 -> c[f] */
+               //act_flags |= F.CARRY; dest = act_c; src = null; src2 = act_c; reg_sub(); break;
+            //case 0026:  /* if b[f] = 0 */
+               //act_inst_state = ST.branch; src = act_b;  dest=null; reg_test_nonequal(); break;
+            //case 0027:  /* if c[f] = 0 */
+               //act_inst_state = ST.branch; src = act_c;  dest=null; reg_test_nonequal(); break;
+            //case 0030:  /* if a >= c[f] */
+               //act_inst_state = ST.branch; dest = null; src = act_a; src2 = act_c; reg_sub(); break;
+            //case 0031:  /* if a >= b[f] */
+               //act_inst_state = ST.branch; dest = null; src = act_a; src2 = act_b; reg_sub(); break;
+            //case 0032:  /* if a[f] # 0 */
+               //act_inst_state = ST.branch; src = act_a; dest=null; reg_test_equal(); break;
+            //case 0033:  /* if c[f] # 0 */
+               //act_inst_state = ST.branch; src = act_c;  dest=null; reg_test_equal(); break;
+            //case 0034:  /* a - c -> a[f] */
+               //dest = act_a; src = act_a; src2 = act_c; reg_sub(); break;
+            //case 0035:  /* shift right a[f] */
+               //dest = act_a; reg_shift_right(); break;
+            //case 0036:  /* shift right b[f] */
+               //dest = act_b; reg_shift_right(); break;
+            //case 0037:  /* shift right c[f] */
+               //dest = act_c; reg_shift_right(); break;
+            default:
+               if (h_processor->flags[TRACE]) fprintf(stdout, "arithmetic");
                break;
          }
+         if (h_processor->flags[TRACE]) fprintf(stdout, "\n");
          break;
    
       case 03:
@@ -319,70 +544,25 @@ int i_processor_tick(o_processor* h_processor) {
          i_counter = i_counter | ((i_opcode >> 2) << 8); /* Should not be bigger than 4095 .*/
          switch (i_opcode & 00003) {
             case 00:
-               if (h_processor->flags[0])
-                  fprintf(stdout, "call\t %01o-%04o \t", h_processor->bank, i_counter);
+               if (h_processor->flags[TRACE])
+                  fprintf(stdout, "call\t %01o-%04o\n", h_processor->bank, i_counter);
                break;
             case 01:
-               if (h_processor->flags[0])
-                  fprintf(stdout, "call\t %01o-%04o \t", h_processor->bank, i_counter);
+               if (h_processor->flags[TRACE])
+                  fprintf(stdout, "call\t %01o-%04o\n", h_processor->bank, i_counter);
                break;
             case 02:
-               if (h_processor->flags[0])
-                  fprintf(stdout, "jump\t %01o-%04o \t", h_processor->bank, i_counter);
+               if (h_processor->flags[TRACE])
+                  fprintf(stdout, "jump\t %01o-%04o\n", h_processor->bank, i_counter);
                break;
             case 03:
-               if (h_processor->flags[0])
-                  fprintf(stdout, "jump\t %01o-%04o \t", h_processor->bank, i_counter);
+               if (h_processor->flags[TRACE])
+                  fprintf(stdout, "jump\t %01o-%04o\n", h_processor->bank, i_counter);
                break;
          }
          break;
-
    }
 
-   if (h_processor->flags[0]) fprintf(stdout, "\n");
-   
    if (h_processor->pc++ >= (ROM_SIZE - 1)) h_processor->pc = 0; /* Increment program counter */   
    return(0); /* TO DO: Return status */
 }
-
-char c_add_nibble(char a, char b, char carry, int base) {
-   char c = 0;
-   c = a + a + carry;
-   carry = 0;
-   if (c >= base) {
-      c -= base;
-      carry = 1;
-   } 
-   return(c);
-}
-
-char c_sub_nibble(char a, char b, char carry, int base) {
-   char c = 0;
-   c = (a - c) - carry;
-   carry = 0;
-   if (c < 0) {
-      c += base;
-      carry = 1;
-   }
-   return(c);
-}
-
-int i_set_register(o_register* h_register, ...) {
-
-   int i_count;
-   va_list t_args;
-
-   va_start(t_args, h_register);
-   for (i_count = 0; i_count <= REG_SIZE; i_count++) {
-      unsigned char c_temp = va_arg(t_args, int);
-      h_register->nibble[i_count]  = c_temp;
-   }
-   debug(fprintf(stderr, "Load (");
-      for (i_count = 0; i_count <= REG_SIZE; i_count++) {
-         fprintf(stderr, "0x%02x", h_register->nibble[i_count]);
-         if (i_count < REG_SIZE) fprintf(stderr, ", ");
-      }
-      fprintf(stderr, ")\n"));
-   return(0);  /* Return status */
-}
-

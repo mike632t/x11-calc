@@ -56,7 +56,7 @@
  
 typedef struct { /* Calculator display structure. */
    int index; 
-   o_segment* segment[DIGITS];
+   osegment* segment[DIGITS];
    int left;
    int top; 
    int width;
@@ -64,12 +64,12 @@ typedef struct { /* Calculator display structure. */
    unsigned int foreground;
    unsigned int background;
    unsigned int border;
-} o_display;
+} odisplay;
 
-o_display* h_display_create(int i_index, 
+odisplay *h_display_create(int i_index, 
    int i_left, int i_top, int i_width, int i_height, 
    unsigned int i_foreground, unsigned int i_background, unsigned int i_border);
    
-int i_display_draw(Display* x_display, int x_application_window, int i_screen, o_display* h_display);
+int i_display_draw(Display* x_display, int x_application_window, int i_screen, odisplay *h_display);
 
-int i_display_update(Display* x_display, int x_application_window, int i_screen, o_display* h_display, o_processor* h_processor);
+int i_display_update(Display* x_display, int x_application_window, int i_screen, odisplay *h_display, oprocessor *h_processor);
