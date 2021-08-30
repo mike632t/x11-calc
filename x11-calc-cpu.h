@@ -32,6 +32,7 @@
 #include "x11-calc.h"
 
 #define REGISTERS      8     /* A, B , C(X), D(Y), E(Z), F(T), M, N(M2) */
+#define FLAGS          10
 #define REG_SIZE       14   
 #define EXP_SIZE       3     /* Two digit exponent plus a sign digit */
 #define STACK_DEPTH    2
@@ -60,28 +61,29 @@ typedef struct {
 } oregister;
 
 typedef struct { 
-   oregister *reg[REGISTERS];
-   oregister *ram[RAM_SIZE]; /* Pointer to the ROM contents */
+   oregister *reg[REGISTERS];       /* Registers */
+   oregister *ram[RAM_SIZE];        /* ROM*/
+   unsigned char flags[FLAGS];      /* Processor flags + TRACE flag*/ 
+   unsigned char status[16];        /* Status (S0 - S15) */
    unsigned int stack[STACK_DEPTH]; /* Call stack */
-   unsigned int pc;           /* Program counter */
-   unsigned int sp;           /* Stack pointer */
-   unsigned int p;            /* P register */
-   unsigned int f;            /* F register */
-   unsigned int data;         /* Data register */
-   unsigned int base;         /* Data register */
-   unsigned char carry;       /* Carry flag */
-   unsigned char status[16];  /* Processor status word */
+   unsigned int pc;                 /* Program counter */
+   unsigned int sp;                 /* Stack pointer */
+   unsigned int p;                  /* P register */
+   unsigned int f;                  /* F register */
+   unsigned int data;               /* Data register */
+   unsigned int base;               /* Data register */
 
-   int flags[10] ;            /* Flags */ 
-   unsigned int bank;         /* ROM bank number */
-   int* rom;                  /* ROM */
+   unsigned int bank;               /* ROM bank number */
+   int* rom;                        /* ROM */
+   unsigned int first;
+   unsigned int last;
 } oprocessor;  
 
 oprocessor *h_processor_create(int *h_rom);
    
 int i_processor_tick(oprocessor *h_procesor);
 
-void v_reg_fprint(FILE *h_file, oregister *h_register);
+void v_reg_fprint(FILE *h_file,  oregister *h_register);
 
 void v_reg_load(oregister *h_register, ...);
 #endif
