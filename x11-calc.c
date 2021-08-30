@@ -91,6 +91,9 @@
  *                     ctrl-q  for single stepping, and ctrl-t to enable  or
  *                     disable tracing - MT
  *                   - Added definition for commit id - MT
+ * 30 Aug 21         - Separated version and licence notices into their own
+ *                     routines - MT
+ *                   - Abort if an error occurs - MT
  *
  * TO DO :           - Don't blank display when a key is pressed (as it will
  *                     be blanked by the firmware automatically).
@@ -105,7 +108,7 @@
 #define DATE           "21 Aug 21"
 #define AUTHOR         "MT"
  
-#define DEBUG          1
+#define DEBUG 0        /* Enable/disable debug*/
 
 #include <stdarg.h>    /* strlen(), etc. */
 #include <string.h>    /* strlen(), etc. */
@@ -128,19 +131,20 @@
 #include "gcc-debug.h" /* print() */
 #include "gcc-wait.h"  /* i_wait() */
 
-void v_version(int b_verbose) { /* Display version information */
+void v_version() { /* Display version information */
 
    fprintf(stderr, "%s: Version %s %s", NAME, VERSION, COMMIT_ID);
    if (__DATE__[4] == ' ') fprintf(stderr, " 0"); else fprintf(stderr, " %c", __DATE__[4]);
    fprintf(stderr, "%c %c%c%c %s %s", __DATE__[5],
       __DATE__[0], __DATE__[1], __DATE__[2], __DATE__ +9, __TIME__ );
    fprintf(stderr, " (Build: %s)\n", BUILD );
-   if (b_verbose) {
-      fprintf(stderr, "Copyright(C) %s %s\n", __DATE__ +7, AUTHOR);
-      fprintf(stderr, "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\n");
-      fprintf(stderr, "This is free software: you are free to change and redistribute it.\n");
-      fprintf(stderr, "There is NO WARRANTY, to the extent permitted by law.\n");
-   }
+}
+
+void v_licence() { /* Display licence information */
+   fprintf(stderr, "Copyright(C) %s %s\n", __DATE__ +7, AUTHOR);
+   fprintf(stderr, "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\n");
+   fprintf(stderr, "This is free software: you are free to change and redistribute it.\n");
+   fprintf(stderr, "There is NO WARRANTY, to the extent permitted by law.\n");
 }
 
 void v_about() { /* Display help text */
@@ -157,16 +161,17 @@ void v_about() { /* Display help text */
    fprintf(stdout, "      --help               display this help and exit\n");
    fprintf(stdout, "      --version            output version information and exit\n\n");
 #endif
+   exit(0);
 }
 
-void v_error(const char *s_fmt, ...) { /* Print formatted error message */
+void v_error(const char *s_fmt, ...) { /* Print formatted error message and exit */
    va_list t_args;
    va_start(t_args, s_fmt);
    fprintf(stderr, "%s : ", NAME);
    vfprintf(stderr, s_fmt, t_args);
    va_end(t_args);
+   exit(-1);
 }
-
  
 int main (int argc, char *argv[]){
 
@@ -207,20 +212,19 @@ int main (int argc, char *argv[]){
          for (i_index = 0; argv[i_count][i_index]; i_index++) /* Convert option to uppercase */
             if (argv[i_count][i_index] >= 'a' && argv[i_count][i_index] <= 'z')
                argv[i_count][i_index] = argv[i_count][i_index] - 32;
-         if (!strncmp(argv[i_count], "/STEP", i_index)) {
-            b_trace = True); /* Start in single step mode */
-         if (!strncmp(argv[i_count], "/TRACE", i_index)) {
-            b_trace = True); /* Enable tracing */
-         if (!strncmp(argv[i_count], "/VERSION", i_index)) {
-            v_version(True); /* Display version information */
+         if (!strncmp(argv[i_count], "/STEP", i_index)) 
+            b_trace = True; /* Start in single step mode */
+         else if (!strncmp(argv[i_count], "/TRACE", i_index))
+            b_trace = True; /* Enable tracing */
+         else if (!strncmp(argv[i_count], "/VERSION", i_index)) {
+            v_version; /* Display version information */
+            v_licence;
             exit(0);
-         } else if ((!strncmp(argv[i_count], "/HELP", i_index)) | (!strncmp(argv[i_count], "/?", i_index))) {
-            v_about();
-            exit(0);
-         } else { /* If we get here then the we have an invalid option */
-            v_error("invalid option %s\nTry '%s /help' for more information.\n", argv[i_count] , NAME);
-            exit(-1);
          }
+         else if ((!strncmp(argv[i_count], "/HELP", i_index)) | (!strncmp(argv[i_count], "/?", i_index)))
+            v_about();
+         else  /* If we get here then the we have an invalid option */
+            v_error("invalid option %s\nTry '%s /help' for more information.\n", argv[i_count] , NAME);
          if (argv[i_count][1] != 0) {
             for (i_index = i_count; i_index < argc - 1; i_index++) argv[i_index] = argv[i_index + 1];
             argc--; i_count--;
@@ -245,20 +249,19 @@ int main (int argc, char *argv[]){
                if (i_index == 2)
                  b_abort = True; /* '--' terminates command line processing */
                else
-                  if (!strncmp(argv[i_count], "--step", i_index)) {
+                  if (!strncmp(argv[i_count], "--step", i_index))
                      b_step = True; /* Start in single step mode */
-                  } else if (!strncmp(argv[i_count], "--trace", i_index)) {
+                  else if (!strncmp(argv[i_count], "--trace", i_index))
                      b_trace = True; /* Enable tracing */
-                  } else if (!strncmp(argv[i_count], "--version", i_index)) {
-                     v_version(True); /* Display version information */
+                  else if (!strncmp(argv[i_count], "--version", i_index)) {
+                     v_version; /* Display version information */
+                     v_licence;
                      exit(0);
-                  } else if (!strncmp(argv[i_count], "--help", i_index)) {
-                     v_about();
-                     exit(0);
-                  } else { /* If we get here then the we have an invalid long option */
-                     v_error("unrecognized option '%s'\nTry '%s --help' for more information.\n", argv[i_count], NAME);
-                     exit(-1);
                   }
+                  else if (!strncmp(argv[i_count], "--help", i_index))
+                     v_about();
+                  else  /* If we get here then the we have an invalid long option */
+                     v_error("unrecognized option '%s'\nTry '%s --help' for more information.\n", argv[i_count], NAME);
                i_index--; /* Leave index pointing at end of string (so argv[i_count][i_index] = 0) */
                break;
             default: /* If we get here the single letter option is unknown */
@@ -286,7 +289,7 @@ int main (int argc, char *argv[]){
 
    i_wait(200);  /* Sleep for 200 milliseconds to 'debounce' keyboard! */
    
-   debug(v_version(False));
+   v_version(False);
                      
    /* Open the display and create a new window. */
    if (!(x_display = XOpenDisplay(s_display_name))) v_error ("Cannot connect to X server '%s'.\n", s_display_name); 
@@ -374,7 +377,7 @@ int main (int argc, char *argv[]){
    /* Flush all pending requests to the X server, and wait until they are processed by the X server. */
    XSync(x_display, False);
    
-   debug(fprintf(stderr, "ROM Size : %4u words \n", (unsigned)(sizeof(i_rom) / sizeof i_rom[0])));   
+   fprintf(stderr, "ROM Size : %4u words \n", (unsigned)(sizeof(i_rom) / sizeof i_rom[0]));   
    h_processor = h_processor_create(i_rom); 
    
    h_processor->flags[TRACE] = b_trace;
@@ -383,7 +386,7 @@ int main (int argc, char *argv[]){
    /* v_reg_load(h_processor->reg[A_REG], 0x9, 0x1, 0x2, 0x3, 0xf, 0xf, 0xf, 0xf, 0xf, 0x9, 0x9, 0x9, 0x0, 0x0); */
    /* v_reg_load(h_processor->reg[B_REG], 0x2, 0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x2, 0x0, 0x0, 0x0, 0x0); */
 
-   /* v_reg_load(h_processor->reg[C_REG], 0x9, 0x1, 0x2, 0x3, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0); */
+   v_reg_load(h_processor->reg[C_REG], 0x9, 0x1, 0x2, 0x3, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0);
 
    /* Main program event loop. */
    b_abort = False;

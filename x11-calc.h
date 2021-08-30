@@ -29,7 +29,7 @@
 #define  COMMIT_ID "[Commit ID: $Format:%h$]"
 #include "x11-calc-21.h"
 
-void v_version(int b_verbose); /* Display version information */
+void v_version(); /* Display version information */
 void v_about(); /* Display help text */
 void v_error(const char *s_fmt, ...); /* Print formatted error message */
 
