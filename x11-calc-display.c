@@ -39,6 +39,7 @@
  *                     significant means it!) - MT
  * 30 Aug 21         - Checks that the display is enabled when updating the
  *                     display- MT
+ *                   - Removed unused variables - MT
  *                      
  */
 
@@ -113,8 +114,7 @@ odisplay *h_display_create(int i_index, int i_left, int i_top, int i_width,
 
 int i_display_draw(Display* x_display, int x_application_window, int i_screen, odisplay *h_display){
 
-   int i_indent, i_extent, i_upper, i_lower;
-   int i_offset, i_count;
+   int i_count;
 
    /* Set the foreground colour. */ 
    XSetForeground(x_display, DefaultGC(x_display, i_screen), h_display->border);
@@ -151,7 +151,7 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
                               DISPLAY_SPACE,
                               DISPLAY_SPACE,
                               DISPLAY_SPACE };
-   int i_offset, i_count;
+   int i_count;
  
    /* Draw display segments. */
    for (i_count = 0; i_count < DIGITS; i_count++)
