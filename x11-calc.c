@@ -254,8 +254,8 @@ int main (int argc, char *argv[]){
                   else if (!strncmp(argv[i_count], "--trace", i_index))
                      b_trace = True; /* Enable tracing */
                   else if (!strncmp(argv[i_count], "--version", i_index)) {
-                     v_version; /* Display version information */
-                     v_licence;
+                     v_version(); /* Display version information */
+                     v_licence();
                      exit(0);
                   }
                   else if (!strncmp(argv[i_count], "--help", i_index))

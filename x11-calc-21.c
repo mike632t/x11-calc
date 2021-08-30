@@ -58,10 +58,6 @@
 oregister o_ram[RAM_SIZE];
 
 int i_rom[ROM_SIZE * ROM_BANKS] = {
-/* 00672, 00656, 00656, 00656, 00656, 00656, 00656, 00656,
-   00656, 00656, 00656, 00656, 00656, 00656, 00656, 00656,
-   00656, 00656, 00656, 00656, 00656, 00656, 00656, 00656, */
-   
    00672, 00672, 01710, 00410, 00432, 00214, 00110, 00310,
    01635, 01566, 00014, 00432, 00072, 00445, 01610, 00134, 
    00120, 01015, 01112, 01512, 00264, 00272, 01363, 00006,
@@ -192,7 +188,7 @@ int i_rom[ROM_SIZE * ROM_BANKS] = {
    01374, 01030, 00630, 00530, 00230, 00430, 01130, 01020
 };
 
-int v_init_keypad(obutton *h_button[]){
+void v_init_keypad(obutton *h_button[]){
 
    /* Define top row of keys. */ 
    h_button[0] = h_button_create(0x11, "1/x", "", "yX", h_normal_font, h_small_font, h_alternate_font, 12, 85, 33, 30, False, BLACK);
