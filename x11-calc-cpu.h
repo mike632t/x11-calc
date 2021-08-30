@@ -35,7 +35,7 @@
 #define FLAGS          10
 #define REG_SIZE       14   
 #define EXP_SIZE       3     /* Two digit exponent plus a sign digit */
-#define STACK_DEPTH    2
+#define STACK_SIZE     2
 
 #define A_REG          0
 #define B_REG          1
@@ -62,10 +62,10 @@ typedef struct {
 
 typedef struct { 
    oregister *reg[REGISTERS];       /* Registers */
-   oregister *ram[RAM_SIZE];        /* ROM*/
+   oregister *ram[RAM_SIZE];        /* Memory registers */
    unsigned char flags[FLAGS];      /* Processor flags + TRACE flag*/ 
    unsigned char status[16];        /* Status (S0 - S15) */
-   unsigned int stack[STACK_DEPTH]; /* Call stack */
+   unsigned int stack[STACK_SIZE];  /* Call stack */
    unsigned int pc;                 /* Program counter */
    unsigned int sp;                 /* Stack pointer */
    unsigned int p;                  /* P register */
