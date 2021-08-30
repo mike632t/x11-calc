@@ -384,7 +384,7 @@ static void op_set_s (oprocessor *h_processor, int i_count) {
    if (i_count < sizeof(h_processor->status) / sizeof(*h_processor->status))
       h_processor->status[i_count] = 1;
    else
-      v_error("Unexpected error in  %s line : %d", __FILE__, __LINE__);
+      v_error("Unexpected error in  %s line : %d\n", __FILE__, __LINE__);
 }
 
 /* Clear the specified status bit */
@@ -392,7 +392,7 @@ static void op_clr_s (oprocessor *h_processor, int i_count) {
    if (i_count < sizeof(h_processor->status) / sizeof(*h_processor->status))
       h_processor->status[i_count] = 1;
    else
-      v_error("Unexpected error in  %s line : %d", __FILE__, __LINE__);
+      v_error("Unexpected error in  %s line : %d\n", __FILE__, __LINE__);
 }
 
 /* Test the specified status bit */
@@ -402,7 +402,7 @@ static void op_test_s (oprocessor *h_processor, int i_count) {
       h_processor->status[i_count] = 0; /* Testing the status clears it */
    }
    else
-      v_error("Unexpected error in  %s line : %d", __FILE__, __LINE__);
+      v_error("Unexpected error in  %s line : %d\n", __FILE__, __LINE__);
 }
 
 static void op_reset_s (oprocessor *h_processor) {
@@ -475,8 +475,9 @@ int i_processor_tick(oprocessor *h_processor) {
             default: 
                if (h_processor->flags[TRACE]) fprintf(stdout, "special group 03");
             }
+            break;
          default: 
-            v_error("Unexpected error in  %s line : %d", __FILE__, __LINE__);
+            v_error("Unexpected error in  %s line : %d\n", __FILE__, __LINE__);
          }
          break;
       case 01: /* Group 1 */ 
@@ -496,7 +497,7 @@ int i_processor_tick(oprocessor *h_processor) {
             if (h_processor->flags[TRACE]) fprintf(stdout, "** delayed rom %d", i_opcode >> 6);
             break;
          default: 
-            v_error("Unexpected error in  %s line : %d", __FILE__, __LINE__);
+            v_error("Unexpected error in  %s line : %d\n", __FILE__, __LINE__);
          }
          break;
       case 02: /* Group 2 */ 
@@ -565,7 +566,7 @@ int i_processor_tick(oprocessor *h_processor) {
             if (h_processor->flags[TRACE]) fprintf(stdout, "TODO p = n");
             break;
          default: 
-            v_error("Unexpected error in  %s line : %d", __FILE__, __LINE__);
+            v_error("Unexpected error in  %s line : %d\n", __FILE__, __LINE__);
          }
          break;
       }
