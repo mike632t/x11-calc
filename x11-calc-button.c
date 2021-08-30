@@ -41,7 +41,7 @@
 #define DATE           "14 Jul 13"
 #define AUTHOR         "MT"
  
-#define DEBUG 1 /* Enable/disable debug*/
+#define DEBUG 1        /* Enable/disable debug*/
  
 #include <string.h>    /* strlen(), etc. */
 #include <stdio.h>     /* fprintf(), etc. */
