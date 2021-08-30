@@ -22,6 +22,8 @@
  * 
  * 16 Aug 20         - Initial  verson (derived from original code used  in 
  *                     gcc-cat.c) - MT
+ * 30 Aug 21         - Changed  format statement to specify a long  integer 
+ *                     in the debug output (fixed warning) - MT
  * 
  */
 
@@ -70,7 +72,7 @@ f_seconds = l_delay / 1000.0;
 return (lib$wait(&f_seconds));
 #else /* Use a portable but very inefficent busy loop */
 struct timeb o_start, o_end;
-debug(fprintf(stderr, "Pausing for %d ms.\n", l_delay)); 
+debug(fprintf(stderr, "Pausing for %ld ms.\n", l_delay)); 
 ftime(&o_start);
 ftime(&o_end);
 while ((1000 * (o_end.time - o_start.time) + o_end.millitm - o_start.millitm) < l_delay) {
