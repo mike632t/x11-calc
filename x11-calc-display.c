@@ -31,11 +31,14 @@
  * 30 Aug 20         - Base  the number of display segments on the  maximum 
  *                     number of digits in the display - MT
  * 08 Aug 21         - Tidied up spelling errors in the comments - MT
- * 26 Aug 21         - Updated the display routines to use the register data
- *                     stored in the processor data structure - MT
- *                   - Reversed order of nibbles in register to match actual
- *                     processor  numbering  (when the register format  says
- *                     the left hand nibble is number 13 it means it!) - MT
+ * 26 Aug 21         - Updated  the display routines to use the contents of 
+ *                     the A and B registers - MT
+ *                   - Reversed  order of nibbles in the registers to match
+ *                     the  actual processor numbering (when  the  register
+ *                     format  says  the  left  hand  nibble  is  the  most
+ *                     significant means it!) - MT
+ * 30 Aug 21         - Checks that the display is enabled when updating the
+ *                     display- MT
  *                      
  */
 
@@ -153,8 +156,9 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
    /* Draw display segments. */
    for (i_count = 0; i_count < DIGITS; i_count++)
       if (!(h_display->segment[i_count] == NULL)) {
-         h_display->segment[i_count]->mask = c_digits[h_processor->reg[A_REG]->nibble[REG_SIZE - 1 - i_count]];
-         switch (h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x07) {
+         if (h_processor->flags[DISPLAY_ENABLE] == 1) {
+            h_display->segment[i_count]->mask = c_digits[h_processor->reg[A_REG]->nibble[REG_SIZE - 1 - i_count]];
+            switch (h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x07) {
             case 0x02: /* Sign */
                if (h_processor->reg[A_REG]->nibble[REG_SIZE -1 - i_count]) 
                   h_display->segment[i_count]->mask = DISPLAY_MINUS;
@@ -163,7 +167,10 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
                break;
             case 0x01: /* Number and decimal point */
                h_display->segment[i_count]->mask = h_display->segment[i_count]->mask | DISPLAY_DECIMAL;
+            }
          }
+         else 
+            h_display->segment[i_count]->mask = DISPLAY_SPACE;
       }
   return (True);
 }
