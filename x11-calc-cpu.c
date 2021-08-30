@@ -203,6 +203,9 @@
  *                   - Separated the 'special' instruction into four groups
  *                     to make it easier to parse the parameters - MT
  *                   - Added several more functions - MT
+ *                   - Implemented code to handle subroutines - MT
+ *                   - Fixed compiler warnings - MT
+ *                   - Added rom select, and register copy - MT
  * 
  * To Do             - Return status from tick().
  *                   - Finish instruction decoder!! 
@@ -235,13 +238,13 @@
 /* Print the content of a register */
 void v_reg_fprint(FILE *h_file, oregister *h_register) {
    const char c_name[8] = {'A', 'B', 'C', 'Y', 'Z', 'T', 'M', 'N'};
-   int i_count, i_temp = 0;
+   int i_count;
    if (h_register != NULL) {
       fprintf(h_file, "reg[");
       if (h_register->id < 0) 
          fprintf(h_file, "*%c", c_name[h_register->id * -1 - 1]);
       else 
-         fprintf(h_file, "%02d", c_name[h_register->id]);
+         fprintf(h_file, "%02d", h_register->id);
       fprintf(h_file, "] = 0x");
       for (i_count = REG_SIZE - 1; i_count >=0 ; i_count--) {
          fprintf(h_file, "%1x", h_register->nibble[i_count]);
@@ -293,7 +296,6 @@ oregister *h_register_create(char c_id){
 /* Load a register */
 void v_reg_load(oregister *h_register, ...) {
    int i_count, i_temp;
-   unsigned char c_temp;
    va_list t_args;
    va_start(t_args, h_register);
    i_temp = sizeof(h_register->nibble) / sizeof(*h_register->nibble) - 1;
@@ -344,6 +346,14 @@ static void v_reg_exch (oprocessor *h_processor, oregister *h_destination, oregi
       i_temp = h_destination->nibble[i_count];
       h_destination->nibble[i_count] = h_source->nibble[i_count];
       h_source->nibble[i_count] = i_temp;
+   }
+}
+
+/* Copy the contents of a register */
+static void v_reg_copy (oprocessor *h_processor, oregister *h_destination, oregister *h_source) {
+   int i_count;
+   for (i_count = h_processor->first; i_count <= h_processor->last; i_count++) {
+      h_destination->nibble[i_count] = h_source->nibble[i_count];
    }
 }
 
@@ -408,6 +418,20 @@ static void op_reset_s (oprocessor *h_processor) {
    int p_test_map [16] = {  4,  8, 12,  2,  9,  1,  6,  3,  1, 13,  5,  0, 11, 10,  7,  4 };
 */
 
+/* Jump to subroutine */
+void op_jsb(oprocessor *h_processor, int i_count){
+   h_processor->stack[h_processor->sp] = h_processor->pc; /* Push program counter on the stack */
+   h_processor->sp = (h_processor->sp + 1) & (STACK_SIZE - 1); /* Update stack pointer */
+   h_processor->pc = i_count - 1; /* Program counter will be auto incremented before next fetch */
+   /* TO DO handle_del_rom(); */
+}
+
+/* Return from subroutine */
+void op_rtn(oprocessor *h_processor) {
+   h_processor->sp = (h_processor->sp - 1) & (STACK_SIZE - 1); /* Update stack pointer */
+   h_processor->pc = h_processor->stack[h_processor->sp]; /* Pop program counter on the stack */
+}
+
 /* Decode and execute a single instruction */
 int i_processor_tick(oprocessor *h_processor) {
 
@@ -425,15 +449,34 @@ int i_processor_tick(oprocessor *h_processor) {
    case 00: /* Special operations */
       switch ((i_opcode >> 2) & 03) {
       case 00: /* Group 0 */
-         switch (i_opcode) {
-         case 00000: /* nop */
+         switch ((i_opcode >> 4) & 03) {
+         case 00: /* nop */
             if (h_processor->flags[TRACE]) fprintf(stdout, "nop");
             break;
-         case 01760: /* hi I'm woodstock */
-            if (h_processor->flags[TRACE]) fprintf(stdout, "hi I'm woodstock");
+         case 01:
+            switch (i_opcode){
+            case 01020: /* return */
+               op_rtn (h_processor);
+               if (h_processor->flags[TRACE]) fprintf(stdout, "return");
+               break;
+            default:
+               if (h_processor->flags[TRACE]) fprintf(stdout, "special group 01");
+            }
             break;
+         case 02: /* select rom */
+            h_processor->pc = (i_opcode >> 6) * 256 + (h_processor->pc % 256);
+            if (h_processor->flags[TRACE]) fprintf(stdout, "select rom %02d", i_opcode >> 6);
+            break;
+         case 03:
+            switch (i_opcode) {
+            case 01760: /* hi I'm woodstock */
+               if (h_processor->flags[TRACE]) fprintf(stdout, "hi I'm woodstock");
+               break;
+            default: 
+               if (h_processor->flags[TRACE]) fprintf(stdout, "special group 03");
+            }
          default: 
-            if (h_processor->flags[TRACE]) fprintf(stdout, "special group 0");
+            v_error("Unexpected error in  %s line : %d", __FILE__, __LINE__);
          }
          break;
       case 01: /* Group 1 */ 
@@ -513,13 +556,13 @@ int i_processor_tick(oprocessor *h_processor) {
             if (h_processor->flags[TRACE]) fprintf(stdout, "0 -> s(%d)", i_opcode >> 6);
             break;
          case 01: /* if 0 = s(n) */
-            if (h_processor->flags[TRACE]) fprintf(stdout, "if 1 = s(%d)", i_opcode >> 6);
+            if (h_processor->flags[TRACE]) fprintf(stdout, "TODO if 1 = s(%d)", i_opcode >> 6);
             break;
          case 02: /* if p # n */
             if (h_processor->flags[TRACE]) fprintf(stdout, "** if p # n");
             break;
          case 03: /* p = n */
-            if (h_processor->flags[TRACE]) fprintf(stdout, "** p = n");
+            if (h_processor->flags[TRACE]) fprintf(stdout, "TODO p = n");
             break;
          default: 
             v_error("Unexpected error in  %s line : %d", __FILE__, __LINE__);
@@ -531,6 +574,7 @@ int i_processor_tick(oprocessor *h_processor) {
 
    case 01: /* Jump subroutine */
       i_counter = i_opcode >> 2; /* Get target address */
+      op_jsb (h_processor, i_counter);
       if (h_processor->flags[TRACE]) fprintf(stdout, "jsb\t %01o-%04o\n", h_processor->bank, i_counter);
       break;
 
@@ -612,9 +656,9 @@ int i_processor_tick(oprocessor *h_processor) {
             v_flags_fprint(stdout, h_processor);
          }
          break;            
-      //case 0003:  /* a -> b[f] */
-         //src = act_a; dest = act_b; reg_copy(); break;
-      //case 0004:  /* a exchange c[f] */
+      /* case 0003:  /* a -> b[f] */
+      /*    src = act_a; dest = act_b; reg_copy(); break; */
+      case 0004:  /* a exch c[f] */
          v_reg_exch(h_processor, h_processor->reg[A_REG], h_processor->reg[C_REG]);
          if (h_processor->flags[TRACE]) {
             fprintf(stdout, "a exch c[%s]\t", s_field);
@@ -623,11 +667,11 @@ int i_processor_tick(oprocessor *h_processor) {
             v_flags_fprint(stdout, h_processor);
          }
          break;            
-      //case 0005:  /* c -> a[f] */
-         //src = act_c; dest = act_a; reg_copy(); break;
-      //case 0006:  /* b -> c[f] */
-         //src = act_b; dest = act_c; reg_copy(); break;
-      //case 0007:  /* b exchange c[f] */
+      /* case 0005:  /* c -> a[f] */
+      /*    src = act_c; dest = act_a; reg_copy(); break; */
+      /* case 0006:  /* b -> c[f] */
+      /*    src = act_b; dest = act_c; reg_copy(); break; */
+      case 0007:  /* b exchange c[f] */
          v_reg_exch(h_processor, h_processor->reg[B_REG], h_processor->reg[C_REG]);
          if (h_processor->flags[TRACE]) {
             fprintf(stdout, "b exch c[%s]\t", s_field);
@@ -644,14 +688,14 @@ int i_processor_tick(oprocessor *h_processor) {
             v_flags_fprint(stdout, h_processor);
          }
          break;
-      //case 0011:  /* a + b -> a[f] */
-         //dest = act_a; src = act_b; reg_add(); break;
-      //case 0012:  /* a + c -> a[f] */
-         //dest = act_a; src = act_c; reg_add(); break;
-      //case 0013:  /* c + c -> c[f] */
-         //dest = act_c; src = act_c; reg_add(); break;
-      //case 0014:  /* a + c -> c[f] */
-         //dest = act_c; src = act_a; reg_add(); break;
+      /* case 0011:  /* a + b -> a[f] */
+      /*    dest = act_a; src = act_b; reg_add(); break; */
+      /* case 0012:  /* a + c -> a[f] */
+      /*    dest = act_a; src = act_c; reg_add(); break; */
+      /* case 0013:  /* c + c -> c[f] */
+      /*    dest = act_c; src = act_c; reg_add(); break; */
+      /* case 0014:  /* a + c -> c[f] */
+      /*    dest = act_c; src = act_a; reg_add(); break; */
       case 0015:  /* a + 1 -> a[f] */
          v_reg_inc (h_processor, h_processor->reg[A_REG]);
          if (h_processor->flags[TRACE]) {
@@ -660,42 +704,42 @@ int i_processor_tick(oprocessor *h_processor) {
             v_flags_fprint(stdout, h_processor);
          }
          break;
-      //case 0016:  /* shift left a[f] */
-         //dest = act_a; reg_shift_left(); break;
-      //case 0017:  /* c + 1 -> c[f] */
-         //dest = act_c; reg_inc(); break;
-      //case 0020:  /* a - b -> a[f] */
-         //dest = act_a; src = act_a; src2 = act_b; reg_sub(); break;
-      //case 0021:  /* a - c -> c[f] */
-         //dest = act_c; src = act_a; src2 = act_c; reg_sub(); break;
-      //case 0022:  /* a - 1 -> a[f] */
-         //act_flags |= F.CARRY; dest = act_a; src = act_a; src2 = null; reg_sub(); break;
-      //case 0023:  /* c - 1 -> c[f] */
-         //act_flags |= F.CARRY; dest = act_c; src = act_c; src2 = null; reg_sub(); break;
-      //case 0024:  /* 0 - c -> c[f] */
-         //dest = act_c; src = null; src2 = act_c; reg_sub(); break;
-      //case 0025:  /* 0 - c - 1 -> c[f] */
-         //act_flags |= F.CARRY; dest = act_c; src = null; src2 = act_c; reg_sub(); break;
-      //case 0026:  /* if b[f] = 0 */
-         //act_inst_state = ST.branch; src = act_b;  dest=null; reg_test_nonequal(); break;
-      //case 0027:  /* if c[f] = 0 */
-         //act_inst_state = ST.branch; src = act_c;  dest=null; reg_test_nonequal(); break;
-      //case 0030:  /* if a >= c[f] */
-         //act_inst_state = ST.branch; dest = null; src = act_a; src2 = act_c; reg_sub(); break;
-      //case 0031:  /* if a >= b[f] */
-         //act_inst_state = ST.branch; dest = null; src = act_a; src2 = act_b; reg_sub(); break;
-      //case 0032:  /* if a[f] # 0 */
-         //act_inst_state = ST.branch; src = act_a; dest=null; reg_test_equal(); break;
-      //case 0033:  /* if c[f] # 0 */
-         //act_inst_state = ST.branch; src = act_c;  dest=null; reg_test_equal(); break;
-      //case 0034:  /* a - c -> a[f] */
-         //dest = act_a; src = act_a; src2 = act_c; reg_sub(); break;
-      //case 0035:  /* shift right a[f] */
-         //dest = act_a; reg_shift_right(); break;
-      //case 0036:  /* shift right b[f] */
-         //dest = act_b; reg_shift_right(); break;
-      //case 0037:  /* shift right c[f] */
-         //dest = act_c; reg_shift_right(); break;
+      /* case 0016:  /* shift left a[f] */
+      /*    dest = act_a; reg_shift_left(); break; */
+      /* case 0017:  /* c + 1 -> c[f] */
+      /*    dest = act_c; reg_inc(); break; */
+      /* case 0020:  /* a - b -> a[f] */
+      /*    dest = act_a; src = act_a; src2 = act_b; reg_sub(); break; */
+      /* case 0021:  /* a - c -> c[f] */
+      /*    dest = act_c; src = act_a; src2 = act_c; reg_sub(); break; */
+      /* case 0022:  /* a - 1 -> a[f] */
+      /*    act_flags |= F.CARRY; dest = act_a; src = act_a; src2 = null; reg_sub(); break; */
+      /* case 0023:  /* c - 1 -> c[f] */
+      /*    act_flags |= F.CARRY; dest = act_c; src = act_c; src2 = null; reg_sub(); break; */
+      /* case 0024:  /* 0 - c -> c[f] */
+      /*    dest = act_c; src = null; src2 = act_c; reg_sub(); break; */
+      /* case 0025:  /* 0 - c - 1 -> c[f] */
+      /*    act_flags |= F.CARRY; dest = act_c; src = null; src2 = act_c; reg_sub(); break; */
+      /* case 0026:  /* if b[f] = 0 */
+      /*    act_inst_state = ST.branch; src = act_b;  dest=null; reg_test_nonequal(); break; */
+      /* case 0027:  /* if c[f] = 0 */
+      /*    act_inst_state = ST.branch; src = act_c;  dest=null; reg_test_nonequal(); break; */
+      /* case 0030:  /* if a >= c[f] */
+      /*    act_inst_state = ST.branch; dest = null; src = act_a; src2 = act_c; reg_sub(); break; */
+      /* case 0031:  /* if a >= b[f] */
+      /*    act_inst_state = ST.branch; dest = null; src = act_a; src2 = act_b; reg_sub(); break; */
+      /* case 0032:  /* if a[f] # 0 */
+      /*    act_inst_state = ST.branch; src = act_a; dest=null; reg_test_equal(); break; */
+      /* case 0033:  /* if c[f] # 0 */
+      /*    act_inst_state = ST.branch; src = act_c;  dest=null; reg_test_equal(); break; */
+      /* case 0034:  /* a - c -> a[f] */
+      /*    dest = act_a; src = act_a; src2 = act_c; reg_sub(); break; */
+      /* case 0035:  /* shift right a[f] */
+      /*    dest = act_a; reg_shift_right(); break; */
+      /* case 0036:  /* shift right b[f] */
+      /*    dest = act_b; reg_shift_right(); break; */
+      /* case 0037:  /* shift right c[f] */
+      /*    dest = act_c; reg_shift_right(); break; */
       default:
          if (h_processor->flags[TRACE]) fprintf(stdout, "arithmetic");
          break;
