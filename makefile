@@ -37,8 +37,7 @@ OBJECTS	= $(SOURCES:.c=.o)
 OUTPUT	= $(PROGRAM).out
 LIBS		= -lX11 -lm
 INCLUDE	= .
-FLAGS		= -Wall -pedantic -ansi
-FLAGS		= 
+FLAGS		= -Wall -Wno-comment -pedantic -ansi
 CC			= gcc
 #
 $(PROGRAM): $(OBJECTS) 
