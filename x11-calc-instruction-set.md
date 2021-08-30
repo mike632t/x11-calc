@@ -35,55 +35,75 @@
 
 ### Special operations.
 
-    0 000 000 000  nop
-    0 000 001 000  clear regs
-    0 000 010 000  keys -> rom address
-    0 001 001 000  clear s
-    0 010 001 000  display toggle
-    0 011 001 000  display off
-    0 100 001 000  m exch c
-    0 101 001 000  m -> c
-    0 110 001 000  n exch c
-    0 111 001 000  n -> c
-    1 000 001 000  stack -> a
-    1 001 001 000  down rotate
-    1 010 001 000  y -> a
-    1 011 001 000  c -> stack
-    1 100 001 000  decimal
-    1 110 001 000  f -> a, f -> a[x]
-    1 111 001 000  f exch a, f exch a[x]
-    0 001 010 000  keys -> a
-    0 010 010 000  a -> rom address
-    0 011 010 000  reset twf
-    0 100 010 000  binary
-    0 101 010 000  rotate a left
-    0 110 010 000  p - 1 -> p                 (dec p)
-    0 111 010 000  p + 1 -> p                 (inc p)
-    1 000 010 000  return
-    1 000 110 000  bank switch
-    0 000 111 000  c -> addr
-    1 010 110 000  clear data registers
-    1 011 110 000  c -> data
-    1 100 110 000  rom checksum
-    1 111 110 000  hi i'm woodstock
+May be one or two word instructions!
 
-    n nnn 000 100  1 -> s(n)
-    n nnn 001 100  0 -> s(n)
-    n nnn 010 100  if 1 = s(n)
-    n nnn 011 000  load n
-    n nnn 011 100  if 0 = s(n)
-    n nnn 100 000  select rom n
-    n nnn 100 100  if p = n
-    n nnn 101 000  c -> data register(n)
-    n nnn 101 100  if p # n
-    n nnn 110 100  delayed rom n
-    n nnn 111 000  data register(n)-> c
-    n nnn 111 100  p = n
+      9   8   7   6   5   4   3   2   1   0
+    +---+---+---+---+---+---+---+---+---+---+
+    | n | n | n | n | n | n | n | n | 0 | 0 | 
+    +---+---+---+---+---+---+---+---+---+---+ 
+
+The can be further categorised by splitting the least significant six bits into three groups
+
+   00000    0 000 00 00 00  nop
+
+   00020    0 000 01 00 00  keys -> rom address
+   00120    0 001 01 00 00  keys -> a
+   00220    0 010 01 00 00  a -> rom address
+   00320    0 011 01 00 00  reset twf
+   00420    0 100 01 00 00  binary
+   00520    0 101 01 00 00  rotate a left
+   00620    0 110 01 00 00  p - 1 -> p                 (dec p)
+   00720    0 111 01 00 00  p + 1 -> p                 (inc p)
+   01020    1 000 01 00 00  return
+
+   0nn40    n nnn 10 00 00  select rom n
+    
+   01060 *  1 000 11 00 00  bank switch
+   01260 *  1 010 11 00 00  clear data registers
+   01360 *  1 011 11 00 00  c -> data
+   01460 *  1 100 11 00 00  rom checksum
+   01760    1 111 11 00 00  hi i'm woodstock
+
+   0nn04    n nnn 00 01 00  1 -> s(n)
+   0nn24    n nnn 01 01 00  if 1 = s(n)
+   0nn44    n nnn 10 01 00  if p = n
+   0nn64 *  n nnn 11 01 00  delayed rom n
+
+   00010    0 000 00 10 00  clear regs
+   00110    0 001 00 10 00  clear s
+   00210    0 010 00 10 00  display toggle
+   00310    0 011 00 10 00  display off
+   00410    0 100 00 10 00  m exch c
+   00510    0 101 00 10 00  m -> c
+   00610    0 110 00 10 00  n exch c
+   00710    0 111 00 10 00  n -> c
+   
+   01010    1 000 00 10 00  stack -> a
+   01110    1 001 00 10 00  down rotate
+   01210    1 010 00 10 00  y -> a
+   01310    1 011 00 10 00  c -> stack
+   01410    1 100 00 10 00  decimal
+   01610    1 110 00 10 00  f -> a, f -> a[x]
+   01710    1 111 00 10 00  f exch a, f exch a[x]
+
+   0nn30    n nnn 01 10 00  load n
+   0nn50    n nnn 10 10 00  c -> data register(n)
+   00070 *  0 000 11 10 00  c -> addr
+   0nn70 *  n nnn 11 10 00  data register(n)-> c      (n > 0)
+
+   0nn14    n nnn 00 11 00  0 -> s(n)
+   0nn34    n nnn 01 11 00  if 0 = s(n)
+   0nn54    n nnn 10 11 00  if p # n                  
+            (where nn=   0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15
+                    p=  14,  4,  7,  8, 11,  2, 10, 12,  1,  3, 13,  6,  0,  9,  5, 14)
+   0nn74    n nnn 11 11 00  p = n
+            (where nn=   0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15
+                    p=   4,  8, 12,  2,  9,  1,  6,  3,  1, 13,  5,  0, 11, 10,  7,  4)
+
+### Jump subroutine
 
     x xxx xxx x01  jsb
-    x xxx xxx x11  if n/c 
-    n nnn nnn nnn  then go to
-
+    
 
 ### Arithmetic operations.
 
@@ -142,3 +162,10 @@
     1 110 1ff f10  shift right a
     1 111 0ff f10  shift right b
     1 111 1ff f10  shift right c
+
+### Conditional    
+    
+    x xxx xxx x11  if n/c 
+    n nnn nnn nnn  then go to
+
+
