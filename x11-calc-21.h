@@ -34,7 +34,7 @@
 #define DIGITS       12
 
 #define ROM_SIZE     02000  
-#define RAM_SIZE     00000
+#define RAM_SIZE     1
 #define ROM_BANKS    1
 
 #define True         1
