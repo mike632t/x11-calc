@@ -1,10 +1,10 @@
 /*
- * x11-calc.c - RPN (Reverse Polish) calculator simulator. 
+ * x11-calc.c - RPN (Reverse Polish) calculator simulator.
  *
  * Copyright(C) 2019 - MT
  *
  * Emulation of various models of HP calculator for X11.
- * 
+ *
  * Deliberately parses the command line without using 'getopt' or 'argparse'
  * to maximise portability.
  *
@@ -20,7 +20,7 @@
  *
  * You  should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  * 13 Jun 13   0.1   - Initial version - MT
  * 16 Jun 13         - Can use predefined button colours - MT
  *                   - Added text to buttons - MT
@@ -51,7 +51,7 @@
  *                     updating the display easier - MT
  * 14 Aug 13         - Tidied up comments - MT
  * 17 Aug 13         - Window is now redrawn automatically when application
- *                     loads - MT  
+ *                     loads - MT
  * 09 Mar 14         - Created  separate files for code that is dependent on
  *                     calculator the model - MT
  * 10 Mar 14         - Changed key code indexes to BCD hex values - MT
@@ -64,12 +64,12 @@
  *                     brief interval (just like the real thing) - MT
  * 10 Dec 18         - Alternate  function key now LIGHT_BLUE, allowing  it
  *                     to be a different colour to the alternate text - MT
- * 11 Dec 28         - Tidied up comments again - MT 
+ * 11 Dec 28         - Tidied up comments again - MT
  * 23 Aug 20         - Modified the debug code (again), optional debug code
  *                     executed using the debug() macro, with print() being
  *                     used to print diagnostic messages - MT
  * 30 Aug 20         - Added number formatting routines - MT
- * 31 Aug 20         - Made  version(), about(), and error() model specific 
+ * 31 Aug 20         - Made  version(), about(), and error() model specific
  *                     so that the name reflects the model number - MT
  * 31 Aug 20         - Resolved dependencies between header files by moving
  *                     common function definitions to a separate file - MT
@@ -94,20 +94,23 @@
  * 30 Aug 21         - Separated version and licence notices into their own
  *                     routines - MT
  *                   - Abort if an error occurs - MT
+ *  2 Sep 21         - Can enable single stepping and tracing at a hardcoded
+ *                     break-point - MT
  *
  * TO DO :           - Don't blank display when a key is pressed (as it will
  *                     be blanked by the firmware automatically).
+ *                   - Set a break-point from thecommand line
  *                   - Free up allocated memory on exit.
  *                   - Sort out colour mapping.
- * 
+ *
  */
- 
+
 #define NAME           "x11-rpncalc"
 #define VERSION        "0.1"
 #define BUILD          "0041"
 #define DATE           "21 Aug 21"
 #define AUTHOR         "MT"
- 
+
 #define DEBUG 0        /* Enable/disable debug*/
 
 #include <stdarg.h>    /* strlen(), etc. */
@@ -117,8 +120,8 @@
 
 #include <X11/Xlib.h>  /* XOpenDisplay(), etc. */
 #include <X11/Xutil.h> /* XSizeHints etc. */
- 
-#include "x11-calc-font.h" 
+
+#include "x11-calc-font.h"
 #include "x11-calc-button.h"
 #include "x11-calc-colour.h"
 
@@ -172,7 +175,7 @@ void v_error(const char *s_fmt, ...) { /* Print formatted error message and exit
    va_end(t_args);
    exit(-1);
 }
- 
+
 int main (int argc, char *argv[]){
 
    Display *x_display; /* Pointer to X display structure. */
@@ -180,12 +183,12 @@ int main (int argc, char *argv[]){
    XEvent x_event;
    XSizeHints *h_size_hint;
    Atom wm_delete;
-   
+
    obutton *h_button[BUTTONS]; /* Array to hold pointers to 30 buttons. */
    obutton *h_pressed;
    odisplay *h_display; /* Pointer to display strudture. */
-   oprocessor *h_processor; 
-   
+   oprocessor *h_processor;
+
    char *s_display_name = ""; /* Just use the default display. */
    char *s_font; /* Font description. */
 
@@ -197,8 +200,8 @@ int main (int argc, char *argv[]){
    int i_window_left, i_window_top; /* Window's top-left corner */
    unsigned int i_colour_depth; /* Window's colour depth. */
    unsigned int i_background_colour; /* Window's background colour. */
-   int i_screen; /* Default screen number. */  
-   
+   int i_screen; /* Default screen number. */
+
    int i_count, i_index;
    char b_trace = False; /* Trace flag */
    char b_step = False; /* Single step flag flag */
@@ -212,7 +215,7 @@ int main (int argc, char *argv[]){
          for (i_index = 0; argv[i_count][i_index]; i_index++) /* Convert option to uppercase */
             if (argv[i_count][i_index] >= 'a' && argv[i_count][i_index] <= 'z')
                argv[i_count][i_index] = argv[i_count][i_index] - 32;
-         if (!strncmp(argv[i_count], "/STEP", i_index)) 
+         if (!strncmp(argv[i_count], "/STEP", i_index))
             b_trace = True; /* Start in single step mode */
          else if (!strncmp(argv[i_count], "/TRACE", i_index))
             b_trace = True; /* Enable tracing */
@@ -276,39 +279,39 @@ int main (int argc, char *argv[]){
          }
       }
    }
-#endif 
+#endif
 
    if (argc > 1 ) {  /* Check command lime parameters - there shouldn't be any! */
 #ifdef vms
       v_error("invalid parameter(s)\nTry '%s /help' for more information.\n", NAME);
 #else
       v_error("invalid operand(s)\nTry '%s --help' for more information.\n", NAME);
-#endif 
+#endif
       exit(-1);
    }
 
    i_wait(200);  /* Sleep for 200 milliseconds to 'debounce' keyboard! */
-   
+
    v_version(False);
-                     
+
    /* Open the display and create a new window. */
-   if (!(x_display = XOpenDisplay(s_display_name))) v_error ("Cannot connect to X server '%s'.\n", s_display_name); 
+   if (!(x_display = XOpenDisplay(s_display_name))) v_error ("Cannot connect to X server '%s'.\n", s_display_name);
 
    /* Get the default screen for our X server. */
    i_screen = DefaultScreen(x_display);
-   
+
    /* Set the background colour. */
    i_background_colour = BACKGROUND;
 
    /* Create the application window, as a child of the root window. */
-   x_application_window = XCreateSimpleWindow(x_display, 
+   x_application_window = XCreateSimpleWindow(x_display,
       RootWindow(x_display, i_screen),
       i_window_width, i_window_height,  /* Window position -igore ? */
       i_window_width, /* Window width. */
       i_window_height, /* Window height. */
       i_window_border, /* Border width - ignored ? */
       BlackPixel(x_display, i_screen), /* Preferred method. */
-      i_background_colour); 
+      i_background_colour);
 
    /* Set application window size. */
    h_size_hint = XAllocSizeHints();
@@ -319,16 +322,16 @@ int main (int argc, char *argv[]){
    h_size_hint->max_width = i_window_width;
    XSetWMNormalHints(x_display, x_application_window, h_size_hint);
    XStoreName(x_display, x_application_window, s_title); /* Set the window title. */
-   
+
    /* Get window geometry. */
-   if (XGetGeometry(x_display, x_application_window, 
+   if (XGetGeometry(x_display, x_application_window,
          &RootWindow(x_display, i_screen),
-         &i_window_left, &i_window_top, 
+         &i_window_left, &i_window_top,
          &i_window_width,
          &i_window_height,
          &i_window_border,
          &i_colour_depth) == False) v_error("Unable to get display properties.\n");
-      
+
    /* Check colour depth. */
    if (i_colour_depth < 24) v_error("Requires a 24-bit colour display.\n");
 
@@ -340,102 +343,103 @@ int main (int argc, char *argv[]){
    if (!(h_small_font = XLoadQueryFont(x_display, s_font))) v_error("Cannot load font '%s'.\n",  s_font);
 
    s_font = ALTERNATE_TEXT; /* Alternate text font. */
-   if (!(h_alternate_font = XLoadQueryFont(x_display, s_font))) v_error("Cannot load font '%s'.\n",  s_font);          
+   if (!(h_alternate_font = XLoadQueryFont(x_display, s_font))) v_error("Cannot load font '%s'.\n",  s_font);
 
    s_font = LARGE_TEXT; /* Large text font. */
 
-   if (!(h_large_font = XLoadQueryFont(x_display, s_font))) v_error("Cannot load font '%s'.\n",  s_font);          
-   
+   if (!(h_large_font = XLoadQueryFont(x_display, s_font))) v_error("Cannot load font '%s'.\n",  s_font);
+
    /* Create buttons. */
    v_init_keypad(h_button);
- 
+
    /* Create display */
    h_display = h_display_create(0, 2, 4, 197, 61, RED, DARK_RED, RED_BACKGROUND);
- 
+
    /* Draw display. */
    i_display_draw(x_display, x_application_window, i_screen, h_display);
 
    /* Draw buttons. */
    for (i_count = 0; i_count < BUTTONS; i_count++)
       if (!(h_button[i_count] == NULL)) i_button_draw(x_display, x_application_window, i_screen, h_button[i_count]);
- 
+
    /* Flush all pending requests to the X server, and wait until they are processed by the X server. */
    XSync(x_display, False);
 
    /* Select kind of events we are interested in. */
-   XSelectInput(x_display, x_application_window, FocusChangeMask | ExposureMask | 
-      KeyPressMask | KeyReleaseMask | ButtonPressMask | 
+   XSelectInput(x_display, x_application_window, FocusChangeMask | ExposureMask |
+      KeyPressMask | KeyReleaseMask | ButtonPressMask |
       ButtonReleaseMask | StructureNotifyMask | SubstructureNotifyMask);
-      
+
    wm_delete = XInternAtom(x_display, "WM_DELETE_WINDOW", False); /* Create a windows delete message 'atom'. */
    XSetWMProtocols(x_display, x_application_window, &wm_delete, 1); /* Tell the display to pass wm_delete messages to the application window. */
 
    /* Show window on display */
-   XMapWindow(x_display, x_application_window); 
+   XMapWindow(x_display, x_application_window);
    XRaiseWindow(x_display, x_application_window); /* Raise window - ensures expose envent is raised? */
- 
+
    /* Flush all pending requests to the X server, and wait until they are processed by the X server. */
    XSync(x_display, False);
-   
-   fprintf(stderr, "ROM Size : %4u words \n", (unsigned)(sizeof(i_rom) / sizeof i_rom[0]));   
-   h_processor = h_processor_create(i_rom); 
-   
+
+   fprintf(stderr, "ROM Size : %4u words \n", (unsigned)(sizeof(i_rom) / sizeof i_rom[0]));
+   h_processor = h_processor_create(i_rom);
+
    h_processor->flags[TRACE] = b_trace;
-   
+
    /* -1234567890e99e-99. */
    /* v_reg_load(h_processor->reg[A_REG], 0x9, 0x1, 0x2, 0x3, 0xf, 0xf, 0xf, 0xf, 0xf, 0x9, 0x9, 0x9, 0x0, 0x0); */
    /* v_reg_load(h_processor->reg[B_REG], 0x2, 0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x2, 0x0, 0x0, 0x0, 0x0); */
 
-   v_reg_load(h_processor->reg[C_REG], 0x9, 0x1, 0x2, 0x3, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0);
+   /* v_reg_load(h_processor->reg[C_REG], 0x9, 0x1, 0x2, 0x3, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0); */
 
    /* Main program event loop. */
    b_abort = False;
    while (!b_abort) {
       i_wait(3);  /* Sleep for 3 milliseconds */
 
-      /* Update and redraw the display. */ 
+      /* Update and redraw the display. */
       i_display_update(x_display, x_application_window, i_screen, h_display, h_processor);
       i_display_draw(x_display, x_application_window, i_screen, h_display);
       XFlush(x_display);
-      
+
+      if (h_processor->pc == -1) {b_step = True; h_processor->flags[TRACE] = True;} /* Breakpoint */
       if (b_run) i_processor_tick(h_processor);
       if (b_step) b_run = False;
 
       while (XPending(x_display)) {
 
          XNextEvent(x_display, &x_event);
-         
+
          /* debug(fprintf(stderr, "Event ID : %i.\n", x_event.type)); */
-         
+
          switch (x_event.type) {
-      
-         case EnterNotify : 
-            debug(fprintf(stderr, "Enter Notify Event\n")); 
+
+         case EnterNotify :
+            debug(fprintf(stderr, "Enter Notify Event\n"));
             break;
 
-         case FocusOut : 
+         case FocusOut :
             b_ctrl = b_alt = b_shift = 0; /* Clear keyboard modifiers */
             break;
-         
-         case KeyPress : 
+
+         case KeyPress :
             debug(fprintf(stderr, "Key pressed - keycode(%d).\n", x_event.xkey.keycode));
-            
+
             if ((x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_Control_L)) || \
-               (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_Control_R))) { 
+               (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_Control_R))) {
                b_ctrl++;
             }
-            else if (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_Alt_L)) { 
+            else if (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_Alt_L)) {
                b_alt++;
             }
             else if ((x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_Shift_L)) || \
-               (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_Shift_R))) { 
+               (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_Shift_R))) {
                b_shift++;
             }
             else if (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_Q))  { /* Check for Ctrl-Q */
                if ((b_ctrl == 1) && (b_shift == 0)) b_step = !(b_run  = True);
             }
             else if (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_S))  { /* Check for Ctrl-S */
-               if ((b_ctrl == 1) && (b_shift == 0)) b_step = b_run =  True; 
+               if ((b_ctrl == 1) && (b_shift == 0)) b_step = b_run =  True;
             }
             else if (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_T))  { /* Check for Ctrl-T */
                if ((b_ctrl == 1) && (b_shift == 0)) {
@@ -446,36 +450,36 @@ int main (int argc, char *argv[]){
                b_abort = True;
             }
             else if (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_space))  { /* Check for space */
-               if ((b_ctrl == 0) && (b_shift == 0)) b_step = b_run =  True; 
+               if ((b_ctrl == 0) && (b_shift == 0)) b_step = b_run =  True;
             }
             break;
 
          case KeyRelease :
             debug(fprintf(stderr, "Key released - keycode(%d).\n", x_event.xkey.keycode));
             if ((x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_Control_L)) || \
-               (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_Control_R))) { 
+               (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_Control_R))) {
                b_ctrl--;
             }
-            else if (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_Alt_L)) { 
+            else if (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_Alt_L)) {
                b_alt--;
             }
             else if ((x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_Shift_L)) || \
-               (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_Shift_R))) { 
+               (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_Shift_R))) {
                b_shift--;
             }
             break;
 
-         case ButtonPress : 
+         case ButtonPress :
             if (x_event.xbutton.button == 1) {
                for (i_count = 0; i_count < BUTTONS; i_count++){
                   h_pressed = h_button_pressed(h_button[i_count], x_event.xbutton.x, x_event.xbutton.y);
                   if (!(h_pressed == NULL)) {
-                     h_pressed->state = True; 
+                     h_pressed->state = True;
                      i_button_draw(x_display, x_application_window, i_screen, h_pressed);
- 
-                     debug(fprintf(stderr, "Button pressed - keycode(%.2X).\n", h_pressed->index)); 
 
-                     /* Clear the display segments and redraw it. */ 
+                     debug(fprintf(stderr, "Button pressed - keycode(%.2X).\n", h_pressed->index));
+
+                     /* Clear the display segments and redraw it. */
                      for (i_count = 0; i_count < DIGITS ; i_count++)
                         h_display->segment[i_count]->mask = DISPLAY_SPACE;
                      i_display_draw(x_display, x_application_window, i_screen, h_display);
@@ -483,18 +487,18 @@ int main (int argc, char *argv[]){
 
                      i_wait(100);  /* Show blank display */
                      break;
-                  }                 
+                  }
                }
             }
             break;
 
-         case ButtonRelease : 
+         case ButtonRelease :
             if (x_event.xbutton.button == 1) {
                if (!(h_pressed == NULL)) {
                   h_pressed->state = False;
                   i_button_draw(x_display, x_application_window, i_screen, h_pressed);
- 
-                  debug(fprintf(stderr, "Button released - keycode(%.2X).\n", h_pressed->index)); 
+
+                  debug(fprintf(stderr, "Button released - keycode(%.2X).\n", h_pressed->index));
                }
             }
             break;
@@ -514,7 +518,7 @@ int main (int argc, char *argv[]){
 
          }
       }
-      
+
    }
 
    /* Close connection to server. */
