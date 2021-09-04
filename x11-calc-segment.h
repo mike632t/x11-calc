@@ -1,10 +1,10 @@
 /*
- * x11-calc-segment.h - RPN (Reverse Polish) calculator simulator. 
+ * x11-calc-segment.h - RPN (Reverse Polish) calculator simulator.
  *
  * Copyright(C) 2013   MT
- * 
+ *
  * 7 segment display digit functions.
- *      
+ *
  * Contains  the  functions needed to create and display  a  seven  segment
  * digit element based on the mask value.
  *
@@ -27,7 +27,7 @@
  * 14 Jul 13         - Initial version - MT
  *
  */
- 
+
 #define SEG_A          0x0001
 #define SEG_B          0x0002
 #define SEG_C          0x0004
@@ -43,16 +43,16 @@ typedef struct { /* Calculator segment structure. */
    int index;
    int mask;
    int left;
-   int top; 
+   int top;
    int width;
-   int height; 
+   int height;
    unsigned int foreground;
    unsigned int background;
 } osegment;
 
 osegment *h_segment_create(int i_index, int i_mask, int i_left, int i_top,
    int i_width, int i_height, unsigned int i_foreground, unsigned int i_background);
-   
+
 int i_segment_draw(Display *h_display, int x_application_window, int i_screen,osegment *h_segment);
 
 
