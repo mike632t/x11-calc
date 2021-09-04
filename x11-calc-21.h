@@ -1,8 +1,8 @@
 /*
- * x11-calc-21.h - RPN (Reverse Polish) calculator simulator. 
+ * x11-calc-21.h - RPN (Reverse Polish) calculator simulator.
  *
  * Copyright(C) 2018    MT
- * 
+ *
  * Model specific functions.
  *
  * This  program is free software: you can redistribute it and/or modify  it
@@ -21,8 +21,8 @@
  * 09 Mar 14   0.1   - Initial version - MT
  * 30 Aug 20         - Moved functions to separate source file - MT
  * 08 Aug 21         - Tidied up spelling errors in the comments - MT
- *                      
- * TO DO :           - 
+ *
+ * TO DO :           -
  */
 
 #ifndef TITLE
@@ -33,7 +33,7 @@
 
 #define DIGITS       12
 
-#define ROM_SIZE     02000  
+#define ROM_SIZE     02000
 #define RAM_SIZE     1
 #define ROM_BANKS    1
 
