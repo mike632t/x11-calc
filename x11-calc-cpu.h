@@ -1,10 +1,10 @@
 /*
- * x11-calc-cpu.h - RPN (Reverse Polish) calculator simulator. 
+ * x11-calc-cpu.h - RPN (Reverse Polish) calculator simulator.
  *
  * Copyright(C) 2020   MT
- * 
+ *
  * Emulates processor operation.
- * 
+ *
  * Contains  the type definitions and functions definitions used to  emulate
  * the CPU microcode.
  *
@@ -33,7 +33,7 @@
 
 #define REGISTERS      8     /* A, B , C(X), D(Y), E(Z), F(T), M, N(M2) */
 #define FLAGS          10
-#define REG_SIZE       14   
+#define REG_SIZE       14
 #define EXP_SIZE       3     /* Two digit exponent plus a sign digit */
 #define STACK_SIZE     2
 
@@ -60,10 +60,10 @@ typedef struct {
    unsigned int nibble[REG_SIZE];
 } oregister;
 
-typedef struct { 
+typedef struct {
    oregister *reg[REGISTERS];       /* Registers */
    oregister *ram[RAM_SIZE];        /* Memory registers */
-   unsigned char flags[FLAGS];      /* Processor flags + TRACE flag*/ 
+   unsigned char flags[FLAGS];      /* Processor flags + TRACE flag*/
    unsigned char status[16];        /* Status (S0 - S15) */
    unsigned int stack[STACK_SIZE];  /* Call stack */
    unsigned int pc;                 /* Program counter */
@@ -74,13 +74,13 @@ typedef struct {
    unsigned int base;               /* Data register */
 
    unsigned int bank;               /* ROM bank number */
-   int* rom;                        /* ROM */
+   int *rom;                        /* ROM */
    unsigned int first;
    unsigned int last;
-} oprocessor;  
+} oprocessor;
 
 oprocessor *h_processor_create(int *h_rom);
-   
+
 int i_processor_tick(oprocessor *h_procesor);
 
 void v_reg_fprint(FILE *h_file,  oregister *h_register);
