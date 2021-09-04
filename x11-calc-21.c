@@ -1,8 +1,8 @@
 /*
- * x11-calc-21.c - RPN (Reverse Polish) calculator simulator. 
+ * x11-calc-21.c - RPN (Reverse Polish) calculator simulator.
  *
  * Copyright(C) 2018   MT
- * 
+ *
  * Model specific functions
  *
  * This  program is free software: you can redistribute it and/or modify it
@@ -17,36 +17,36 @@
  *
  * You  should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  * 09 Jun 14   0.1   - Initial version - MT
  * 10 Mar 14         - Changed indexes to BCD hex values - MT
  * 10 Dec 18         - Alternate  function  key now LIGHT_BLUE, allowing  it
  *                     to be a different colour to the alternate text - MT
- * 31 Aug 20         - Made  version(), about(), and error() model specific 
+ * 31 Aug 20         - Made  version(), about(), and error() model specific
  *                     so that the name reflects the model number - MT
  *                   - Modified version() to display a leading zero in  the
  *                     date instead of a space - MT
  * 08 Aug 21         - Tidied up spelling errors in the comments - MT
  * 10 Aug 21         - Added HP21 ROM contents - MT
- *                      
+ *
  * To Do :           - Modify key colour - MT
  */
- 
+
 #define VERSION        "0.1"
 #define BUILD          "0007"
 #define DATE           "10 Aug 21"
 #define AUTHOR         "MT"
 
 #define DEBUG 1        /* Enable/disable debug*/
- 
+
 #include <stdarg.h>    /* strlen(), etc. */
 #include <stdio.h>     /* fprintf(), etc. */
 #include <stdlib.h>    /* getenv(), etc. */
- 
+
 #include <X11/Xlib.h>  /* XOpenDisplay(), etc. */
 #include <X11/Xutil.h> /* XSizeHints etc. */
- 
-#include "x11-calc-font.h" 
+
+#include "x11-calc-font.h"
 #include "x11-calc-button.h"
 #include "x11-calc-colour.h"
 #include "x11-calc-cpu.h"
@@ -59,7 +59,7 @@ oregister o_ram[RAM_SIZE];
 
 int i_rom[ROM_SIZE * ROM_BANKS] = {
    00672, 00672, 01710, 00410, 00432, 00214, 00110, 00310,
-   01635, 01566, 00014, 00432, 00072, 00445, 01610, 00134, 
+   01635, 01566, 00014, 00432, 00072, 00445, 01610, 00134,
    00120, 01015, 01112, 01512, 00264, 00272, 01363, 00006,
    01645, 01715, 01074, 00706, 01174, 00706, 00174, 01646,
    01646, 00232, 00256, 01352, 00047, 00412, 01216, 01371,
@@ -190,19 +190,19 @@ int i_rom[ROM_SIZE * ROM_BANKS] = {
 
 void v_init_keypad(obutton *h_button[]){
 
-   /* Define top row of keys. */ 
+   /* Define top row of keys. */
    h_button[0] = h_button_create(0x11, "1/x", "", "yX", h_normal_font, h_small_font, h_alternate_font, 12, 85, 33, 30, False, BLACK);
    h_button[1] = h_button_create(0x12, "SIN", "", "SIN-\xb9", h_normal_font, h_small_font, h_alternate_font, 48, 85, 33, 30, False, BLACK);
    h_button[2] = h_button_create(0x13, "COS", "", "COS-\xb9", h_normal_font, h_small_font, h_alternate_font, 84, 85, 33, 30, False, BLACK);
    h_button[3] = h_button_create(0x14, "TAN", "", "TAN-\xb9", h_normal_font, h_small_font, h_alternate_font, 120, 85, 33, 30, False, BLACK);
    h_button[4] = h_button_create(0x15, "", "", "", h_normal_font, h_small_font, h_alternate_font, 156, 85, 33, 30, False, LIGHT_BLUE);
-   
-   /* Define second row of keys. */ 
+
+   /* Define second row of keys. */
    h_button[5] = h_button_create(0x21, "X-Y", "", "-R", h_normal_font, h_small_font, h_alternate_font, 12, 128, 33, 30, False, BLACK);
    h_button[6] = h_button_create(0x22, "R", "", "-P", h_normal_font, h_small_font, h_alternate_font, 48, 128, 33, 30, False, BLACK);
    h_button[7] = h_button_create(0x23, "eX", "", "LN", h_normal_font, h_small_font, h_alternate_font, 84, 128, 33, 30, False, BLACK);
    h_button[8] = h_button_create(0x24, "STO", "", "LOG", h_normal_font, h_small_font, h_alternate_font, 120, 128, 33, 30, False, BLACK);
-   h_button[9] = h_button_create(0x25, "RCL", "", "10x", h_normal_font, h_small_font, h_alternate_font, 156, 128, 33, 30, False, BLACK); 
+   h_button[9] = h_button_create(0x25, "RCL", "", "10x", h_normal_font, h_small_font, h_alternate_font, 156, 128, 33, 30, False, BLACK);
 
    /* Define third row of keys. */
    h_button[10] = h_button_create(0x31, "ENTER", "", "", h_normal_font, h_small_font, h_alternate_font, 12, 171, 69, 30, False, BLACK);
