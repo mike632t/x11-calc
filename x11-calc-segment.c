@@ -1,10 +1,10 @@
 /*
- * x11-calc-segment.c - RPN (Reverse Polish) calculator simulator. 
+ * x11-calc-segment.c - RPN (Reverse Polish) calculator simulator.
  *
  * Copyright(C) 2013   MT
- * 
+ *
  * 7 segment display digit functions.
- *      
+ *
  * Contains  the  functions needed to create and display  a  seven  segment
  * digit element based on the mask value.
  *
@@ -39,49 +39,49 @@
  *                     segment A is now bit 1, and segment G bit 7 - MT
  * 19 Jul 13         - Added shading to the display segments and reduced
  *                     the number times the foreground colour is set by
- *                     drawing all the background elements for every segment 
+ *                     drawing all the background elements for every segment
  *                     before filling in the foreground - MT
  * 15 Dec 18         - Changed debug macro and added an error macro - MT
  * 08 Aug 21         - Tidied up spelling errors in the comments - MT
- *                      
- * TO DO :           - Optimize drawing of display segment by drawing in 
+ *
+ * TO DO :           - Optimize drawing of display segment by drawing in
  ^                     all the darker background regions before the foreground.
  ^
  */
- 
+
 #define VERSION        "0.0"
 #define BUILD          "0006"
 #define DATE           "19 Jul 13"
 #define AUTHOR         "MT"
 
 #define DEBUG 0        /* Enable/disable debug*/
- 
+
 #include <stdio.h>     /* fprintf(), etc. */
 #include <stdlib.h>    /* malloc(), etc. */
- 
+
 #include <X11/Xlib.h>  /* XOpenDisplay(), etc. */
 #include <X11/Xutil.h> /* XSizeHints etc. */
- 
+
 #include "x11-calc-button.h"
 
-#include "x11-calc.h" 
+#include "x11-calc.h"
 
 #include "x11-calc-colour.h"
 #include "x11-calc-segment.h"
- 
+
 #include "gcc-debug.h"
 
 /*
  * segment_create (index, text, left, top, width, height, state,
  *                colour)
  *
- * Allocates storage for a new display segment, sets the properties and  
- * returns a pointer to the segment, or exits the program if there isn't 
+ * Allocates storage for a new display segment, sets the properties and
+ * returns a pointer to the segment, or exits the program if there isn't
  * enough memory available.
  *
  */
 
-osegment *h_segment_create(int i_index, int i_mask, int i_left, int i_top, 
+osegment *h_segment_create(int i_index, int i_mask, int i_left, int i_top,
    int i_width, int i_height, unsigned int i_foreground, unsigned int i_background){
 
    osegment *h_segment; /* Ponter to segment. */
@@ -89,13 +89,13 @@ osegment *h_segment_create(int i_index, int i_mask, int i_left, int i_top,
    /* Attempt to allcoate memory for a segment. */
    if ((h_segment = malloc (sizeof(*h_segment)))==NULL) v_error("Memory allocation failed!");
 
-   h_segment->index = i_index; 
-   h_segment->mask = i_mask; 
+   h_segment->index = i_index;
+   h_segment->mask = i_mask;
 
    h_segment->left = i_left;
    h_segment->top = i_top;
    h_segment->width = i_width;
-   h_segment->height = i_height; 
+   h_segment->height = i_height;
 
    h_segment->foreground = i_foreground;
    h_segment->background = i_background;
@@ -126,14 +126,14 @@ int i_segment_draw(Display *h_display, int x_application_window, int i_screen, o
       h_segment->mask & SEG_DECIMAL && 1, h_segment->mask & SEG_G && 1, \
       h_segment->mask & SEG_F && 1, h_segment->mask & SEG_E && 1, \
       h_segment->mask & SEG_D && 1, h_segment->mask & SEG_C && 1, \
-      h_segment->mask & SEG_B && 1, h_segment->mask & SEG_A && 1)); 
+      h_segment->mask & SEG_B && 1, h_segment->mask & SEG_A && 1));
 
-   /* Draw the display segment background. */ 
+   /* Draw the display segment background. */
    XSetForeground(h_display, DefaultGC(h_display, i_screen), h_segment->background);
    XFillRectangle(h_display, x_application_window, DefaultGC(h_display, i_screen), h_segment->left, h_segment->top, h_segment->width, h_segment->height);
    XDrawRectangle(h_display, x_application_window, DefaultGC(h_display, i_screen), h_segment->left, h_segment->top, h_segment->width, h_segment->height);
 
-   /* Fill in the background for each active display segment. */ 
+   /* Fill in the background for each active display segment. */
    XSetForeground(h_display, DefaultGC(h_display, i_screen),i_shade( h_segment->foreground));
    if (h_segment->mask & SEG_A) {/* Draw the segment A.  */
       XDrawLine(h_display, x_application_window, DefaultGC(h_display, i_screen), i_left, i_upper, i_right, i_upper);
@@ -184,7 +184,7 @@ int i_segment_draw(Display *h_display, int x_application_window, int i_screen, o
       XFillRectangle(h_display, x_application_window, DefaultGC(h_display, i_screen), i_right + 3, i_offset + 2, 3, 3);
    }
 
-   /* Draw the in the foreground elements. */ 
+   /* Draw the in the foreground elements. */
    XSetForeground(h_display, DefaultGC(h_display, i_screen), h_segment->foreground);
    if (h_segment->mask & SEG_A) {/* Draw the segment A.  */
       XDrawLine(h_display, x_application_window, DefaultGC(h_display, i_screen), i_left + 1, i_upper, i_right - 1, i_upper);
