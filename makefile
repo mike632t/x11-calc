@@ -39,6 +39,7 @@ OUTPUT	= $(PROGRAM).out
 LIBS		= -lX11 -lm
 INCLUDE	= .
 FLAGS		= -Wall -Wno-comment -pedantic -ansi
+#FLAGS		+= -g # For debugging
 CC			= gcc
 
 $(PROGRAM): $(OBJECTS)
