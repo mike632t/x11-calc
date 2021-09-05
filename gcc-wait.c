@@ -55,11 +55,12 @@
  * Waits for the specified number of milliseconds
  *
  * 16 Aug 20         - Initial version taken from gcc-cat.c - MT
+ *  4 Sep 21         - Fixed formatting in debug code - MT
  *
  */
 int i_wait(long l_delay) { /* wait for milliseconds */
 #if defined(linux) /* Use usleep() function */
-debug(fprintf(stderr, "Pausing using usleep() for  %d ms.\n", l_delay));
+debug(fprintf(stderr, "Pausing using usleep() for  %ld ms.\n", l_delay));
 return (usleep(l_delay * 1000));
 #elif defined(WIN32) /* Use usleep() function */
 debug(fprintf(stderr, "Pausing using sleep() for %d ms.\n", l_delay));
@@ -67,7 +68,7 @@ Sleep(l_delay);
 return (0);
 #elif defined(VMS) /* Use VMS LIB$WAIT */
 float f_seconds;
-debug(fprintf(stderr, "Pausing using LIB$WAIT for %d ms.\n", l_delay));
+debug(fprintf(stderr, "Pausing using LIB$WAIT for %ld ms.\n", l_delay));
 f_seconds = l_delay / 1000.0;
 return (lib$wait(&f_seconds));
 #else /* Use a portable but very inefficent busy loop */
