@@ -74,32 +74,36 @@
  * 31 Aug 20         - Resolved dependencies between header files by moving
  *                     common function definitions to a separate file - MT
  * 08 Aug 21         - Tidied up spelling errors in the comments - MT
- * 09 Aug 21         - The  main program loop now checks for pending  events
- *                     before  processing  any event messages, so  NextEvent
+ * 09 Aug 21         - The main program loop now checks for pending  events
+ *                     before  processing  any event messages, so NextEvent
  *                     no longer blocks program execution - MT
- * 10 Aug 21         - Moved  version(), about(), and error() back to  their
+ * 10 Aug 21         - Moved  version(), about(), and error() back to their
  *                     original position - MT
- * 16 Aug 21         - Now calls tick() to execute  a single instruction for
- *                     each iteration of the main event loop - MT
- * 19 Aug 21         - Modified  processor simulation to make it more object
+ * 16 Aug 21         - Executes  a single instruction in every iteration of
+ *                     the main event loop - MT
+ * 19 Aug 21         - Modified processor simulation to make it more object
  *                     orientated - MT
- * 21 Aug 21         - Removed -? help option and fixed help text and (which
- *                     I should have done that a long time ago!) - MT
+ * 21 Aug 21         - Removed short form of the help option and fixed help
+ *                     text - MT
  *                   - Added a flags for the Shift, Ctrl and Alt keys - MT
- *                   - Added  single step and trace command line options and
- *                     the ability to control the processor using ctrl-s and
- *                     ctrl-q  for single stepping, and ctrl-t to enable  or
- *                     disable tracing - MT
+ *                   - Added single step and trace command line options and
+ *                     the  ability  to control the processor using  ctrl-s
+ *                     and ctrl-q for single stepping, and ctrl-t to enable
+ *                     or disable tracing - MT
  *                   - Added definition for commit id - MT
  * 30 Aug 21         - Separated version and licence notices into their own
  *                     routines - MT
  *                   - Abort if an error occurs - MT
- *  2 Sep 21         - Can enable single stepping and tracing at a hardcoded
- *                     break-point - MT
+ *  2 Sep 21         - Can  now enable single stepping and tracing using  a 
+ *                     hard-coded break-point - MT
+ *  5 Sep 21         - The display is no longer blanked automatically  when
+ *                     a key is pressed - MT
+ *                   - Key press events now handled properly using keypress
+ *                     and keystate properties - MT
+ *                   - Tidied up comments - MT
  *
- * TO DO :           - Don't blank display when a key is pressed (as it will
- *                     be blanked by the firmware automatically).
- *                   - Set a break-point from thecommand line
+ * TO DO :           - Buffer key board entry...
+ *                   - Allow a break-point to be set from the command line.
  *                   - Free up allocated memory on exit.
  *                   - Sort out colour mapping.
  *
@@ -112,6 +116,8 @@
 #define AUTHOR         "MT"
 
 #define DEBUG 0        /* Enable/disable debug*/
+
+#define BREAKPOINT -1  /* -1 to disable */
 
 #include <stdarg.h>    /* strlen(), etc. */
 #include <string.h>    /* strlen(), etc. */
@@ -401,7 +407,7 @@ int main (int argc, char *argv[]){
       i_display_draw(x_display, x_application_window, i_screen, h_display);
       XFlush(x_display);
 
-      if (h_processor->pc == -1) {b_step = True; h_processor->flags[TRACE] = True;} /* Breakpoint */
+      if (h_processor->pc == BREAKPOINT) {b_step = True; h_processor->flags[TRACE] = True;} /* Breakpoint */
       if (b_run) i_processor_tick(h_processor);
       if (b_step) b_run = False;
 
@@ -477,15 +483,12 @@ int main (int argc, char *argv[]){
                      h_pressed->state = True;
                      i_button_draw(x_display, x_application_window, i_screen, h_pressed);
 
+                     h_processor->keycode = h_pressed->index;
+                     h_processor->keydown = 1;
+                     h_processor->status[15] = 1;
+
                      debug(fprintf(stderr, "Button pressed - keycode(%.2X).\n", h_pressed->index));
 
-                     /* Clear the display segments and redraw it. */
-                     for (i_count = 0; i_count < DIGITS ; i_count++)
-                        h_display->segment[i_count]->mask = DISPLAY_SPACE;
-                     i_display_draw(x_display, x_application_window, i_screen, h_display);
-                     XFlush(x_display);
-
-                     i_wait(100);  /* Show blank display */
                      break;
                   }
                }
@@ -497,6 +500,7 @@ int main (int argc, char *argv[]){
                if (!(h_pressed == NULL)) {
                   h_pressed->state = False;
                   i_button_draw(x_display, x_application_window, i_screen, h_pressed);
+                  h_processor->keydown = 0; /* Don't clear the status bit here!! */
 
                   debug(fprintf(stderr, "Button released - keycode(%.2X).\n", h_pressed->index));
                }
