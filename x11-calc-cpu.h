@@ -25,7 +25,12 @@
  * 24 Aug 21         - Added  properties for the p and data registers,  and
  *                     an  array of flags to keep track of things like  the
  *                     arithmetic mode and instruction tracing - MT
- *
+ * 5 Sep 21          - Changed  first and last into signed integers  (fixed
+ *                     segmentation fault in register left shift)  - MT
+ *                   - Added a keycode and keystate properties to store the
+ *                     key  code of the key and the state of the actual key
+ *                     (necessary as clearing status bit 15 when the key is
+ *                     released does NOT work!) - MT*
  */
 
 #ifndef REGISTERS
@@ -70,13 +75,15 @@ typedef struct {
    unsigned int sp;                 /* Stack pointer */
    unsigned int p;                  /* P register */
    unsigned int f;                  /* F register */
+   unsigned int keycode;            /* Key code */
+   unsigned char keydown;           /* Is a key pressed */
    unsigned int data;               /* Data register */
    unsigned int base;               /* Data register */
 
    unsigned int bank;               /* ROM bank number */
    int *rom;                        /* ROM */
-   unsigned int first;
-   unsigned int last;
+   int first;
+   int last;
 } oprocessor;
 
 oprocessor *h_processor_create(int *h_rom);
