@@ -242,8 +242,10 @@
  *                     released does NOT work!) - MT
  *                   - Modified  code to allow status bit 15 to be  cleared
  *                     if a key is not pressed - MT
+ *  8 Sep 21         - Stack operations now work (ENTER, X-Y, and R) - MT
  *
  * To Do             - Figure out what is going on with S(5)
+ *                   - Fix decimal point...
  *                   - Actually return status from tick() ?
  *                   - Finish instruction decoder!!
  *
