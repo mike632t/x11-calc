@@ -156,8 +156,6 @@
  * +---+---+---+---+---+---+---+---+   +---+---+---+---+---+---+---+---+
  *
  *
- *
- *
  * 10 Sep 20         - Initial version - MT
  * 08 Aug 21         - Tidied up spelling errors in the comments and  added
  *                     a section describing the processor registers - MT
@@ -243,6 +241,13 @@
  *                   - Modified  code to allow status bit 15 to be  cleared
  *                     if a key is not pressed - MT
  *  8 Sep 21         - Stack operations now work (ENTER, X-Y, and R) - MT
+ *  9 Sep 21         - Modified add and subtract to specify the destination
+ *                     separately and allow NULL arguments - MT
+ *                   - Logical shift clears carry flags - MT
+ *                   - Don't clear status bits when tested! - MT
+ *                   - Added   y -> a,   0 - c - 1 -> c[f],   if a >= c[f], 
+ *                     a - c -> c[f],  and if a >= b[f].  Basic  arithmetic
+ *                     operations now work!! - MT
  *
  * To Do             - Figure out what is going on with S(5)
  *                   - Fix decimal point...
@@ -256,7 +261,7 @@
 #define DATE           "20 Aug 21"
 #define AUTHOR         "MT"
 
-#define DEBUG 0        /* Enable/disable debug*/
+#define DEBUG 1        /* Enable/disable debug*/
 
 #include <stdlib.h>    /* malloc(), etc. */
 #include <stdio.h>     /* fprintf(), etc. */
@@ -393,7 +398,7 @@ oprocessor *h_processor_create(int *h_rom){
 
 /* Delayed ROM bank switching */
 void delayed_bank_switch(oprocessor *h_processor) { /* delayed ROM bank switching */
-   if (h_processor->flags[TRACE]) fprintf(stdout," %d %05o %d BANK SWITCH ", h_processor->flags[DELAYED_ROM], h_processor->pc, h_processor->bank);
+   if (h_processor->flags[TRACE]) fprintf(stdout," ** ");
    if (h_processor->flags[DELAYED_ROM] != 0) {
       h_processor->pc = h_processor->bank << 8 | (h_processor->pc & 00377);
       h_processor->flags[DELAYED_ROM] = 0; /* Clear flag */
@@ -450,37 +455,37 @@ static void v_reg_copy (oprocessor *h_processor, oregister *h_destination, oregi
 }
 
 /* Add the contents of two registers */
-static void v_reg_add (oprocessor *h_processor, oregister *h_destination, oregister *h_source){
+static void v_reg_add (oprocessor *h_processor, oregister *h_destination, oregister *h_source, oregister *h_argument){
    int i_count, i_temp;
    for (i_count = h_processor->first; i_count <= h_processor->last; i_count++){
-      if (h_source != NULL) i_temp = h_source->nibble[i_count]; else i_temp = 0;
-      i_temp = h_destination->nibble[i_count] + i_temp + h_processor->flags[CARRY];
+      if (h_argument != NULL) i_temp = h_argument->nibble[i_count]; else i_temp = 0;
+      i_temp = h_source->nibble[i_count] + i_temp + h_processor->flags[CARRY];
       if (i_temp >= h_processor->base){
          i_temp -= h_processor->base;
          h_processor->flags[CARRY] = 1;
       } else {
          h_processor->flags[CARRY] = 0;
       }
-      h_destination->nibble[i_count] = i_temp;
+      if (h_destination != NULL) h_destination->nibble[i_count] = i_temp; /* Destination can be null */
    }
 }
 
 /* Subtract the contents of two registers */
-static void v_reg_sub (oprocessor *h_processor, oregister *h_destination, oregister *h_source){
+static void v_reg_sub (oprocessor *h_processor, oregister *h_destination, oregister *h_source, oregister *h_argument){
    int i_count, i_temp;
    for (i_count = h_processor->first; i_count <= h_processor->last; i_count++){
-      if (h_source != NULL) i_temp = h_source->nibble[i_count]; else i_temp = 0;
-      i_temp = (h_destination->nibble[i_count] - i_temp) - h_processor->flags[CARRY];
+      if (h_argument != NULL) i_temp = h_argument->nibble[i_count]; else i_temp = 0;
+      if (h_source != NULL) i_temp = (h_source->nibble[i_count] - i_temp); else i_temp = (0 - i_temp);
+      i_temp = i_temp - h_processor->flags[CARRY];
       if (i_temp < 0) {
          i_temp += h_processor->base;
          h_processor->flags[CARRY] = 1;
       }
       else
          h_processor->flags[CARRY] = 0;
-      h_destination->nibble[i_count] = i_temp;
+      if (h_destination != NULL) h_destination->nibble[i_count] = i_temp; /* Destination can be null */
    }
 }
-
 
 /* Test if registers are equal */
 void v_reg_test_eq (oprocessor *h_processor, oregister *h_destination, oregister *h_source) {
@@ -526,7 +531,7 @@ static void v_reg_negate (oprocessor *h_processor, oregister *h_register){
 /* Increment the contents of a register */
 static void v_reg_inc (oprocessor *h_processor, oregister *h_register){
    h_processor->flags[CARRY] = 1; /* Set carry */
-   v_reg_add (h_processor, h_register, NULL); /* Add carry to register */
+   v_reg_add (h_processor, h_register, h_register, NULL); /* Add carry to register */
 }
 
 /* Logical shift right a register */
@@ -548,6 +553,7 @@ static void v_reg_shl (oprocessor *h_processor, oregister *h_register){
          h_register->nibble[i_count] = 0;
       else
          h_register->nibble[i_count] = h_register->nibble[i_count - 1];
+   h_processor->flags[PREV_CARRY] = h_processor->flags[CARRY] = 0;
 }
 
 /* Decode and execute a single instruction */
@@ -622,6 +628,7 @@ int i_processor_tick(oprocessor *h_processor) {
             break;
          case 01: /* if 1 = s(n) */
             if (h_processor->flags[TRACE]) fprintf(stdout, "if 1 = s(%d)", i_opcode >> 6);
+            if (h_processor->flags[TRACE]) fprintf(stdout, " (s(%d) == %d)", i_opcode >> 6, h_processor->status[i_opcode >> 6]);
             h_processor->flags[CARRY] = (h_processor->status[i_opcode >> 6] != 1);
             switch (i_opcode >> 6) {
                case 1:  /* Scientific notation */
@@ -629,7 +636,7 @@ int i_processor_tick(oprocessor *h_processor) {
                case 5:  /* Set if decimal point has already been entered */
                case 15: /* Set if any key is pressed */
                   break;
-               default:
+               /* default:
                   h_processor->status[i_opcode >> 6] = 0; /* Testing the status clears it ??? */
             }
             v_op_inc_pc(h_processor); /* Increment program counter */
@@ -654,18 +661,18 @@ int i_processor_tick(oprocessor *h_processor) {
             {
                int i_count;
                h_processor->first = 0; h_processor->last = REG_SIZE - 1;
-               for (i_count = 0; i_count < REGISTERS; i_count++) 
+               for (i_count = 0; i_count < REGISTERS; i_count++)
                   v_reg_copy(h_processor, h_processor->reg[i_count], NULL); /* Copying nothing to a register clears it */
                for (i_count = 0; i_count < STACK_SIZE; i_count++)
                   h_processor->stack[i_count] = 0;
-            }            
+            }
             break;
          case 00110: /* clear s */
             if (h_processor->flags[TRACE]) fprintf(stdout, "clear s");
             {
                int i_count;
                for (i_count = 0; i_count < sizeof(h_processor->status) / sizeof(*h_processor->status); i_count++)
-                  switch (i_opcode >> 6) {
+                  switch (i_count) {
                      case 1:  /* Scientific notation */
                      case 2:  /* Auto Enter (if set entering digit will push 'X') */
                      case 5:  /* Set if decimal point has already been entered */
@@ -720,6 +727,11 @@ int i_processor_tick(oprocessor *h_processor) {
                v_reg_exch(h_processor, h_processor->reg[T_REG], h_processor->reg[C_REG]); /* T = Z  */
                v_reg_exch(h_processor, h_processor->reg[C_REG], h_processor->reg[Y_REG]); /* T = Z  */
                v_reg_exch(h_processor, h_processor->reg[Y_REG], h_processor->reg[Z_REG]); /* T = Z  */
+            break;
+         case 01210: /* y -> a */
+            if (h_processor->flags[TRACE]) fprintf(stdout, "m1 -> c");
+            h_processor->first = 0; h_processor->last = REG_SIZE - 1;
+            v_reg_copy(h_processor, h_processor->reg[A_REG], h_processor->reg[Y_REG]);
             break;
          case 01310: /* c -> stack */
             if (h_processor->flags[TRACE]) fprintf(stdout, "stack -> a");
@@ -808,7 +820,7 @@ int i_processor_tick(oprocessor *h_processor) {
       break;
    case 02: /* Arithmetic operations */
       i_field = (i_opcode >> 2) & 7;
-      
+
       switch (i_field) {
       case 0: /* 000   P  : determined by P register             ([P]) */
          h_processor->first = h_processor->p; h_processor->last = h_processor->p;
@@ -893,19 +905,19 @@ int i_processor_tick(oprocessor *h_processor) {
          break;
       case 0011: /* a + b -> a[f] */
          if (h_processor->flags[TRACE]) fprintf(stdout, "a + b -> a[%s]", s_field);
-         v_reg_add(h_processor, h_processor->reg[A_REG], h_processor->reg[B_REG]);
+         v_reg_add(h_processor, h_processor->reg[A_REG], h_processor->reg[A_REG], h_processor->reg[B_REG]);
          break;
       case 0012: /* a + c -> a[f] */
-         v_reg_add(h_processor, h_processor->reg[A_REG], h_processor->reg[C_REG]);
+         v_reg_add(h_processor, h_processor->reg[A_REG], h_processor->reg[A_REG], h_processor->reg[C_REG]);
          if (h_processor->flags[TRACE]) fprintf(stdout, "a + c -> a[%s]", s_field);
          break;
       case 0013: /* c + c -> c[f] */
          if (h_processor->flags[TRACE]) fprintf(stdout, "c + c -> c[%s]", s_field);
-         v_reg_add(h_processor, h_processor->reg[C_REG], h_processor->reg[C_REG]);
+         v_reg_add(h_processor, h_processor->reg[C_REG], h_processor->reg[C_REG], h_processor->reg[C_REG]);
          break;
        case 0014: /* a + c -> c[f] */
          if (h_processor->flags[TRACE]) fprintf(stdout, "a + c -> c[%s]", s_field);
-         v_reg_add(h_processor, h_processor->reg[C_REG], h_processor->reg[A_REG]);
+         v_reg_add(h_processor, h_processor->reg[C_REG], h_processor->reg[C_REG], h_processor->reg[A_REG]);
          break;
       case 0015: /* a + 1 -> a[f] */
          if (h_processor->flags[TRACE]) fprintf(stdout, "a + 1 -> a[%s]", s_field);
@@ -922,22 +934,22 @@ int i_processor_tick(oprocessor *h_processor) {
          break;
       case 0020: /* a - b -> a[f] */
          if (h_processor->flags[TRACE]) fprintf(stdout, "a - b -> a[%s]", s_field);
-         v_reg_sub(h_processor, h_processor->reg[A_REG], h_processor->reg[B_REG]);
-         break;           
+         v_reg_sub(h_processor, h_processor->reg[A_REG], h_processor->reg[A_REG], h_processor->reg[B_REG]);
+         break;
       case 0021: /* a - c -> c[f] */
          if (h_processor->flags[TRACE]) fprintf(stdout, "a - c -> c[%s]", s_field);
          /* dest = act_c; src = act_a; src2 = act_c; reg_sub(); break; */
-         v_error("Unexpected error in  %s line : %d\n", __FILE__, __LINE__);
+         v_reg_sub(h_processor, h_processor->reg[C_REG], h_processor->reg[A_REG], h_processor->reg[C_REG]);
          break;
       case 0022: /* a - 1 -> a[f] */
          if (h_processor->flags[TRACE]) fprintf(stdout, "a - 1 -> a[%s]", s_field);
          h_processor->flags[CARRY] = 1; /* Set carry */
-         v_reg_sub(h_processor, h_processor->reg[A_REG], NULL);
+         v_reg_sub(h_processor, h_processor->reg[A_REG], h_processor->reg[A_REG], NULL);
          break;
       case 0023: /* c - 1 -> c[f] */
          if (h_processor->flags[TRACE]) fprintf(stdout, "c - 1 -> c[%s]", s_field);
          h_processor->flags[CARRY] = 1; /* Set carry */
-         v_reg_sub(h_processor, h_processor->reg[C_REG], NULL);
+         v_reg_sub(h_processor, h_processor->reg[C_REG], h_processor->reg[C_REG], NULL);
          break;
       case 0024: /* 0 - c -> c[f] */
          if (h_processor->flags[TRACE]) fprintf(stdout, "0 - c -> c[%s]", s_field);
@@ -946,8 +958,8 @@ int i_processor_tick(oprocessor *h_processor) {
          break;
       case 0025: /* 0 - c - 1 -> c[f] */
          if (h_processor->flags[TRACE]) fprintf(stdout, "0 - c - 1 -> c[%s]", s_field);
-         /* act_flags |= F.CARRY; dest = act_c; src = null; src2 = act_c; reg_sub(); break; */
-         v_error("Unexpected error in  %s line : %d\n", __FILE__, __LINE__);
+         h_processor->flags[CARRY] = 1; /* Set carry */
+         v_reg_sub(h_processor, h_processor->reg[C_REG], NULL, h_processor->reg[C_REG]);
          break;
       case 0026: /* if b[f] = 0 */
          if (h_processor->flags[TRACE]) fprintf(stdout, "if b[%s] = 0", s_field);
@@ -963,13 +975,15 @@ int i_processor_tick(oprocessor *h_processor) {
          break;
       case 0030: /* if a >= c[f] */
          if (h_processor->flags[TRACE]) fprintf(stdout, "if a >= c[%s]", s_field);
-         /* act_inst_state = ST.branch; dest = null; src = act_a; src2 = act_c; reg_sub(); break; */
-         v_error("Unexpected error in  %s line : %d\n", __FILE__, __LINE__);
+         v_reg_sub(h_processor, NULL, h_processor->reg[A_REG], h_processor->reg[C_REG]);
+         v_op_inc_pc(h_processor); /* Increment program counter */
+         v_op_goto(h_processor);
          break;
-      case 0031: /* if a >= b[f] */
+      case 0031: /* if a >= b[f] */ /** TO DO Check */
          if (h_processor->flags[TRACE]) fprintf(stdout, "if a >= b[%s]", s_field);
-         /* act_inst_state = ST.branch; dest = null; src = act_a; src2 = act_b; reg_sub(); break; */
-         v_error("Unexpected error in  %s line : %d\n", __FILE__, __LINE__);
+         v_reg_sub(h_processor, NULL, h_processor->reg[A_REG], h_processor->reg[B_REG]);
+         v_op_inc_pc(h_processor); /* Increment program counter */
+         v_op_goto(h_processor);
          break;
       case 0032: /* if a[f] <> 0 */
          if (h_processor->flags[TRACE]) fprintf(stdout, "if a[%s] <> 0", s_field);
@@ -985,8 +999,8 @@ int i_processor_tick(oprocessor *h_processor) {
          break;
       case 0034: /* a - c -> a[f] */
          if (h_processor->flags[TRACE]) fprintf(stdout, "a - c -> a[%s]", s_field);
-         v_reg_sub(h_processor, h_processor->reg[A_REG], h_processor->reg[C_REG]);
-         break;         
+         v_reg_sub(h_processor, h_processor->reg[A_REG], h_processor->reg[A_REG], h_processor->reg[C_REG]);
+         break;
       case 0035: /* shift right a[f] */
          if (h_processor->flags[TRACE]) fprintf(stdout, "shift right a[%s]", s_field);
          v_reg_shr(h_processor, h_processor->reg[A_REG]);
