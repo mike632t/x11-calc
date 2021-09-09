@@ -101,6 +101,7 @@
  *                   - Key press events now handled properly using keypress
  *                     and keystate properties - MT
  *                   - Tidied up comments - MT
+ *  9 Sep 21         - Don't trace busy loops - MT
  *
  * TO DO :           - Buffer key board entry...
  *                   - Allow a break-point to be set from the command line.
@@ -209,6 +210,7 @@ int main (int argc, char *argv[]){
    int i_screen; /* Default screen number. */
 
    int i_count, i_index;
+   int i_current = -1; /* Current program counter */
    char b_trace = False; /* Trace flag */
    char b_step = False; /* Single step flag flag */
    char b_run = True; /* Run flag controls CPU instruction execution in main loop */
@@ -352,7 +354,6 @@ int main (int argc, char *argv[]){
    if (!(h_alternate_font = XLoadQueryFont(x_display, s_font))) v_error("Cannot load font '%s'.\n",  s_font);
 
    s_font = LARGE_TEXT; /* Large text font. */
-
    if (!(h_large_font = XLoadQueryFont(x_display, s_font))) v_error("Cannot load font '%s'.\n",  s_font);
 
    /* Create buttons. */
@@ -381,21 +382,13 @@ int main (int argc, char *argv[]){
 
    /* Show window on display */
    XMapWindow(x_display, x_application_window);
-   XRaiseWindow(x_display, x_application_window); /* Raise window - ensures expose envent is raised? */
+   XRaiseWindow(x_display, x_application_window); /* Raise window - ensures expose event is raised? */
 
    /* Flush all pending requests to the X server, and wait until they are processed by the X server. */
    XSync(x_display, False);
 
    fprintf(stderr, "ROM Size : %4u words \n", (unsigned)(sizeof(i_rom) / sizeof i_rom[0]));
    h_processor = h_processor_create(i_rom);
-
-   h_processor->flags[TRACE] = b_trace;
-
-   /* -1234567890e99e-99. */
-   /* v_reg_load(h_processor->reg[A_REG], 0x9, 0x1, 0x2, 0x3, 0xf, 0xf, 0xf, 0xf, 0xf, 0x9, 0x9, 0x9, 0x0, 0x0); */
-   /* v_reg_load(h_processor->reg[B_REG], 0x2, 0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x2, 0x0, 0x0, 0x0, 0x0); */
-
-   /* v_reg_load(h_processor->reg[C_REG], 0x9, 0x1, 0x2, 0x3, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0); */
 
    /* Main program event loop. */
    b_abort = False;
@@ -407,7 +400,10 @@ int main (int argc, char *argv[]){
       i_display_draw(x_display, x_application_window, i_screen, h_display);
       XFlush(x_display);
 
+      h_processor->flags[TRACE] = b_trace;
       if (h_processor->pc == BREAKPOINT) {b_step = True; h_processor->flags[TRACE] = True;} /* Breakpoint */
+      if (h_processor->pc == i_current) h_processor->flags[TRACE] = False; /* Don't trace busy loops */
+      i_current = h_processor->pc;
       if (b_run) i_processor_tick(h_processor);
       if (b_step) b_run = False;
 
@@ -449,7 +445,7 @@ int main (int argc, char *argv[]){
             }
             else if (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_T))  { /* Check for Ctrl-T */
                if ((b_ctrl == 1) && (b_shift == 0)) {
-                  h_processor->flags[TRACE]  = !(h_processor->flags[TRACE]); /* Toggle CPU tracing */
+                  b_trace  = !b_trace; /* Toggle CPU tracing */
                }
             }
             else if (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_Escape)) { /* Check for Escape */
