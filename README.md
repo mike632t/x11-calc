@@ -11,6 +11,10 @@ The  intention is for the code to be reasonably portable.  Currently it will
 compile on Linux running on an x64, arm, or i386 processor, VMS running on a
 VAX or Alpha processor, and Tru64 Unix running on an Alpha processor.
 
+And it really does run on DEC Windows!
+
+![HP21](./images/x11-calc-21-decwindows.png)
+
 ## To Do
 
 * Sort out colour mapping to allow program to run on display with less  than
