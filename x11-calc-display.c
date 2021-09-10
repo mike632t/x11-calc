@@ -40,6 +40,8 @@
  * 30 Aug 21         - Checks that the display is enabled when updating the
  *                     display- MT
  *                   - Removed unused variables - MT
+ * 10 Sep 21         - Updated  lookup  table with codes  used  to  display
+ *                     error messages - MT
  *
  */
 
@@ -145,11 +147,11 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
                               DISPLAY_SEVEN,
                               DISPLAY_EIGHT,
                               DISPLAY_NINE,
+                              DISPLAY_r,
                               DISPLAY_SPACE,
+                              DISPLAY_o,
                               DISPLAY_SPACE,
-                              DISPLAY_SPACE,
-                              DISPLAY_SPACE,
-                              DISPLAY_SPACE,
+                              DISPLAY_E,
                               DISPLAY_SPACE };
    int i_count;
 
