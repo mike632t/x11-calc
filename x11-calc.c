@@ -103,8 +103,9 @@
  *                   - Tidied up comments - MT
  *  9 Sep 21         - Don't trace busy loops - MT
  *
- * TO DO :           - Buffer key board entry...
+ * TO DO :           - Fix STO and RCL.
  *                   - Allow a break-point to be set from the command line.
+ *                   - Buffer key board entry...?
  *                   - Free up allocated memory on exit.
  *                   - Sort out colour mapping.
  *
