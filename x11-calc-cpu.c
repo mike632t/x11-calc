@@ -245,13 +245,14 @@
  *                     separately and allow NULL arguments - MT
  *                   - Logical shift clears carry flags - MT
  *                   - Don't clear status bits when tested! - MT
- *                   - Added   y -> a,   0 - c - 1 -> c[f],   if a >= c[f], 
- *                     a - c -> c[f],  and if a >= b[f].  Basic  arithmetic
- *                     operations now work!! - MT
+ *                   - Added 'y -> a', '0 - c - 1 -> c[f]', 'if a >= c[f]', 
+ *                     'a - c -> c[f]',  and 'if a >= b[f]' - MT
+ *                   - Basic arithmetic operations now work!! - MT
+ *                   - Fixed bug in clear s - MT
+ * 10 Sep 21         - Restructured  decoder for group 2 type  instructions
+ *                     and implemented load n - MT
  *
- * To Do             - Figure out what is going on with S(5)
- *                   - Fix decimal point...
- *                   - Actually return status from tick() ?
+ * To Do             - Actually return status from tick() ?
  *                   - Finish instruction decoder!!
  *
  */
@@ -655,112 +656,130 @@ int i_processor_tick(oprocessor *h_processor) {
          }
          break;
       case 02: /* Group 2 */
-         switch (i_opcode) {
-         case 00010: /* clear registers */
-            if (h_processor->flags[TRACE]) fprintf(stdout, "clear registers");
-            {
-               int i_count;
-               h_processor->first = 0; h_processor->last = REG_SIZE - 1;
-               for (i_count = 0; i_count < REGISTERS; i_count++)
-                  v_reg_copy(h_processor, h_processor->reg[i_count], NULL); /* Copying nothing to a register clears it */
-               for (i_count = 0; i_count < STACK_SIZE; i_count++)
-                  h_processor->stack[i_count] = 0;
-            }
-            break;
-         case 00110: /* clear s */
-            if (h_processor->flags[TRACE]) fprintf(stdout, "clear s");
-            {
-               int i_count;
-               for (i_count = 0; i_count < sizeof(h_processor->status) / sizeof(*h_processor->status); i_count++)
-                  switch (i_count) {
-                     case 1:  /* Scientific notation */
-                     case 2:  /* Auto Enter (if set entering digit will push 'X') */
-                     case 5:  /* Set if decimal point has already been entered */
-                     case 15: /* Set if any key is pressed */
-                        break;
-                     default:
-                        h_processor->status[i_count] = 0; /* Clear all bits except bits 1,2,5,15 */
-                  }
-            }
-            break;
-         case 00210: /* display toggle */
-            if (h_processor->flags[TRACE]) fprintf(stdout, "display toggle");
-            if (h_processor->flags[DISPLAY_ENABLE] == 0)
-               h_processor->flags[DISPLAY_ENABLE] = 1;
-            else
+         switch ((i_opcode >> 4) & 03) {
+         case 00: /* Sub group 0 */
+            switch (i_opcode) {
+            case 00010: /* clear registers */
+               if (h_processor->flags[TRACE]) fprintf(stdout, "clear registers");
+               {
+                  int i_count;
+                  h_processor->first = 0; h_processor->last = REG_SIZE - 1;
+                  for (i_count = 0; i_count < REGISTERS; i_count++)
+                     v_reg_copy(h_processor, h_processor->reg[i_count], NULL); /* Copying nothing to a register clears it */
+                  for (i_count = 0; i_count < STACK_SIZE; i_count++)
+                     h_processor->stack[i_count] = 0;
+               }
+               break;
+            case 00110: /* clear s */
+               if (h_processor->flags[TRACE]) fprintf(stdout, "clear s");
+               {
+                  int i_count;
+                  for (i_count = 0; i_count < sizeof(h_processor->status) / sizeof(*h_processor->status); i_count++)
+                     switch (i_count) {
+                        case 1:  /* Scientific notation */
+                        case 2:  /* Auto Enter (if set entering digit will push 'X') */
+                        case 5:  /* Set if decimal point has already been entered */
+                        case 15: /* Set if any key is pressed */
+                           break;
+                        default:
+                           h_processor->status[i_count] = 0; /* Clear all bits except bits 1,2,5,15 */
+                     }
+               }
+               break;
+            case 00210: /* display toggle */
+               if (h_processor->flags[TRACE]) fprintf(stdout, "display toggle");
+               if (h_processor->flags[DISPLAY_ENABLE] == 0)
+                  h_processor->flags[DISPLAY_ENABLE] = 1;
+               else
+                  h_processor->flags[DISPLAY_ENABLE] = 0;
+               break;
+            case 00310: /* display off */
+               if (h_processor->flags[TRACE]) fprintf(stdout, "display off");
                h_processor->flags[DISPLAY_ENABLE] = 0;
-            break;
-         case 00310: /* display off */
-            if (h_processor->flags[TRACE]) fprintf(stdout, "display off");
-            h_processor->flags[DISPLAY_ENABLE] = 0;
-            break;
-         case 00410: /* m1 exch c */
-            if (h_processor->flags[TRACE]) fprintf(stdout, "m1 exch c");
-            h_processor->first = 0; h_processor->last = REG_SIZE - 1;
-            v_reg_exch(h_processor, h_processor->reg[M_REG], h_processor->reg[C_REG]);
-            break;
-         case 00510: /* m1 -> c */
-            if (h_processor->flags[TRACE]) fprintf(stdout, "m1 -> c");
-            h_processor->first = 0; h_processor->last = REG_SIZE - 1;
-            v_reg_copy(h_processor, h_processor->reg[M_REG], h_processor->reg[C_REG]);
-            break;
-         case 00610: /* m2 exch c */
-            if (h_processor->flags[TRACE]) fprintf(stdout, "m2 exch c");
-            h_processor->first = 0; h_processor->last = REG_SIZE - 1;
-            v_reg_exch(h_processor, h_processor->reg[N_REG], h_processor->reg[C_REG]);
-            break;
-         case 00710: /* m2 -> c */
-            if (h_processor->flags[TRACE]) fprintf(stdout, "m2 -> c");
-            h_processor->first = 0; h_processor->last = REG_SIZE - 1;
-            v_reg_copy(h_processor, h_processor->reg[N_REG], h_processor->reg[C_REG]);
-            break;
-         case 01010: /* stack -> a */
-            if (h_processor->flags[TRACE]) fprintf(stdout, "stack -> a");
+               break;
+            case 00410: /* m1 exch c */
+               if (h_processor->flags[TRACE]) fprintf(stdout, "m1 exch c");
                h_processor->first = 0; h_processor->last = REG_SIZE - 1;
-               v_reg_copy(h_processor, h_processor->reg[A_REG], h_processor->reg[Y_REG]); /* T = Z  */
-               v_reg_copy(h_processor, h_processor->reg[Y_REG], h_processor->reg[Z_REG]); /* T = Z  */
-               v_reg_copy(h_processor, h_processor->reg[Z_REG], h_processor->reg[T_REG]); /* T = Z  */
-            break;
-         case 01110: /* down rotate */
-            if (h_processor->flags[TRACE]) fprintf(stdout, "stack -> a");
+               v_reg_exch(h_processor, h_processor->reg[M_REG], h_processor->reg[C_REG]);
+               break;
+            case 00510: /* m1 -> c */
+               if (h_processor->flags[TRACE]) fprintf(stdout, "m1 -> c");
                h_processor->first = 0; h_processor->last = REG_SIZE - 1;
-               v_reg_exch(h_processor, h_processor->reg[T_REG], h_processor->reg[C_REG]); /* T = Z  */
-               v_reg_exch(h_processor, h_processor->reg[C_REG], h_processor->reg[Y_REG]); /* T = Z  */
-               v_reg_exch(h_processor, h_processor->reg[Y_REG], h_processor->reg[Z_REG]); /* T = Z  */
-            break;
-         case 01210: /* y -> a */
-            if (h_processor->flags[TRACE]) fprintf(stdout, "m1 -> c");
-            h_processor->first = 0; h_processor->last = REG_SIZE - 1;
-            v_reg_copy(h_processor, h_processor->reg[A_REG], h_processor->reg[Y_REG]);
-            break;
-         case 01310: /* c -> stack */
-            if (h_processor->flags[TRACE]) fprintf(stdout, "stack -> a");
+               v_reg_copy(h_processor, h_processor->reg[C_REG], h_processor->reg[M_REG]);
+               break;
+            case 00610: /* m2 exch c */
+               if (h_processor->flags[TRACE]) fprintf(stdout, "m2 exch c");
                h_processor->first = 0; h_processor->last = REG_SIZE - 1;
-               v_reg_copy(h_processor, h_processor->reg[T_REG], h_processor->reg[Z_REG]); /* T = Z  */
-               v_reg_copy(h_processor, h_processor->reg[Z_REG], h_processor->reg[Y_REG]); /* T = Z  */
-               v_reg_copy(h_processor, h_processor->reg[Y_REG], h_processor->reg[C_REG]); /* T = Z  */
-            break;
-         case 01410: /* decimal */
-            if (h_processor->flags[TRACE]) fprintf(stdout, "decimal");
-            h_processor->base = 10;
-            break;
-        case 01610: /* f -> a */
-            h_processor->reg[A_REG]->nibble[0] = h_processor->f;
-            if (h_processor->flags[TRACE]) fprintf(stdout, "f -> a");
-            break;
-         case 01710: /* f exch a */
-            if (h_processor->flags[TRACE]) fprintf(stdout, "f exch a");
-            {
-               int i_temp;
-               i_temp = h_processor->reg[A_REG]->nibble[0];
+               v_reg_exch(h_processor, h_processor->reg[N_REG], h_processor->reg[C_REG]);
+               break;
+            case 00710: /* m2 -> c */
+               if (h_processor->flags[TRACE]) fprintf(stdout, "m2 -> c");
+               h_processor->first = 0; h_processor->last = REG_SIZE - 1;
+               v_reg_copy(h_processor, h_processor->reg[N_REG], h_processor->reg[C_REG]);
+               break;
+            case 01010: /* stack -> a */
+               if (h_processor->flags[TRACE]) fprintf(stdout, "stack -> a");
+                  h_processor->first = 0; h_processor->last = REG_SIZE - 1;
+                  v_reg_copy(h_processor, h_processor->reg[A_REG], h_processor->reg[Y_REG]); /* T = Z  */
+                  v_reg_copy(h_processor, h_processor->reg[Y_REG], h_processor->reg[Z_REG]); /* T = Z  */
+                  v_reg_copy(h_processor, h_processor->reg[Z_REG], h_processor->reg[T_REG]); /* T = Z  */
+               break;
+            case 01110: /* down rotate */
+               if (h_processor->flags[TRACE]) fprintf(stdout, "stack -> a");
+                  h_processor->first = 0; h_processor->last = REG_SIZE - 1;
+                  v_reg_exch(h_processor, h_processor->reg[T_REG], h_processor->reg[C_REG]); /* T = Z  */
+                  v_reg_exch(h_processor, h_processor->reg[C_REG], h_processor->reg[Y_REG]); /* T = Z  */
+                  v_reg_exch(h_processor, h_processor->reg[Y_REG], h_processor->reg[Z_REG]); /* T = Z  */
+               break;
+            case 01210: /* y -> a */
+               if (h_processor->flags[TRACE]) fprintf(stdout, "y -> a");
+               h_processor->first = 0; h_processor->last = REG_SIZE - 1;
+               v_reg_copy(h_processor, h_processor->reg[A_REG], h_processor->reg[Y_REG]);
+               break;
+            case 01310: /* c -> stack */
+               if (h_processor->flags[TRACE]) fprintf(stdout, "stack -> a");
+                  h_processor->first = 0; h_processor->last = REG_SIZE - 1;
+                  v_reg_copy(h_processor, h_processor->reg[T_REG], h_processor->reg[Z_REG]); /* T = Z  */
+                  v_reg_copy(h_processor, h_processor->reg[Z_REG], h_processor->reg[Y_REG]); /* T = Z  */
+                  v_reg_copy(h_processor, h_processor->reg[Y_REG], h_processor->reg[C_REG]); /* T = Z  */
+               break;
+            case 01410: /* decimal */
+               if (h_processor->flags[TRACE]) fprintf(stdout, "decimal");
+               h_processor->base = 10;
+               break;
+            case 01610: /* f -> a */
                h_processor->reg[A_REG]->nibble[0] = h_processor->f;
-               h_processor->f = i_temp;
+               if (h_processor->flags[TRACE]) fprintf(stdout, "f -> a");
+               break;
+            case 01710: /* f exch a */
+               if (h_processor->flags[TRACE]) fprintf(stdout, "f exch a");
+               {
+                  int i_temp;
+                  i_temp = h_processor->reg[A_REG]->nibble[0];
+                  h_processor->reg[A_REG]->nibble[0] = h_processor->f;
+                  h_processor->f = i_temp;
+               }
+               break;
+            default:
+               v_error("Unexpected opcode (%05o) in  %s line : %d\n", i_opcode, __FILE__, __LINE__);
             }
+            break;
+         case 01: /* load n */
+            if (h_processor->flags[TRACE]) fprintf(stdout, "load (%d)", i_opcode >> 6);
+            h_processor->reg[C_REG]->nibble[h_processor->p] = i_opcode >> 6;
+            if (h_processor->p > 0) h_processor->p--; else h_processor->p = REG_SIZE - 1;
+            break;
+         case 02: /* c -> data register(n) */
+            v_error("Unexpected opcode (%05o) in  %s line : %d\n", i_opcode, __FILE__, __LINE__);
+            break;
+         case 03: /* c -> addr or data register(n)-> c (for n > 0) */
+            v_error("Unexpected opcode (%05o) in  %s line : %d\n", i_opcode, __FILE__, __LINE__);
             break;
          default:
             v_error("Unexpected opcode (%05o) in  %s line : %d\n", i_opcode, __FILE__, __LINE__);
          }
          break;
+ 
       case 03: /* Group 3 */
          switch ((i_opcode >> 4) & 03) {
          case 00: /* 0 -> s(n) */
