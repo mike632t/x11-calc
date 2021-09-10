@@ -73,10 +73,10 @@ The can be further categorised by splitting the least significant six bits into 
    00110    0 001 00 10 00  clear s
    00210    0 010 00 10 00  display toggle
    00310    0 011 00 10 00  display off
-   00410    0 100 00 10 00  m exch c
-   00510    0 101 00 10 00  m -> c
-   00610    0 110 00 10 00  n exch c
-   00710    0 111 00 10 00  n -> c
+   00410    0 100 00 10 00  m1 exch c
+   00510    0 101 00 10 00  m1 -> c
+   00610    0 110 00 10 00  m2 exch c
+   00710    0 111 00 10 00  m2 -> c
 
    01010    1 000 00 10 00  stack -> a
    01110    1 001 00 10 00  down rotate
