@@ -29,6 +29,8 @@
 #  27 Sep 20   0.3   - Added make clean option - MT
 #  08 Aug 21   0.4   - Removed x11-calc-format - MT
 #  11 Aug 21	0.5	- Backup created in parent folder - MT
+#	12 Sep 21	0.6	- Added '-no-pie' option so that the resulting program
+#							  can be executed by double clicking on it - MT
 #
 
 PROGRAM 	= x11-calc
@@ -38,7 +40,7 @@ OBJECTS	= $(SOURCES:.c=.o)
 OUTPUT	= $(PROGRAM).out
 LIBS		= -lX11 -lm
 INCLUDE	= .
-FLAGS		= -Wall -Wno-comment -pedantic -ansi
+FLAGS		= -Wall -Wno-comment -pedantic -ansi -no-pie
 #FLAGS		+= -g # For debugging
 CC			= gcc
 
