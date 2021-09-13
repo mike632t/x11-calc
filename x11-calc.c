@@ -102,6 +102,9 @@
  *                     and keystate properties - MT
  *                   - Tidied up comments - MT
  *  9 Sep 21         - Don't trace busy loops - MT
+ * 12 Sep 21         - Fixed bug with single step and trace  - MT
+ *                   - Added  option to allow breakpoint to be set from the
+ *                     command line - MT
  *
  * TO DO :           - Fix STO and RCL.
  *                   - Allow a break-point to be set from the command line.
@@ -117,9 +120,7 @@
 #define DATE           "21 Aug 21"
 #define AUTHOR         "MT"
 
-#define DEBUG 0        /* Enable/disable debug*/
-
-#define BREAKPOINT -1  /* -1 to disable */
+#define DEBUG 1        /* Enable/disable debug*/
 
 #include <stdarg.h>    /* strlen(), etc. */
 #include <string.h>    /* strlen(), etc. */
@@ -201,29 +202,32 @@ int main (int argc, char *argv[]){
    char *s_font; /* Font description. */
 
    char *s_title = TITLE; /* Windows title. */
+
+
    unsigned int i_window_width = WIDTH; /* Window width in pixels. */
    unsigned int i_window_height = HEIGHT; /* Window height in pixels. */
-
    unsigned int i_window_border = 4; /* Window's border width. */
-   int i_window_left, i_window_top; /* Window's top-left corner */
    unsigned int i_colour_depth; /* Window's colour depth. */
    unsigned int i_background_colour; /* Window's background colour. */
+   int i_window_left, i_window_top; /* Window's top-left corner */
    int i_screen; /* Default screen number. */
 
-   int i_count, i_index;
-   int i_current = -1; /* Current program counter */
    char b_trace = False; /* Trace flag */
    char b_step = False; /* Single step flag flag */
    char b_run = True; /* Run flag controls CPU instruction execution in main loop */
    char b_abort = False; /*Abort flag controls execution of main loop */
    char b_ctrl = 0, b_alt = 0, b_shift= 0; /* State of the ctrl, alt and shift keys */
 
+   int i_offset, i_count, i_index;
+   int i_current = -1; /* Current program counter */
+   int i_breakpoint = -1; /* Breakpoint */
+
 #ifdef vms /* Parse DEC style command line options */
    for (i_count = 1; i_count < argc; i_count++) {
       if (argv[i_count][0] == '/') {
          for (i_index = 0; argv[i_count][i_index]; i_index++) /* Convert option to uppercase */
             if (argv[i_count][i_index] >= 'a' && argv[i_count][i_index] <= 'z')
-               argv[i_count][i_index] = argv[i_count][i_index] - 32;
+               argv[i_count][i_index] = argv[i_count][i_index] - 32;  /* TO DO - Assumes 8-bit ASCII encoding */
          if (!strncmp(argv[i_count], "/STEP", i_index))
             b_trace = True; /* Start in single step mode */
          else if (!strncmp(argv[i_count], "/TRACE", i_index))
@@ -250,8 +254,37 @@ int main (int argc, char *argv[]){
          i_index = 1;
          while (argv[i_count][i_index] != 0) {
             switch (argv[i_count][i_index]) {
+            case 'b': /* Breakpoint */
+               if (argv[i_count][i_index + 1] != 0) {
+                  v_error("expected argument not -- '%c' \nTry '%s --help' for more information.\n", argv[i_count][i_index + 1], NAME);
+               }
+               else {
+                  if (i_count + 1 < argc) {
+                     i_breakpoint = 0;
+                     for (i_offset = 0; i_offset < strlen(argv[i_count + 1]); i_offset++) { /* Parse octal number */
+                        if ((argv[i_count + 1][i_offset] < '0') || (argv[i_count + 1][i_offset] > '7'))
+                           v_error("not an octal address -- '%s' \nTry '%s --help' for more information.\n", argv[i_count + 1], NAME);
+                        else 
+                           i_breakpoint = i_breakpoint * 8 + argv[i_count + 1][i_offset] - '0';
+                     }
+                     if ((i_breakpoint < 0)  || (i_breakpoint > (unsigned)(sizeof(i_rom) / sizeof i_rom[0]))) { /* Check address range */
+                        v_error("address out of range -- '%s' \nTry '%s --help' for more information.\n", argv[i_count + 1], NAME);
+                     }
+                     else {
+                        if (i_count + 2 < argc) /* Remove the parameter from the arguments */
+                           for (i_offset = i_count + 1; i_offset < argc - 1; i_offset++)
+                              argv[i_offset] = argv[i_offset + 1];
+                        argc--;
+                     }
+                  }
+                  else {
+                     v_error("option requires an argument -- '%s'\nTry '%s --help' for more information.\n", argv[i_count], NAME);
+                  }
+               }
+               i_index = strlen(argv[i_count]) - 1;
+               break;
             case 's': /* Start in single step mode */
-               b_run = !(b_step = True);
+               b_trace = b_step = True;
                break;
             case 't': /* Enable tracing */
                b_trace = True;
@@ -262,7 +295,7 @@ int main (int argc, char *argv[]){
                  b_abort = True; /* '--' terminates command line processing */
                else
                   if (!strncmp(argv[i_count], "--step", i_index))
-                     b_step = True; /* Start in single step mode */
+                     b_trace = b_step = True; /* Start in single step mode */
                   else if (!strncmp(argv[i_count], "--trace", i_index))
                      b_trace = True; /* Enable tracing */
                   else if (!strncmp(argv[i_count], "--version", i_index)) {
@@ -280,10 +313,11 @@ int main (int argc, char *argv[]){
                v_error("invalid option -- '%c'\nTry '%s --help' for more information.\n", argv[i_count][i_index], NAME);
                exit(-1);
             }
-            i_index++; /* Parse next letter in options */
+            i_index++; /* Parse next letter in option */
          }
          if (argv[i_count][1] != 0) {
-            for (i_index = i_count; i_index < argc - 1; i_index++) argv[i_index] = argv[i_index + 1];
+            for (i_offset = i_count; i_offset < argc - 1; i_offset++)
+               argv[i_offset] = argv[i_offset + 1];
             argc--; i_count--;
          }
       }
@@ -401,11 +435,12 @@ int main (int argc, char *argv[]){
       i_display_draw(x_display, x_application_window, i_screen, h_display);
       XFlush(x_display);
 
+      if (h_processor->pc == i_breakpoint) b_trace = b_step = True;/* Breakpoint */
       h_processor->flags[TRACE] = b_trace;
-      if (h_processor->pc == BREAKPOINT) {b_step = True; h_processor->flags[TRACE] = True;} /* Breakpoint */
       if (h_processor->pc == i_current) h_processor->flags[TRACE] = False; /* Don't trace busy loops */
-      i_current = h_processor->pc;
-      if (b_run) i_processor_tick(h_processor);
+      if (b_run) { 
+         i_current = h_processor->pc; i_processor_tick(h_processor);
+      }
       if (b_step) b_run = False;
 
       while (XPending(x_display)) {
@@ -438,22 +473,20 @@ int main (int argc, char *argv[]){
                (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_Shift_R))) {
                b_shift++;
             }
-            else if (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_Q))  { /* Check for Ctrl-Q */
+            else if (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_Q)) { /* Check for Ctrl-Q */
                if ((b_ctrl == 1) && (b_shift == 0)) b_step = !(b_run  = True);
             }
-            else if (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_S))  { /* Check for Ctrl-S */
-               if ((b_ctrl == 1) && (b_shift == 0)) b_step = b_run =  True;
+            else if (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_S)) { /* Check for Ctrl-S */
+               if ((b_ctrl == 1) && (b_shift == 0)) b_trace = b_step = b_run = True;
             }
-            else if (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_T))  { /* Check for Ctrl-T */
-               if ((b_ctrl == 1) && (b_shift == 0)) {
-                  b_trace  = !b_trace; /* Toggle CPU tracing */
-               }
+            else if (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_T)) { /* Check for Ctrl-T */
+               if ((b_ctrl == 1) && (b_shift == 0)) b_trace = !b_trace; /* Toggle CPU tracing */
             }
             else if (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_Escape)) { /* Check for Escape */
                b_abort = True;
             }
-            else if (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_space))  { /* Check for space */
-               if ((b_ctrl == 0) && (b_shift == 0)) b_step = b_run =  True;
+            else if (x_event.xkey.keycode == XKeysymToKeycode(x_display, XK_space)) { /* Check for space */
+               if ((b_ctrl == 0) && (b_shift == 0)) b_trace = b_step = b_run = True;
             }
             break;
 
