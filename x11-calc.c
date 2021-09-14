@@ -105,22 +105,22 @@
  * 12 Sep 21         - Fixed bug with single step and trace  - MT
  *                   - Added  option to allow breakpoint to be set from the
  *                     command line - MT
+ * 14 Sep 21         - Reduced delay between ticks - MT
  *
- * TO DO :           - Fix STO and RCL.
- *                   - Allow a break-point to be set from the command line.
- *                   - Buffer key board entry...?
+ * TO DO :           - Fix display update problem.
+ *                   - Allow VMS users to set breakpoints.
  *                   - Free up allocated memory on exit.
  *                   - Sort out colour mapping.
  *
  */
 
 #define NAME           "x11-rpncalc"
-#define VERSION        "0.1"
-#define BUILD          "0041"
-#define DATE           "21 Aug 21"
+#define VERSION        "0.2"
+#define BUILD          "0049"
+#define DATE           "14 Sep 21"
 #define AUTHOR         "MT"
 
-#define DEBUG 1        /* Enable/disable debug*/
+#define DEBUG 0        /* Enable/disable debug*/
 
 #include <stdarg.h>    /* strlen(), etc. */
 #include <string.h>    /* strlen(), etc. */
@@ -185,7 +185,7 @@ void v_error(const char *s_fmt, ...) { /* Print formatted error message and exit
    exit(-1);
 }
 
-int main (int argc, char *argv[]){
+int main(int argc, char *argv[]){
 
    Display *x_display; /* Pointer to X display structure. */
    Window x_application_window; /* Application window structure. */
@@ -227,7 +227,7 @@ int main (int argc, char *argv[]){
       if (argv[i_count][0] == '/') {
          for (i_index = 0; argv[i_count][i_index]; i_index++) /* Convert option to uppercase */
             if (argv[i_count][i_index] >= 'a' && argv[i_count][i_index] <= 'z')
-               argv[i_count][i_index] = argv[i_count][i_index] - 32;  /* TO DO - Assumes 8-bit ASCII encoding */
+               argv[i_count][i_index] = argv[i_count][i_index] - 32; /* TO DO - Assumes 8-bit ASCII encoding */
          if (!strncmp(argv[i_count], "/STEP", i_index))
             b_trace = True; /* Start in single step mode */
          else if (!strncmp(argv[i_count], "/TRACE", i_index))
@@ -333,7 +333,7 @@ int main (int argc, char *argv[]){
       exit(-1);
    }
 
-   i_wait(200);  /* Sleep for 200 milliseconds to 'debounce' keyboard! */
+   i_wait(200); /* Sleep for 200 milliseconds to 'debounce' keyboard! */
 
    v_version(False);
 
@@ -428,7 +428,7 @@ int main (int argc, char *argv[]){
    /* Main program event loop. */
    b_abort = False;
    while (!b_abort) {
-      i_wait(3);  /* Sleep for 3 milliseconds */
+      i_wait(1); /* Sleep for 1 millisecond */
 
       /* Update and redraw the display. */
       i_display_update(x_display, x_application_window, i_screen, h_display, h_processor);
