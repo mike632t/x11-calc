@@ -79,9 +79,9 @@ obutton *h_button_pressed(obutton *h_button, int i_xpos, int i_ypos){
 
    if (((i_xpos > i_indent ) && (i_xpos < i_extent)) &&
       ((i_ypos > i_upper ) && (i_ypos < i_lower))) {
-      return (h_button);
+      return(h_button);
    }
-   return (NULL);
+   return(NULL);
 }
 
 /*
@@ -120,7 +120,7 @@ obutton *h_button_create(int i_index, char* s_text,char* s_label ,char* s_altern
 
    h_button->state = i_state;
    h_button->colour = i_colour;
-   return (h_button);
+   return(h_button);
 }
 
 /*
@@ -235,7 +235,7 @@ int i_button_draw(Display *h_display, int x_application_window, int i_screen, ob
    /* Draw the text. */
    XDrawString(h_display, x_application_window, DefaultGC(h_display, i_screen), i_indent, i_lower, h_button->alternate, strlen(h_button->alternate));
 
-   return (True);
+   return(True);
 }
 
 

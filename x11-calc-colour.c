@@ -94,7 +94,7 @@ unsigned int i_tint(unsigned int i_colour){
 
    /* Combine the red, blue and green values to give a lighter tint of the 
       original colour. */
-   return ((((i_red << 8) | i_green) << 8) | i_blue);
+   return((((i_red << 8) | i_green) << 8) | i_blue);
 }
 
 

@@ -234,7 +234,7 @@ int i_segment_draw(Display *h_display, int x_application_window, int i_screen, o
       XDrawLine(h_display, x_application_window, DefaultGC(h_display, i_screen), i_right + 4, i_offset + 4, i_right + 4, i_offset + 2);
    }
 
-   return (True);
+   return(True);
 }
 
 
