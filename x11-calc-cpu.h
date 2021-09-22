@@ -68,6 +68,7 @@ typedef struct {
 typedef struct {
    oregister *reg[REGISTERS];       /* Registers */
    oregister *ram[DATA_REGISTERS];  /* Memory registers */
+   int address;
    int *rom;
    int first;
    int last;

@@ -264,9 +264,11 @@
  *                     routine  to allow main routine to do a reset without
  *                     having to exit and restart the program - MT
  * 16 Sep 21         - Hopefully now handles bank switching better - MT
+ * 22 Sep 21         - Added 'c -> data address' - MT
+ *                   - Added the line number to the unexpected opcode error
+ *                     message - MT
  *
- * To Do             - Fix regression issue with delayed ROM select
- *                     - HP21 has an error in goto target @ 1350
+ * To Do             - Fix handle conditional branch operations properly
  *                   - Overlay program memory storage onto data registers (
  *                     different data structures pointing at the same data).
  *
@@ -290,8 +292,6 @@
 #include "x11-calc-font.h"
 #include "x11-calc-button.h"
 #include "x11-calc-cpu.h"
-
-#include "x11-calc.h"
 
 #include "gcc-debug.h" /* print() */
 #include "gcc-wait.h"  /* i_wait() */
@@ -539,7 +539,6 @@ void v_processor_init(oprocessor *h_processor) {
    h_processor->f = 0;
    h_processor->keycode = 0;
    h_processor->keydown = 0;
-   h_processor->data = 0;
    h_processor->base = 10;
    h_processor->delayed_rom_number = 0;
    h_processor->rom_number = 0;
@@ -579,8 +578,7 @@ static void v_op_inc_pc(oprocessor *h_processor) {
 void op_jsb(oprocessor *h_processor, int i_count){
    h_processor->stack[h_processor->sp] = h_processor->pc; /* Push program counter on the stack */
    h_processor->sp = (h_processor->sp + 1) & (STACK_SIZE - 1); /* Update stack pointer */
-   h_processor->pc = i_count - 1; /* Program counter will be auto incremented before next fetch */
-   h_processor->pc = ((h_processor->pc & 0xff00) | i_count) - 1;
+   h_processor->pc = ((h_processor->pc & 0xff00) | i_count) - 1; /* Program counter will be auto incremented before next fetch */
    delayed_rom_switch(h_processor);
 }
 
@@ -592,10 +590,11 @@ void v_op_rtn(oprocessor *h_processor) {
 
 /* Conditional go to */
 void v_op_goto(oprocessor *h_processor){
-   if (h_processor->flags[TRACE]) fprintf(stdout, "\n%1o-%04o\t %04o\t   goto %01o-%04o",
+   if (h_processor->flags[TRACE]) fprintf(stdout, "\n%1o-%04o %04o    then goto %01o-%04o",
       h_processor->rom_number, h_processor->pc, h_processor->rom[h_processor->pc], h_processor->rom_number, h_processor->rom[h_processor->pc]);
-   if (h_processor->flags[PREV_CARRY] == 0) {
-      h_processor->pc = h_processor->rom[h_processor->pc] - 1; /* Do if True */
+   if (h_processor->flags[PREV_CARRY] == 0) { /* Do if True */
+      h_processor->pc = h_processor->rom[h_processor->pc] - 1; /* Program counter will be auto incremented before next fetch */
+      /* h_processor->pc = ((h_processor->pc & 0xff00) | h_processor->rom[h_processor->pc]) - 1; /* Program counter will be auto incremented before next fetch */
       delayed_rom_switch(h_processor);
    }
 }
@@ -612,7 +611,7 @@ void v_processor_tick(oprocessor *h_processor) {
    const char *s_field; /* Holds pointer to field name */
 
    if (h_processor->flags[TRACE])
-      fprintf(stdout, "%1o-%04o\t %04o\t ", h_processor->rom_number, h_processor->pc, h_processor->rom[h_processor->pc]);
+      fprintf(stdout, "%1o-%04o %04o  ", h_processor->rom_number, h_processor->pc, h_processor->rom[h_processor->pc]);
 
    i_opcode = h_processor->rom[h_processor->pc];
 
@@ -649,7 +648,7 @@ void v_processor_tick(oprocessor *h_processor) {
                h_processor->pc = h_processor->stack[h_processor->sp]; /* Pop program counter on the stack */
                break;
             default:
-               v_error("Unexpected opcode (%05o) in  %s line : %d\n", i_opcode, __FILE__, __LINE__);
+               v_error("Unexpected opcode %04o at %1o-%04o in  %s line : %d\n", i_opcode, h_processor->rom_number, h_processor->pc, __FILE__, __LINE__);
             }
             break;
          case 02: /* select rom */
@@ -658,6 +657,12 @@ void v_processor_tick(oprocessor *h_processor) {
             break;
          case 03:
             switch (i_opcode) {
+            case 01160: /* c -> data address  */
+               if (h_processor->flags[TRACE]) fprintf(stdout, "c -> data address ");
+               h_processor->address = (h_processor->reg[C_REG]->nibble[1] << 4) + h_processor->reg[C_REG]->nibble[0];
+               if (h_processor->address >= ROM_SIZE * ROM_BANKS)
+                  v_error("Address %05o out of range in  %s line : %d\n", h_processor->address, __FILE__, __LINE__);
+               break;
             case 01260: /* clear data registers */
                if (h_processor->flags[TRACE]) fprintf(stdout, "clear data registers");
                v_processor_clear_data_registers(h_processor);
@@ -666,7 +671,7 @@ void v_processor_tick(oprocessor *h_processor) {
                if (h_processor->flags[TRACE]) fprintf(stdout, "hi I'm woodstock");
                break;
             default:
-               v_error("Unexpected opcode (%05o) in  %s line : %d\n", i_opcode, __FILE__, __LINE__);
+               v_error("Unexpected opcode %04o at %1o-%04o in  %s line : %d\n", i_opcode, h_processor->rom_number, h_processor->pc, __FILE__, __LINE__);
             }
          }
          break;
@@ -803,7 +808,7 @@ void v_processor_tick(oprocessor *h_processor) {
                }
                break;
             default:
-               v_error("Unexpected opcode (%05o) in  %s line : %d\n", i_opcode, __FILE__, __LINE__);
+               v_error("Unexpected opcode %04o at %1o-%04o in  %s line : %d\n", i_opcode, h_processor->rom_number, h_processor->pc, __FILE__, __LINE__);
             }
             break;
          case 01: /* load n */
@@ -812,10 +817,10 @@ void v_processor_tick(oprocessor *h_processor) {
             if (h_processor->p > 0) h_processor->p--; else h_processor->p = REG_SIZE - 1;
             break;
          case 02: /* c -> data register(n) */
-            v_error("Unexpected opcode (%05o) in  %s line : %d\n", i_opcode, __FILE__, __LINE__);
+               v_error("Unexpected opcode %04o at %1o-%04o in  %s line : %d\n", i_opcode, h_processor->rom_number, h_processor->pc, __FILE__, __LINE__);
             break;
          case 03: /* c -> addr or data register(n)-> c (for n > 0) */
-            v_error("Unexpected opcode (%05o) in  %s line : %d\n", i_opcode, __FILE__, __LINE__);
+               v_error("Unexpected opcode %04o at %1o-%04o in  %s line : %d\n", i_opcode, h_processor->rom_number, h_processor->pc, __FILE__, __LINE__);
             break;
          default:
             v_error("Unexpected error in  %s line : %d\n", __FILE__, __LINE__);
@@ -877,7 +882,8 @@ void v_processor_tick(oprocessor *h_processor) {
 
    case 01: /* jsb */
       if (h_processor->flags[TRACE]) fprintf(stdout, "jsb %01o-%04o", h_processor->rom_number, ((h_processor->pc & 0xff00) | i_opcode >> 2));
-      op_jsb(h_processor, ((h_processor->pc & 0xff00) | i_opcode >> 2));
+      /* op_jsb(h_processor, ((h_processor->pc & 0xff00) | i_opcode >> 2)); */
+      op_jsb(h_processor, (i_opcode >> 2));
       break;
    case 02: /* Arithmetic operations */
       i_field = (i_opcode >> 2) & 7;
@@ -1081,15 +1087,15 @@ void v_processor_tick(oprocessor *h_processor) {
       switch (i_opcode & 03) {
       case 00:
          if (h_processor->flags[TRACE]) fprintf(stdout, "call\t%01o-%04o", h_processor->rom_number, i_opcode >> 2);
-         v_error("Unexpected opcode (%05o) in  %s line : %d\n", i_opcode, __FILE__, __LINE__);
+               v_error("Unexpected opcode %04o at %1o-%04o in  %s line : %d\n", i_opcode, h_processor->rom_number, h_processor->pc, __FILE__, __LINE__);
          break;
       case 01:
          if (h_processor->flags[TRACE]) fprintf(stdout, "call\t%01o-%04o", h_processor->rom_number, i_opcode >> 2);
-         v_error("Unexpected opcode (%05o) in  %s line : %d\n", i_opcode, __FILE__, __LINE__);
+               v_error("Unexpected opcode %04o at %1o-%04o in  %s line : %d\n", i_opcode, h_processor->rom_number, h_processor->pc, __FILE__, __LINE__);
          break;
       case 02:
          if (h_processor->flags[TRACE]) fprintf(stdout, "jump\t%01o-%04o", h_processor->rom_number, i_opcode >> 2);
-         v_error("Unexpected opcode (%05o) in  %s line : %d\n", i_opcode, __FILE__, __LINE__);
+               v_error("Unexpected opcode %04o at %1o-%04o in  %s line : %d\n", i_opcode, h_processor->rom_number, h_processor->pc, __FILE__, __LINE__);
          break;
       case 03: /* if nc goto */
          if (h_processor->flags[TRACE]) fprintf(stdout, "if nc goto %01o-%04o",
