@@ -34,13 +34,14 @@
 #
 
 PROGRAM 	= x11-calc
-SOURCES 	= x11-calc.c x11-calc-21.c x11-calc-cpu.c x11-calc-display.c x11-calc-segment.c x11-calc-button.c x11-calc-colour.c gcc-wait.c
+SOURCES 	= x11-calc.c x11-calc-21.c x11-calc-cpu.c x11-calc-display.c x11-calc-segment.c x11-calc-button.c x11-calc-colour.c x11-keyboard.c gcc-wait.c
 FILES		= *.c *.h LICENSE README.md makefile x11-calc-instruction-set.md .gitignore .gitattributes
 OBJECTS	= $(SOURCES:.c=.o)
 OUTPUT	= $(PROGRAM).out
 LIBS		= -lX11 -lm
 INCLUDE	= .
-FLAGS		= -Wall -Wno-comment -pedantic -ansi -no-pie
+FLAGS		= -Wall -pedantic -ansi -no-pie
+FLAGS		+= -Wno-comment -Wno-deprecated-declarations
 #FLAGS		+= -g # For debugging
 CC			= gcc
 
@@ -50,7 +51,7 @@ $(PROGRAM): $(OBJECTS)
 $(OBJECTS) : $(SOURCES)
 	@$(CC) $(FLAGS) -c $(SOURCES) -I $(INCLUDE)
 
-all: $(PROGRAM) $(OBJECTS)
+all: clean $(PROGRAM) $(OBJECTS)
 
 clean:
 	@rm -f $(OBJECTS)
