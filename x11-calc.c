@@ -135,7 +135,7 @@
 #define DATE           "14 Sep 21"
 #define AUTHOR         "MT"
 
-#define DEBUG 1        /* Enable/disable debug*/
+#define DEBUG 0        /* Enable/disable debug*/
 
 #define INTERVAL 100   /* Number of ticks to execute before updating the display */
 

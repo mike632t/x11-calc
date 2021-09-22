@@ -30,7 +30,7 @@
 #define BUILD          "0001"
 #define DATE           "02 Jul 13"
  
-#define DEBUG 1        /* Enable/disable debug*/
+#define DEBUG 0        /* Enable/disable debug*/
  
 #include "gcc-debug.h"
  
