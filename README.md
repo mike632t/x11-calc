@@ -1,19 +1,25 @@
 ## x11-calc - Another RPN (Reverse Polish) calculator.
 
-![HP21](./images/x11-calc-21.png) ![HP32](./images/x11-calc-32.png) ![HP33](./images/x11-calc-33.png)
+![HP21](./images/x11-calc-21.png) 
 
-Written in C using X11. Work in progress, currently just a 'nice' GUI,  with
-animated  buttons.  I've created the data structures for the  CPU,  register
-and  display  'objects'  but the  actual  implementation  of  the  processor
-simulation is still work in progress.
+Written in C using X11.  
 
-The  intention is for the code to be reasonably portable.  Currently it will
-compile on Linux running on an x64, arm, or i386 processor, VMS running on a
-VAX or Alpha processor, and Tru64 Unix running on an Alpha processor.
+The use of any language extensions or non standard features has been avoided
+in order to try to make the code as portable as possible.  Currently it will
+compile using Linux running on x64, arm, or i386 processors.  
 
-And it really does run on DEC Windows!
+Earlier versions of the code would also compile on VMS running on either VAX
+or Alpha processors, and Tru64 Unix running on Alpha.  This is not currently
+possible but this capability will be restored in future releases.  
 
-![HP21](./images/x11-calc-21-decwindows.png)
+(Removing the keyboard handling routines should allow the current code to be
+compiled on VMS).
+
+Currently the only calculator that is simulated is an HP21 but the aim is to
+add support for additional models when possible.
+
+![HP32](./images/x11-calc-32.png) ![HP33](./images/x11-calc-33.png)
+
 
 ## To Do
 
