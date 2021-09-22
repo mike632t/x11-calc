@@ -22,15 +22,18 @@
  *
  * 02 Jul 13         - Initial version - MT
  * 08 Aug 21         - Tidied up spelling errors in the comments - MT
+ * 18 Sep 21         - Added keycode to the button properties and a  method
+ *                     to determine if this corrisponds to a button - MT
  *
  */
 
 #ifndef BUTTON
 typedef struct { /* Calculator button structure. */
    int index;
-   char* text;
-   char* label;
-   char* alternate;
+   char key; /* Key code corisponding to button */
+   char* text; /* Text on face of button */ 
+   char* label; /* Label on button */
+   char* alternate; /* Alternate text above button */
    XFontStruct* text_font; /* Pointer to font. */
    XFontStruct* label_font; /* Pointer to shifted font. */
    XFontStruct* alternate_font; /* Pointer to alternate font. */
@@ -42,9 +45,11 @@ typedef struct { /* Calculator button structure. */
    unsigned int colour;
 } obutton;
 
+obutton *h_button_key_pressed(obutton *h_button, char c_key);
+
 obutton *h_button_pressed(obutton *h_button, int i_xpos, int i_ypos);
 
-obutton *h_button_create(int i_index, char* s_text,char* s_label ,char* s_alternate,
+obutton *h_button_create(int i_index, char c_key, char* s_text,char* s_label ,char* s_alternate,
    XFontStruct *h_normal_font, XFontStruct *h_shift_font, XFontStruct *h_alternate_font,
    int i_left, int i_top, int i_width, int i_height, int i_state,
    unsigned int i_colour);

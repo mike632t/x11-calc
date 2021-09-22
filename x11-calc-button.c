@@ -59,6 +59,23 @@
 #include "gcc-debug.h"
 
 /*
+ * button_key_pressed (button, key)
+ *
+ * If the x and y co-ordinate are within the area of the button this
+ * function returns a pointer to the button, or a NULL otherwise.
+ *
+ * 01 Jul 13         - Initial version - MT
+ *
+ */
+
+obutton *h_button_key_pressed(obutton *h_button, char c_key){
+   if (h_button->key != '\000') {
+      if (c_key == h_button->key)
+         return(h_button);
+   }
+   return(NULL);
+}
+/*
  * button_pressed (button, x, y)
  *
  * If the x and y co-ordinate are within the area of the button this
@@ -85,9 +102,9 @@ obutton *h_button_pressed(obutton *h_button, int i_xpos, int i_ypos){
 }
 
 /*
- * button_create (index, text, label ,alternate, font, label_font,
- *                alternate_font, left, top, width, height, state,
- *                colour)
+ * button_create (index, key, text, label ,alternate, font, 
+ *                label_font, alternate_font, left, top, width, height,
+ *                state, colour)
  *
  * Allocates storage for a new button, sets the properties and returns a
  * pointer to the button, or exits the program if there isn't enough
@@ -95,7 +112,7 @@ obutton *h_button_pressed(obutton *h_button, int i_xpos, int i_ypos){
  *
  */
 
-obutton *h_button_create(int i_index, char* s_text,char* s_label ,char* s_alternate,
+obutton *h_button_create(int i_index, char c_key, char* s_text, char* s_label ,char* s_alternate,
    XFontStruct *h_normal_font, XFontStruct *h_shift_font, XFontStruct *h_alternate_font,
    int i_left, int i_top, int i_width, int i_height, int i_state,
    unsigned int i_colour){
@@ -106,6 +123,7 @@ obutton *h_button_create(int i_index, char* s_text,char* s_label ,char* s_altern
    if ((h_button = malloc (sizeof(*h_button)))==NULL) v_error("Memory allocation failed!");
 
    h_button->index = i_index;
+   h_button->key = c_key;
    h_button->text = s_text;
    h_button->label = s_label;
    h_button->alternate = s_alternate;
