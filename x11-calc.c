@@ -118,6 +118,7 @@
  *                     allows a button to be operated by a key - MT
  * 19 Sep 21         - Created a keyboard class to keep track of the  input
  *                     state and translate keystrokes into characters - MT
+ * 21 Sep 21         - Set the default active button to NULL - MT
  *
  * To Do             - Save trace and single step options and restore when
  *                     resetting the processor...
@@ -134,7 +135,7 @@
 #define DATE           "14 Sep 21"
 #define AUTHOR         "MT"
 
-#define DEBUG 0        /* Enable/disable debug*/
+#define DEBUG 1        /* Enable/disable debug*/
 
 #define INTERVAL 100   /* Number of ticks to execute before updating the display */
 
@@ -214,7 +215,7 @@ int main(int argc, char *argv[]){
    Atom wm_delete;
 
    obutton *h_button[BUTTONS]; /* Array to hold pointers to 30 buttons. */
-   obutton *h_pressed;
+   obutton *h_pressed = NULL;
    odisplay *h_display; /* Pointer to display strudture. */
    okeyboard *h_keyboard;
    oprocessor *h_processor;
@@ -461,9 +462,9 @@ int main(int argc, char *argv[]){
 
       while (XPending(x_display)) {
          XNextEvent(x_display, &x_event);
-         /* debug(fprintf(stderr, "Event ID : %i.\n", x_event.type)); */
+         debug(fprintf(stderr, "Event ID : %i.\n", x_event.type));
          switch (x_event.type) {
-         case FocusOut :
+         case FocusOut:
             if (!(h_pressed == NULL)) {
                h_pressed->state = False;
                i_button_draw(x_display, x_application_window, i_screen, h_pressed);
