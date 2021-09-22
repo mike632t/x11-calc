@@ -3,9 +3,9 @@
  *
  * Copyright(C) 2020   MT
  *
- * Emulates processor operation.
+ * Simulates the ACT processor.
  *
- * Contains  the type definitions and functions definitions used to  emulate
+ * Contains  the type definitions and functions definitions used to emulate
  * the CPU microcode.
  *
  * This  program is free software: you can redistribute it and/or modify it
@@ -13,7 +13,7 @@
  * Free  Software Foundation, either version 3 of the License, or (at  your
  * option) any later version.
  *
- * This  program  is distributed in the hope that it will  be  useful,  but
+ * This  program  is distributed in the hope that it will  be  useful, but
  * WITHOUT   ANY   WARRANTY;   without even   the   implied   warranty   of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
  * Public License for more details.
@@ -22,7 +22,7 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * 10 Sep 20         - Initial version - MT
- * 24 Aug 21         - Added  properties for the p and data registers,  and
+ * 24 Aug 21         - Added  properties for the p and data  registers, and
  *                     an  array of flags to keep track of things like  the
  *                     arithmetic mode and instruction tracing - MT
  * 5 Sep 21          - Changed  first and last into signed integers  (fixed
@@ -36,7 +36,7 @@
 #ifndef REGISTERS
 #include "x11-calc.h"
 
-#define REGISTERS      8     /* A, B , C(X), D(Y), E(Z), F(T), M, N(M2) */
+#define REGISTERS      8     /* A, B, C(X), D(Y), E(Z), F(T), M, N(M2) */
 #define FLAGS          10
 #define REG_SIZE       14
 #define EXP_SIZE       3     /* Two digit exponent plus a sign digit */
@@ -55,7 +55,7 @@
 #define CARRY          1
 #define PREV_CARRY     2
 #define DELAYED_ROM    3
-#define BANK_SWICH     4
+#define BANK_SWITCH    4
 #define DISPLAY_ENABLE 5
 #define TIMER          8
 #define TRACE          9
@@ -67,7 +67,12 @@ typedef struct {
 
 typedef struct {
    oregister *reg[REGISTERS];       /* Registers */
-   oregister *ram[RAM_SIZE];        /* Memory registers */
+   oregister *ram[DATA_REGISTERS];  /* Memory registers */
+   int *rom;
+   int first;
+   int last;
+   unsigned int rom_number;         /* ROM number */
+   unsigned int delayed_rom_number; /* Delayed ROM number */
    unsigned char flags[FLAGS];      /* Processor flags + TRACE flag*/
    unsigned char status[16];        /* Status (S0 - S15) */
    unsigned int stack[STACK_SIZE];  /* Call stack */
@@ -80,17 +85,15 @@ typedef struct {
    unsigned int data;               /* Data register */
    unsigned int base;               /* Data register */
 
-   unsigned int bank;               /* ROM bank number */
-   int *rom;                        /* ROM */
-   int first;
-   int last;
 } oprocessor;
 
 oprocessor *h_processor_create(int *h_rom);
 
-int i_processor_tick(oprocessor *h_procesor);
+void v_processor_init(oprocessor *h_processor);
 
-void v_reg_fprint(FILE *h_file,  oregister *h_register);
+void v_processor_tick(oprocessor *h_procesor);
 
 void v_reg_load(oregister *h_register, ...);
+
+void v_reg_fprint(FILE *h_file, oregister *h_register);
 #endif

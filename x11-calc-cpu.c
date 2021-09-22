@@ -1,9 +1,9 @@
 /*
  * x11-calc-cpu.c - RPN (Reverse Polish) calculator simulator.
  *
- * Emulates processor operation.
+ * Copyright(C) 2020   MT
  *
- * Copyright(C) 2020    MT
+ * Simulates the ACT processor.
  *
  * This processor simulator is based on the work of a number of individuals
  * including  Jacques LAPORTE, David HICKS, Greg SYDNEY-SMITH, Eric  SMITH,
@@ -64,7 +64,7 @@
  * F1          Carry.
  * F2          Prev Carry.
  * F3          Delayed ROM select.
- * F4          Bank switch
+ * F4          ROM select
  * F5          Display enabled
  * F6          ???
  * F7          ???
@@ -203,7 +203,7 @@
  *                   - Added several more functions - MT
  *                   - Implemented code to handle subroutines - MT
  *                   - Fixed compiler warnings - MT
- *                   - Added rom select, and register copy - MT
+ *                   - Added ROM select, and register copy - MT
  * 31 Aug 21         - Fixed typo in RAM initialisation code - MT
  *                   - Using a NULL argument with the copy register routine
  *                     means it can be used to replace the function used to
@@ -258,8 +258,18 @@
  *                   - Modified some error messages - MT
  *                   - Tidied up extra spaces - MT
  *             0.2   - It works !!
+ * 15 Sep 21         - Added 'clear data registers', and delayed ROM select
+ *                     handling to 'jsb' and 'goto' - MT
+ *                   - Moved  the processor initialisation into a  separate
+ *                     routine  to allow main routine to do a reset without
+ *                     having to exit and restart the program - MT
+ * 16 Sep 21         - Hopefully now handles bank switching better - MT
  *
- * To Do             -
+ * To Do             - Fix regression issue with delayed ROM select
+ *                     - HP21 has an error in goto target @ 1350
+ *                   - Overlay program memory storage onto data registers (
+ *                     different data structures pointing at the same data).
+ *
  *
  */
 
@@ -305,7 +315,7 @@ void v_reg_fprint(FILE *h_file, oregister *h_register) {
 }
 
 /* Display the current processor status word */
-void v_status_fprint(FILE *h_file,oprocessor *h_processor) {
+void v_status_fprint(FILE *h_file, oprocessor *h_processor) {
    int i_count, i_temp = 0;
    if (h_processor != NULL) {
       for (i_count = (sizeof(h_processor->status) / sizeof(*h_processor->status)); i_count >= 0; i_count--)
@@ -315,39 +325,39 @@ void v_status_fprint(FILE *h_file,oprocessor *h_processor) {
 }
 
 /* Display the current processor flags */
-void v_flags_fprint(FILE *h_file,oprocessor *h_processor) {
+void v_flags_fprint(FILE *h_file, oprocessor *h_processor) {
    int i_count, i_temp = 0;
    if (h_processor != NULL) {
       for (i_count = 0; i_count < TRACE; i_count++) /* Ignore TRACE flag */
          i_temp += h_processor->flags[i_count] << i_count;
-      fprintf(stdout,"Ox%02x (", i_temp);
+      fprintf(stdout, "Ox%02x (", i_temp);
       for (i_count = 0; i_count < TRACE; i_count++)
-         fprintf(stdout,"%d", h_processor->flags[TRACE - 1 - i_count]);
-      fprintf(stdout,")  ");
+         fprintf(stdout, "%d", h_processor->flags[TRACE - 1 - i_count]);
+      fprintf(stdout, ")  ");
    }
 }
 
 /* Display the current processor flags */
-void v_ptr_fprint(FILE *h_file,oprocessor *h_processor) {
-   if (h_processor != NULL) fprintf(stdout,"%02d ", h_processor->p);
+void v_ptr_fprint(FILE *h_file, oprocessor *h_processor) {
+   if (h_processor != NULL) fprintf(stdout, "%02d ", h_processor->p);
 }
 
-void v_state_fprint(FILE *h_file,oprocessor *h_processor) {
+void v_state_fprint(FILE *h_file, oprocessor *h_processor) {
    int i_count;
    for (i_count = 0; i_count < REGISTERS; i_count++) {
-      if (i_count % 3 == 0) fprintf(stdout,"\n\t");
+      if (i_count % 3 == 0) fprintf(stdout, "\n\t");
       v_reg_fprint(stdout, h_processor->reg[i_count]);
    }
-   fprintf(stdout,"\n\tflags[] = ");
+   fprintf(stdout, "\n\tflags[] = ");
    v_flags_fprint(stdout, h_processor);
-   fprintf(stdout,"status  = ");
+   fprintf(stdout, "status  = ");
    v_status_fprint(stdout, h_processor);
-   fprintf(stdout,"ptr     = ");
+   fprintf(stdout, "ptr     = ");
    v_ptr_fprint(stdout, h_processor);
-   fprintf(stdout,"\n\n");
+   fprintf(stdout, "\n\n");
 }
 
-/* Create a new register object */
+/* Create a new register , */
 oregister *h_register_create(char c_id){
    oregister *h_register; /* Pointer to register. */
    int i_count, i_temp;
@@ -370,77 +380,6 @@ void v_reg_load(oregister *h_register, ...) {
    i_temp = sizeof(h_register->nibble) / sizeof(*h_register->nibble) - 1;
    for (i_count = i_temp; i_count >= 0; i_count--)
       h_register->nibble[i_count]  = va_arg(t_args, int);
-}
-
-/* Create a new processor object */
-oprocessor *h_processor_create(int *h_rom){
-   oprocessor *h_processor;
-   int i_count;
-   if ((h_processor = malloc(sizeof(*h_processor)))==NULL) v_error("Memory allocation failed!"); /* Attempt to allocate memory to hold the processor structure. */
-   for (i_count = 0; i_count < REGISTERS; i_count++)
-      h_processor->reg[i_count] = h_register_create((i_count + 1) * -1); /* Allocate storage for the registers */
-   for (i_count = 0; i_count < (sizeof(h_processor->ram) / sizeof(h_processor->ram[0])); i_count++)
-      h_processor->ram[i_count] = h_register_create(i_count); /* Allocate storage for the RAM */
-   for (i_count = 0; i_count < (sizeof(h_processor->status) / sizeof(h_processor->status[0]) ); i_count++)
-      h_processor->status[i_count] = 0; /* Clear the processor status word */
-   h_processor->status[5] = 1; /* TO DO - Check which flags should be set by default */
-   h_processor->status[3] = 1;
-   for (i_count = 0; i_count < STACK_SIZE; i_count++)
-      h_processor->stack[i_count] = 0; /* Clear the processor stack */
-   for (i_count = 0; i_count < FLAGS; i_count++)
-      h_processor->flags[i_count] = False; /* Clear the processor flags */
-   h_processor->flags[MODE] = 1; /* Select RUN mode */
-   h_processor->pc = 0; /* Program counter */
-   h_processor->sp = 0; /* Stack pointer */
-   h_processor->p = 0; /* Pointer register */
-   h_processor->f = 0; /* F register */
-   h_processor->keycode = 0; /* Key code */
-   h_processor->keydown = 0; /* Key down */
-   h_processor->data = 0; /* Data register */
-   h_processor->base = 10; /* Data register */
-
-   h_processor->bank = 0; /* ROM bank number */
-   h_processor->rom = h_rom ; /* Address of ROM */
-   return(h_processor);
-}
-
-/* Delayed ROM bank switching */
-void delayed_bank_switch(oprocessor *h_processor) { /* delayed ROM bank switching */
-   if (h_processor->flags[TRACE]) fprintf(stdout," ** ");
-   if (h_processor->flags[DELAYED_ROM] != 0) {
-      h_processor->pc = h_processor->bank << 8 | (h_processor->pc & 00377);
-      h_processor->flags[DELAYED_ROM] = 0; /* Clear flag */
-   }
-}
-
-/* Increment program counter */
-static void v_op_inc_pc(oprocessor *h_processor) {
-   if (h_processor->pc++ >= (ROM_SIZE - 1)) h_processor->pc = 0;
-   h_processor->flags[PREV_CARRY] = h_processor->flags[CARRY];
-   h_processor->flags[CARRY] = 0;
-}
-
-/* Jump to subroutine */
-void op_jsb(oprocessor *h_processor, int i_count){
-   h_processor->stack[h_processor->sp] = h_processor->pc; /* Push program counter on the stack */
-   h_processor->sp = (h_processor->sp + 1) & (STACK_SIZE - 1); /* Update stack pointer */
-   h_processor->pc = i_count - 1; /* Program counter will be auto incremented before next fetch */
-   /* TO DO handle_del_rom(); */
-}
-
-/* Return from subroutine */
-void v_op_rtn(oprocessor *h_processor) {
-   h_processor->sp = (h_processor->sp - 1) & (STACK_SIZE - 1); /* Update stack pointer */
-   h_processor->pc = h_processor->stack[h_processor->sp]; /* Pop program counter on the stack */
-}
-
-/* Conditional go to */
-void v_op_goto(oprocessor *h_processor){
-   if (h_processor->flags[TRACE]) fprintf(stdout, "\n%1o-%04o\t %04o\t   goto %01o-%04o",
-      h_processor->bank, h_processor->pc, h_processor->rom[h_processor->pc], h_processor->bank, h_processor->rom[h_processor->pc]);
-   if (h_processor->flags[PREV_CARRY] == 0) h_processor->pc =  h_processor->rom[h_processor->pc] - 1; /* Do if True */
-   /*delayed_bank_switch(h_processor);
-   /* Increment PC using h_processor->pc = ((h_processor->pc & 0xFC00) | i_count) - 1 ??? */
 }
 
 /* Exchange the contents of two registers */
@@ -564,8 +503,106 @@ static void v_reg_shl(oprocessor *h_processor, oregister *h_register){
    h_processor->flags[PREV_CARRY] = h_processor->flags[CARRY] = 0;
 }
 
+/* Clear registers */
+void v_processor_clear_registers(oprocessor *h_processor) {
+   int i_count;
+   h_processor->first = 0; h_processor->last = REG_SIZE - 1;
+   for (i_count = 0; i_count < REGISTERS; i_count++)
+      v_reg_copy(h_processor, h_processor->reg[i_count], NULL); /* Copying nothing to a register clears it */
+   for (i_count = 0; i_count < STACK_SIZE; i_count++)
+      h_processor->stack[i_count] = 0; /* Clear the processor stack */
+}
+
+/* Clear data registers */
+void v_processor_clear_data_registers(oprocessor *h_processor) {
+   int i_count;
+   h_processor->first = 0; h_processor->last = REG_SIZE - 1;
+   for (i_count = 0; i_count < DATA_REGISTERS; i_count++)
+      v_reg_copy(h_processor, h_processor->ram[i_count], NULL); /* Copying nothing to a register clears it */
+}
+
+/* Reset processor */
+void v_processor_init(oprocessor *h_processor) {
+   int i_count;
+   v_processor_clear_registers(h_processor); /*Clear the CPU registers and stack */
+   v_processor_clear_data_registers(h_processor); /* Clear the memory registers*/
+   for (i_count = 0; i_count < (sizeof(h_processor->status) / sizeof(h_processor->status[0]) ); i_count++)
+      h_processor->status[i_count] = 0; /* Clear the processor status word */
+   for (i_count = 0; i_count < FLAGS; i_count++)
+      h_processor->flags[i_count] = False; /* Clear the processor flags */
+   h_processor->status[5] = 1; /* TO DO - Check which flags should be set by default */
+   h_processor->status[3] = 1;
+   h_processor->flags[MODE] = 1; /* Select RUN mode */
+   h_processor->pc = 0;
+   h_processor->sp = 0;
+   h_processor->p = 0;
+   h_processor->f = 0;
+   h_processor->keycode = 0;
+   h_processor->keydown = 0;
+   h_processor->data = 0;
+   h_processor->base = 10;
+   h_processor->delayed_rom_number = 0;
+   h_processor->rom_number = 0;
+}
+
+/* Create a new processor , */
+oprocessor *h_processor_create(int *h_rom){
+   oprocessor *h_processor;
+   int i_count;
+   if ((h_processor = malloc(sizeof(*h_processor)))==NULL) v_error("Memory allocation failed!"); /* Attempt to allocate memory to hold the processor structure. */
+   for (i_count = 0; i_count < REGISTERS; i_count++)
+      h_processor->reg[i_count] = h_register_create((i_count + 1) * -1); /* Allocate storage for the registers */
+   for (i_count = 0; i_count < DATA_REGISTERS; i_count++)
+      h_processor->ram[i_count] = h_register_create(i_count); /* Allocate storage for the RAM */
+   h_processor->rom = h_rom ; /* Address of ROM */
+   v_processor_init(h_processor);
+   return(h_processor);
+}
+
+/* Delayed ROM select */
+static void delayed_rom_switch(oprocessor *h_processor) { /* Delayed ROM select */
+   if (h_processor->flags[DELAYED_ROM] != 0) {
+      if (h_processor->flags[TRACE]) fprintf(stdout, " ** ");
+      h_processor->pc = h_processor->delayed_rom_number << 8 | (h_processor->pc & 00377);
+      h_processor->flags[DELAYED_ROM] = 0; /* Clear flag */
+   }
+}
+
+/* Increment program counter */
+static void v_op_inc_pc(oprocessor *h_processor) {
+   if (h_processor->pc++ >= (ROM_SIZE - 1)) h_processor->pc = 0;
+   h_processor->flags[PREV_CARRY] = h_processor->flags[CARRY];
+   h_processor->flags[CARRY] = 0;
+}
+
+/* Jump to subroutine */
+void op_jsb(oprocessor *h_processor, int i_count){
+   h_processor->stack[h_processor->sp] = h_processor->pc; /* Push program counter on the stack */
+   h_processor->sp = (h_processor->sp + 1) & (STACK_SIZE - 1); /* Update stack pointer */
+   h_processor->pc = i_count - 1; /* Program counter will be auto incremented before next fetch */
+   h_processor->pc = ((h_processor->pc & 0xff00) | i_count) - 1;
+   delayed_rom_switch(h_processor);
+}
+
+/* Return from subroutine */
+void v_op_rtn(oprocessor *h_processor) {
+   h_processor->sp = (h_processor->sp - 1) & (STACK_SIZE - 1); /* Update stack pointer */
+   h_processor->pc = h_processor->stack[h_processor->sp]; /* Pop program counter on the stack */
+}
+
+/* Conditional go to */
+void v_op_goto(oprocessor *h_processor){
+   if (h_processor->flags[TRACE]) fprintf(stdout, "\n%1o-%04o\t %04o\t   goto %01o-%04o",
+      h_processor->rom_number, h_processor->pc, h_processor->rom[h_processor->pc], h_processor->rom_number, h_processor->rom[h_processor->pc]);
+   if (h_processor->flags[PREV_CARRY] == 0) {
+      h_processor->pc = h_processor->rom[h_processor->pc] - 1; /* Do if True */
+      delayed_rom_switch(h_processor);
+   }
+}
+
+
 /* Decode and execute a single instruction */
-int i_processor_tick(oprocessor *h_processor) {
+void v_processor_tick(oprocessor *h_processor) {
 
    static const int i_set_p[16] = { 14,  4,  7,  8, 11,  2, 10, 12,  1,  3, 13,  6,  0,  9,  5, 14 };
    static const int i_tst_p[16] = { 4 ,  8, 12,  2,  9,  1,  6,  3,  1, 13,  5,  0, 11, 10,  7,  4 };
@@ -575,7 +612,7 @@ int i_processor_tick(oprocessor *h_processor) {
    const char *s_field; /* Holds pointer to field name */
 
    if (h_processor->flags[TRACE])
-      fprintf(stdout, "%1o-%04o\t %04o\t ", h_processor->bank, h_processor->pc, h_processor->rom[h_processor->pc]);
+      fprintf(stdout, "%1o-%04o\t %04o\t ", h_processor->rom_number, h_processor->pc, h_processor->rom[h_processor->pc]);
 
    i_opcode = h_processor->rom[h_processor->pc];
 
@@ -621,6 +658,10 @@ int i_processor_tick(oprocessor *h_processor) {
             break;
          case 03:
             switch (i_opcode) {
+            case 01260: /* clear data registers */
+               if (h_processor->flags[TRACE]) fprintf(stdout, "clear data registers");
+               v_processor_clear_data_registers(h_processor);
+               break;
             case 01760: /* hi I'm woodstock */
                if (h_processor->flags[TRACE]) fprintf(stdout, "hi I'm woodstock");
                break;
@@ -659,7 +700,7 @@ int i_processor_tick(oprocessor *h_processor) {
             break;
          case 03: /* delayed select rom n */
             if (h_processor->flags[TRACE]) fprintf(stdout, "delayed select rom %d", i_opcode >> 6);
-            h_processor->bank = i_opcode >> 6;
+            h_processor->delayed_rom_number = i_opcode >> 6;
             h_processor->flags[DELAYED_ROM] = 1;
          }
          break;
@@ -669,14 +710,7 @@ int i_processor_tick(oprocessor *h_processor) {
             switch (i_opcode) {
             case 00010: /* clear registers */
                if (h_processor->flags[TRACE]) fprintf(stdout, "clear registers");
-               {
-                  int i_count;
-                  h_processor->first = 0; h_processor->last = REG_SIZE - 1;
-                  for (i_count = 0; i_count < REGISTERS; i_count++)
-                     v_reg_copy(h_processor, h_processor->reg[i_count], NULL); /* Copying nothing to a register clears it */
-                  for (i_count = 0; i_count < STACK_SIZE; i_count++)
-                     h_processor->stack[i_count] = 0;
-               }
+               v_processor_clear_registers(h_processor);
                break;
             case 00110: /* clear s */
                if (h_processor->flags[TRACE]) fprintf(stdout, "clear s");
@@ -690,7 +724,7 @@ int i_processor_tick(oprocessor *h_processor) {
                         case 15: /* Set if any key is pressed */
                            break;
                         default:
-                           h_processor->status[i_count] = 0; /* Clear all bits except bits 1,2,5,15 */
+                           h_processor->status[i_count] = 0; /* Clear all bits except bits 1, 2, 5, 15 */
                      }
                }
                break;
@@ -842,7 +876,7 @@ int i_processor_tick(oprocessor *h_processor) {
       break;
 
    case 01: /* jsb */
-      if (h_processor->flags[TRACE]) fprintf(stdout, "jsb %01o-%04o", h_processor->bank, ((h_processor->pc & 0xff00) | i_opcode >> 2));
+      if (h_processor->flags[TRACE]) fprintf(stdout, "jsb %01o-%04o", h_processor->rom_number, ((h_processor->pc & 0xff00) | i_opcode >> 2));
       op_jsb(h_processor, ((h_processor->pc & 0xff00) | i_opcode >> 2));
       break;
    case 02: /* Arithmetic operations */
@@ -1004,7 +1038,7 @@ int i_processor_tick(oprocessor *h_processor) {
          v_op_inc_pc(h_processor); /* Increment program counter */
          v_op_goto(h_processor);
          break;
-      case 0031: /* if a >= b[f] */ /** TO DO Check */
+      case 0031: /* if a >= b[f] */
          if (h_processor->flags[TRACE]) fprintf(stdout, "if a >= b[%s]", s_field);
          v_reg_sub(h_processor, NULL, h_processor->reg[A_REG], h_processor->reg[B_REG]);
          v_op_inc_pc(h_processor); /* Increment program counter */
@@ -1046,23 +1080,23 @@ int i_processor_tick(oprocessor *h_processor) {
    case 03:/* Subroutine calls and long conditional jumps */
       switch (i_opcode & 03) {
       case 00:
-         if (h_processor->flags[TRACE]) fprintf(stdout, "call\t%01o-%04o", h_processor->bank, i_opcode >> 2);
+         if (h_processor->flags[TRACE]) fprintf(stdout, "call\t%01o-%04o", h_processor->rom_number, i_opcode >> 2);
          v_error("Unexpected opcode (%05o) in  %s line : %d\n", i_opcode, __FILE__, __LINE__);
          break;
       case 01:
-         if (h_processor->flags[TRACE]) fprintf(stdout, "call\t%01o-%04o", h_processor->bank, i_opcode >> 2);
+         if (h_processor->flags[TRACE]) fprintf(stdout, "call\t%01o-%04o", h_processor->rom_number, i_opcode >> 2);
          v_error("Unexpected opcode (%05o) in  %s line : %d\n", i_opcode, __FILE__, __LINE__);
          break;
       case 02:
-         if (h_processor->flags[TRACE]) fprintf(stdout, "jump\t%01o-%04o", h_processor->bank, i_opcode >> 2);
+         if (h_processor->flags[TRACE]) fprintf(stdout, "jump\t%01o-%04o", h_processor->rom_number, i_opcode >> 2);
          v_error("Unexpected opcode (%05o) in  %s line : %d\n", i_opcode, __FILE__, __LINE__);
          break;
       case 03: /* if nc goto */
          if (h_processor->flags[TRACE]) fprintf(stdout, "if nc goto %01o-%04o",
-            h_processor->bank, (h_processor->pc & 0xff00) | i_opcode >> 2);
+            h_processor->rom_number, (h_processor->pc & 0xff00) | i_opcode >> 2);
          if (h_processor->flags[PREV_CARRY] == 0)
              h_processor->pc = ((h_processor->pc & 0xff00) | i_opcode >> 2) - 1;
-         delayed_bank_switch(h_processor);
+         delayed_rom_switch(h_processor);
          break;
       default:
          v_error("Unexpected error in  %s line : %d\n", __FILE__, __LINE__);
@@ -1077,6 +1111,4 @@ int i_processor_tick(oprocessor *h_processor) {
    }
 
    v_op_inc_pc(h_processor); /* Increment program counter */
-
-   return(0); /* TO DO: Return status */
 }
