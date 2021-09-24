@@ -23,7 +23,7 @@
  *                     common function definitions to a separate file - MT
  * 08 Aug 21         - Tidied up spelling errors in the comments - MT
  * 22 Aug 21         - Added definition for commit id - MT
- * 23 Sep 21         - Model number is not defined in the make file - MT 
+ * 23 Sep 21         - Model number is no defined in the make file - MT 
  *
  * TO DO :           -
  */
