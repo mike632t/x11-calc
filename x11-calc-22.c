@@ -29,7 +29,8 @@
  * 08 Aug 21         - Tidied up spelling errors in the comments - MT
  * 10 Aug 21         - Added HP21 ROM contents - MT
  *
- * To Do :           - Modify key colour - MT
+ * To Do :           - Modify key colour?
+ *                   - Fix EEX
  */
 
 #define VERSION        "0.1"
