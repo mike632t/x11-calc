@@ -267,6 +267,8 @@
  * 22 Sep 21         - Added 'c -> data address' - MT
  *                   - Added the line number to the unexpected opcode error
  *                     message - MT
+ * 23 Sep 21         - Fixed 'go to' address calculation (hopefully) - MT
+ *                   - Fixed bug in 'p - 1 -> p' - MT
  *
  * To Do             - Fix handle conditional branch operations properly
  *                   - Overlay program memory storage onto data registers (
@@ -578,7 +580,8 @@ static void v_op_inc_pc(oprocessor *h_processor) {
 void op_jsb(oprocessor *h_processor, int i_count){
    h_processor->stack[h_processor->sp] = h_processor->pc; /* Push program counter on the stack */
    h_processor->sp = (h_processor->sp + 1) & (STACK_SIZE - 1); /* Update stack pointer */
-   h_processor->pc = ((h_processor->pc & 0xff00) | i_count) - 1; /* Program counter will be auto incremented before next fetch */
+   h_processor->pc = ((h_processor->pc & 0xff00) | i_count); /* Note - Uses an eight bit address */
+   h_processor->pc--; /* Program counter will be auto incremented before next fetch */
    delayed_rom_switch(h_processor);
 }
 
@@ -590,11 +593,12 @@ void v_op_rtn(oprocessor *h_processor) {
 
 /* Conditional go to */
 void v_op_goto(oprocessor *h_processor){
-   if (h_processor->flags[TRACE]) fprintf(stdout, "\n%1o-%04o %04o    then goto %01o-%04o",
+   if (h_processor->flags[TRACE]) fprintf(stdout, "\n%1o-%04o %04o    then go to %01o-%04o",
       h_processor->rom_number, h_processor->pc, h_processor->rom[h_processor->pc], h_processor->rom_number, h_processor->rom[h_processor->pc]);
    if (h_processor->flags[PREV_CARRY] == 0) { /* Do if True */
-      h_processor->pc = h_processor->rom[h_processor->pc] - 1; /* Program counter will be auto incremented before next fetch */
-      /* h_processor->pc = ((h_processor->pc & 0xff00) | h_processor->rom[h_processor->pc]) - 1; /* Program counter will be auto incremented before next fetch */
+      /* h_processor->pc = h_processor->rom[h_processor->pc]; */
+      h_processor->pc = ((h_processor->pc & 0xfc00) | h_processor->rom[h_processor->pc]); /* Note - Uses a _ten_ bit address */
+      h_processor->pc--; /* Program counter will be auto incremented before next fetch */
       delayed_rom_switch(h_processor);
    }
 }
@@ -636,7 +640,7 @@ void v_processor_tick(oprocessor *h_processor) {
                break;
             case 00620: /* p - 1 -> p */
                if (h_processor->flags[TRACE]) fprintf(stdout, "p - 1 -> p");
-               if (h_processor->p == 0 ) h_processor->p = REG_SIZE; else h_processor->p--;
+               if (h_processor->p == 0 ) h_processor->p = REG_SIZE - 1; else h_processor->p--;
                break;
             case 00720: /* p - 1 -> p */
                if (h_processor->flags[TRACE]) fprintf(stdout, "p - 1 -> p");
@@ -881,8 +885,7 @@ void v_processor_tick(oprocessor *h_processor) {
       break;
 
    case 01: /* jsb */
-      if (h_processor->flags[TRACE]) fprintf(stdout, "jsb %01o-%04o", h_processor->rom_number, ((h_processor->pc & 0xff00) | i_opcode >> 2));
-      /* op_jsb(h_processor, ((h_processor->pc & 0xff00) | i_opcode >> 2)); */
+      if (h_processor->flags[TRACE]) fprintf(stdout, "jsb %01o-%04o", h_processor->rom_number, ((h_processor->pc & 0xff00) | i_opcode >> 2)); /* Note - uses and eight bit address */
       op_jsb(h_processor, (i_opcode >> 2));
       break;
    case 02: /* Arithmetic operations */
@@ -1098,8 +1101,8 @@ void v_processor_tick(oprocessor *h_processor) {
                v_error("Unexpected opcode %04o at %1o-%04o in  %s line : %d\n", i_opcode, h_processor->rom_number, h_processor->pc, __FILE__, __LINE__);
          break;
       case 03: /* if nc goto */
-         if (h_processor->flags[TRACE]) fprintf(stdout, "if nc goto %01o-%04o",
-            h_processor->rom_number, (h_processor->pc & 0xff00) | i_opcode >> 2);
+         if (h_processor->flags[TRACE]) fprintf(stdout, "if nc go to %01o-%04o",
+            h_processor->rom_number, (h_processor->pc & 0xff00) | i_opcode >> 2); /* Note - uses and eight bit address */
          if (h_processor->flags[PREV_CARRY] == 0)
              h_processor->pc = ((h_processor->pc & 0xff00) | i_opcode >> 2) - 1;
          delayed_rom_switch(h_processor);
