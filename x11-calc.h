@@ -23,11 +23,17 @@
  *                     common function definitions to a separate file - MT
  * 08 Aug 21         - Tidied up spelling errors in the comments - MT
  * 22 Aug 21         - Added definition for commit id - MT
+ * 23 Sep 21         - Model number is not defined in the make file - MT 
  *
  * TO DO :           -
  */
 #define  COMMIT_ID "[Commit ID: $Format:%h$]"
+
+#ifdef HP22
+#include "x11-calc-22.h"
+#elif HP21
 #include "x11-calc-21.h"
+#endif
 
 void v_version(); /* Display version information */
 void v_about(); /* Display help text */

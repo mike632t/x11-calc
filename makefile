@@ -31,10 +31,13 @@
 #  11 Aug 21	0.5	- Backup created in parent folder - MT
 #	12 Sep 21	0.6	- Added '-no-pie' option so that the resulting program
 #							  can be executed by double clicking on it - MT
+#	23 Sep 21	0.7	- Model number can now be selected just by setting the
+#							  MODEL number in this file - MT
 #
 
 PROGRAM 	= x11-calc
-SOURCES 	= x11-calc.c x11-calc-21.c x11-calc-cpu.c x11-calc-display.c x11-calc-segment.c x11-calc-button.c x11-calc-colour.c x11-keyboard.c gcc-wait.c
+MODEL		= 22
+SOURCES 	= x11-calc.c x11-calc-cpu.c x11-calc-display.c x11-calc-segment.c x11-calc-button.c x11-calc-colour.c x11-keyboard.c gcc-wait.c
 FILES		= *.c *.h LICENSE README.md makefile x11-calc-instruction-set.md .gitignore .gitattributes
 OBJECTS	= $(SOURCES:.c=.o)
 OUTPUT	= $(PROGRAM).out
@@ -45,16 +48,20 @@ FLAGS		+= -Wno-comment -Wno-deprecated-declarations
 #FLAGS		+= -g # For debugging
 CC			= gcc
 
+all: clean $(PROGRAM) $(OBJECTS)
+FLAGS		+= -D HP$(MODEL)
+SOURCES 	+= x11-calc-$(MODEL).c 
+
 $(PROGRAM): $(OBJECTS)
 	@$(CC) $(FLAGS) $(OBJECTS) -o $@ $(LIBS)
 
 $(OBJECTS) : $(SOURCES)
+#	@echo $(CC) $(FLAGS) -c $(SOURCES)
 	@$(CC) $(FLAGS) -c $(SOURCES) -I $(INCLUDE)
 
-all: clean $(PROGRAM) $(OBJECTS)
-
 clean:
-	@rm -f $(OBJECTS)
+	@rm -f *.o
+#	@rm -f $(OBJECTS)
 #	@rm -f $(PROGRAM)
 
 backup:
