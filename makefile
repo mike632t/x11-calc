@@ -35,8 +35,8 @@
 #							  MODEL number in this file - MT
 #
 
-PROGRAM 	= x11-calc
-MODEL		= 22
+MODEL		= 21
+PROGRAM 	= x11-calc-$(MODEL)
 SOURCES 	= x11-calc.c x11-calc-cpu.c x11-calc-display.c x11-calc-segment.c x11-calc-button.c x11-calc-colour.c x11-keyboard.c gcc-wait.c
 FILES		= *.c *.h LICENSE README.md makefile x11-calc-instruction-set.md .gitignore .gitattributes
 OBJECTS	= $(SOURCES:.c=.o)
@@ -56,6 +56,7 @@ $(PROGRAM): $(OBJECTS)
 	@$(CC) $(FLAGS) $(OBJECTS) -o $@ $(LIBS)
 
 $(OBJECTS) : $(SOURCES)
+	@echo $(PROGRAM)
 #	@echo $(CC) $(FLAGS) -c $(SOURCES)
 	@$(CC) $(FLAGS) -c $(SOURCES) -I $(INCLUDE)
 
