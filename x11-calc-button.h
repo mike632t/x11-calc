@@ -34,6 +34,7 @@ typedef struct { /* Calculator button structure. */
    char* text; /* Text on face of button */ 
    char* label; /* Label on button */
    char* alternate; /* Alternate text above button */
+   unsigned int colour; /* Colour */
    XFontStruct* text_font; /* Pointer to font. */
    XFontStruct* label_font; /* Pointer to shifted font. */
    XFontStruct* alternate_font; /* Pointer to alternate font. */
@@ -42,7 +43,6 @@ typedef struct { /* Calculator button structure. */
    int width;
    int height;
    int state;
-   unsigned int colour;
 } obutton;
 
 obutton *h_button_key_pressed(obutton *h_button, char c_key);

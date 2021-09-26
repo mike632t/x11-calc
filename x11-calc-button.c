@@ -28,12 +28,13 @@
  * 14 Jul 13         - Flush X buffer each time button is drawn - MT
  * 15 Dec 18         - Changed debug macro and added an error macro - MT
  * 08 Aug 21         - Tidied up spelling errors in the comments - MT
+ * 26 Sep 21         - Alternate text colour defined by model number, it is
+ *                     bit of a fudge, as the text colours really should be
+ *                     implemented as separate properties - MT
+ * 
+ * TO DO             - Implement text colours as button properties
+ *                   - Add an alternate label text 
  *
- * TO DO :           - Add additional details to button shading.
- *                   - Use a wider range of colour hints to improve button
- *                     appearance.
- *                   - Highlight bottom of button when pressed.
- *                   - Optimize drawing code...
  */
 
 #define VERSION        "0.1"
@@ -75,15 +76,7 @@ obutton *h_button_key_pressed(obutton *h_button, char c_key){
    }
    return(NULL);
 }
-/*
- * button_pressed (button, x, y)
- *
- * If the x and y co-ordinate are within the area of the button this
- * function returns a pointer to the button, or a NULL otherwise.
- *
- * 01 Jul 13         - Initial version - MT
- *
- */
+/* button_pressed (button, x, y) */
 
 obutton *h_button_pressed(obutton *h_button, int i_xpos, int i_ypos){
 
@@ -101,15 +94,9 @@ obutton *h_button_pressed(obutton *h_button, int i_xpos, int i_ypos){
    return(NULL);
 }
 
-/*
- * button_create (index, key, text, label ,alternate, font, 
- *                label_font, alternate_font, left, top, width, height,
+/*button_create (index, key, text, label ,alternate, font, label_font, 
+ *                alternate_font, left, top, width, height,
  *                state, colour)
- *
- * Allocates storage for a new button, sets the properties and returns a
- * pointer to the button, or exits the program if there isn't enough
- * memory available.
- *
  */
 
 obutton *h_button_create(int i_index, char c_key, char* s_text, char* s_label ,char* s_alternate,
@@ -141,17 +128,16 @@ obutton *h_button_create(int i_index, char c_key, char* s_text, char* s_label ,c
    return(h_button);
 }
 
-/*
- * button_draw (display, window, screen, button)
- *
- * Draws the a button on the screen.
- *
- */
+/* button_draw (display, window, screen, button) */
 
 int i_button_draw(Display *h_display, int x_application_window, int i_screen, obutton *h_button){
 
    unsigned int i_label = YELLOW;
+#ifdef HP27
+   unsigned int i_alternate = BLACK;
+#else
    unsigned int i_alternate = BLUE;
+#endif
    int i_indent, i_extent, i_upper, i_lower;
    int i_offset;
 
