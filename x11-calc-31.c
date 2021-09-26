@@ -1,5 +1,5 @@
 /*
- * x11-calc-21.c - RPN (Reverse Polish) calculator simulator.
+ * x11-calc-31.c - RPN (Reverse Polish) calculator simulator.
  *
  * Copyright(C) 2018   MT
  *
@@ -18,18 +18,8 @@
  * You  should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * 09 Jun 14   0.1   - Initial version - MT
- * 10 Mar 14         - Changed indexes to BCD hex values - MT
- * 10 Dec 18         - Alternate  function  key now LIGHT_BLUE, allowing  it
- *                     to be a different colour to the alternate text - MT
- * 31 Aug 20         - Made  version(), about(), and error() model specific
- *                     so that the name reflects the model number - MT
- *                   - Modified version() to display a leading zero in  the
- *                     date instead of a space - MT
- * 08 Aug 21         - Tidied up spelling errors in the comments - MT
- * 10 Aug 21         - Added HP21 ROM contents - MT
+ * 21 Sep 21   0.1   - Initial version - MT
  *
- * To Do :           - Modify key colour - MT
  */
 
 #define VERSION        "0.1"
@@ -37,7 +27,7 @@
 #define DATE           "10 Aug 21"
 #define AUTHOR         "MT"
 
-#define DEBUG 1        /* Enable/disable debug*/
+#define DEBUG 0        /* Enable/disable debug*/
 
 #include <stdarg.h>    /* strlen(), etc. */
 #include <stdio.h>     /* fprintf(), etc. */
@@ -55,7 +45,54 @@
 
 #include "gcc-debug.h"
 
-oregister o_ram[DATA_REGISTERS];
+oregister o_mem[MEMORY_SIZE];
+
+void v_init_keypad(obutton* h_button[]){
+
+   /* Define top row of keys. */ 
+   h_button[0] = h_button_create(00064, 000, "/\xaf", "FIX", "", h_normal_font, h_small_font, h_alternate_font, 12, 85, 33, 30, False, BLACK);
+   h_button[1] = h_button_create(00063, 000, "1/x", "SCI", "", h_normal_font, h_small_font, h_alternate_font, 48, 85, 33, 30, False, BLACK);
+   h_button[2] = h_button_create(00062, 000, "yX", "\x1c", "", h_normal_font, h_small_font, h_alternate_font, 84, 85, 33, 30, False, BLACK);
+   h_button[3] = h_button_create(00061, 000, "eX", "10x", "", h_normal_font, h_small_font, h_alternate_font, 120, 85, 33, 30, False, BLACK);
+   h_button[4] = h_button_create(00060, 000, "LN", "LOG", "", h_normal_font, h_small_font, h_alternate_font, 156, 85, 33, 30, False, BLACK);
+   
+   /* Define second row of keys. */ 
+   h_button[5] = h_button_create(00224, 000, "X-Y", "DEG", "", h_normal_font, h_small_font, h_alternate_font, 12, 128, 33, 30, False, BLACK);
+   h_button[6] = h_button_create(00223, 000, "R", "RAD", "", h_normal_font, h_small_font, h_alternate_font, 48, 128, 33, 30, False, BLACK);
+   h_button[7] = h_button_create(00222, 000, "STO", "GRD", "", h_normal_font, h_small_font, h_alternate_font, 84, 128, 33, 30, False, BLACK);
+   h_button[8] = h_button_create(00221, 000, "RCL", "LASTx", "", h_normal_font, h_small_font, h_alternate_font, 120, 128, 33, 30, False, BLACK);
+   h_button[9] = h_button_create(00220, 'f', "f", "", "", h_normal_font, h_small_font, h_alternate_font, 156, 128, 33, 30, False, YELLOW); /* Shift key. */
+
+   /* Define third row of keys. */
+   h_button[10] = h_button_create(00163, 000, "ENTER", "MANT PREFIX", "", h_normal_font, h_small_font, h_alternate_font, 12, 171, 69, 30, False, BLACK);
+   h_button[11] = h_button_create(00162, 'c', "CHS", "ALL", "", h_normal_font, h_small_font, h_alternate_font, 84, 171, 33, 30, False, BLACK);
+   h_button[12] = h_button_create(00161, 'e', "EEX", "REG", "", h_normal_font, h_small_font, h_alternate_font, 120, 171, 33, 30, False, BLACK);
+   h_button[13] = h_button_create(00160, 033, "CLX", "STK", "", h_normal_font, h_small_font, h_alternate_font, 156, 171, 33, 30, False, BLACK);
+
+   /* Define fourth row of keys. */
+   h_button[14] = h_button_create(00243, '-', "-", "-R", "", h_large_font, h_small_font, h_alternate_font, 12, 214, 33, 30, False, LIGHT_GRAY);
+   h_button[15] = h_button_create(00242, '7', "7", "SIN", "", h_large_font, h_small_font, h_alternate_font, 52, 214, 41, 30, False, LIGHT_GRAY);
+   h_button[16] = h_button_create(00241, '8', "8", "COS", "", h_large_font, h_small_font, h_alternate_font, 100, 214, 41, 30, False, LIGHT_GRAY);
+   h_button[17] = h_button_create(00240, '9', "9", "TAN", "", h_large_font, h_small_font, h_alternate_font, 148, 214, 41, 30, False, LIGHT_GRAY);
+
+   /* Define fifth row of keys. */
+   h_button[18] = h_button_create(00143, '+', "+", "-P", "", h_large_font, h_small_font, h_alternate_font, 12, 257, 33, 30, False, LIGHT_GRAY);
+   h_button[19] = h_button_create(00142, '4', "4", "SIN-\xb9", "", h_large_font, h_small_font, h_alternate_font, 52, 257, 41, 30, False, LIGHT_GRAY);
+   h_button[20] = h_button_create(00141, '5', "5", "COS-\xb9", "", h_large_font, h_small_font, h_alternate_font, 100, 257, 41, 30, False, LIGHT_GRAY);
+   h_button[21] = h_button_create(00140, '6', "6", "TAN-\xb9", "", h_large_font, h_small_font, h_alternate_font, 148, 257, 41, 30, False, LIGHT_GRAY);
+
+   /* Define sixth row of keys. */
+   h_button[22] = h_button_create(00323, '*', "\xd7", "-DEG", "", h_large_font, h_small_font, h_alternate_font, 12, 300, 33, 30, False, LIGHT_GRAY);
+   h_button[23] = h_button_create(00322, '1', "1", "-in", "", h_large_font, h_small_font, h_alternate_font, 52, 300, 41, 30, False, LIGHT_GRAY);
+   h_button[24] = h_button_create(00321, '2', "2", "-\x07\x46", "", h_large_font, h_small_font, h_alternate_font, 100, 300, 41, 30, False, LIGHT_GRAY);
+   h_button[25] = h_button_create(00320, '3', "3", "-lbm", "", h_large_font, h_small_font, h_alternate_font, 148, 300, 41, 30, False, LIGHT_GRAY);
+
+   /* Define bottom row of keys. */
+   h_button[26] = h_button_create(00103, '/', "\xf7", "-RAD", "", h_large_font, h_small_font, h_alternate_font, 12, 343, 33, 30, False, LIGHT_GRAY);
+   h_button[27] = h_button_create(00102, '0', "0", "-mm", "", h_large_font, h_small_font, h_alternate_font, 52, 343, 41, 30, False, LIGHT_GRAY);
+   h_button[28] = h_button_create(00101, '.', ".", "-\x07\x43", "", h_large_font, h_small_font, h_alternate_font, 100, 343, 41, 30, False, LIGHT_GRAY);
+   h_button[29] = h_button_create(00100, '%', "%", "-kg", "", h_normal_font, h_small_font, h_alternate_font, 148, 343, 41, 30, False, LIGHT_GRAY);
+}
 
 int i_rom[ROM_SIZE * ROM_BANKS] = {
    00664, 00013, 01460, 00031, 01360, 01020, 01566, 00011,
@@ -315,51 +352,3 @@ int i_rom[ROM_SIZE * ROM_BANKS] = {
    00620, 00620, 00620, 00664, 00767, 00624, 00073, 01110,
    01273, 00624, 00252, 01025, 01204, 01161, 00767, 00547
 };
-
-void v_init_keypad(obutton* h_button[]){
-
-   /* Define top row of keys. */ 
-   h_button[0] = h_button_create(00064, "/\xaf", "FIX", "", h_normal_font, h_small_font, h_alternate_font, 12, 85, 33, 30, False, BLACK);
-   h_button[1] = h_button_create(00063, "1/x", "SCI", "", h_normal_font, h_small_font, h_alternate_font, 48, 85, 33, 30, False, BLACK);
-   h_button[2] = h_button_create(00062, "yX", "\x1c", "", h_normal_font, h_small_font, h_alternate_font, 84, 85, 33, 30, False, BLACK);
-   h_button[3] = h_button_create(00061, "eX", "10x", "", h_normal_font, h_small_font, h_alternate_font, 120, 85, 33, 30, False, BLACK);
-   h_button[4] = h_button_create(00060, "LN", "LOG", "", h_normal_font, h_small_font, h_alternate_font, 156, 85, 33, 30, False, BLACK);
-   
-   /* Define second row of keys. */ 
-   h_button[5] = h_button_create(00224, "X-Y", "DEG", "", h_normal_font, h_small_font, h_alternate_font, 12, 128, 33, 30, False, BLACK);
-   h_button[6] = h_button_create(00223, "R", "RAD", "", h_normal_font, h_small_font, h_alternate_font, 48, 128, 33, 30, False, BLACK);
-   h_button[7] = h_button_create(00222, "STO", "GRD", "", h_normal_font, h_small_font, h_alternate_font, 84, 128, 33, 30, False, BLACK);
-   h_button[8] = h_button_create(00221, "RCL", "LASTx", "", h_normal_font, h_small_font, h_alternate_font, 120, 128, 33, 30, False, BLACK);
-   h_button[9] = h_button_create(00220, "f", "", "", h_normal_font, h_small_font, h_alternate_font, 156, 128, 33, 30, False, YELLOW); /* Shift key. */
-
-   /* Define third row of keys. */
-   h_button[10] = h_button_create(00163, "ENTER", "MANT PREFIX", "", h_normal_font, h_small_font, h_alternate_font, 12, 171, 69, 30, False, BLACK);
-   h_button[11] = h_button_create(00162, "CHS", "ALL", "", h_normal_font, h_small_font, h_alternate_font, 84, 171, 33, 30, False, BLACK);
-   h_button[12] = h_button_create(00161, "EEX", "REG", "", h_normal_font, h_small_font, h_alternate_font, 120, 171, 33, 30, False, BLACK);
-   h_button[13] = h_button_create(00160, "CLX", "STK", "", h_normal_font, h_small_font, h_alternate_font, 156, 171, 33, 30, False, BLACK);
-
-   /* Define fourth row of keys. */
-   h_button[14] = h_button_create(00243, "-", "-R", "", h_large_font, h_small_font, h_alternate_font, 12, 214, 33, 30, False, LIGHT_GRAY);
-   h_button[15] = h_button_create(00242, "7", "SIN", "", h_large_font, h_small_font, h_alternate_font, 52, 214, 41, 30, False, LIGHT_GRAY);
-   h_button[16] = h_button_create(00241, "8", "COS", "", h_large_font, h_small_font, h_alternate_font, 100, 214, 41, 30, False, LIGHT_GRAY);
-   h_button[17] = h_button_create(00240, "9", "TAN", "", h_large_font, h_small_font, h_alternate_font, 148, 214, 41, 30, False, LIGHT_GRAY);
-
-   /* Define fifth row of keys. */
-   h_button[18] = h_button_create(00143, "+", "-P", "", h_large_font, h_small_font, h_alternate_font, 12, 257, 33, 30, False, LIGHT_GRAY);
-   h_button[19] = h_button_create(00142, "4", "SIN-\xb9", "", h_large_font, h_small_font, h_alternate_font, 52, 257, 41, 30, False, LIGHT_GRAY);
-   h_button[20] = h_button_create(00141, "5", "COS-\xb9", "", h_large_font, h_small_font, h_alternate_font, 100, 257, 41, 30, False, LIGHT_GRAY);
-   h_button[21] = h_button_create(00140, "6", "TAN-\xb9", "", h_large_font, h_small_font, h_alternate_font, 148, 257, 41, 30, False, LIGHT_GRAY);
-
-   /* Define sixth row of keys. */
-   h_button[22] = h_button_create(00323, "\xd7", "-DEG", "", h_large_font, h_small_font, h_alternate_font, 12, 300, 33, 30, False, LIGHT_GRAY);
-   h_button[23] = h_button_create(00322, "1", "-in", "", h_large_font, h_small_font, h_alternate_font, 52, 300, 41, 30, False, LIGHT_GRAY);
-   h_button[24] = h_button_create(00321, "2", "-\x07\x46", "", h_large_font, h_small_font, h_alternate_font, 100, 300, 41, 30, False, LIGHT_GRAY);
-   h_button[25] = h_button_create(00320, "3", "-lbm", "", h_large_font, h_small_font, h_alternate_font, 148, 300, 41, 30, False, LIGHT_GRAY);
-
-   /* Define bottom row of keys. */
-   h_button[26] = h_button_create(00103, "\xf7", "-RAD", "", h_large_font, h_small_font, h_alternate_font, 12, 343, 33, 30, False, LIGHT_GRAY);
-   h_button[27] = h_button_create(00102, "0", "-mm", "", h_large_font, h_small_font, h_alternate_font, 52, 343, 41, 30, False, LIGHT_GRAY);
-   h_button[28] = h_button_create(00101, ".", "-\x07\x43", "", h_large_font, h_small_font, h_alternate_font, 100, 343, 41, 30, False, LIGHT_GRAY);
-   h_button[29] = h_button_create(00100, "%", "-kg", "", h_normal_font, h_small_font, h_alternate_font, 148, 343, 41, 30, False, LIGHT_GRAY);
-
-}

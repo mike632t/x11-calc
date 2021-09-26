@@ -17,10 +17,8 @@
  * You  should have received a copy of the GNU General Public License  along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- * 09 Mar 14         - Initial verson - MEJT
- * 10 Mar 14         - Changed indexes to BCD hex values - MEJT
- *                      
- * TO DO :           - 
+ * 21 Sep 21   0.1   - Initial version - MT
+ *        - 
  */
 
 
@@ -33,7 +31,7 @@
 #define DIGITS         11
 
 #define ROM_SIZE       04000
-#define DATA_REGISTERS 1
+#define MEMORY_SIZE    4
 #define ROM_BANKS      1
 
 #define True           1
