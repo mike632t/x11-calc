@@ -88,7 +88,7 @@ The can be further categorised by splitting the least significant six bits into 
 
    0nn30    n nnn 01 10 00  load n
    0nn50    n nnn 10 10 00  c -> data register(n)
-   00070 *  0 000 11 10 00  c -> addr
+   00070 *  0 000 11 10 00  data -> c 
    0nn70 *  n nnn 11 10 00  data register(n)-> c      (n > 0)
 
    0nn14    n nnn 00 11 00  0 -> s(n)
