@@ -40,7 +40,7 @@ likely that the memory data structures will have to be revised.
 
 ##### HP 29 - Only keyboard working.
 
-##### HP 31.
+##### HP 31 - Partially working.
 * Need to add keycodes to button definitions.
 * Implement missing opcodes.
 
