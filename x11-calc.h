@@ -19,20 +19,34 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * 31 Aug 20   0.1   - Initial version - MT
- * 31 Aug 20         - Resolved dependencies between header files by  moving
+ * 31 Aug 20         - Resolved dependencies between header files by moving
  *                     common function definitions to a separate file - MT
  * 08 Aug 21         - Tidied up spelling errors in the comments - MT
  * 22 Aug 21         - Added definition for commit id - MT
- * 23 Sep 21         - Model number is no defined in the make file - MT 
+ * 23 Sep 21         - Model number defined in the makefile and selected in
+ *                     here  using a preprocessor directive to include  the
+ *                     appropriate constants and funtion definitions  - MT
  *
  * TO DO :           -
  */
 #define  COMMIT_ID "[Commit ID: $Format:%h$]"
 
-#ifdef HP22
-#include "x11-calc-22.h"
-#elif HP21
+#ifdef HP21
 #include "x11-calc-21.h"
+#elif HP22
+#include "x11-calc-22.h"
+#elif HP25
+#include "x11-calc-25.h"
+#elif HP27
+#include "x11-calc-27.h"
+#elif HP29
+#include "x11-calc-29.h"
+#elif HP31
+#include "x11-calc-31.h"
+#elif HP32
+#include "x11-calc-32.h"
+#elif HP33
+#include "x11-calc-33.h"
 #endif
 
 void v_version(); /* Display version information */
