@@ -50,8 +50,9 @@ likely that the memory data structures will have to be revised.
 
 ### Known Issues
 
-Attempting to compile using a later version of 'gcc' will generates several
-warning messages owing the the use of 'ftime()' which has been deprecated.
+Attempting to compile using a later version of 'gcc' will result in several
+warning  messages being generated due to the the use of 'ftime()' which has
+been deprecated.
 
 Need  to sort out colour mapping to allow program to run on a display  with
 less than 24 -bit colour - may get round to this be one day...
