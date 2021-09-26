@@ -31,10 +31,10 @@
 #define WIDTH        201   /* Yes really! */
 #define BUTTONS      30
 
-#define DIGITS       12
+#define DIGITS       11
 
 #define ROM_SIZE     02000  
-#define RAM_SIZE     00000
+#define MEMORY_SIZE  16
 #define ROM_BANKS    1
 
 #define True         1
@@ -44,5 +44,5 @@ int i_rom [ROM_SIZE * ROM_BANKS];
 
 void v_init_calc();
 
-int v_init_keypad(obutton *h_button[]);
+void v_init_keypad(obutton *h_button[]);
 #endif
