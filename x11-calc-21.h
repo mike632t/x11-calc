@@ -33,7 +33,7 @@
 
 #define DIGITS         12
 
-#define DATA_REGISTERS 1 /* Can't be zero*/
+#define MEMORY_SIZE    1 /* Can't be zero*/
 #define ROM_SIZE       02000
 #define ROM_BANKS      1
 
