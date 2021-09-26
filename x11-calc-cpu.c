@@ -269,6 +269,13 @@
  *                     message - MT
  * 23 Sep 21         - Fixed 'go to' address calculation (hopefully) - MT
  *                   - Fixed bug in 'p - 1 -> p' - MT
+ * 25 Sep 21         - Updated register debug output - MT
+ *                   - Changed DATA_REGISTERS to MEMORY_SIZE - MT
+ * 26 Sep 21         - Display register contents when debugging - MT
+ *                   - Implemented 'c -> data' and 'data -> c' - MT
+ *                   - Added  range checking to 'data register(n)-> c'  and
+ *                     'c -> data address' - MT
+ *
  *
  * To Do             - x11-rpncalc : Break at 0-0614 in x11-calc-cpu.c line : 837
  *                   - Overlay program memory storage onto data registers (
@@ -282,7 +289,7 @@
 #define DATE           "14 Sep 21"
 #define AUTHOR         "MT"
 
-#define DEBUG 1        /* Enable/disable debug*/
+#define DEBUG 0        /* Enable/disable debug*/
 
 #include <stdlib.h>    /* malloc(), etc. */
 #include <stdio.h>     /* fprintf(), etc. */
@@ -342,6 +349,10 @@ void v_state_fprint(FILE *h_file, oprocessor *h_processor) {
       for (i_count = 0; i_count < REGISTERS; i_count++) {
          if (i_count % 3 == 0) fprintf(h_file, "\n\t");
          v_reg_fprint(h_file, h_processor->reg[i_count]);
+      }
+      for (i_count = 0; i_count < MEMORY_SIZE; i_count++) {
+         if (i_count % 3 == 0) fprintf(h_file, "\n\t");
+         v_reg_fprint(h_file, h_processor->mem[i_count]);
       }
       fprintf(h_file, "\n\tflags[] = ");
       v_flags_fprint(h_file, h_processor);
@@ -454,21 +465,6 @@ static void v_reg_test_ne(oprocessor *h_processor, oregister *h_destination, ore
       }
    }
 }
-
-/* Negate the contents of a register
-static void v_reg_negate(oprocessor *h_processor, oregister *h_register){
-   int i_count, i_temp;
-   for (i_count = h_processor->first; i_count <= h_processor->last; i_count++){
-      i_temp = 0 - (h_destination->nibble[i_count]) - h_processor->flags[CARRY];
-      if (i_temp < 0) {
-         i_temp += h_processor->base;
-         h_processor->flags[CARRY] = 1;
-      }
-      else
-         h_processor->flags[CARRY] = 0;
-      h_destination->nibble[i_count] = i_temp;
-   }
-} */
 
 /* Increment the contents of a register */
 static void v_reg_inc(oprocessor *h_processor, oregister *h_register){
@@ -655,14 +651,24 @@ void v_processor_tick(oprocessor *h_processor) {
          case 03:
             switch (i_opcode) {
             case 01160: /* c -> data address  */
-               if (h_processor->flags[TRACE]) fprintf(stdout, "c -> data address ");
-               h_processor->addr = (h_processor->reg[C_REG]->nibble[1] << 4) + h_processor->reg[C_REG]->nibble[0];
-               if (h_processor->addr >= ROM_SIZE * ROM_BANKS)
-                  v_error("Address %05o out of range in %s line : %d\n", h_processor->addr, __FILE__, __LINE__);
+               {
+                  int i_addr;
+                  if (h_processor->flags[TRACE]) fprintf(stdout, "c -> data address ");
+                  i_addr = (h_processor->reg[C_REG]->nibble[1] << 4) + h_processor->reg[C_REG]->nibble[0];
+                  if (i_addr < MEMORY_SIZE)
+                     h_processor->addr = i_addr;
+                  else
+                     v_error("Address %02o out of range at %1o-%04o in %s line : %d\n", i_addr, h_processor->rom_number, h_processor->pc, __FILE__, __LINE__);
+               }
                break;
             case 01260: /* clear data registers */
                if (h_processor->flags[TRACE]) fprintf(stdout, "clear data registers");
                v_processor_clear_data_registers(h_processor);
+               break;
+            case 01360: /* c -> data */
+               if (h_processor->flags[TRACE]) fprintf(stdout, "c -> data ");
+               h_processor->first = 0; h_processor->last = REG_SIZE - 1;
+               v_reg_copy(h_processor, h_processor->mem[h_processor->addr], h_processor->reg[C_REG]);
                break;
             case 01760: /* hi I'm woodstock */
                if (h_processor->flags[TRACE]) fprintf(stdout, "hi I'm woodstock");
@@ -820,13 +826,22 @@ void v_processor_tick(oprocessor *h_processor) {
                v_reg_copy(h_processor, h_processor->mem[(i_opcode >> 6)], h_processor->reg[C_REG]); /* C -> reg(n)  */
             }
             else
-               v_error("Invalid register REG[%d] at %1o-%04o in %s line : %d\n", i_opcode >> 6, h_processor->rom_number, h_processor->pc, __FILE__, __LINE__);
+               v_error("Address %02o out of range at %1o-%04o in %s line : %d\n", i_opcode >> 6, h_processor->rom_number, h_processor->pc, __FILE__, __LINE__);
             break;
-         case 03: /* data register(n)-> c */
-            if (h_processor->flags[TRACE]) fprintf(stdout, "c -> data register(%d)", i_opcode >> 6);
+         case 03: /* data -> c or data register(n)-> c */
             if ((i_opcode >> 6) < MEMORY_SIZE) {
                h_processor->first = 0; h_processor->last = REG_SIZE - 1;
-               v_reg_copy(h_processor, h_processor->reg[C_REG], h_processor->mem[(i_opcode >> 6)]); /* reg(n) -> C  */
+               if ((i_opcode >> 6) == 0) {
+                  if (h_processor->flags[TRACE]) fprintf(stdout, "data -> c");
+                  v_reg_copy(h_processor, h_processor->reg[C_REG], h_processor->mem[h_processor->addr]);
+               }
+               else {
+                  if (h_processor->flags[TRACE]) fprintf(stdout, "data register(%d) -> c", i_opcode >> 6);
+                  if ((i_opcode >> 6) < MEMORY_SIZE)
+                     v_reg_copy(h_processor, h_processor->reg[C_REG], h_processor->mem[(i_opcode >> 6)]);
+                  else
+                     v_error("Address %02o out of range at %1o-%04o in %s line : %d\n", (i_opcode >> 6), h_processor->rom_number, h_processor->pc, __FILE__, __LINE__);                  
+               }
             }
             else
                v_error("Invalid register REG[%d] at %1o-%04o in %s line : %d\n", i_opcode >> 6, h_processor->rom_number, h_processor->pc, __FILE__, __LINE__);
