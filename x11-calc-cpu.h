@@ -67,8 +67,7 @@ typedef struct {
 
 typedef struct {
    oregister *reg[REGISTERS];       /* Registers */
-   oregister *ram[DATA_REGISTERS];  /* Memory registers */
-   int address;
+   oregister *mem[MEMORY_SIZE];     /* Memory registers */
    int *rom;
    int first;
    int last;
@@ -81,10 +80,10 @@ typedef struct {
    unsigned int sp;                 /* Stack pointer */
    unsigned int p;                  /* P register */
    unsigned int f;                  /* F register */
+   unsigned int addr;               /* Address register */
+   unsigned int base;               /* Current arithmetic base */
    unsigned int keycode;            /* Key code */
    unsigned char keydown;           /* Is a key pressed */
-   unsigned int data;               /* Data register */
-   unsigned int base;               /* Data register */
 
 } oprocessor;
 
