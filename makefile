@@ -33,12 +33,14 @@
 #							  can be executed by double clicking on it - MT
 #	23 Sep 21	0.7	- Model number can now be selected just by setting the
 #							  MODEL number in this file - MT
+#  26 Sep 21	0.8	- Added images to list of files (to backup) - MT
 #
 
 MODEL		= 21
 PROGRAM 	= x11-calc-$(MODEL)
 SOURCES 	= x11-calc.c x11-calc-cpu.c x11-calc-display.c x11-calc-segment.c x11-calc-button.c x11-calc-colour.c x11-keyboard.c gcc-wait.c
 FILES		= *.c *.h LICENSE README.md makefile x11-calc-instruction-set.md .gitignore .gitattributes
+FILES		+= images/x11-calc-*.png
 OBJECTS	= $(SOURCES:.c=.o)
 OUTPUT	= $(PROGRAM).out
 LIBS		= -lX11 -lm
@@ -50,7 +52,7 @@ CC			= gcc
 
 all: clean $(PROGRAM) $(OBJECTS)
 FLAGS		+= -D HP$(MODEL)
-SOURCES 	+= x11-calc-$(MODEL).c 
+SOURCES 	+= x11-calc-$(MODEL).c
 
 $(PROGRAM): $(OBJECTS)
 	@$(CC) $(FLAGS) $(OBJECTS) -o $@ $(LIBS)
