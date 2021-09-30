@@ -38,7 +38,6 @@
 #define False          0
 
 int i_rom [ROM_SIZE * ROM_BANKS];
-
-void v_init_keypad(obutton *h_button[]);
+void v_init_keypad(obutton *h_button[], oswitch *h_switch[]);
 #endif
 
