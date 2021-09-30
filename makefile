@@ -34,11 +34,12 @@
 #	23 Sep 21	0.7	- Model number can now be selected just by setting the
 #							  MODEL number in this file - MT
 #  26 Sep 21	0.8	- Added images to list of files (to backup) - MT
+#  30 Sep 21	0.9	- Builds label and switch 'classes' - MT
 #
 
 MODEL		= 21
 PROGRAM 	= x11-calc-$(MODEL)
-SOURCES 	= x11-calc.c x11-calc-cpu.c x11-calc-display.c x11-calc-segment.c x11-calc-button.c x11-calc-colour.c x11-keyboard.c gcc-wait.c
+SOURCES 	= x11-calc.c x11-calc-cpu.c x11-calc-display.c x11-calc-segment.c x11-calc-button.c x11-calc-switch.c x11-calc-label.c x11-calc-colour.c x11-keyboard.c gcc-wait.c
 FILES		= *.c *.h LICENSE README.md makefile x11-calc-instruction-set.md .gitignore .gitattributes
 FILES		+= images/x11-calc-*.png
 OBJECTS	= $(SOURCES:.c=.o)
@@ -64,8 +65,8 @@ $(OBJECTS) : $(SOURCES)
 
 clean:
 	@rm -f *.o
-#	@rm -f $(OBJECTS)
-#	@rm -f $(PROGRAM)
+	@rm -f $(OBJECTS)
+	@rm -f $(PROGRAM)
 
 backup:
 	@echo "$(PROGRAM)-`date +'%Y%m%d%H%M'`.tar.gz"; tar -czpf ..\/$(PROGRAM)-`date +'%Y%m%d%H%M'`.tar.gz $(FILES)
