@@ -27,14 +27,12 @@
  *
  */
 
-#ifndef BUTTON
 typedef struct { /* Calculator button structure. */
    int index;
    char key; /* Key code corisponding to button */
    char* text; /* Text on face of button */ 
    char* label; /* Label on button */
    char* alternate; /* Alternate text above button */
-   unsigned int colour; /* Colour */
    XFontStruct* text_font; /* Pointer to font. */
    XFontStruct* label_font; /* Pointer to shifted font. */
    XFontStruct* alternate_font; /* Pointer to alternate font. */
@@ -42,7 +40,10 @@ typedef struct { /* Calculator button structure. */
    int top;
    int width;
    int height;
-   int state;
+   char state;
+   unsigned int colour; /* Button colour */
+   unsigned int label_colour;
+   unsigned int alternate_colour;
 } obutton;
 
 obutton *h_button_key_pressed(obutton *h_button, char c_key);
@@ -52,7 +53,6 @@ obutton *h_button_pressed(obutton *h_button, int i_xpos, int i_ypos);
 obutton *h_button_create(int i_index, char c_key, char* s_text,char* s_label ,char* s_alternate,
    XFontStruct *h_normal_font, XFontStruct *h_shift_font, XFontStruct *h_alternate_font,
    int i_left, int i_top, int i_width, int i_height, int i_state,
-   unsigned int i_colour);
+   unsigned int i_colour, unsigned int i_label_colour, unsigned int i_alternate_colour);
 
 int i_button_draw(Display *h_display, int x_application_window, int i_screen,obutton *h_button);
-#endif

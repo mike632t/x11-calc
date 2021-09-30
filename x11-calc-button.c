@@ -28,12 +28,10 @@
  * 14 Jul 13         - Flush X buffer each time button is drawn - MT
  * 15 Dec 18         - Changed debug macro and added an error macro - MT
  * 08 Aug 21         - Tidied up spelling errors in the comments - MT
- * 26 Sep 21         - Alternate text colour defined by model number, it is
- *                     bit of a fudge, as the text colours really should be
- *                     implemented as separate properties - MT
+ * 30 Sep 21         - Added the additional properties for the label colour
+ *                     and alternate function colour - MT
  * 
- * TO DO             - Implement text colours as button properties
- *                   - Add an alternate label text 
+ * TO DO             - Add an alternate label text 
  *
  */
 
@@ -53,6 +51,7 @@
 
 #include "x11-calc-font.h"
 #include "x11-calc-button.h"
+#include "x11-calc-switch.h"
 
 #include "x11-calc.h"
 
@@ -102,7 +101,7 @@ obutton *h_button_pressed(obutton *h_button, int i_xpos, int i_ypos){
 obutton *h_button_create(int i_index, char c_key, char* s_text, char* s_label ,char* s_alternate,
    XFontStruct *h_normal_font, XFontStruct *h_shift_font, XFontStruct *h_alternate_font,
    int i_left, int i_top, int i_width, int i_height, int i_state,
-   unsigned int i_colour){
+   unsigned int i_colour, unsigned int i_label_colour, unsigned int i_alternate_colour) {
 
    obutton *h_button; /* Ponter to button. */
 
@@ -125,25 +124,20 @@ obutton *h_button_create(int i_index, char c_key, char* s_text, char* s_label ,c
 
    h_button->state = i_state;
    h_button->colour = i_colour;
+   h_button->label_colour = i_label_colour;
+   h_button->alternate_colour = i_alternate_colour;
    return(h_button);
 }
 
 /* button_draw (display, window, screen, button) */
 
-int i_button_draw(Display *h_display, int x_application_window, int i_screen, obutton *h_button){
+int i_button_draw(Display *h_display, int x_application_window, int i_screen, obutton *h_button) {
 
-   unsigned int i_label = YELLOW;
-#ifdef HP27
-   unsigned int i_alternate = BLACK;
-#else
-   unsigned int i_alternate = BLUE;
-#endif
    int i_indent, i_extent, i_upper, i_lower;
    int i_offset;
 
-
    /* Set label foreground colour and font. */
-   XSetForeground(h_display, DefaultGC(h_display, i_screen),i_label);
+   XSetForeground(h_display, DefaultGC(h_display, i_screen), h_button->label_colour);
    XSetFont(h_display, DefaultGC(h_display, i_screen), h_button->label_font->fid);
 
    /* Find position of the label. */
@@ -230,7 +224,7 @@ int i_button_draw(Display *h_display, int x_application_window, int i_screen, ob
    XDrawString(h_display, x_application_window, DefaultGC(h_display, i_screen), i_indent, i_upper ,h_button->text, strlen(h_button->text));
 
    /* Set alternate text foreground colour and font. */
-   XSetForeground(h_display, DefaultGC(h_display, i_screen),i_alternate);
+   XSetForeground(h_display, DefaultGC(h_display, i_screen), h_button->alternate_colour);
    XSetFont(h_display, DefaultGC(h_display, i_screen), h_button->alternate_font->fid);
 
    /* Find position of the alternate text. */
