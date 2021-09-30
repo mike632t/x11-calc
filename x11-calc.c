@@ -137,7 +137,7 @@
 
 #define DEBUG 0        /* Enable/disable debug*/
 
-#define INTERVAL 100   /* Number of ticks to execute before updating the display */
+#define INTERVAL 3     /* Number of ticks to execute before updating the display */
 
 #include <stdarg.h>    /* strlen(), etc. */
 #include <string.h>    /* strlen(), etc. */
@@ -151,6 +151,7 @@
 
 #include "x11-calc-font.h"
 #include "x11-calc-button.h"
+#include "x11-calc-switch.h"
 #include "x11-calc-colour.h"
 
 #include "x11-calc.h"
@@ -214,6 +215,8 @@ int main(int argc, char *argv[]){
    XSizeHints *h_size_hint;
    Atom wm_delete;
 
+   oswitch *h_switch[2];
+   /* oswitch *h_selected = NULL; */
    obutton *h_button[BUTTONS]; /* Array to hold pointers to 30 buttons. */
    obutton *h_pressed = NULL;
    odisplay *h_display; /* Pointer to display strudture. */
@@ -224,7 +227,6 @@ int main(int argc, char *argv[]){
    char *s_font; /* Font description. */
 
    char *s_title = TITLE; /* Windows title. */
-
 
    unsigned int i_window_width = WIDTH; /* Window width in pixels. */
    unsigned int i_window_height = HEIGHT; /* Window height in pixels. */
@@ -412,14 +414,9 @@ int main(int argc, char *argv[]){
    s_font = LARGE_TEXT; /* Large text font. */
    if (!(h_large_font = XLoadQueryFont(x_display, s_font))) v_error("Cannot load font '%s'.\n",  s_font);
 
-   v_init_keypad(h_button); /* Create buttons. */
+   v_init_keypad(h_button, h_switch); /* Create buttons. */
    h_display = h_display_create(0, 2, 4, 197, 61, RED, DARK_RED, RED_BACKGROUND); /* Create display */
-   i_display_draw(x_display, x_application_window, i_screen, h_display); /* Draw display. */
-   for (i_count = 0; i_count < BUTTONS; i_count++) /* Draw buttons. */
-      if (!(h_button[i_count] == NULL)) i_button_draw(x_display, x_application_window, i_screen, h_button[i_count]);
    h_keyboard = h_keyboard_create(x_display);
-
-   XSync(x_display, False); /* Flush all pending requests to the X server, and wait until they are processed by the X server. */
 
    /* Select kind of events we are interested in. */
    XSelectInput(x_display, x_application_window, FocusChangeMask | ExposureMask |
@@ -442,11 +439,14 @@ int main(int argc, char *argv[]){
    /* Main program event loop. */
    b_abort = False;
    i_count = 0;
+
+   h_processor->select = h_switch[1]->state;
+   debug(fprintf(stderr, "Switch (%s).\n", h_processor->select ? "On" : "Off"));
    while (!b_abort) {
       i_count--;
       if (i_count < 0) {
          i_display_update(x_display, x_application_window, i_screen, h_display, h_processor);
-         i_display_draw(x_display, x_application_window, i_screen, h_display);
+         i_display_draw(x_display, x_application_window, i_screen, h_display); /* Redraw display */
          i_count = INTERVAL;
          i_wait(INTERVAL / 2); /* Sleep for 0.5 ms per tick */
       }
@@ -462,13 +462,12 @@ int main(int argc, char *argv[]){
 
       while (XPending(x_display)) {
          XNextEvent(x_display, &x_event);
-         debug(fprintf(stderr, "Event ID : %i.\n", x_event.type));
          switch (x_event.type) {
          case FocusOut:
             if (!(h_pressed == NULL)) {
                h_pressed->state = False;
                i_button_draw(x_display, x_application_window, i_screen, h_pressed);
-               h_processor->keydown = 0; /* Don't clear the status bit here!! */
+               h_processor->keystate = 0; /* Don't clear the status bit here!! */
             }
             break;
          case KeyPress :
@@ -492,7 +491,7 @@ int main(int argc, char *argv[]){
                      i_button_draw(x_display, x_application_window, i_screen, h_pressed);
 
                      h_processor->keycode = h_pressed->index;
-                     h_processor->keydown = 1;
+                     h_processor->keystate = 1;
                      h_processor->status[15] = 1;
                      break;
                   }
@@ -505,28 +504,42 @@ int main(int argc, char *argv[]){
                if (h_keyboard->key == h_pressed->key) {
                   h_pressed->state = False;
                   i_button_draw(x_display, x_application_window, i_screen, h_pressed);
-                  h_processor->keydown = 0; /* Don't clear the status bit here!! */
+                  h_processor->keystate = 0; /* Don't clear the status bit here!! */
                }
             }
             break;
          case ButtonPress :
             if (x_event.xbutton.button == 1) {
                int i_count;
-               for (i_count = 0; i_count < BUTTONS; i_count++){
+               for (i_count = 0; i_count < sizeof(h_button) / sizeof(*h_button); i_count++) {
+               /* for (i_count = 0; i_count < BUTTONS; i_count++){ /* Check buttons pressed */
                   h_pressed = h_button_pressed(h_button[i_count], x_event.xbutton.x, x_event.xbutton.y);
                   if (!(h_pressed == NULL)) {
                      h_pressed->state = True;
                      i_button_draw(x_display, x_application_window, i_screen, h_pressed);
-
                      h_processor->keycode = h_pressed->index;
-                     h_processor->keydown = 1;
+                     h_processor->keystate = 1;
                      h_processor->status[15] = 1;
-
                      debug(fprintf(stderr, "Button pressed - keycode(%.2X).\n", h_pressed->index));
-
                      break;
                   }
-               }
+               } 
+               if (h_pressed == NULL) {
+                  if (!(h_switch_pressed(h_switch[0], x_event.xbutton.x, x_event.xbutton.y) == NULL)) {
+                     h_switch[0]->state = !(h_switch[0]->state); /* Toggle switch */
+                     i_switch_draw(x_display, x_application_window, i_screen, h_switch[0]);
+                     if (h_switch[0]->state) 
+                        v_processor_init(h_processor); /* Reset the processor */
+                     else
+                        h_processor->enabled = False; /* Disable the processor */
+                  }
+                  if (!(h_switch_pressed(h_switch[1], x_event.xbutton.x, x_event.xbutton.y) == NULL)) {
+                     h_switch[1]->state = !(h_switch[1]->state); /* Toggle switch */
+                     i_switch_draw(x_display, x_application_window, i_screen, h_switch[1]);
+                     h_processor->select = h_switch[1]->state;
+                     debug(fprintf(stderr, "Switch clicked (%s).\n", h_processor->select ? "On" : "Off"));
+                  }
+               } 
             }
             break;
          case ButtonRelease :
@@ -534,14 +547,15 @@ int main(int argc, char *argv[]){
                if (!(h_pressed == NULL)) {
                   h_pressed->state = False;
                   i_button_draw(x_display, x_application_window, i_screen, h_pressed);
-                  h_processor->keydown = 0; /* Don't clear the status bit here!! */
-
+                  h_processor->keystate = 0; /* Don't clear the status bit here!! */
                   debug(fprintf(stderr, "Button released - keycode(%.2X).\n", h_pressed->index));
                }
             }
             break;
          case Expose : /* Draw or redraw the window. */
-            i_display_draw(x_display, x_application_window, i_screen, h_display);/* Redraw display. */
+            /** i_display_draw(x_display, x_application_window, i_screen, h_display);/* Redraw display. */
+            i_switch_draw(x_display, x_application_window, i_screen, h_switch[0]);
+            i_switch_draw(x_display, x_application_window, i_screen, h_switch[1]);
             {
                int i_count;
                for (i_count = 0; i_count < 30; i_count++) /* Draw buttons. */
