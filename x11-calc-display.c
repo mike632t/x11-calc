@@ -59,6 +59,7 @@
 #include <X11/Xutil.h> /* XSizeHints etc. */
 
 #include "x11-calc-button.h"
+#include "x11-calc-switch.h"
 
 #include "x11-calc.h"
 
@@ -158,7 +159,7 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
    /* Draw display segments. */
    for (i_count = 0; i_count < DIGITS; i_count++)
       if (!(h_display->segment[i_count] == NULL)) {
-         if (h_processor->flags[DISPLAY_ENABLE] == 1) {
+         if ((h_processor->flags[DISPLAY_ENABLE] == 1) && h_processor->enabled) {
             h_display->segment[i_count]->mask = c_digits[h_processor->reg[A_REG]->nibble[REG_SIZE - 1 - i_count]];
             switch (h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x07) {
             case 0x02: /* Sign */

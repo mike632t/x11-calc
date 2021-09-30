@@ -23,6 +23,7 @@
  * 10 Dec 18         - Define monochrome colours if compiling on VMS (a bit
  *                     of  a cheat to allow me to test the code using  simh
  *                     as it doesn't support a colour display) - MT
+ * 28 Sep 21         - Added mid grey - MT
  *
  */
 
@@ -31,10 +32,14 @@
 #define DARK_TEXT      0x000000 /* Dark gray text. */
 #define LIGHT_TEXT     0x000000 /* Off white text. */
 
-#define LIGHT_GRAY     0xffffff /* Light gray numeric keys. */
 #define BEIGE          0xffffff /* Beige numeric keys. */
 #define BLACK          0xffffff /* Black function keys. */
+#define DARK_GREY      0xffffff /* Gray function keys. */
 #define DARK_GRAY      0xffffff /* Gray function keys. */
+#define MID_GREY       0xffffff /* Mid gray numeric keys. */
+#define MID_GRAY       0xffffff /* Mid gray numeric keys. */
+#define LIGHT_GREY     0xffffff /* Light gray numeric keys. */
+#define LIGHT_GRAY     0xffffff /* Light gray numeric keys. */
 #define GREEN          0xffffff /* Green function keys. */
 #define YELLOW         0xffffff /* Yellow shift key. */
 #define BLUE           0x000000 /* Blue alternate text. */
@@ -50,10 +55,14 @@
 #define DARK_TEXT      0x101010 /* Dark gray text. */
 #define LIGHT_TEXT     0xf0f0f0 /* Off white text. */
 
-#define LIGHT_GRAY     0xcecfc6 /* Light gray numeric keys. */
 #define BEIGE          0xd9c8b6 /* Beige numeric keys. */
 #define BLACK          0x2e312e /* Black function keys. */
+#define DARK_GREY      0x8f8f8f /* Gray function keys. */
 #define DARK_GRAY      0x8f8f8f /* Gray function keys. */
+#define MID_GREY       0xa9a9a9 /* Mid gray numeric keys. */
+#define MID_GRAY       0xa9a9a9 /* Mid gray numeric keys. */
+#define LIGHT_GREY     0xcecfc6 /* Light gray numeric keys. */
+#define LIGHT_GRAY     0xcecfc6 /* Light gray numeric keys. */
 #define GREEN          0x736a34 /* Green function keys. */
 #define YELLOW         0xf5a434 /* Yellow shift key. */
 #define BLUE           0x4aa0b0 /* Blue alternate text. */
