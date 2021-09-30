@@ -18,9 +18,8 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
  * 21 Sep 21   0.1   - Initial version - MT
- *        - 
+ *
  */
-
 
 #ifndef TITLE
 #define TITLE          "RPN calc 31"
