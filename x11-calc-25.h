@@ -29,7 +29,7 @@
 
 #define DIGITS         12
 
-#define MEMORY_SIZE    8 /* 0 - 7 */
+#define MEMORY_SIZE    48 /* 0 - 7 */
 #define ROM_SIZE       04000
 #define ROM_BANKS      1
 
