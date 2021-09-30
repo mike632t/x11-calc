@@ -30,8 +30,8 @@
  * 08 Aug 21         - Tidied up spelling errors in the comments - MT
  * 30 Sep 21         - Added the additional properties for the label colour
  *                     and alternate function colour - MT
- * 
- * TO DO             - Add an alternate label text 
+ *
+ * TO DO             - Add an alternate label text
  *
  */
 
@@ -93,7 +93,7 @@ obutton *h_button_pressed(obutton *h_button, int i_xpos, int i_ypos){
    return(NULL);
 }
 
-/*button_create (index, key, text, label ,alternate, font, label_font, 
+/*button_create (index, key, text, label ,alternate, font, label_font,
  *                alternate_font, left, top, width, height,
  *                state, colour)
  */

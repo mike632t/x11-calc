@@ -30,7 +30,7 @@
 typedef struct { /* Calculator button structure. */
    int index;
    char key; /* Key code corisponding to button */
-   char* text; /* Text on face of button */ 
+   char* text; /* Text on face of button */
    char* label; /* Label on button */
    char* alternate; /* Alternate text above button */
    XFontStruct* text_font; /* Pointer to font. */
