@@ -30,7 +30,8 @@
  *                   - Added a keycode and keystate properties to store the
  *                     key  code of the key and the state of the actual key
  *                     (necessary as clearing status bit 15 when the key is
- *                     released does NOT work!) - MT*
+ *                     released does NOT work!) - MT
+ * 30 Sep 21         - Added properties for enable and select - MT
  */
 
 #ifndef REGISTERS
@@ -83,8 +84,9 @@ typedef struct {
    unsigned int addr;               /* Address register */
    unsigned int base;               /* Current arithmetic base */
    unsigned int keycode;            /* Key code */
-   unsigned char keydown;           /* Is a key pressed */
-
+   unsigned char keystate;          /* Is a key pressed */
+   unsigned char select;            /* Save switch state */
+   unsigned char enabled;           /* Enabled */
 } oprocessor;
 
 oprocessor *h_processor_create(int *h_rom);
