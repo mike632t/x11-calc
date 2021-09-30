@@ -30,20 +30,22 @@ likely that the memory data structures will have to be revised.
 ##### HP21 - Working 
 * Implement on/off and deg/rad switches.
 
-##### HP 22 - Partially working.
-* Implement missing opcodes. (To fix STO and RCL). 
-* Implement on/off and begin/end switch.
+##### HP 22 - Probably working.
+* Implement on/off and begin/end switches.
+* Continue testing finance functions.
 
-##### HP 25 - Only keyboard working.
+##### HP 25 - Work in progress.
+* Add support for missing opcodes.
+* Implement on/off and prgm/run switches.
 
 ##### HP 27 - Only keyboard working.
 
 ##### HP 29 - Only keyboard working.
 
-##### HP 31 - Partially working.
+##### HP 31 - Work in progress.
+* Add support for missing opcodes.
+* Implement on/off switch.
 * Fix display.
-* Need to add keycodes to button definitions.
-* Implement missing opcodes.
 
 ##### HP 32 - Only keyboard working.
 
