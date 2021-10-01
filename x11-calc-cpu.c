@@ -25,137 +25,6 @@
  * You  should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Contains the type definitions and functions definitions used to  emulate
- * the  ACT processor with seven 56-bit Registers.  Each register  consists
- * of 14 4-bit nibbles capable of storing a 10 digit mantissa and a 2 digit
- * exponent with separate signs for both the mantissa and exponent.
- *
- * Each  16-bit  processor  instruction is  retrieved  from  the  currently
- * selected  ROM using either an 8-bit or 12-bit address (depending on  the
- * calculator model) and allows each of the registers (or the selected part
- * of  each  register)  to  be  cleared, copied,  exchanged,   incremented,
- * decremented, shifted left or right and tested.
- *
- * Arithmetic Registers
- *
- *  13   12  11  10  9   8   7   6   5   4   3   2   1   0
- * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+
- * | s | m | m | m | m | m | m | m | m | m | m | s | e | e |
- * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+
- *
- * A, B, C:    General purpose registers.  The C register is used to access
- *             the M register and or memory as well as holding the value of
- *             the 'X' register.
- * Y, Z, T:    Stack registers.
- * M, N:       Memory registers.
- *
- * Special purpose registers
- *
- * F:          F register.
- * P:          A  4-bit register that is used to select which part of  each
- *             register should be used.
- * DATA:       An 8-bit register holding the memory address used to read or
- *             write to memory from the C register.
- * SP:         Stack pointer
- *
- * Processor flags
- *
- * F 0         Selects Run / Program mode.
- * F 1         Carry.
- * F 2         Prev Carry.
- * F 3         Delayed ROM select.
- * F 4         ROM select
- * F 5         Display enabled
- * F 6         ???
- * F 7         ???
- * F 8         Timer.
- * F 9         Trace enabled (implementation specific!).
- *
- * Processor status word.
- *
- * S 0         Not used.
- * S 1  *      Scientific notation (clear for fixed point notation).
- * S 2  *      Auto Enter (if set entering digit will push 'X').
- * S 3         Set for radians clear for degrees.
- * S 4         Power OK (clear for lower power)
- * S 5  ?      Set if decimal point has already been entered
- * S 6         ?
- * S 7         ?
- * S 8         ?
- * S 9         ?
- * S 10        ?
- * S 11        ?
- * S 12        ?
- * S 13        Set if function key has been pressed.
- * S 14        Set if EEX has been pressed?
- * S 15 *      Set if any key is pressed.
- *
- * Instruction set
- *
- * Special operations - May be one or two word instructions!
- *
- *   9   8   7   6   5   4   3   2   1   0
- * +---+---+---+---+---+---+---+---+---+---+
- * | n | n | n | n | n | n | n | n | 0 | 0 |
- * +---+---+---+---+---+---+---+---+---+---+
- *
- * Jump Subroutine
- *
- *   9   8   7   6   5   4   3   2   1   0
- * +---+---+---+---+---+---+---+---+---+---+
- * | n | n | n | n | n | n | n | n | 1 | 1 |
- * +---+---+---+---+---+---+---+---+---+---+
- *
- *   7   6   5   4   3   2   1   0
- * +---+---+---+---+---+---+---+---+
- * | n | n | n | n | n | n | n | n | Address
- * +---+---+---+---+---+---+---+---+
- *
- * Arithmetic operations.
- *
- *   9   8   7   6   5   4   3   2   1   0
- * +---+---+---+---+---+---+---+---+---+---+
- * | n | n | n | n | n | m | m | m | 1 | 0 |
- * +---+---+---+---+---+---+---+---+---+---+
- *
- * Where mmm is the field modifier
- *
- * 000   P  : determined by P register             ([P])
- * 001  WP  : word up to and including P register  ([0 .. P])
- * 010  XS  : exponent and sign                    ([0 .. 2])
- * 011   X  : exponent                             ([0 .. 1])
- * 100   S  : sign                                 ([13])
- * 101   M  : mantissa                             ([3 .. 12])
- * 110   W  : word                                 ([0 .. 13])
- * 111  MS  : mantissa and sign                    ([3 .. 13])
- *
- * Subroutine calls and long conditional jumps.
- *
- *   9   8   7   6   5   4   3   2   1   0
- * +---+---+---+---+---+---+---+---+---+---+
- * | l | l | l | l | l | l | l | l | 0 | 1 |
- * +---+---+---+---+---+---+---+---+---+---+
- *
- *   9   8   7   6   5   4   3   2   1   0
- * +---+---+---+---+---+---+---+---+---+---+
- * | h | h | h | h | h | h | h | h | t | t |
- * +---+---+---+---+---+---+---+---+---+---+
- *
- * Where tt is the type of jump:
- *
- * 00       : subroutine call if carry clear
- * 01       : subroutine call if carry set
- * 10       : jump if carry clear
- * 11       : jump if carry set
- *
- * Address format:
- *
- *  15  14  13  12  11  10   9   8       7   6   5   4   3   2   1   0
- * +---+---+---+---+---+---+---+---+   +---+---+---+---+---+---+---+---+
- * | h | h | h | h | h | h | h | h |   | l | l | l | l | l | l | l | l |
- * +---+---+---+---+---+---+---+---+   +---+---+---+---+---+---+---+---+
- *
- *
  * 10 Sep 20   0.1   - Initial version - MT
  * 08 Aug 21         - Tidied up spelling errors in the comments and  added
  *                     a section describing the processor registers - MT
@@ -279,9 +148,9 @@
  *                   - Added properties for enable and select - MT
  *                   - For the HP21 and HP22 the state of the select switch
  *                     is checked when setting or clearing S 3 - MT
+ *  1 Oct 21         - Converted flags to Boolean variables - MT
  *
- * To Do             - x11-rpncalc : Break at 0-0614 in x11-calc-cpu.c line : 837
- *                   - Overlay program memory storage onto data registers (
+ * To Do             - Overlay program memory storage onto data registers (
  *                     different data structures pointing at the same data).
  *
  *
@@ -292,7 +161,7 @@
 #define DATE           "14 Sep 21"
 #define AUTHOR         "MT"
 
-#define DEBUG 1        /* Enable/disable debug*/
+#define DEBUG 0        /* Enable/disable debug*/
 
 #include <stdlib.h>    /* malloc(), etc. */
 #include <stdio.h>     /* fprintf(), etc. */
@@ -422,12 +291,13 @@ static void v_reg_add(oprocessor *h_processor, oregister *h_destination, oregist
    int i_count, i_temp;
    for (i_count = h_processor->first; i_count <= h_processor->last; i_count++){
       if (h_argument != NULL) i_temp = h_argument->nibble[i_count]; else i_temp = 0;
-      i_temp = h_source->nibble[i_count] + i_temp + h_processor->flags[CARRY];
+      i_temp = h_source->nibble[i_count] + i_temp;
+      if (h_processor->flags[CARRY]) i_temp++;
       if (i_temp >= h_processor->base){
          i_temp -= h_processor->base;
-         h_processor->flags[CARRY] = 1;
+         h_processor->flags[CARRY] = True;
       } else {
-         h_processor->flags[CARRY] = 0;
+         h_processor->flags[CARRY] = False;
       }
       if (h_destination != NULL) h_destination->nibble[i_count] = i_temp; /* Destination can be null */
    }
@@ -439,13 +309,13 @@ static void v_reg_sub(oprocessor *h_processor, oregister *h_destination, oregist
    for (i_count = h_processor->first; i_count <= h_processor->last; i_count++){
       if (h_argument != NULL) i_temp = h_argument->nibble[i_count]; else i_temp = 0;
       if (h_source != NULL) i_temp = (h_source->nibble[i_count] - i_temp); else i_temp = (0 - i_temp);
-      i_temp = i_temp - h_processor->flags[CARRY];
+      if (h_processor->flags[CARRY]) i_temp--;
       if (i_temp < 0) {
          i_temp += h_processor->base;
-         h_processor->flags[CARRY] = 1;
+         h_processor->flags[CARRY] = True;
       }
       else
-         h_processor->flags[CARRY] = 0;
+         h_processor->flags[CARRY] = False;
       if (h_destination != NULL) h_destination->nibble[i_count] = i_temp; /* Destination can be null */
    }
 }
@@ -453,11 +323,11 @@ static void v_reg_sub(oprocessor *h_processor, oregister *h_destination, oregist
 /* Test if registers are equal */
 static void v_reg_test_eq(oprocessor *h_processor, oregister *h_destination, oregister *h_source) {
   int i_count, i_temp;
-  h_processor->flags[CARRY] = 0; /* Clear carry - Do If True */
+  h_processor->flags[CARRY] = False; /* Clear carry - Do If True */
    for (i_count = h_processor->first; i_count <= h_processor->last; i_count++){
       if (h_source != NULL) i_temp = h_source->nibble[i_count]; else i_temp = 0;
       if (h_destination->nibble[i_count] != i_temp) {
-         h_processor->flags[CARRY] = 1; /* Set carry */
+         h_processor->flags[CARRY] = True; /* Set carry */
          break;
       }
    }
@@ -466,11 +336,11 @@ static void v_reg_test_eq(oprocessor *h_processor, oregister *h_destination, ore
 /* Test if registers are not equal */
 static void v_reg_test_ne(oprocessor *h_processor, oregister *h_destination, oregister *h_source) {
   int i_count, i_temp;
-  h_processor->flags[CARRY] = 1;
+  h_processor->flags[CARRY] = True;
    for (i_count = h_processor->first; i_count <= h_processor->last; i_count++){
       if (h_source != NULL) i_temp = h_source->nibble[i_count]; else i_temp = 0;
       if (h_destination->nibble[i_count] != i_temp) {
-         h_processor->flags[CARRY] = 0; /* Clear carry - Do If True */
+         h_processor->flags[CARRY] = False; /* Clear carry - Do If True */
          break;
       }
    }
@@ -478,14 +348,14 @@ static void v_reg_test_ne(oprocessor *h_processor, oregister *h_destination, ore
 
 /* Increment the contents of a register */
 static void v_reg_inc(oprocessor *h_processor, oregister *h_register){
-   h_processor->flags[CARRY] = 1; /* Set carry */
+   h_processor->flags[CARRY] = True; /* Set carry */
    v_reg_add (h_processor, h_register, h_register, NULL); /* Add carry to register */
 }
 
 /* Logical shift right a register */
 static void v_reg_shr(oprocessor *h_processor, oregister *h_register){
    int i_count;
-   h_processor->flags[CARRY] = 0; /* Clear carry */
+   h_processor->flags[CARRY] = False; /* Clear carry */
    for (i_count = h_processor->first; i_count <= h_processor->last; i_count++)
       if (i_count == h_processor->last)
          h_register->nibble[i_count] = 0;
@@ -501,7 +371,7 @@ static void v_reg_shl(oprocessor *h_processor, oregister *h_register){
          h_register->nibble[i_count] = 0;
       else
          h_register->nibble[i_count] = h_register->nibble[i_count - 1];
-   h_processor->flags[PREV_CARRY] = h_processor->flags[CARRY] = 0;
+   h_processor->flags[PREV_CARRY] = h_processor->flags[CARRY] = False;
 }
 
 /* Clear flags */
@@ -541,21 +411,23 @@ static void v_processor_clear_data_registers(oprocessor *h_processor) {
 void v_processor_init(oprocessor *h_processor) {
    v_processor_clear_registers(h_processor); /*Clear the CPU registers and stack */
    v_processor_clear_data_registers(h_processor); /* Clear the memory registers*/
+   h_processor->rom_number = 0;
+   h_processor->delayed_rom_number = 0;
    v_processor_clear_flags(h_processor); /* Clear processor flags */
-   h_processor->flags[MODE] = 1; /* Select run mode */
    v_processor_clear_status(h_processor); /* Clear processor status */
-   h_processor->status[5] = 1; /* TO DO - Check which flags should be set by default */
-   h_processor->status[3] = 1; /* Select radians */
    h_processor->pc = 0;
    h_processor->sp = 0;
    h_processor->p = 0;
    h_processor->f = 0;
+   h_processor->addr = 0;
+   h_processor->base = 10;
    h_processor->keycode = 0;
    h_processor->keystate = 0;
-   h_processor->base = 10;
-   h_processor->delayed_rom_number = 0;
-   h_processor->rom_number = 0;
    h_processor->enabled = True;
+
+   h_processor->status[5] = 1; /* TO DO - Check which flags should be set by default */
+   h_processor->status[3] = 1; /* Select radians */
+   h_processor->flags[MODE] = True; /* Select run mode */
 }
 
 /* Create a new processor , */
@@ -568,16 +440,17 @@ oprocessor *h_processor_create(int *h_rom){
    for (i_count = 0; i_count < MEMORY_SIZE; i_count++)
       h_processor->mem[i_count] = h_register_create(i_count); /* Allocate storage for the RAM */
    h_processor->rom = h_rom ; /* Address of ROM */
+   h_processor->select = False;
    v_processor_init(h_processor);
    return(h_processor);
 }
 
 /* Delayed ROM select */
 static void v_delayed_rom(oprocessor *h_processor) { /* Delayed ROM select */
-   if (h_processor->flags[DELAYED_ROM] != 0) {
+   if (h_processor->flags[DELAYED_ROM]) {
       if (h_processor->flags[TRACE]) fprintf(stdout, " ** ");
       h_processor->pc = h_processor->delayed_rom_number << 8 | (h_processor->pc & 00377);
-      h_processor->flags[DELAYED_ROM] = 0; /* Clear flag */
+      h_processor->flags[DELAYED_ROM] = False; /* Clear flag */
    }
 }
 
@@ -585,7 +458,7 @@ static void v_delayed_rom(oprocessor *h_processor) { /* Delayed ROM select */
 static void v_op_inc_pc(oprocessor *h_processor) {
    if (h_processor->pc++ >= (ROM_SIZE - 1)) h_processor->pc = 0;
    h_processor->flags[PREV_CARRY] = h_processor->flags[CARRY];
-   h_processor->flags[CARRY] = 0;
+   h_processor->flags[CARRY] = False;
 }
 
 /* Jump to subroutine */
@@ -607,7 +480,7 @@ void v_op_rtn(oprocessor *h_processor) {
 void v_op_goto(oprocessor *h_processor){
    if (h_processor->flags[TRACE]) fprintf(stdout, "\n%1o-%04o %04o    then go to %01o-%04o",
       h_processor->rom_number, h_processor->pc, h_processor->rom[h_processor->pc], h_processor->rom_number, h_processor->rom[h_processor->pc]);
-   if (h_processor->flags[PREV_CARRY] == 0) { /* Do if True */
+   if (!h_processor->flags[PREV_CARRY]) { /* Do if True */
       h_processor->pc = ((h_processor->pc & 0xfc00) | h_processor->rom[h_processor->pc]); /* Note - Uses a _ten_ bit address */
       h_processor->pc--; /* Program counter will be auto incremented before next fetch */
       /* v_delayed_rom(h_processor); Not - applicable ?*/
@@ -705,36 +578,28 @@ void v_processor_tick(oprocessor *h_processor) {
             switch ((i_opcode >> 4) & 03) {
             case 00: /* 1 -> s(n) */
                if (h_processor->flags[TRACE]) fprintf(stdout, "1 -> s(%d)", i_opcode >> 6);
-               switch (i_opcode >> 6) {
-#if defined  HP21 || defined  HP22 
-                  case 3: /* Switch overrides value of S 3 */ 
-                     if (h_processor->select)
-                        h_processor->status[3] = 1;
-                     else 
-                        h_processor->status[3] = 0;
-                     break;
-#endif
-                  default:
-                     h_processor->status[i_opcode >> 6] = 1;
-               }               
+               h_processor->status[i_opcode >> 6] = 1;
                break;
             case 01: /* if 1 = s(n) */
                if (h_processor->flags[TRACE]) fprintf(stdout, "if 1 = s %d", i_opcode >> 6);
-               if (h_processor->flags[TRACE]) fprintf(stdout, " (s %d == %d)", i_opcode >> 6, h_processor->status[i_opcode >> 6]);
-               h_processor->flags[CARRY] = (h_processor->status[i_opcode >> 6] != 1);
+               /* if (h_processor->flags[TRACE]) fprintf(stdout, " (s %d == %d)", i_opcode >> 6, h_processor->status[i_opcode >> 6]); */
+               if (h_processor->status[i_opcode >> 6] == 1)
+                  h_processor->flags[CARRY] = False;
+               else
+                  h_processor->flags[CARRY] = True;
                v_op_inc_pc(h_processor); /* Increment program counter */
                v_op_goto(h_processor);
                break;
             case 02: /* if p = n */
                if (h_processor->flags[TRACE]) fprintf(stdout, "if p = %d", i_tst_p[i_opcode >> 6]);
-               h_processor->flags[CARRY]= !(h_processor->p == i_tst_p[i_opcode >> 6]);
+               h_processor->flags[CARRY] = !(h_processor->p == i_tst_p[i_opcode >> 6]);
                v_op_inc_pc(h_processor); /* Increment program counter */
                v_op_goto(h_processor);
                break;
             case 03: /* delayed select rom n */
                if (h_processor->flags[TRACE]) fprintf(stdout, "delayed select rom %d", i_opcode >> 6);
                h_processor->delayed_rom_number = i_opcode >> 6;
-               h_processor->flags[DELAYED_ROM] = 1;
+               h_processor->flags[DELAYED_ROM] = True;
             }
             break;
          case 02: /* Group 2 */
@@ -763,14 +628,11 @@ void v_processor_tick(oprocessor *h_processor) {
                   break;
                case 00210: /* display toggle */
                   if (h_processor->flags[TRACE]) fprintf(stdout, "display toggle");
-                  if (h_processor->flags[DISPLAY_ENABLE] == 0)
-                     h_processor->flags[DISPLAY_ENABLE] = 1;
-                  else
-                     h_processor->flags[DISPLAY_ENABLE] = 0;
+                  h_processor->flags[DISPLAY_ENABLE] = (!h_processor->flags[DISPLAY_ENABLE]);
                   break;
                case 00310: /* display off */
                   if (h_processor->flags[TRACE]) fprintf(stdout, "display off");
-                  h_processor->flags[DISPLAY_ENABLE] = 0;
+                  h_processor->flags[DISPLAY_ENABLE] = False;
                   break;
                case 00410: /* m exch c */
                   if (h_processor->flags[TRACE]) fprintf(stdout, "m exch c");
@@ -887,25 +749,23 @@ void v_processor_tick(oprocessor *h_processor) {
                   case 5:  
                      h_processor->status[5] = 1; /* HP21 @ 00135 */
                      break;
-#if defined  HP21 || defined  HP22 
-                  case 3: /* Select overrides value of S 3 */ 
+                  case 3: /* TO DO - Second switch overrides value of S 3 */ 
                      if (h_processor->select)
                         h_processor->status[3] = 1;
-                     else 
+                     else
                         h_processor->status[3] = 0;
                      break;
-#endif
                   default:
                      h_processor->status[i_opcode >> 6] = 0;
                }
                break;
             case 01: /* if 0 = s(n) */
                if (h_processor->flags[TRACE]) fprintf(stdout, "if 0 = s %d ", i_opcode >> 6);
-               if (h_processor->flags[TRACE]) fprintf(stdout, " (s %d == %d)", i_opcode >> 6, h_processor->status[i_opcode >> 6]);
-               if (h_processor->status[i_opcode >> 6] != 0)
-                  h_processor->flags[CARRY]  = 1;
+               /* if (h_processor->flags[TRACE]) fprintf(stdout, " (s %d == %d)", i_opcode >> 6, h_processor->status[i_opcode >> 6]); */
+               if (h_processor->status[i_opcode >> 6] == 0)
+                  h_processor->flags[CARRY]  = False;
                else
-                  h_processor->flags[CARRY]  = 0;
+                  h_processor->flags[CARRY]  = True;
                v_op_inc_pc(h_processor); /* Increment program counter */
                v_op_goto(h_processor);
                break;
@@ -1066,12 +926,12 @@ void v_processor_tick(oprocessor *h_processor) {
             break;
          case 0022: /* a - 1 -> a[f] */
             if (h_processor->flags[TRACE]) fprintf(stdout, "a - 1 -> a[%s]", s_field);
-            h_processor->flags[CARRY] = 1; /* Set carry */
+            h_processor->flags[CARRY] = True; /* Set carry */
             v_reg_sub(h_processor, h_processor->reg[A_REG], h_processor->reg[A_REG], NULL);
             break;
          case 0023: /* c - 1 -> c[f] */
             if (h_processor->flags[TRACE]) fprintf(stdout, "c - 1 -> c[%s]", s_field);
-            h_processor->flags[CARRY] = 1; /* Set carry */
+            h_processor->flags[CARRY] = True; /* Set carry */
             v_reg_sub(h_processor, h_processor->reg[C_REG], h_processor->reg[C_REG], NULL);
             break;
          case 0024: /* 0 - c -> c[f] */
@@ -1080,7 +940,7 @@ void v_processor_tick(oprocessor *h_processor) {
             break;
          case 0025: /* 0 - c - 1 -> c[f] */
             if (h_processor->flags[TRACE]) fprintf(stdout, "0 - c - 1 -> c[%s]", s_field);
-            h_processor->flags[CARRY] = 1; /* Set carry */
+            h_processor->flags[CARRY] = True; /* Set carry */
             v_reg_sub(h_processor, h_processor->reg[C_REG], NULL, h_processor->reg[C_REG]);
             break;
          case 0026: /* if b[f] = 0 */
@@ -1157,7 +1017,7 @@ void v_processor_tick(oprocessor *h_processor) {
          case 03: /* if nc go to */
             if (h_processor->flags[TRACE]) fprintf(stdout, "if nc go to %01o-%04o",
                h_processor->rom_number, (h_processor->pc & 0xff00) | i_opcode >> 2); /* Note - Uses an eight bit address */
-            if (h_processor->flags[PREV_CARRY] == 0) {
+            if (!h_processor->flags[PREV_CARRY]) {
                h_processor->pc = ((h_processor->pc & 0xff00) | i_opcode >> 2) - 1;
                v_delayed_rom(h_processor);
             }
