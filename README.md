@@ -28,11 +28,9 @@ complete but several important functions remain to be implemented and it is
 likely that the memory data structures will have to be revised.
 
 ##### HP21 - Working 
-* Implement on/off and deg/rad switches.
 
-##### HP 22 - Probably working.
-* Implement on/off and begin/end switches.
-* Continue testing finance functions.
+##### HP 22 - Mostly working.
+* Some issues with the the BEGIN/END switch.
 
 ##### HP 25 - Work in progress.
 * Add support for missing opcodes.
