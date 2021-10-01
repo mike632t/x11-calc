@@ -29,7 +29,7 @@
 
 #ifndef TITLE
 #define TITLE          "RPN calc 21"
-#define HEIGHT         397
+#define HEIGHT         385
 #define WIDTH          201
 #define BUTTONS        30
 
