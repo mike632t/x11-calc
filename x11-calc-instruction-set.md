@@ -1,37 +1,133 @@
 ## x11-calc - Another RPN (Reverse Polish) calculator.
 
-### Registers
+Contains the type definitions and functions definitions used to emulate the
+ACT  processor  with seven 56-bit Registers.  Each register consists  of 14
+4-bit nibbles capable of storing a 10 digit mantissa and a 2 digit exponent
+with separate signs for both the mantissa and exponent.
 
-    A, B, C:   General purpose registers.  The C register is used to access
+Each  16-bit processor instruction is retrieved from the currently selected
+ROM and can operate on one or more registers (or the selected part of  each
+register) allowing them to  be  cleared, copied,  exchanged,   incremented,
+decremented, shifted left or right and tested.
+
+###Arithmetic Registers
+
+    13   12  11  10  9   8   7   6   5   4   3   2   1   0
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+   | s | m | m | m | m | m | m | m | m | m | m | s | e | e |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+
+   A, B, C:    General purpose registers.  The C register is used to access
                the M register and or memory as well as holding the value of
                the 'X' register.
-    D, E, F:   Stack registers used to hold the values of 'Y', 'Z', and 'T'.
-    M, N:      Memory registers.
+   Y, Z, T:    Stack registers.
+   M, N:       Memory registers.
 
-    P:         A  4-bit register that is used to select which part of  each
+###Special purpose registers
+
+   F:          F register.
+   P:          A  4-bit register that is used to select which part of  each
                register should be used.
-    DATA:      An 8-bit register holding the memory address used to read or
+   DATA:       An 8-bit register holding the memory address used to read or
                write to memory from the C register.
+   SP:         Stack pointer
 
-    S0-S11:    Processor status bits.
+###Processor flags
 
-      S0       Not used.
-      S1       Scientific notation (clear for fixed point notation).
-      S2       Auto Enter (if set entering digit will push 'X').
-      S3       Set for radians clear for degrees.
-      S4       Power OK (clear for lower power).
-      S5       Set if decimal point has already been entered.
-      S6       ?
-      S7       ?
-      S8       ?
-      S9       ?
-      S10      ?
-      S11      ?
-      S12      ?
-      S13      Set if function key has been pressed.
-      S14      ?
-      S15      Set if any key is pressed.
+   F 0         Selects Run / Program mode.
+   F 1         Carry.
+   F 2         Prev Carry.
+   F 3         Delayed ROM select.
+   F 4         ROM select
+   F 5         Display enabled
+   F 6         ???
+   F 7         ???
+   F 8         Timer.
+   F 9         Trace enabled (implementation specific!).
 
+###Processor status word.
+
+   S 0         Not used.
+   S 1  *      Scientific notation (clear for fixed point notation).
+   S 2  *      Auto Enter (if set entering digit will push 'X').
+   S 3         Set for radians clear for degrees.
+   S 4         Power OK (clear for lower power)
+   S 5  ?      Set if decimal point has already been entered
+   S 6         ?
+   S 7         ?
+   S 8         ?
+   S 9         ?
+   S 10        ?
+   S 11        ?
+   S 12        ?
+   S 13        Set if function key has been pressed.
+   S 14        Set if EEX has been pressed?
+   S 15 *      Set if any key is pressed.
+
+###Instruction set
+
+   Special operations - May be one or two word instructions!
+
+     9   8   7   6   5   4   3   2   1   0
+   +---+---+---+---+---+---+---+---+---+---+
+   | n | n | n | n | n | n | n | n | 0 | 0 |
+   +---+---+---+---+---+---+---+---+---+---+
+
+   Jump Subroutine
+
+     9   8   7   6   5   4   3   2   1   0
+   +---+---+---+---+---+---+---+---+---+---+
+   | n | n | n | n | n | n | n | n | 1 | 1 |
+   +---+---+---+---+---+---+---+---+---+---+
+
+     7   6   5   4   3   2   1   0
+   +---+---+---+---+---+---+---+---+
+   | n | n | n | n | n | n | n | n | Address
+   +---+---+---+---+---+---+---+---+
+
+   Arithmetic operations.
+
+     9   8   7   6   5   4   3   2   1   0
+   +---+---+---+---+---+---+---+---+---+---+
+   | n | n | n | n | n | m | m | m | 1 | 0 |
+   +---+---+---+---+---+---+---+---+---+---+
+
+   Where mmm is the field modifier
+
+   000   P  : determined by P register             ([P])
+   001  WP  : word up to and including P register  ([0 .. P])
+   010  XS  : exponent and sign                    ([0 .. 2])
+   011   X  : exponent                             ([0 .. 1])
+   100   S  : sign                                 ([13])
+   101   M  : mantissa                             ([3 .. 12])
+   110   W  : word                                 ([0 .. 13])
+   111  MS  : mantissa and sign                    ([3 .. 13])
+
+   Subroutine calls and long conditional jumps.
+
+     9   8   7   6   5   4   3   2   1   0
+   +---+---+---+---+---+---+---+---+---+---+
+   | l | l | l | l | l | l | l | l | 0 | 1 |
+   +---+---+---+---+---+---+---+---+---+---+
+
+     9   8   7   6   5   4   3   2   1   0
+   +---+---+---+---+---+---+---+---+---+---+
+   | h | h | h | h | h | h | h | h | t | t |
+   +---+---+---+---+---+---+---+---+---+---+
+
+   Where tt is the type of jump:
+
+   00       : subroutine call if carry clear
+   01       : subroutine call if carry set
+   10       : jump if carry clear
+   11       : jump if carry set
+
+   Address format:
+
+    15  14  13  12  11  10   9   8       7   6   5   4   3   2   1   0
+   +---+---+---+---+---+---+---+---+   +---+---+---+---+---+---+---+---+
+   | h | h | h | h | h | h | h | h |   | l | l | l | l | l | l | l | l |
+   +---+---+---+---+---+---+---+---+   +---+---+---+---+---+---+---+---+
 
 ### Special operations.
 
