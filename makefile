@@ -35,10 +35,11 @@
 #							  MODEL number in this file - MT
 #  26 Sep 21	0.8	- Added images to list of files (to backup) - MT
 #  30 Sep 21	0.9	- Builds label and switch 'classes' - MT
+#   3 Oct 21	0.10	- Fixed issue with backup file name - MT
 #
 
 MODEL		= 21
-PROGRAM 	= x11-calc-$(MODEL)
+PROGRAM	= x11-calc
 SOURCES 	= x11-calc.c x11-calc-cpu.c x11-calc-display.c x11-calc-segment.c x11-calc-button.c x11-calc-switch.c x11-calc-label.c x11-calc-colour.c x11-keyboard.c gcc-wait.c
 FILES		= *.c *.h LICENSE README.md makefile x11-calc-instruction-set.md .gitignore .gitattributes
 FILES		+= images/x11-calc-*.png
@@ -46,20 +47,21 @@ OBJECTS	= $(SOURCES:.c=.o)
 OUTPUT	= $(PROGRAM).out
 LIBS		= -lX11 -lm
 INCLUDE	= .
-FLAGS		= -Wall -pedantic -ansi -no-pie
+FLAGS		= -Wall -pedantic -ansi
 FLAGS		+= -Wno-comment -Wno-deprecated-declarations
+FLAGS		+= -no-pie
 #FLAGS		+= -g # For debugging
 CC			= gcc
 
-all: clean $(PROGRAM) $(OBJECTS)
+all: clean $(PROGRAM)-$(MODEL) $(OBJECTS)
 FLAGS		+= -D HP$(MODEL)
 SOURCES 	+= x11-calc-$(MODEL).c
 
-$(PROGRAM): $(OBJECTS)
+$(PROGRAM)-$(MODEL): $(OBJECTS)
 	@$(CC) $(FLAGS) $(OBJECTS) -o $@ $(LIBS)
 
 $(OBJECTS) : $(SOURCES)
-	@echo $(PROGRAM)
+	@echo $(PROGRAM)-$(MODEL)
 #	@echo $(CC) $(FLAGS) -c $(SOURCES)
 	@$(CC) $(FLAGS) -c $(SOURCES) -I $(INCLUDE)
 
