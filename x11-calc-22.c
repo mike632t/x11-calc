@@ -19,6 +19,7 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * 21 Sep 21   0.1   - Initial version - MT
+ *  3 Oct 21         - Updated switches - MT
  *
  */
 
@@ -53,7 +54,7 @@ void v_init_keypad(obutton *h_button[], oswitch *h_switch[]) {
 
    /* Define the switches. */
    h_switch[0] = h_switch_create(00000, "OFF", "ON ", h_alternate_font, 12, 67, 67, 10, True, MID_GREY, DARK_GREY);
-   h_switch[1] = h_switch_create(00000, "BEGIN", "END", h_alternate_font, 120, 67, 67, 10, True, MID_GREY, DARK_GREY);
+   h_switch[1] = h_switch_create(00000, "BEGIN", "END", h_alternate_font, 120, 67, 67, 10, False, MID_GREY, DARK_GREY);
 
    /* Define top row of keys. */
    h_button[0] = h_button_create(00263, 000, "n", "12\xd7", "", h_normal_font, h_small_font, h_alternate_font, 12, 89, 33, 30, False, BLACK, YELLOW, BLACK);
