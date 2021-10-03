@@ -36,7 +36,6 @@ examples in the owners handbook..
 
 ##### HP 25 - Work in progress.
 ** Add support for missing opcodes.
-** Implement on/off and prgm/run switches.
 
 ##### HP 27 - Only keyboard working.
 
