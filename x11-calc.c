@@ -120,6 +120,7 @@
  *                     state and translate keystrokes into characters - MT
  * 21 Sep 21         - Set the default active button to NULL - MT
  *  1 Oct 21         - Converted flags to Boolean variables - MT
+ *  2 Oct 21         - Changed property names - MT
  *
  * To Do             - Save trace and single step options and restore when
  *                     resetting the processor...
@@ -138,7 +139,7 @@
 
 #define DEBUG 0        /* Enable/disable debug*/
 
-#define INTERVAL 3     /* Number of ticks to execute before updating the display */
+#define INTERVAL 100     /* Number of ticks to execute before updating the display */
 
 #include <stdarg.h>    /* strlen(), etc. */
 #include <string.h>    /* strlen(), etc. */
@@ -442,7 +443,6 @@ int main(int argc, char *argv[]){
    i_count = 0;
 
    h_processor->select = h_switch[1]->state;
-   debug(fprintf(stderr, "Switch (%s).\n", h_processor->select ? "On" : "Off"));
    while (!b_abort) {
       i_count--;
       if (i_count < 0) {
@@ -468,7 +468,7 @@ int main(int argc, char *argv[]){
             if (!(h_pressed == NULL)) {
                h_pressed->state = False;
                i_button_draw(x_display, x_application_window, i_screen, h_pressed);
-               h_processor->keystate = False; /* Don't clear the status bit here!! */
+               h_processor->keypressed = False; /* Don't clear the status bit here!! */
             }
             break;
          case KeyPress :
@@ -491,9 +491,9 @@ int main(int argc, char *argv[]){
                      h_pressed->state = True;
                      i_button_draw(x_display, x_application_window, i_screen, h_pressed);
 
-                     h_processor->keycode = h_pressed->index;
-                     h_processor->keystate = True;
-                     h_processor->status[15] = True;
+                     h_processor->code = h_pressed->index;
+                     h_processor->keypressed = True;
+                     /* h_processor->status[15] = True; */
                      break;
                   }
                }
@@ -505,7 +505,7 @@ int main(int argc, char *argv[]){
                if (h_keyboard->key == h_pressed->key) {
                   h_pressed->state = False;
                   i_button_draw(x_display, x_application_window, i_screen, h_pressed);
-                  h_processor->keystate = False; /* Don't clear the status bit here!! */
+                  h_processor->keypressed = False; /* Don't clear the status bit here!! */
                }
             }
             break;
@@ -518,9 +518,9 @@ int main(int argc, char *argv[]){
                   if (!(h_pressed == NULL)) {
                      h_pressed->state = True;
                      i_button_draw(x_display, x_application_window, i_screen, h_pressed);
-                     h_processor->keycode = h_pressed->index;
-                     h_processor->keystate = True;
-                     h_processor->status[15] = True;
+                     h_processor->code = h_pressed->index;
+                     h_processor->keypressed = True;
+                     /* h_processor->status[15] = True; */
                      debug(fprintf(stderr, "Button pressed - keycode(%.2X).\n", h_pressed->index));
                      break;
                   }
@@ -548,7 +548,7 @@ int main(int argc, char *argv[]){
                if (!(h_pressed == NULL)) {
                   h_pressed->state = False;
                   i_button_draw(x_display, x_application_window, i_screen, h_pressed);
-                  h_processor->keystate = False; /* Don't clear the status bit here!! */
+                  h_processor->keypressed = False; /* Don't clear the status bit here!! */
                   debug(fprintf(stderr, "Button released - keycode(%.2X).\n", h_pressed->index));
                }
             }
