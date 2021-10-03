@@ -50,9 +50,9 @@ decremented, shifted left or right and tested.
    S 0         Not used.
    S 1  *      Scientific notation (clear for fixed point notation).
    S 2  *      Auto Enter (if set entering digit will push 'X').
-   S 3         Set for radians clear for degrees.
-   S 4         Power OK (clear for lower power)
-   S 5  ?      Set if decimal point has already been entered
+   S 3  *      Switch position (set if on).
+   S 4
+   S 5  *      Power OK (clear for lower power)
    S 6         ?
    S 7         ?
    S 8         ?
@@ -184,7 +184,7 @@ The can be further categorised by splitting the least significant six bits into 
 
    0nn30    n nnn 01 10 00  load n
    0nn50    n nnn 10 10 00  c -> data register(n)
-   00070 *  0 000 11 10 00  data -> c 
+   00070 *  0 000 11 10 00  data -> c
    0nn70 *  n nnn 11 10 00  data register(n)-> c      (n > 0)
 
    0nn14    n nnn 00 11 00  0 -> s(n)
@@ -264,7 +264,7 @@ The can be further categorised by splitting the least significant six bits into 
     n nnn nnn n11  if n/c goto nnnnnnnn
 
 ### Op Codes (Woodstock Processor)
-                         
+
 0 - c - 1 -> c[m]        1266
 0 - c - 1 -> c[ms]       1276
 0 - c - 1 -> c[p]        1242

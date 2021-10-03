@@ -29,21 +29,23 @@ likely that the memory data structures will have to be revised.
 
 ##### HP21 - Working 
 
-##### HP 22 - Mostly working.
-* Some issues with the the BEGIN/END switch.
+##### HP 22 - Working
+The  following issues were observed when checking the behaviour against the
+examples in the owners handbook..
+** The examples on pages 65, 66 and 76 only work if END is selected.
 
 ##### HP 25 - Work in progress.
-* Add support for missing opcodes.
-* Implement on/off and prgm/run switches.
+** Add support for missing opcodes.
+** Implement on/off and prgm/run switches.
 
 ##### HP 27 - Only keyboard working.
 
 ##### HP 29 - Only keyboard working.
 
 ##### HP 31 - Work in progress.
-* Add support for missing opcodes.
-* Implement on/off switch.
-* Fix display.
+** Add support for missing opcodes.
+** Implement on/off switch.
+** Fix display.
 
 ##### HP 32 - Only keyboard working.
 
@@ -57,3 +59,7 @@ been deprecated.
 
 Need  to sort out colour mapping to allow program to run on a display  with
 less than 24 -bit colour - may get round to this be one day...
+
+The  X11 implementation on the Raspberry Pi 4 is just too slow to draw  the
+display without it flickering (but it works well on the Jetson Nano, and an
+old P4 with Intel graphics).
