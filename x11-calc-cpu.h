@@ -27,7 +27,7 @@
  *                     arithmetic mode and instruction tracing - MT
  * 5 Sep 21          - Changed  first and last into signed integers  (fixed
  *                     segmentation fault in register left shift)  - MT
- *                   - Added a keycode and keystate properties to store the
+ *                   - Added a code and key pressed properties to store the
  *                     key  code of the key and the state of the actual key
  *                     (necessary as clearing status bit 15 when the key is
  *                     released does NOT work!) - MT
@@ -83,8 +83,8 @@ typedef struct {
    unsigned int f;                  /* F register */
    unsigned int addr;               /* Address register */
    unsigned int base;               /* Current arithmetic base */
-   unsigned int keycode;            /* Key code */
-   unsigned char keystate;          /* Is a key pressed */
+   unsigned int code;               /* Key code */
+   unsigned char keypressed;        /* Key pressed */
    unsigned char select;            /* Save switch state */
    unsigned char enabled;           /* Enabled */
 } oprocessor;

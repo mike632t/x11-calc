@@ -161,7 +161,7 @@
 #define DATE           "14 Sep 21"
 #define AUTHOR         "MT"
 
-#define DEBUG 0        /* Enable/disable debug*/
+#define DEBUG 1        /* Enable/disable debug*/
 
 #include <stdlib.h>    /* malloc(), etc. */
 #include <stdio.h>     /* fprintf(), etc. */
@@ -201,7 +201,8 @@ void v_reg_fprint(FILE *h_file, oregister *h_register) {
 void v_status_fprint(FILE *h_file, oprocessor *h_processor) {
    int i_count, i_temp = 0;
    for (i_count = (sizeof(h_processor->status) / sizeof(*h_processor->status) - 1); i_count >= 0; i_count--) {
-      i_temp = (i_temp << 1) | h_processor->status[i_count];
+      i_temp <<= 1;
+      if (h_processor->status[i_count]) i_temp |= 1;
    }
    fprintf(h_file, "0x%04x%12c", i_temp, ' ');
 }
@@ -386,7 +387,7 @@ static void v_processor_clear_status(oprocessor *h_processor) {
    int i_count;
    for (i_count = 0; i_count < (sizeof(h_processor->status) / sizeof(h_processor->status[0]) ); i_count++)
       if ((i_count != 1) && (i_count != 2) && (i_count != 5) && (i_count != 15))
-         h_processor->status[i_count] = 0; /* Clear the processor status word */
+         h_processor->status[i_count] = False; /* Clear the processor status word */
 }
 
 /* Clear registers */
@@ -421,12 +422,12 @@ void v_processor_init(oprocessor *h_processor) {
    h_processor->f = 0;
    h_processor->addr = 0;
    h_processor->base = 10;
-   h_processor->keycode = 0;
-   h_processor->keystate = 0;
+   h_processor->code = 0;
+   h_processor->keypressed = False;
    h_processor->enabled = True;
 
-   h_processor->status[5] = 1; /* TO DO - Check which flags should be set by default */
-   h_processor->status[3] = 1; /* Select radians */
+   h_processor->status[5] = False; /* TO DO - Check which flags should be set by default */
+   /* h_processor->status[3] = True; /* Select radians */
    h_processor->flags[MODE] = True; /* Select run mode */
 }
 
@@ -502,7 +503,13 @@ void v_processor_tick(oprocessor *h_processor) {
       if (h_processor->flags[TRACE])
          fprintf(stdout, "%1o-%04o %04o  ", h_processor->rom_number, h_processor->pc, h_processor->rom[h_processor->pc]);
 
-      i_opcode = h_processor->rom[h_processor->pc];
+      if (h_processor->keypressed)
+         h_processor->status[15] = True; /* Set status bit if key pressed */
+      if (h_processor->select)
+         h_processor->status[3] = True; /* Set status bit based on switch position */
+      h_processor->status[5] = True; /* Power OK */
+
+      i_opcode = h_processor->rom[h_processor->pc]; /* Get next instruction */
 
       switch (i_opcode & 03) {
       case 00: /* Special operations */
@@ -517,7 +524,7 @@ void v_processor_tick(oprocessor *h_processor) {
                case 00020: /* keys -> rom address */
                   if (h_processor->flags[TRACE]) fprintf(stdout, "keys -> rom address");
                   h_processor->pc &= 0x0f00;
-                  h_processor->pc += h_processor->keycode - 1;
+                  h_processor->pc += h_processor->code - 1;
                   break;
                case 00420: /* binary */
                   if (h_processor->flags[TRACE]) fprintf(stdout, "binary");
@@ -578,15 +585,11 @@ void v_processor_tick(oprocessor *h_processor) {
             switch ((i_opcode >> 4) & 03) {
             case 00: /* 1 -> s(n) */
                if (h_processor->flags[TRACE]) fprintf(stdout, "1 -> s(%d)", i_opcode >> 6);
-               h_processor->status[i_opcode >> 6] = 1;
+               h_processor->status[i_opcode >> 6] = True;
                break;
             case 01: /* if 1 = s(n) */
                if (h_processor->flags[TRACE]) fprintf(stdout, "if 1 = s %d", i_opcode >> 6);
-               /* if (h_processor->flags[TRACE]) fprintf(stdout, " (s %d == %d)", i_opcode >> 6, h_processor->status[i_opcode >> 6]); */
-               if (h_processor->status[i_opcode >> 6] == 1)
-                  h_processor->flags[CARRY] = False;
-               else
-                  h_processor->flags[CARRY] = True;
+               h_processor->flags[CARRY] = !h_processor->status[i_opcode >> 6];
                v_op_inc_pc(h_processor); /* Increment program counter */
                v_op_goto(h_processor);
                break;
@@ -618,11 +621,11 @@ void v_processor_tick(oprocessor *h_processor) {
                         switch (i_count) {
                            case 1:  /* Scientific notation */
                            case 2:  /* Auto Enter (if set entering digit will push 'X') */
-                           case 5:  /* Set if decimal point has already been entered */
+                           case 5:  /* Low power warning */
                            case 15: /* Set if any key is pressed */
                               break;
                            default:
-                              h_processor->status[i_count] = 0; /* Clear all bits except bits 1, 2, 5, 15 */
+                              h_processor->status[i_count] = False; /* Clear all bits except bits 1, 2, 5, 15 */
                         }
                   }
                   break;
@@ -742,30 +745,11 @@ void v_processor_tick(oprocessor *h_processor) {
             switch ((i_opcode >> 4) & 03) {
             case 00: /* 0 -> s(n) */
                if (h_processor->flags[TRACE]) fprintf(stdout, "0 -> s(%d)", i_opcode >> 6);
-               switch (i_opcode >> 6) {
-                  case 15: /* Don't clear if a key is pressed */
-                     if (h_processor->keystate == 0) h_processor->status[15] = 0;
-                     break;
-                  case 5:  
-                     h_processor->status[5] = 1; /* HP21 @ 00135 */
-                     break;
-                  case 3: /* TO DO - Second switch overrides value of S 3 */ 
-                     if (h_processor->select)
-                        h_processor->status[3] = 1;
-                     else
-                        h_processor->status[3] = 0;
-                     break;
-                  default:
-                     h_processor->status[i_opcode >> 6] = 0;
-               }
+               h_processor->status[i_opcode >> 6] = False;
                break;
             case 01: /* if 0 = s(n) */
                if (h_processor->flags[TRACE]) fprintf(stdout, "if 0 = s %d ", i_opcode >> 6);
-               /* if (h_processor->flags[TRACE]) fprintf(stdout, " (s %d == %d)", i_opcode >> 6, h_processor->status[i_opcode >> 6]); */
-               if (h_processor->status[i_opcode >> 6] == 0)
-                  h_processor->flags[CARRY]  = False;
-               else
-                  h_processor->flags[CARRY]  = True;
+               h_processor->flags[CARRY] = h_processor->status[i_opcode >> 6];
                v_op_inc_pc(h_processor); /* Increment program counter */
                v_op_goto(h_processor);
                break;
