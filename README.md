@@ -32,19 +32,19 @@ likely that the memory data structures will have to be revised.
 ##### HP 22 - Working
 The  following issues were observed when checking the behaviour against the
 examples in the owners handbook..
-** The examples on pages 65, 66 and 76 only work if END is selected.
+* The examples on pages 65, 66 and 76 only work if END is selected.
 
 ##### HP 25 - Work in progress.
-** Add support for missing opcodes.
+* Add support for missing opcodes.
 
 ##### HP 27 - Only keyboard working.
 
 ##### HP 29 - Only keyboard working.
 
 ##### HP 31 - Work in progress.
-** Add support for missing opcodes.
-** Implement on/off switch.
-** Fix display.
+* Add support for missing opcodes.
+* Implement on/off switch.
+* Fix display.
 
 ##### HP 32 - Only keyboard working.
 
