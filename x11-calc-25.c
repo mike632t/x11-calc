@@ -66,8 +66,8 @@ void v_init_keypad(obutton *h_button[], oswitch *h_switch[]) {
    h_button[0] = h_button_create(00263, ' ', "SST", "FIX", "", h_normal_font, h_small_font, h_alternate_font, 12, 89, 33, 30, False, BLACK, YELLOW, BLUE);
    h_button[1] = h_button_create(00262, 000, "BST", "SCI", "", h_normal_font, h_small_font, h_alternate_font, 48, 89, 33, 30, False, BLACK, YELLOW, BLUE);
    h_button[2] = h_button_create(00261, 000, "GTO", "ENG", "", h_normal_font, h_small_font, h_alternate_font, 84, 89, 33, 30, False, BLACK, YELLOW, BLUE);
-   h_button[3] = h_button_create(00260, 'f', "", "", "", h_normal_font, h_small_font, h_alternate_font, 120, 89, 33, 30, False, YELLOW, BACKGROUND, YELLOW);
-   h_button[4] = h_button_create(00264, 'g', "", "", "", h_normal_font, h_small_font, h_alternate_font, 156, 89, 33, 30, False, LIGHT_BLUE, BACKGROUND, LIGHT_BLUE);
+   h_button[3] = h_button_create(00260, 'f', "f", "", "", h_normal_font, h_small_font, h_alternate_font, 120, 89, 33, 30, False, YELLOW, BACKGROUND, YELLOW);
+   h_button[4] = h_button_create(00264, 'g', "g", "", "", h_normal_font, h_small_font, h_alternate_font, 156, 89, 33, 30, False, LIGHT_BLUE, BACKGROUND, LIGHT_BLUE);
    
    /* Define second row of keys. */ 
    h_button[5] = h_button_create(00103, 000, "X-Y", "x", "%", h_normal_font, h_small_font, h_alternate_font, 12, 132, 33, 30, False, BLACK, YELLOW, BLUE);
