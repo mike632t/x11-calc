@@ -28,8 +28,6 @@ examples in the owners handbook..
 * The examples on pages 65, 66 and 76 only work if END is selected.
 
 ##### HP 25 - Work in progress.
-* Can run a simple psudo random number generator program.
-* Not all functions work.
 
 ##### HP 27 - Only keyboard working.
 
