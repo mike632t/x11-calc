@@ -14,13 +14,6 @@ it will only compile without modification on Linux (Debian 10), but as with
 earlier  versions of the intention is to be able to compile the code on VMS
 running on either VAX or Alpha processors, and Tru64 Unix running on Alpha.
 
-### Compiling
-
-To build a the simulator for a particular model on Linux or Tru64 UNIX edit
-the make file and change the value of the MODEL number, then do 'make all'.
-
-On VMS use '@make.com'.
-
 ### Status
 
 Currently very much work in progress. The CPU simulation code is now mostly
@@ -35,7 +28,8 @@ examples in the owners handbook..
 * The examples on pages 65, 66 and 76 only work if END is selected.
 
 ##### HP 25 - Work in progress.
-* Add support for missing opcodes.
+* Can run a simple psudo random number generator program.
+* Not all functions work.
 
 ##### HP 27 - Only keyboard working.
 
@@ -50,6 +44,38 @@ examples in the owners handbook..
 
 ##### HP 33 - Only keyboard working.
 
+### Compiling
+
+To build a the simulator for a particular model on Linux or Tru64 UNIX edit
+the make file and change the value of the MODEL number, then do 'make all'.
+
+On VMS use '@make.com'.
+
+### Keyboard Shortcuts
+
+The following keyboard shortcuts should work:
+
+'0' - '9', '+'. '-'. '*'. '/' and 'Enter' should do what you expect them to
+(when using numeric key pad you need to use numlock as usual).
+
+'Esc' is 'Clx', 'c' is CHS, 'e' is 'EEX' and on programmable models 'Space'
+corresponds to 'SST'. 
+
+'f' and where applicable 'g' and 'h' correspond to the function keys.
+
+'Ctrl-Z' Quits, and 'Ctrl-C' does a reset.
+
+### Debugging
+
+You  can  start the simulation in trace mode using '-t', or in single  step 
+mode using '-s', and set a breakpoint using '-b <octal address>'.
+
+'Ctrl-T'  also toggles trace mode when running, 'Ctrl-S' executes the  next
+instruction, 'Ctrl-Q' resumes execution, and 'Ctrl-R' displays the contents
+of the CPU registers .  
+
+When in trace mode a jump to the same instruction produces no output.
+
 ### Known Issues
 
 Attempting to compile using a later version of 'gcc' will result in several
@@ -61,4 +87,6 @@ less than 24 -bit colour - may get round to this be one day...
 
 The  X11 implementation on the Raspberry Pi 4 is just too slow to draw  the
 display without it flickering (but it works well on the Jetson Nano, and an
-old P4 with Intel graphics).
+old P4 with Intel graphics).  I suspect that rewriting the display code  to
+use  a custom font or a fixed size bitmap for each digit instead of drawing
+each segment individually might speed things up. 
