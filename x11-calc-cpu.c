@@ -149,6 +149,7 @@
  *                   - For the HP21 and HP22 the state of the select switch
  *                     is checked when setting or clearing S 3 - MT
  *  1 Oct 21         - Converted flags to Boolean variables - MT
+ *  4 Oct 21         - Added 'a -> rom address' - MT
  *
  * To Do             - Overlay program memory storage onto data registers (
  *                     different data structures pointing at the same data).
@@ -161,7 +162,7 @@
 #define DATE           "14 Sep 21"
 #define AUTHOR         "MT"
 
-#define DEBUG 1        /* Enable/disable debug*/
+#define DEBUG 0        /* Enable/disable debug*/
 
 #include <stdlib.h>    /* malloc(), etc. */
 #include <stdio.h>     /* fprintf(), etc. */
@@ -180,7 +181,7 @@
 #include "gcc-wait.h"  /* i_wait() */
 
 /* Print the contents of a register */
-void v_reg_fprint(FILE *h_file, oregister *h_register) {
+static void v_fprint_register(FILE *h_file, oregister *h_register) {
    const char c_name[8] = {'A', 'B', 'C', 'Y', 'Z', 'T', 'M', 'N'};
    int i_count;
    if (h_register != NULL) {
@@ -198,7 +199,7 @@ void v_reg_fprint(FILE *h_file, oregister *h_register) {
 }
 
 /* Display the current processor status word */
-void v_status_fprint(FILE *h_file, oprocessor *h_processor) {
+static void v_fprint_status(FILE *h_file, oprocessor *h_processor) {
    int i_count, i_temp = 0;
    for (i_count = (sizeof(h_processor->status) / sizeof(*h_processor->status) - 1); i_count >= 0; i_count--) {
       i_temp <<= 1;
@@ -208,7 +209,7 @@ void v_status_fprint(FILE *h_file, oprocessor *h_processor) {
 }
 
 /* Display the current processor flags */
-void v_flags_fprint(FILE *h_file, oprocessor *h_processor) {
+static void v_fprint_flags(FILE *h_file, oprocessor *h_processor) {
    int i_count, i_temp = 0;
    for (i_count = 0; i_count < TRACE; i_count++) /* Ignore TRACE flag */
       i_temp += h_processor->flags[i_count] << i_count;
@@ -218,30 +219,24 @@ void v_flags_fprint(FILE *h_file, oprocessor *h_processor) {
    fprintf(h_file, ")  ");
 }
 
-void v_state_fprint(FILE *h_file, oprocessor *h_processor)
-{
-   if (h_processor != NULL){
-      /* 
-      int i_count;
-      for (i_count = 0; i_count < REGISTERS; i_count++) {
-         if (i_count % 3 == 0) fprintf(h_file, "\n\t");
-         v_reg_fprint(h_file, h_processor->reg[i_count]);
-      }
-       */
-      /* 
-         for (i_count = 0; i_count < MEMORY_SIZE; i_count++) {
-            if (i_count % 3 == 0) fprintf(h_file, "\n\t");
-            v_reg_fprint(h_file, h_processor->mem[i_count]);
+/* Display current processor state */
+void v_fprint_state(FILE *h_file, oprocessor *h_processor) {
+   if (h_processor != NULL) 
+      if (h_processor->flags[TRACE]) {
+         int i_count;
+         fprintf(h_file, "\t");      
+         for (i_count = 0; i_count < REGISTERS; i_count++) {
+            if ((i_count % 3 == 0) && (i_count > 0)) fprintf(h_file, "\n\t");
+            v_fprint_register(h_file, h_processor->reg[i_count]);
          }
-       */
-      fprintf(h_file, "\n\tflags[] = ");
-      v_flags_fprint(h_file, h_processor);
-      fprintf(h_file, "status  = ");
-      v_status_fprint(h_file, h_processor);
-      fprintf(h_file, "ptr     = %02d  ", h_processor->p);
-      fprintf(h_file, "addr    = %02d ", h_processor->addr);
-      fprintf(h_file, "\n");
-   }
+         fprintf(h_file, "\n\tflags[] = ");
+         v_fprint_flags(h_file, h_processor);
+         fprintf(h_file, "status  = ");
+         v_fprint_status(h_file, h_processor);
+         fprintf(h_file, "ptr     = %02d  ", h_processor->p);
+         fprintf(h_file, "addr    = %02d ", h_processor->addr);
+         fprintf(h_file, "\n");
+      }
 }
 
 /* Create a new register , */
@@ -449,7 +444,6 @@ oprocessor *h_processor_create(int *h_rom){
 /* Delayed ROM select */
 static void v_delayed_rom(oprocessor *h_processor) { /* Delayed ROM select */
    if (h_processor->flags[DELAYED_ROM]) {
-      if (h_processor->flags[TRACE]) fprintf(stdout, " ** ");
       h_processor->pc = h_processor->delayed_rom_number << 8 | (h_processor->pc & 00377);
       h_processor->flags[DELAYED_ROM] = False; /* Clear flag */
    }
@@ -525,6 +519,19 @@ void v_processor_tick(oprocessor *h_processor) {
                   if (h_processor->flags[TRACE]) fprintf(stdout, "keys -> rom address");
                   h_processor->pc &= 0x0f00;
                   h_processor->pc += h_processor->code - 1;
+                  break;
+               case 00220: /* a -> rom address */ 
+                  {
+                     int i_addr;
+                     if (h_processor->flags[TRACE]) fprintf(stdout, "a -> rom address");
+                     h_processor->pc &= 0x0ff00;
+                     i_addr = h_processor->pc + (h_processor->reg[A_REG]->nibble[2] << 4) + h_processor->reg[A_REG]->nibble[1];
+                     if (i_addr < ROM_SIZE)
+                         h_processor->pc = i_addr - 1;
+                     else
+                        v_error("Address %02o out of range at %1o-%04o in %s line : %d\n", i_addr, h_processor->rom_number, h_processor->pc, __FILE__, __LINE__);
+                     v_delayed_rom(h_processor);
+                  }
                   break;
                case 00420: /* binary */
                   if (h_processor->flags[TRACE]) fprintf(stdout, "binary");
@@ -1014,8 +1021,7 @@ void v_processor_tick(oprocessor *h_processor) {
          v_error("Unexpected error in %s line : %d\n", __FILE__, __LINE__);
       }
       if (h_processor->flags[TRACE]) {
-         fprintf(stdout, "**\n");
-         debug(v_state_fprint(stdout, h_processor));
+         fprintf(stdout, "\n");
       }
       v_op_inc_pc(h_processor); /* Increment program counter */
    }
