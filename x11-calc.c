@@ -110,20 +110,24 @@
  *             0.2   - It works !!
  * 15 Sep 21         - The  escape key now resets the simulator instead  of
  *                     exiting - MT
- * 16 Sep 21         - Fixed  the  display flicker problem by  pausing  the
- *                     execution  and  updating the display only  every 100
- *                     instead of every tick- MT
+ * 16 Sep 21         - Improved the display flicker problem by updating the
+ *                     display  only once every 100 ticks instead of  every
+ *                     tick- MT
  * 18 Sep 21         - Added keycode to the button properties and a  method
- *                     to  determine if this corrisponds to a button  which
+ *                     to  determine if this corresponds to a button  which
  *                     allows a button to be operated by a key - MT
  * 19 Sep 21         - Created a keyboard class to keep track of the  input
  *                     state and translate keystrokes into characters - MT
  * 21 Sep 21         - Set the default active button to NULL - MT
+ * 28 Sep 21         - The  escape key now mapped to 'Clx' - MT
  *  1 Oct 21         - Converted flags to Boolean variables - MT
  *  2 Oct 21         - Changed property names - MT
+ *  4 Oct 21         - Added the ability to display the CPU registers using
+ *                     Ctrl-R when in trace mode - MT
  *
  * To Do             - Save trace and single step options and restore when
  *                     resetting the processor...
+ *                   - Load ROMs from a separate file?
  *                   - Fix display update problem on Raspberry Pi.
  *                   - Allow VMS users to set breakpoints?
  *                   - Free up allocated memory on exit.
@@ -133,8 +137,8 @@
 
 #define NAME           "x11-rpncalc"
 #define VERSION        "0.2"
-#define BUILD          "0049"
-#define DATE           "14 Sep 21"
+#define BUILD          "0058"
+#define DATE           "04 Oct 21"
 #define AUTHOR         "MT"
 
 #define DEBUG 0        /* Enable/disable debug*/
@@ -473,15 +477,18 @@ int main(int argc, char *argv[]){
             break;
          case KeyPress :
             h_key_pressed(h_keyboard, x_display, x_event.xkey.keycode, x_event.xkey.state); /* Attempts to translate a key code into a character. */
-            if (h_keyboard->key == (XK_Z & 0x1f)) b_abort = True; /* Ctrl-z to exit  */
-            else if (h_keyboard->key == (XK_Q & 0x1f))
-               b_step = !(b_run  = True); /* Ctrl-Q to resume */
-            else if ((h_keyboard->key == (XK_S & 0x1f)) || h_keyboard->key == ' ')
-               b_trace = b_step = b_run = True; /* Ctrl-S or space to single step */
-            else if (h_keyboard->key == (XK_T & 0x1f))
-               b_trace = !b_trace; /* Ctrl-T to toggle tracing */
-            else if (h_keyboard->key == (XK_C & 0x1f)) {
-               v_processor_init(h_processor); b_run = True; /* Ctrl-c to reset  */
+            if (h_keyboard->key == (XK_Z & 0x1f)) /* Ctrl-z to exit  */
+               b_abort = True;
+            else if (h_keyboard->key == (XK_Q & 0x1f)) /* Ctrl-Q to resume */
+               b_step = !(b_run  = True);
+            else if (h_keyboard->key == (XK_S & 0x1f)) /* Ctrl-S or space to single step */
+               b_trace = b_step = b_run = True;
+            else if (h_keyboard->key == (XK_T & 0x1f)) /* Ctrl-T to toggle tracing */
+               b_trace = !b_trace;
+            else if (h_keyboard->key == (XK_R & 0x1f)) /* Ctrl-R to display internal CPU registers */
+               v_fprint_state(stdout, h_processor);
+            else if (h_keyboard->key == (XK_C & 0x1f)) { /* Ctrl-C to reset  */
+               v_processor_init(h_processor); b_run = True;
             }
             else { /* Check for matching button */
                int i_count;
