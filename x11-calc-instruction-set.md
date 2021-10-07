@@ -56,8 +56,8 @@ decremented, shifted left or right and tested.
    S 6         ?
    S 7         ?
    S 8         ?
-   S 9         ?
-   S 10        ?
+   S 9         f prefix pressed
+   S 10        g prefix pressed
    S 11        ?
    S 12        ?
    S 13        Set if function key has been pressed.
