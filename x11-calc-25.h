@@ -18,8 +18,8 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
  * 09 Mar 14         - Initial verson - MEJT
- *                   - Corrected number of registers - MT
- *                      
+ * 06 Oct 21         - Corrected number of registers - MT
+ *
  */
 
 #ifndef TITLE
@@ -30,7 +30,9 @@
 
 #define DIGITS         12
 
-#define MEMORY_SIZE    8 /* 0 - 7 */
+/* Reserve enough storage in memory to hold eight registers (0 - 7), Lastx,
+ * and forty nine program steps */
+#define MEMORY_SIZE    (8 + 1 + (49 / 7)) 
 #define ROM_SIZE       04000
 #define ROM_BANKS      1
 
