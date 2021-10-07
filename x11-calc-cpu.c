@@ -150,7 +150,7 @@
  *                     is checked when setting or clearing S 3 - MT
  *  1 Oct 21         - Converted flags to Boolean variables - MT
  *  4 Oct 21         - Added 'a -> rom address' - MT
- *  6 Oct 21         - Dumps all register contents when displaying status
+ *  6 Oct 21         - Dumps all registers when displaying status - MT
  *  7 Oct 21         - Fixed bug in 'data register(n)-> c' - MT
  *
  * To Do             - Overlay program memory storage onto data registers (
