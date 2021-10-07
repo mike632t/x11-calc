@@ -150,6 +150,8 @@
  *                     is checked when setting or clearing S 3 - MT
  *  1 Oct 21         - Converted flags to Boolean variables - MT
  *  4 Oct 21         - Added 'a -> rom address' - MT
+ *  6 Oct 21         - Dumps all register contents when displaying status
+ *  7 Oct 21         - Fixed bug in 'data register(n)-> c' - MT
  *
  * To Do             - Overlay program memory storage onto data registers (
  *                     different data structures pointing at the same data).
@@ -205,7 +207,7 @@ static void v_fprint_status(FILE *h_file, oprocessor *h_processor) {
       i_temp <<= 1;
       if (h_processor->status[i_count]) i_temp |= 1;
    }
-   fprintf(h_file, "0x%04x%12c", i_temp, ' ');
+   fprintf(h_file, "0x%04X%12c", i_temp, ' ');
 }
 
 /* Display the current processor flags */
@@ -221,22 +223,26 @@ static void v_fprint_flags(FILE *h_file, oprocessor *h_processor) {
 
 /* Display current processor state */
 void v_fprint_state(FILE *h_file, oprocessor *h_processor) {
-   if (h_processor != NULL) 
-      if (h_processor->flags[TRACE]) {
-         int i_count;
-         fprintf(h_file, "\t");      
-         for (i_count = 0; i_count < REGISTERS; i_count++) {
-            if ((i_count % 3 == 0) && (i_count > 0)) fprintf(h_file, "\n\t");
-            v_fprint_register(h_file, h_processor->reg[i_count]);
+   if (h_processor != NULL) {
+      int i_count;
+      for (i_count = 0; i_count < REGISTERS; i_count++) {
+         if (i_count % 3 == 0) fprintf(h_file, "\n\t");
+         v_fprint_register(h_file, h_processor->reg[i_count]);
+      }
+      fprintf(h_file, "\n\tflags[] = ");
+      v_fprint_flags(h_file, h_processor);
+      fprintf(h_file, "status  = ");
+      v_fprint_status(h_file, h_processor);
+      fprintf(h_file, "ptr     = %02d  ", h_processor->p);
+      fprintf(h_file, "addr    = %02d\n", h_processor->addr);
+      if (MEMORY_SIZE > 1) { /* Bit of a fudge but... */
+         for (i_count = 0; i_count < MEMORY_SIZE; i_count++) {
+            if (i_count % 3 == 0) fprintf(h_file, "\n\t");
+            v_fprint_register(h_file, h_processor->mem[i_count]);
          }
-         fprintf(h_file, "\n\tflags[] = ");
-         v_fprint_flags(h_file, h_processor);
-         fprintf(h_file, "status  = ");
-         v_fprint_status(h_file, h_processor);
-         fprintf(h_file, "ptr     = %02d  ", h_processor->p);
-         fprintf(h_file, "addr    = %02d ", h_processor->addr);
          fprintf(h_file, "\n");
       }
+   }
 }
 
 /* Create a new register , */
@@ -520,7 +526,7 @@ void v_processor_tick(oprocessor *h_processor) {
                   h_processor->pc &= 0x0f00;
                   h_processor->pc += h_processor->code - 1;
                   break;
-               case 00220: /* a -> rom address */ 
+               case 00220: /* a -> rom address */
                   {
                      int i_addr;
                      if (h_processor->flags[TRACE]) fprintf(stdout, "a -> rom address");
@@ -733,11 +739,13 @@ void v_processor_tick(oprocessor *h_processor) {
                      v_reg_copy(h_processor, h_processor->reg[C_REG], h_processor->mem[h_processor->addr]);
                   }
                   else {
-                     if (h_processor->flags[TRACE]) fprintf(stdout, "data register(%d) -> c", i_opcode >> 6);
-                     if ((i_opcode >> 6) < MEMORY_SIZE)
-                        v_reg_copy(h_processor, h_processor->reg[C_REG], h_processor->mem[(i_opcode >> 6)]);
+                     h_processor->addr &= 0xfff0;
+                     h_processor->addr += (i_opcode >> 6);
+                     if (h_processor->flags[TRACE]) fprintf(stdout, "data register(%d) -> c", h_processor->addr);
+                     if ((h_processor->addr) < MEMORY_SIZE)
+                        v_reg_copy(h_processor, h_processor->reg[C_REG], h_processor->mem[h_processor->addr]);
                      else
-                        v_error("Address %02o out of range at %1o-%04o in %s line : %d\n", (i_opcode >> 6), h_processor->rom_number, h_processor->pc, __FILE__, __LINE__);                  
+                        v_error("Address %02o out of range at %1o-%04o in %s line : %d\n", h_processor->addr, h_processor->rom_number, h_processor->pc, __FILE__, __LINE__);
                   }
                }
                else
