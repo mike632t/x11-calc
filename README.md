@@ -27,9 +27,9 @@ The  following issues were observed when checking the behaviour against the
 examples in the owners handbook..
 * The examples on pages 65, 66 and 76 only work if END is selected.
 
-##### HP 25 - Work in progress.
-* Fixed issue with E+/E-.
+##### HP 25 - Can execute programs.
 * Clear stack set SCI display mode!
+* No continuous memory.
 
 ##### HP 27 - Only keyboard working.
 
