@@ -127,6 +127,7 @@
  *
  * To Do             - Save trace and single step options and restore when
  *                     resetting the processor...
+ *                   - Continuous Memory !! 
  *                   - Load ROMs from a separate file?
  *                   - Fix display update problem on Raspberry Pi.
  *                   - Allow VMS users to set breakpoints?
