@@ -28,6 +28,8 @@ examples in the owners handbook..
 * The examples on pages 65, 66 and 76 only work if END is selected.
 
 ##### HP 25 - Work in progress.
+* Fixed issue with E+/E-.
+* Clear stack set SCI display mode!
 
 ##### HP 27 - Only keyboard working.
 
