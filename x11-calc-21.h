@@ -35,7 +35,7 @@
 
 #define DIGITS         12
 
-#define MEMORY_SIZE    1 /* Can't be zero*/
+#define MEMORY_SIZE    1 /* Not used but can't be zero*/
 #define ROM_SIZE       02000
 #define ROM_BANKS      1
 

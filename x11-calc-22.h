@@ -30,7 +30,9 @@
 
 #define DIGITS         12
 
-#define MEMORY_SIZE    16      /* 0 - 15 */
+/* Reserve enough storage in memory to hold ten registers (0 - 9), and  the
+ * six financial registers.  */
+#define MEMORY_SIZE    (10 + 6) /* 0 - 15 */
 #define ROM_SIZE       04000
 #define ROM_BANKS      1
 
