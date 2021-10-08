@@ -10,7 +10,7 @@ ROM and can operate on one or more registers (or the selected part of  each
 register) allowing them to  be  cleared, copied,  exchanged,   incremented,
 decremented, shifted left or right and tested.
 
-<h3>Arithmetic Registers</h3>
+### Arithmetic Registers
 
      13   12  11  10  9   8   7   6   5   4   3   2   1   0
     +---+---+---+---+---+---+---+---+---+---+---+---+---+---+
@@ -23,7 +23,7 @@ decremented, shifted left or right and tested.
     Y, Z, T:   Stack registers.
     M, N:      Memory registers.
 
-<h3>Special purpose registers</h3>
+### Special purpose registers
 
     F:         F register.
     P:         A  4-bit register that is used to select which part of  each
@@ -32,7 +32,7 @@ decremented, shifted left or right and tested.
                write to memory from the C register.
     SP:        Stack pointer
 
-<h3>Processor flags</h3>
+### Processor flags
 
 Ten processor flags are available (F 0 - F 9)
 
@@ -47,7 +47,7 @@ Ten processor flags are available (F 0 - F 9)
     F 8        Timer.
     F 9        Trace enabled (implementation specific!).
 
-<h3>Processor status word</h3>
+### Processor status word
 
 Comprises of 16 status bits (S 0 - S 15)
 
@@ -68,9 +68,9 @@ Comprises of 16 status bits (S 0 - S 15)
     S 14       Set if EEX has been pressed?
     S 15 *     Set if any key is pressed.
 
-<h2>Instruction set</h2>
+## Instruction set
 
-<h3>Special operations</h3>
+### Special operations
 
 May be one or two word instructions!
 
@@ -79,8 +79,8 @@ May be one or two word instructions!
      | n | n | n | n | n | n | n | n | 0 | 0 |
      +---+---+---+---+---+---+---+---+---+---+
 
-The can be further categorised by splitting the least significant six  bits
-into three groups
+They can be further sub-categorised by splitting the least significant  six
+bits of each opcode into three groups.
 
     00000    0 000 00 00 00  nop
 
@@ -138,20 +138,19 @@ into three groups
             (where nn=   0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15
                     p=   4,  8, 12,  2,  9,  1,  6,  3,  1, 13,  5,  0, 11, 10,  7,  4)
 
-<h3>Jump subroutine</h3>
+### Jump subroutine
 
     x xxx xxx x01  jsb
 
 
-<h3>Arithmetic operations</h3>
+### Arithmetic operations
 
       9   8   7   6   5   4   3   2   1   0
     +---+---+---+---+---+---+---+---+---+---+
     | n | n | n | n | n | f | f | f | 1 | 0 |
     +---+---+---+---+---+---+---+---+---+---+
 
-Where fff is the field modifier.  Which is used to select which part of
-the register the instruction will operate on.
+Where fff is the field modifier. 
 
      13   12  11  10  9   8   7   6   5   4   3   2   1   0
     +---+---+---+---+---+---+---+---+---+---+---+---+---+---+
@@ -166,41 +165,42 @@ the register the instruction will operate on.
     101   M : mantissa                             ([3 .. 12])
     110   W : word                                 ([0 .. 13])
     111  MS : mantissa and sign                    ([3 .. 13])
-<p>  
 
-    0 000 0ff f10  0 -> a
-    0 000 1ff f10  0 -> b
-    0 001 0ff f10  a exchange b                    ???
-    0 001 0ff f10  a -> b                          ???
-    0 001 1ff f10  a exchange c
-    0 010 0ff f10  c -> a
-    0 010 1ff f10  b -> c
-    0 011 0ff f10  b exchange c
-    0 011 1ff f10  0 -> c
-    0 100 0ff f10  a + b -> a
-    0 100 1ff f10  a + c -> a
-    0 101 0ff f10  c + c -> c
-    0 101 1ff f10  a + c -> c
-    0 110 0ff f10  a + 1 -> a
-    0 110 1ff f10  shift left a
-    0 111 0ff f10  c + 1 -> c
-    0 111 1ff f10  a - b -> a
-    1 000 1ff f10  a - c -> c
-    1 001 0ff f10  a - 1 -> a
-    1 001 1ff f10  c - 1 -> c
-    1 010 0ff f10  0 - c -> c
-    1 010 1ff f10  0 - c - 1 -> c                  (negate)
-    1 011 0ff f10  if b = 0
-    1 011 1ff f10  if c = 0
-    1 100 0ff f10  if a >= c
-    1 100 1ff f10  if a >= b
-    1 101 0ff f10  if a # 0
-    1 101 1ff f10  if c # 0
-    1 110 0ff f10  a - c -> a
-    1 110 1ff f10  shift right a
-    1 111 0ff f10  shift right b
-    1 111 1ff f10  shift right c
+The field modifier is used to select which part of the register to use.
 
-<h3>Conditional Go To</h3>
+    0 000 0 fff 10 0 -> a
+    0 000 1 fff 10 0 -> b
+    0 001 0 fff 10 a exchange b                    ???
+    0 001 0 fff 10 a -> b                          ???
+    0 001 1 fff 10 a exchange c
+    0 010 0 fff 10 c -> a
+    0 010 1 fff 10 b -> c
+    0 011 0 fff 10 b exchange c
+    0 011 1 fff 10 0 -> c
+    0 100 0 fff 10 a + b -> a
+    0 100 1 fff 10 a + c -> a
+    0 101 0 fff 10 c + c -> c
+    0 101 1 fff 10 a + c -> c
+    0 110 0 fff 10 a + 1 -> a
+    0 110 1 fff 10 shift left a
+    0 111 0 fff 10 c + 1 -> c
+    0 111 1 fff 10 a - b -> a
+    1 000 1 fff 10 a - c -> c
+    1 001 0 fff 10 a - 1 -> a
+    1 001 1 fff 10 c - 1 -> c
+    1 010 0 fff 10 0 - c -> c
+    1 010 1 fff 10 0 - c - 1 -> c                  (negate)
+    1 011 0 fff 10 if b = 0
+    1 011 1 fff 10 if c = 0
+    1 100 0 fff 10 if a >= c
+    1 100 1 fff 10 if a >= b
+    1 101 0 fff 10 if a # 0
+    1 101 1 fff 10 if c # 0
+    1 110 0 fff 10 a - c -> a
+    1 110 1 fff 10 shift right a
+    1 111 0 fff 10 shift right b
+    1 111 1 fff 10 shift right c
+
+### Conditional Go To
 
     n nnn nnn n11  if n/c goto nnnnnnnn
