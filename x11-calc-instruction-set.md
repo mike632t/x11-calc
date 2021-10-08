@@ -13,9 +13,9 @@ decremented, shifted left or right and tested.
 ###Arithmetic Registers
 
     13   12  11  10  9   8   7   6   5   4   3   2   1   0
-   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-   | s | m | m | m | m | m | m | m | m | m | m | s | e | e |
-   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+    | s | m | m | m | m | m | m | m | m | m | m | s | e | e |
+    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
    A, B, C:    General purpose registers.  The C register is used to access
                the M register and or memory as well as holding the value of
@@ -67,16 +67,16 @@ decremented, shifted left or right and tested.
 ###Instruction set
 
    Special operations - May be one or two word instructions!
-
-     9   8   7   6   5   4   3   2   1   0
-   +---+---+---+---+---+---+---+---+---+---+
-   | n | n | n | n | n | n | n | n | 0 | 0 |
-   +---+---+---+---+---+---+---+---+---+---+
+   
+       9   8   7   6   5   4   3   2   1   0
+     +---+---+---+---+---+---+---+---+---+---+
+     | n | n | n | n | n | n | n | n | 0 | 0 |
+     +---+---+---+---+---+---+---+---+---+---+
 
    Jump Subroutine
 
      9   8   7   6   5   4   3   2   1   0
-   +---+---+---+---+---+---+---+---+---+---+
+     +---+---+---+---+---+---+---+---+---+---+
    | n | n | n | n | n | n | n | n | 1 | 1 |
    +---+---+---+---+---+---+---+---+---+---+
 
