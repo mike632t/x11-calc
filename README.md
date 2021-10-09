@@ -1,10 +1,10 @@
 ## x11-calc - Another RPN (Reverse Polish) calculator.
 
-![HP21](./images/x11-calc-21.png) ![HP22](./images/x11-calc-22.png) ![HP25](./images/x11-calc-25.png) 
+![HP21](./img/x11-calc-21.png) ![HP22](./img/x11-calc-22.png) ![HP25](./img/x11-calc-25.png) 
 
-![HP27](./images/x11-calc-27.png) ![HP29](./images/x11-calc-29.png) ![HP31](./images/x11-calc-31.png)
+![HP27](./img/x11-calc-27.png) ![HP29](./img/x11-calc-29.png) ![HP31](./img/x11-calc-31.png)
 
-![HP32](./images/x11-calc-32.png) ![HP33](./images/x11-calc-33.png)
+![HP32](./img/x11-calc-32.png) ![HP33](./img/x11-calc-33.png)
 
 Written in C using X11.
 
@@ -27,9 +27,8 @@ The  following issues were observed when checking the behaviour against the
 examples in the owners handbook..
 * The examples on pages 65, 66 and 76 only work if END is selected.
 
-##### HP 25 - Can execute programs.
-* Clear stack set SCI display mode!
-* No continuous memory.
+##### HP 25 - Working
+* Not continuous memory.
 
 ##### HP 27 - Only keyboard working.
 
