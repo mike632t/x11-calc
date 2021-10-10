@@ -45,10 +45,10 @@ examples in the owners handbook..
 
 ### Compiling
 
-To build a the simulator for a particular model on Linux or Tru64 UNIX edit
-the make file and change the value of the MODEL number, then do 'make all'.
+To  build  the  simulator on Linux or Tru64 UNIX, change directory  to  the
+source folder and run 'make MODEL=nn', where nn is a valid model number.
 
-On VMS use '@make.com'.
+On VMS set default to the source folder and use '@make.com'.
 
 ### Keyboard Shortcuts
 
@@ -86,6 +86,12 @@ less than 24 -bit colour - may get round to this be one day...
 
 The  X11 implementation on the Raspberry Pi 4 is just too slow to draw  the
 display without it flickering (but it works well on the Jetson Nano, and an
-old P4 with Intel graphics).  I suspect that rewriting the display code  to
+old Intel Atom based netbook). I suspect that rewriting the display code to
 use  a custom font or a fixed size bitmap for each digit instead of drawing
 each segment individually might speed things up. 
+
+### Dependencies
+
+The following packages are required to build and run the simulator.
+
+gcc, make, libx11-dev, libc6-dev, xfonts-base ...?
