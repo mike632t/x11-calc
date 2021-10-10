@@ -1,10 +1,9 @@
 /*
- *
- * x11-calc-33.h
+ * x11-calc-33.h - RPN (Reverse Polish) calculator simulator.
  *
  * Copyright(C) 2018   MT
  * 
- * Model specific functions
+ * Model specific constants and function prototypes.
  *
  * This  program is free software: you can redistribute it and/or modify it
  * under  the terms of the GNU General Public License as published  by  the

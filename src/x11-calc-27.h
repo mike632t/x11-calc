@@ -1,8 +1,9 @@
 /*
- *
- * x11-calc-29.h - Model specific functions.
+ * x11-calc-29.h - RPN (Reverse Polish) calculator simulator.
  *
  * Copyright(C) 2018   MEJT
+ * 
+ * Model specific constants and function prototypes.
  *
  * This  program is free software: you can redistribute it and/or modify  it
  * under  the  terms of the GNU General Public License as published  by  the
