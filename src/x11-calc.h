@@ -47,6 +47,8 @@
 #include "x11-calc-32.h"
 #elif HP33
 #include "x11-calc-33.h"
+#elif HP11
+#include "x11-calc-11.h"
 #endif
 
 void v_version(); /* Display version information */

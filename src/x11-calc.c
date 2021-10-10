@@ -124,10 +124,11 @@
  *  2 Oct 21         - Changed property names - MT
  *  4 Oct 21         - Added the ability to display the CPU registers using
  *                     Ctrl-R when in trace mode - MT
+ * 10 Oct 21         - Allows  switches and buttons to be undefined if  not
+ *                     used - MT
  *
  * To Do             - Save trace and single step options and restore when
  *                     resetting the processor...
- *                   - Continuous Memory !! 
  *                   - Load ROMs from a separate file?
  *                   - Fix display update problem on Raspberry Pi.
  *                   - Allow VMS users to set breakpoints?
@@ -172,7 +173,6 @@
 #include "gcc-debug.h" /* print() */
 #include "gcc-wait.h"  /* i_wait() */
 
-
 void v_version() { /* Display version information */
 
    fprintf(stderr, "%s: Version %s %s", NAME, VERSION, COMMIT_ID);
@@ -188,37 +188,7 @@ void v_licence() { /* Display licence information */
    fprintf(stderr, "This is free software: you are free to change and redistribute it.\n");
    fprintf(stderr, "There is NO WARRANTY, to the extent permitted by law.\n");
 }
-/*
- * x11-calc.h - RPN (Reverse Polish) calculator simulator.
- *
- * Copyright(C) 2018   MT
- *
- * Common function definitions.
- *
- * This  program is free software: you can redistribute it and/or modify it
- * under  the terms of the GNU General Public License as published  by  the
- * Free  Software Foundation, either version 3 of the License, or (at  your
- * option) any later version.
- *
- * This  program  is distributed in the hope that it will  be  useful,  but
- * WITHOUT   ANY   WARRANTY;   without even   the   implied   warranty   of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- *
- * You  should have received a copy of the GNU General Public License along
- * with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- * 31 Aug 20   0.1   - Initial version - MT
- * 31 Aug 20         - Resolved dependencies between header files by moving
- *                     common function definitions to a separate file - MT
- * 08 Aug 21         - Tidied up spelling errors in the comments - MT
- * 22 Aug 21         - Added definition for commit id - MT
- * 23 Sep 21         - Model number defined in the makefile and selected in
- *                     here  using a preprocessor directive to include  the
- *                     appropriate constants and funtion definitions  - MT
- *
- * TO DO :           -
- */
+
 void v_about() { /* Display help text */
    fprintf(stdout, "Usage: %s [OPTION]... \n", NAME);
    fprintf(stdout, "An RPN Calculator simulation for X11.\n\n");
@@ -228,9 +198,8 @@ void v_about() { /* Display help text */
    fprintf(stdout, "  /version                 output version information and exit\n\n");
    fprintf(stdout, "  /?, /help                display this help and exit\n");
 #else
-   fprintf(stdout, "  -b ADDRESS               set break-point at ADDRESS (octal)\n");
-   fprintf(stdout, "  -s,                      start in single step (implies trace)\n");
-   fprintf(stdout, "  -t,                      trace execution\n");
+   fprintf(stdout, "  -s, --step               start in single step\n");
+   fprintf(stdout, "  -t, --trace              trace execution\n");
    fprintf(stdout, "      --help               display this help and exit\n");
    fprintf(stdout, "      --version            output version information and exit\n\n");
 #endif
@@ -257,7 +226,7 @@ int main(int argc, char *argv[]){
 
    oswitch *h_switch[2];
    /* oswitch *h_selected = NULL; */
-   obutton *h_button[BUTTONS]; /* Array to hold pointers to 30 buttons. */
+   obutton *h_button[BUTTONS]; /* Array to hold pointers to buttons. */
    obutton *h_pressed = NULL;
    odisplay *h_display; /* Pointer to display strudture. */
    okeyboard *h_keyboard;
@@ -476,7 +445,8 @@ int main(int argc, char *argv[]){
    b_abort = False;
    i_count = 0;
 
-   h_processor->select = h_switch[1]->state;
+   if (h_switch[1] != NULL) h_processor->select = h_switch[1]->state; else h_processor->select = True; /* Allow switches to be undefined if not used */
+
    while (!b_abort) {
       i_count--;
       if (i_count < 0) {
@@ -524,7 +494,7 @@ int main(int argc, char *argv[]){
                int i_count;
                for (i_count = 0; i_count < BUTTONS; i_count++){
                   h_pressed = h_button_key_pressed(h_button[i_count], h_keyboard->key);
-                  if (!(h_pressed == NULL)) {
+                  if (h_pressed != NULL) {
                      h_pressed->state = True;
                      i_button_draw(x_display, x_application_window, i_screen, h_pressed);
 
@@ -538,7 +508,7 @@ int main(int argc, char *argv[]){
             break;
          case KeyRelease :
             h_key_released(h_keyboard, x_display, x_event.xkey.keycode, x_event.xkey.state);
-            if (!(h_pressed == NULL)) {
+            if (h_pressed != NULL) {
                if (h_keyboard->key == h_pressed->key) {
                   h_pressed->state = False;
                   i_button_draw(x_display, x_application_window, i_screen, h_pressed);
@@ -596,8 +566,8 @@ int main(int argc, char *argv[]){
             i_switch_draw(x_display, x_application_window, i_screen, h_switch[1]);
             {
                int i_count;
-               for (i_count = 0; i_count < 30; i_count++) /* Draw buttons. */
-                  if (!(h_button[i_count] == NULL)) i_button_draw(x_display, x_application_window, i_screen, h_button[i_count]);
+               for (i_count = 0; i_count < BUTTONS; i_count++) /* Draw buttons. */
+                  i_button_draw(x_display, x_application_window, i_screen, h_button[i_count]);
             }
             break;
          case ClientMessage : /* Message from window manager */
