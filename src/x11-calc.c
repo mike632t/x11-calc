@@ -127,7 +127,11 @@
  * 10 Oct 21         - Allows  switches and buttons to be undefined if  not
  *                     used - MT
  *
- * To Do             - Save trace and single step options and restore when
+ * To Do             - Allow the the display and processor properties to be
+ *                     model  specific, or use a separate calculator  class
+ *                     for each model?
+ *                   - Parse command line in a separate routine. 
+ *                   - Save trace and single step options and restore when
  *                     resetting the processor...
  *                   - Load ROMs from a separate file?
  *                   - Fix display update problem on Raspberry Pi.
