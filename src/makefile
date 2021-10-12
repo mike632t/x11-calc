@@ -40,7 +40,7 @@
 #							  folders - MT 
 #
 
-MODEL		= 31
+MODEL		= 25
 PROGRAM	= x11-calc
 SOURCES 	= x11-calc.c x11-calc-cpu.c x11-calc-display.c x11-calc-segment.c 
 SOURCES 	+= x11-calc-button.c x11-calc-switch.c x11-calc-label.c x11-calc-colour.c 
@@ -58,7 +58,7 @@ FLAGS		+= -no-pie
 CC			= gcc
 
 
-all: ../bin/$(PROGRAM)-$(MODEL) $(OBJECTS)
+all: clean ../bin/$(PROGRAM)-$(MODEL) $(OBJECTS)
 FLAGS		+= -D HP$(MODEL)
 SOURCES 	+= x11-calc-$(MODEL).c
 
@@ -70,4 +70,4 @@ $(OBJECTS) : $(SOURCES)
 	@$(CC) $(FLAGS) -c $(SOURCES) -I $(INCLUDE)
 
 clean:
-	@rm -f *.o
+	@rm -f $(PROGRAM)-$(MODEL).o
