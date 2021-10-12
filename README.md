@@ -94,4 +94,15 @@ each segment individually might speed things up.
 
 The following packages are required to build and run the simulator.
 
-gcc, make, libx11-dev, libc6-dev, xfonts-base ...?
+- Debian : gcc, make, libx11-dev, libc6-dev, xfonts-base
+
+- Ubuntu : gcc, make, libx11-dev, libc6-dev, xfonts-base
+
+- Fedora : gcc, make, libx11-dev, libc6-dev, xorg-x11-xfonts-base ?
+
+- Gentoo : gcc, make, libx11-dev, libc6-dev, font-misc-misc
+
+- Arch   : gcc, make, libx11-dev, libc6-dev, xorg-fonts-misc ?
+
+- Alpine : gcc, make, libx11-dev, libc6-dev, font-misc-misc ?
+
