@@ -70,7 +70,7 @@ void v_init_keypad(obutton *h_button[], oswitch *h_switch[]) {
    h_button[9] = h_button_create(00220, 'f', "f", "", "", h_normal_font, h_small_font, h_alternate_font, 156, 132, 33, 30, False, YELLOW, YELLOW, BACKGROUND); /* Shift key. */
 
    /* Define third row of keys. */
-   h_button[10] = h_button_create(00163, 000, "ENTER", "MANT PREFIX", "", h_normal_font, h_small_font, h_alternate_font, 12, 175, 69, 30, False, BLACK, YELLOW, BLUE);
+   h_button[10] = h_button_create(00163, 015, "ENTER", "MANT PREFIX", "", h_normal_font, h_small_font, h_alternate_font, 12, 175, 69, 30, False, BLACK, YELLOW, BLUE);
    h_button[11] = h_button_create(00162, 'c', "CHS", "ALL", "", h_normal_font, h_small_font, h_alternate_font, 84, 175, 33, 30, False, BLACK, YELLOW, BLUE);
    h_button[12] = h_button_create(00161, 'e', "EEX", "REG", "", h_normal_font, h_small_font, h_alternate_font, 120, 175, 33, 30, False, BLACK, YELLOW, BLUE);
    h_button[13] = h_button_create(00160, 033, "CLX", "STK", "", h_normal_font, h_small_font, h_alternate_font, 156, 175, 33, 30, False, BLACK, YELLOW, BLUE);
