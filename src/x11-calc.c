@@ -130,7 +130,7 @@
  * To Do             - Allow the the display and processor properties to be
  *                     model  specific, or use a separate calculator  class
  *                     for each model?
- *                   - Parse command line in a separate routine. 
+ *                   - Parse command line in a separate routine.
  *                   - Save trace and single step options and restore when
  *                     resetting the processor...
  *                   - Load ROMs from a separate file?
@@ -535,7 +535,7 @@ int main(int argc, char *argv[]){
                      debug(fprintf(stderr, "Button pressed - keycode(%.2X).\n", h_pressed->index));
                      break;
                   }
-               } 
+               }
                if (h_pressed == NULL) {
                   if (!(h_switch_pressed(h_switch[0], x_event.xbutton.x, x_event.xbutton.y) == NULL)) {
                      h_switch[0]->state = !(h_switch[0]->state); /* Toggle switch */
@@ -551,7 +551,7 @@ int main(int argc, char *argv[]){
                      h_processor->select = h_switch[1]->state;
                      debug(fprintf(stderr, "Switch clicked (%s).\n", h_processor->select ? "On" : "Off"));
                   }
-               } 
+               }
             }
             break;
          case ButtonRelease :
