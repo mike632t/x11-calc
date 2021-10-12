@@ -47,7 +47,7 @@
 
 #define RED            0x000000 /* LED display colour. */
 #define DARK_RED       0xffffff /* LED display shading. */
-#define RED_BACKGROUND 0xffffff /* LED display backgropund */
+#define RED_BACKGROUND 0xffffff /* LED display background */
 #define BACKGROUND     0x000000 /* Background. */
 
 #else
@@ -70,7 +70,7 @@
 
 #define RED            0xb00000 /* LED display colour. */
 #define DARK_RED       0x400000 /* LED display shading. */
-#define RED_BACKGROUND 0x180000 /* LED display backgropund */
+#define RED_BACKGROUND 0x180000 /* LED display background */
 #define BACKGROUND     0x433431 /* Background. */
 
 #endif
