@@ -2,7 +2,7 @@
  * x11-calc-25.h - RPN (Reverse Polish) calculator simulator.
  *
  * Copyright(C) 2018   MEJT
- * 
+ *
  * Model specific constants and function prototypes.
  *
  * This  program is free software: you can redistribute it and/or modify  it
@@ -17,7 +17,7 @@
  *
  * You  should have received a copy of the GNU General Public License  along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  * 09 Mar 14         - Initial verson - MEJT
  * 06 Oct 21         - Corrected number of registers - MT
  *
@@ -33,7 +33,7 @@
 
 /* Reserve enough storage in memory to hold eight registers (0 - 7), Lastx,
  * and forty nine program steps */
-#define MEMORY_SIZE    (8 + 1 + (49 / 7)) 
+#define MEMORY_SIZE    (8 + 1 + (49 / 7))
 #define ROM_SIZE       04000
 #define ROM_BANKS      1
 
@@ -44,7 +44,7 @@ int i_rom [ROM_SIZE * ROM_BANKS];
 
 void v_init_keypad(obutton *h_button[], oswitch *h_switch[]);
 #endif
- 
+
 
 
 

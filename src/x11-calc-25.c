@@ -26,7 +26,7 @@
  *                   - Added shortcut key definitions - MT
  *  3 Oct 21         - Added switches and updated keys - MT
  *                   - Fixed button positions - MT
- * 
+ *
  */
 
 #define VERSION        "0.1"
@@ -62,19 +62,19 @@ void v_init_keypad(obutton *h_button[], oswitch *h_switch[]) {
    h_switch[0] = h_switch_create(00000, "OFF", "ON ", h_alternate_font, 12, 67, 67, 10, True, MID_GREY, DARK_GREY);
    h_switch[1] = h_switch_create(00000, "PRGM", "RUN", h_alternate_font, 120, 67, 67, 10, True, MID_GREY, DARK_GREY);
 
-   /* Define top row of keys. */ 
+   /* Define top row of keys. */
    h_button[0] = h_button_create(00263, ' ', "SST", "FIX", "", h_normal_font, h_small_font, h_alternate_font, 12, 89, 33, 30, False, BLACK, YELLOW, BLUE);
    h_button[1] = h_button_create(00262, 000, "BST", "SCI", "", h_normal_font, h_small_font, h_alternate_font, 48, 89, 33, 30, False, BLACK, YELLOW, BLUE);
    h_button[2] = h_button_create(00261, 000, "GTO", "ENG", "", h_normal_font, h_small_font, h_alternate_font, 84, 89, 33, 30, False, BLACK, YELLOW, BLUE);
    h_button[3] = h_button_create(00260, 'f', "f", "", "", h_normal_font, h_small_font, h_alternate_font, 120, 89, 33, 30, False, YELLOW, BACKGROUND, YELLOW);
    h_button[4] = h_button_create(00264, 'g', "g", "", "", h_normal_font, h_small_font, h_alternate_font, 156, 89, 33, 30, False, LIGHT_BLUE, BACKGROUND, LIGHT_BLUE);
-   
-   /* Define second row of keys. */ 
+
+   /* Define second row of keys. */
    h_button[5] = h_button_create(00103, 000, "X-Y", "x", "%", h_normal_font, h_small_font, h_alternate_font, 12, 132, 33, 30, False, BLACK, YELLOW, BLUE);
    h_button[6] = h_button_create(00102, 000, "R", "s", "1/x", h_normal_font, h_small_font, h_alternate_font, 48, 132, 33, 30, False, BLACK, YELLOW, BLUE);
    h_button[7] = h_button_create(00101, 000, "STO", "", "", h_normal_font, h_small_font, h_alternate_font, 84, 132, 33, 30, False, BLACK, YELLOW, BLUE);
    h_button[8] = h_button_create(00100, 000, "RCL", "", "", h_normal_font, h_small_font, h_alternate_font, 120, 132, 33, 30, False, BLACK, YELLOW, BLUE);
-   h_button[9] = h_button_create(00104, 000, "E+", "E-", "", h_normal_font, h_small_font, h_alternate_font, 156, 132, 33, 30, False, BLACK, YELLOW, BLUE); 
+   h_button[9] = h_button_create(00104, 000, "E+", "E-", "", h_normal_font, h_small_font, h_alternate_font, 156, 132, 33, 30, False, BLACK, YELLOW, BLUE);
 
    /* Define third row of keys. */
    h_button[10] = h_button_create(00323, 015, "ENTER", "PREFIX", "", h_normal_font, h_small_font, h_alternate_font, 12, 175, 69, 30, False, BLACK, YELLOW, BLUE);
