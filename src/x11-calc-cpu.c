@@ -154,6 +154,9 @@
  *  7 Oct 21         - Fixed bug in 'data register(n)-> c' - MT
  *                   - Fixed bug in 'clear registers' - MT
  *             0.3   - HP25 simulator now working..
+ * 10 Oct 21         - Fixed bug in code to check the ROM size - MT
+ *                   - Added 'keys -> a' and 'keys -> a' - MT
+ *                   - Fixed bug in 'c -> data register(n)' - MT
  *
  * To Do             - Overlay program memory storage onto data registers (
  *                     different data structures pointing at the same data).
@@ -166,7 +169,7 @@
 #define DATE           "14 Sep 21"
 #define AUTHOR         "MT"
 
-#define DEBUG 0        /* Enable/disable debug*/
+#define DEBUG 1        /* Enable/disable debug*/
 
 #include <stdlib.h>    /* malloc(), etc. */
 #include <stdio.h>     /* fprintf(), etc. */
@@ -453,14 +456,15 @@ oprocessor *h_processor_create(int *h_rom){
 /* Delayed ROM select */
 static void v_delayed_rom(oprocessor *h_processor) { /* Delayed ROM select */
    if (h_processor->flags[DELAYED_ROM]) {
-      h_processor->pc = h_processor->delayed_rom_number << 8 | (h_processor->pc & 00377);
+      /** debug(fprintf(stdout,"select ROM = %02d (%05o)\n", h_processor->delayed_rom_number, h_processor->delayed_rom_number << 8 | (h_processor->pc & 00377))); */
+      h_processor->pc =(h_processor->delayed_rom_number << 8 | (h_processor->pc & 00377));
       h_processor->flags[DELAYED_ROM] = False; /* Clear flag */
    }
 }
 
 /* Increment program counter */
 static void v_op_inc_pc(oprocessor *h_processor) {
-   if (h_processor->pc++ >= (ROM_SIZE - 1)) h_processor->pc = 0;
+   if (h_processor->pc++ >= ((ROM_SIZE * ROM_BANKS) - 1)) h_processor->pc = 0;
    h_processor->flags[PREV_CARRY] = h_processor->flags[CARRY];
    h_processor->flags[CARRY] = False;
 }
@@ -529,13 +533,18 @@ void v_processor_tick(oprocessor *h_processor) {
                   h_processor->pc &= 0x0f00;
                   h_processor->pc += h_processor->code - 1;
                   break;
+               case 00120: /* keys -> a */
+                  if (h_processor->flags[TRACE]) fprintf(stdout, "keys -> a");
+                  h_processor->reg[A_REG]->nibble[2] = (h_processor->code >> 4);
+                  h_processor->reg[A_REG]->nibble[1] = (h_processor->code & 0x0f);
+                  break;
                case 00220: /* a -> rom address */
                   {
                      int i_addr;
                      if (h_processor->flags[TRACE]) fprintf(stdout, "a -> rom address");
                      h_processor->pc &= 0x0ff00;
                      i_addr = h_processor->pc + (h_processor->reg[A_REG]->nibble[2] << 4) + h_processor->reg[A_REG]->nibble[1];
-                     if (i_addr < ROM_SIZE)
+                     if (i_addr < (ROM_SIZE * ROM_BANKS))
                          h_processor->pc = i_addr - 1;
                      else
                         v_error("Address %02o out of range at %05o in %s line : %d\n", i_addr, h_processor->pc, __FILE__, __LINE__);
@@ -545,6 +554,17 @@ void v_processor_tick(oprocessor *h_processor) {
                case 00420: /* binary */
                   if (h_processor->flags[TRACE]) fprintf(stdout, "binary");
                   h_processor->base = 16;
+                  break;
+               case 00520: /* rotate left a */
+                  if (h_processor->flags[TRACE]) fprintf(stdout, "rotate left a");
+                  {
+                     int c_temp, i_count;
+                     c_temp = h_processor->reg[A_REG]->nibble[REG_SIZE - 1];
+                     for (i_count = REG_SIZE - 1; i_count > 0; i_count--)
+                        h_processor->reg[A_REG]->nibble[i_count] = h_processor->reg[A_REG]->nibble[i_count - 1];
+                     h_processor->reg[A_REG]->nibble[0] = c_temp;
+                     h_processor->flags[PREV_CARRY] = h_processor->flags[CARRY] = False;
+                  }
                   break;
                case 00620: /* p - 1 -> p */
                   if (h_processor->flags[TRACE]) fprintf(stdout, "p - 1 -> p");
@@ -726,10 +746,12 @@ void v_processor_tick(oprocessor *h_processor) {
                if (h_processor->p > 0) h_processor->p--; else h_processor->p = REG_SIZE - 1;
                break;
             case 02: /* c -> data register(n) */
-               if (h_processor->flags[TRACE]) fprintf(stdout, "c -> data register(%d)", i_opcode >> 6);
-               if ((i_opcode >> 6) < MEMORY_SIZE) {
+               h_processor->addr &= 0xfff0;
+               h_processor->addr += (i_opcode >> 6);
+               if (h_processor->flags[TRACE]) fprintf(stdout, "c -> data register(%d)", h_processor->addr);
+               if ((h_processor->addr) < MEMORY_SIZE) {
                   h_processor->first = 0; h_processor->last = REG_SIZE - 1;
-                  v_reg_copy(h_processor, h_processor->mem[(i_opcode >> 6)], h_processor->reg[C_REG]); /* C -> reg(n)  */
+                  v_reg_copy(h_processor, h_processor->mem[h_processor->addr], h_processor->reg[C_REG]); /* C -> reg(n)  */
                }
                else
                   v_error("Address %02o out of range at %05o in %s line : %d\n", i_opcode >> 6, h_processor->pc, __FILE__, __LINE__);
