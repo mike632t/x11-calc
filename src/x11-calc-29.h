@@ -2,7 +2,7 @@
  * x11-calc-29.h - RPN (Reverse Polish) calculator simulator.
  *
  * Copyright(C) 2018   MEJT
- * 
+ *
  * Model specific constants and function prototypes.
  *
  * This  program is free software: you can redistribute it and/or modify  it
@@ -17,7 +17,7 @@
  *
  * You  should have received a copy of the GNU General Public License  along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  * 09 Mar 14         - Initial version - MEJT
  *
  */
