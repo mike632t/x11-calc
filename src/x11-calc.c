@@ -126,6 +126,15 @@
  *                     Ctrl-R when in trace mode - MT
  * 10 Oct 21         - Allows  switches and buttons to be undefined if  not
  *                     used - MT
+ * 11 Oct 21         - Most  text  messages are now defined in the  header,
+ *                     this allows the content to be defined separately for
+ *                     each platform which means that about() and licence()
+ *                     can  be replaced by simple calls to fprintf().  This
+ *                     also  makes it easier to support multiple  languages
+ *                     if necessary in the future  - MT
+ *                   - Required  colour depth now defined in header (allows
+ *                     code to work on VMS using a black and white  display
+ *                     without being modified) - MT
  *
  * To Do             - Allow the the display and processor properties to be
  *                     model  specific, or use a separate calculator  class
@@ -141,7 +150,7 @@
  *
  */
 
-#define NAME           "x11-rpncalc"
+#define NAME           "x11-calc"
 #define VERSION        "0.2"
 #define BUILD          "0058"
 #define DATE           "04 Oct 21"
@@ -179,46 +188,21 @@
 
 void v_version() { /* Display version information */
 
-   fprintf(stderr, "%s: Version %s %s", NAME, VERSION, COMMIT_ID);
+   fprintf(stderr, "%s: Version %s %s", FILENAME, VERSION, COMMIT_ID);
    if (__DATE__[4] == ' ') fprintf(stderr, " 0"); else fprintf(stderr, " %c", __DATE__[4]);
    fprintf(stderr, "%c %c%c%c %s %s", __DATE__[5],
       __DATE__[0], __DATE__[1], __DATE__[2], __DATE__ +9, __TIME__ );
    fprintf(stderr, " (Build: %s)\n", BUILD );
 }
 
-void v_licence() { /* Display licence information */
-   fprintf(stderr, "Copyright(C) %s %s\n", __DATE__ +7, AUTHOR);
-   fprintf(stderr, "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\n");
-   fprintf(stderr, "This is free software: you are free to change and redistribute it.\n");
-   fprintf(stderr, "There is NO WARRANTY, to the extent permitted by law.\n");
-}
-
-void v_about() { /* Display help text */
-   fprintf(stdout, "Usage: %s [OPTION]... \n", NAME);
-   fprintf(stdout, "An RPN Calculator simulation for X11.\n\n");
-#ifdef vms /* Use DEC command line options */
-   fprintf(stdout, "  /step                    trace execution\n");
-   fprintf(stdout, "  /trace                   trace execution\n");
-   fprintf(stdout, "  /version                 output version information and exit\n\n");
-   fprintf(stdout, "  /?, /help                display this help and exit\n");
-#else
-   fprintf(stdout, "  -s, --step               start in single step\n");
-   fprintf(stdout, "  -t, --trace              trace execution\n");
-   fprintf(stdout, "      --help               display this help and exit\n");
-   fprintf(stdout, "      --version            output version information and exit\n\n");
-#endif
-   exit(0);
-}
-
 void v_error(const char *s_fmt, ...) { /* Print formatted error message and exit */
    va_list t_args;
    va_start(t_args, s_fmt);
-   fprintf(stderr, "%s : ", NAME);
+   fprintf(stderr, "%s : ", FILENAME);
    vfprintf(stderr, s_fmt, t_args);
    va_end(t_args);
    exit(-1);
 }
-
 
 int main(int argc, char *argv[]){
 
@@ -232,7 +216,7 @@ int main(int argc, char *argv[]){
    /* oswitch *h_selected = NULL; */
    obutton *h_button[BUTTONS]; /* Array to hold pointers to buttons. */
    obutton *h_pressed = NULL;
-   odisplay *h_display; /* Pointer to display strudture. */
+   odisplay *h_display; /* Pointer to display structure. */
    okeyboard *h_keyboard;
    oprocessor *h_processor;
 
@@ -256,7 +240,7 @@ int main(int argc, char *argv[]){
 
    int i_offset, i_count, i_index;
    int i_current = -1; /* Current program counter */
-   int i_breakpoint = -1; /* Breakpoint */
+   int i_breakpoint = -1; /* Break-point */
 
 #ifdef vms /* Parse DEC style command line options */
    for (i_count = 1; i_count < argc; i_count++) {
@@ -270,13 +254,15 @@ int main(int argc, char *argv[]){
             b_trace = True; /* Enable tracing */
          else if (!strncmp(argv[i_count], "/VERSION", i_index)) {
             v_version; /* Display version information */
-            v_licence;
+            fprintf(stderr, LICENCE_TEXT, __DATE__ +7, AUTHOR);
             exit(0);
          }
-         else if ((!strncmp(argv[i_count], "/HELP", i_index)) | (!strncmp(argv[i_count], "/?", i_index)))
-            v_about();
-         else  /* If we get here then the we have an invalid option */
-            v_error("invalid option %s\nTry '%s /help' for more information.\n", argv[i_count] , NAME);
+         else if ((!strncmp(argv[i_count], "/HELP", i_index)) | (!strncmp(argv[i_count], "/?", i_index))) {
+            fprintf(stdout, HELP_TEXT, FILENAME); 
+            exit(0);
+         }
+         else /* If we get here then the we have an invalid option */
+            v_error(INVALID_OPTION HELP_COMMAND, argv[i_count] , FILENAME);
          if (argv[i_count][1] != 0) {
             for (i_index = i_count; i_index < argc - 1; i_index++) argv[i_index] = argv[i_index + 1];
             argc--; i_count--;
@@ -291,20 +277,19 @@ int main(int argc, char *argv[]){
          while (argv[i_count][i_index] != 0) {
             switch (argv[i_count][i_index]) {
             case 'b': /* Breakpoint */
-               if (argv[i_count][i_index + 1] != 0) {
-                  v_error("expected argument not -- '%c' \nTry '%s --help' for more information.\n", argv[i_count][i_index + 1], NAME);
-               }
+               if (argv[i_count][i_index + 1] != 0)
+                  v_error(INVALID_ARGUMENT, argv[i_count][i_index + 1], FILENAME);
                else {
                   if (i_count + 1 < argc) {
                      i_breakpoint = 0;
                      for (i_offset = 0; i_offset < strlen(argv[i_count + 1]); i_offset++) { /* Parse octal number */
                         if ((argv[i_count + 1][i_offset] < '0') || (argv[i_count + 1][i_offset] > '7'))
-                           v_error("not an octal address -- '%s' \nTry '%s --help' for more information.\n", argv[i_count + 1], NAME);
+                           v_error(INVALID_ADDRESS , argv[i_count + 1], FILENAME);
                         else
                            i_breakpoint = i_breakpoint * 8 + argv[i_count + 1][i_offset] - '0';
                      }
                      if ((i_breakpoint < 0)  || (i_breakpoint > (unsigned)(sizeof(i_rom) / sizeof i_rom[0]))) { /* Check address range */
-                        v_error("address out of range -- '%s' \nTry '%s --help' for more information.\n", argv[i_count + 1], NAME);
+                        v_error(INVALID_ADDRESS HELP_COMMAND, argv[i_count + 1], FILENAME);
                      }
                      else {
                         if (i_count + 2 < argc) /* Remove the parameter from the arguments */
@@ -314,7 +299,7 @@ int main(int argc, char *argv[]){
                      }
                   }
                   else {
-                     v_error("option requires an argument -- '%s'\nTry '%s --help' for more information.\n", argv[i_count], NAME);
+                     v_error(MISSING_ARGUMENT HELP_COMMAND, argv[i_count], FILENAME);
                   }
                }
                i_index = strlen(argv[i_count]) - 1;
@@ -332,18 +317,19 @@ int main(int argc, char *argv[]){
                else
                   if (!strncmp(argv[i_count], "--version", i_index)) {
                      v_version(); /* Display version information */
-                     v_licence();
+                     fprintf(stderr, LICENCE_TEXT, __DATE__ +7, AUTHOR);
                      exit(0);
                   }
-                  else if (!strncmp(argv[i_count], "--help", i_index))
-                     v_about();
+                  else if (!strncmp(argv[i_count], "--help", i_index)) {
+                     fprintf(stdout, HELP_TEXT, FILENAME);
+                     exit(0);
+                  }
                   else  /* If we get here then the we have an invalid long option */
-                     v_error("unrecognized option '%s'\nTry '%s --help' for more information.\n", argv[i_count], NAME);
+                     v_error(UNRECOGNIZED_OPTION HELP_COMMAND, argv[i_count], FILENAME);
                i_index--; /* Leave index pointing at end of string (so argv[i_count][i_index] = 0) */
                break;
             default: /* If we get here the single letter option is unknown */
-               v_error("invalid option -- '%c'\nTry '%s --help' for more information.\n", argv[i_count][i_index], NAME);
-               exit(-1);
+               v_error(INVALID_OPTION HELP_COMMAND, argv[i_count][i_index], FILENAME);
             }
             i_index++; /* Parse next letter in option */
          }
@@ -356,13 +342,19 @@ int main(int argc, char *argv[]){
    }
 #endif
 
-   if (argc > 1 ) {  /* Check command lime parameters - there shouldn't be any! */
-#ifdef vms
-      v_error("invalid parameter(s)\nTry '%s /help' for more information.\n", NAME);
-#else
-      v_error("invalid operand(s)\nTry '%s --help' for more information.\n", NAME);
-#endif
-      exit(-1);
+   if (argc > 1 ) v_error(INVALID_COMMAND, FILENAME); /* There shouldn't be any command lime parameters */
+   
+   {
+      char s_datafile[strlen(argv[0]) + strlen(".dat") * sizeof(*argv[0]) + 1];
+
+      /*
+      s_datafile[0] = '\0';
+      strcat(s_datafile, argv[0]);
+      strcat(s_datafile, ".dat");
+       */
+      memcpy(s_datafile, argv[0], strlen(argv[0]));
+      strcat(s_datafile, ".dat");
+      printf("%s\n", s_datafile);
    }
 
    i_wait(200); /* Sleep for 200 milliseconds to 'debounce' keyboard! */
@@ -405,23 +397,24 @@ int main(int argc, char *argv[]){
          &i_window_width,
          &i_window_height,
          &i_window_border,
-         &i_colour_depth) == False) v_error("Unable to get display properties.\n");
+         &i_colour_depth) == False) 
+      v_error(DISPLAY_ERROR);
 
    /* Check colour depth. */
-   if (i_colour_depth < 24) v_error("Requires a 24-bit colour display.\n");
+   if (i_colour_depth != COLOUR_DEPTH) v_error(COLOUR_ERROR, COLOUR_DEPTH);
 
    /* Load fonts. */
    s_font = NORMAL_TEXT; /* Normal text font. */
-   if (!(h_normal_font = XLoadQueryFont(x_display, s_font))) v_error("Cannot load font '%s'.\n",  s_font);
+   if (!(h_normal_font = XLoadQueryFont(x_display, s_font))) v_error(FONT_ERROR, s_font);
 
    s_font = SMALL_TEXT; /* Small text font. */
-   if (!(h_small_font = XLoadQueryFont(x_display, s_font))) v_error("Cannot load font '%s'.\n",  s_font);
+   if (!(h_small_font = XLoadQueryFont(x_display, s_font))) v_error(FONT_ERROR, s_font);
 
    s_font = ALTERNATE_TEXT; /* Alternate text font. */
-   if (!(h_alternate_font = XLoadQueryFont(x_display, s_font))) v_error("Cannot load font '%s'.\n",  s_font);
+   if (!(h_alternate_font = XLoadQueryFont(x_display, s_font))) v_error(FONT_ERROR, s_font);
 
    s_font = LARGE_TEXT; /* Large text font. */
-   if (!(h_large_font = XLoadQueryFont(x_display, s_font))) v_error("Cannot load font '%s'.\n",  s_font);
+   if (!(h_large_font = XLoadQueryFont(x_display, s_font))) v_error(FONT_ERROR, s_font);
 
    v_init_keypad(h_button, h_switch); /* Create buttons. */
    h_display = h_display_create(0, 2, 4, 197, 61, RED, DARK_RED, RED_BACKGROUND); /* Create display */
