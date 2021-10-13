@@ -26,9 +26,10 @@
  * 23 Sep 21         - Model number defined in the makefile and selected in
  *                     here  using a preprocessor directive to include  the
  *                     appropriate constants and funtion definitions  - MT
- * 12 Oct 21         - Created macros for the output text messages allowing
- *                     them to be redefined here if required - MT
- *                   - Define  title and original filename based  on  model
+ * 12 Oct 21         - Created  macros for all the text messages making  it
+ *                     easier to redefine them based on language at compile
+ *                     time if required - MT
+ *                   - Defined  title and original filename based on  model
  *                     number - MT
  *
  * TO DO :           -
@@ -102,3 +103,6 @@ void v_version(); /* Display version information */
 void v_about(); /* Display help text */
 
 void v_error(const char *s_fmt, ...); /* Print formatted error message */
+
+void v_warning(const char *s_fmt, ...); /* Print formatted warning message and return */
+

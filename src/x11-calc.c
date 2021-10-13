@@ -135,10 +135,13 @@
  *                   - Required  colour depth now defined in header (allows
  *                     code to work on VMS using a black and white  display
  *                     without being modified) - MT
+ * 12 Oct 21         - Added routine to display warnings - MT
  *
  * To Do             - Allow the the display and processor properties to be
  *                     model  specific, or use a separate calculator  class
  *                     for each model?
+ *                   - Combine error and warning routines (add severity  to
+ *                     parameters).
  *                   - Parse command line in a separate routine.
  *                   - Save trace and single step options and restore when
  *                     resetting the processor...
@@ -202,6 +205,14 @@ void v_error(const char *s_fmt, ...) { /* Print formatted error message and exit
    vfprintf(stderr, s_fmt, t_args);
    va_end(t_args);
    exit(-1);
+}
+
+void v_warning(const char *s_fmt, ...) { /* Print formatted warning message and return */
+   va_list t_args;
+   va_start(t_args, s_fmt);
+   fprintf(stderr, "%s : ", FILENAME);
+   vfprintf(stderr, s_fmt, t_args);
+   va_end(t_args);
 }
 
 int main(int argc, char *argv[]){
@@ -344,19 +355,6 @@ int main(int argc, char *argv[]){
 
    if (argc > 1 ) v_error(INVALID_COMMAND, FILENAME); /* There shouldn't be any command lime parameters */
    
-   {
-      char s_datafile[strlen(argv[0]) + strlen(".dat") * sizeof(*argv[0]) + 1];
-
-      /*
-      s_datafile[0] = '\0';
-      strcat(s_datafile, argv[0]);
-      strcat(s_datafile, ".dat");
-       */
-      memcpy(s_datafile, argv[0], strlen(argv[0]));
-      strcat(s_datafile, ".dat");
-      printf("%s\n", s_datafile);
-   }
-
    i_wait(200); /* Sleep for 200 milliseconds to 'debounce' keyboard! */
 
    v_version(False);
