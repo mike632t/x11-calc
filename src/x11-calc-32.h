@@ -20,12 +20,12 @@
  * 
  * 13 Jun 13   0.1   - Initial version - MT
  * 30 Aug 20         - Moved functions to separate source file - MT
+ * 12 Oct 21         - Removed Title and replaced with model number - MT
+ *                   - Added init_state() - MT
  *                      
- * TO DO :           - 
  */
 
-#ifndef TITLE
-#define TITLE        "RPN calc 32"
+#define MODEL        "32"
 #define HEIGHT       385
 #define WIDTH        201   /* Yes really! */
 #define BUTTONS      30
@@ -36,12 +36,8 @@
 #define MEMORY_SIZE  16
 #define ROM_BANKS    1
 
-#define True         1
-#define False        0
-
 int i_rom [ROM_SIZE * ROM_BANKS];
 
-void v_init_calc();
+void v_init_state();
 
 void v_init_keypad(obutton *h_button[], oswitch *h_switch[]);
-#endif

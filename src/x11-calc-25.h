@@ -20,32 +20,26 @@
  *
  * 09 Mar 14         - Initial verson - MEJT
  * 06 Oct 21         - Corrected number of registers - MT
+ * 12 Oct 21         - Removed Title and replaced with model number - MT
+ *                   - Added init_state() - MT
  *
  */
 
-#ifndef TITLE
-#define TITLE          "RPN calc 25"
-#define HEIGHT         385
-#define WIDTH          201 /* Yes really! */
-#define BUTTONS        30
+#define MODEL        "25"
+#define HEIGHT       385
+#define WIDTH        201 /* Yes really! */
+#define BUTTONS      30
 
-#define DIGITS         12
+#define DIGITS       12
 
 /* Reserve enough storage in memory to hold eight registers (0 - 7), Lastx,
  * and forty nine program steps */
-#define MEMORY_SIZE    (8 + 1 + (49 / 7))
-#define ROM_SIZE       04000
-#define ROM_BANKS      1
-
-#define True           1
-#define False          0
+#define MEMORY_SIZE  (8 + 1 + (49 / 7))
+#define ROM_SIZE     04000
+#define ROM_BANKS    1
 
 int i_rom [ROM_SIZE * ROM_BANKS];
 
+void v_init_state();
+
 void v_init_keypad(obutton *h_button[], oswitch *h_switch[]);
-#endif
-
-
-
-
-

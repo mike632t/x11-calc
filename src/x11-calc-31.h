@@ -19,25 +19,24 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
  * 21 Sep 21   0.1   - Initial version - MT
+ * 12 Oct 21         - Removed Title and replaced with model number - MT
+ *                   - Added init_state() - MT
  *
  */
 
-#ifndef TITLE
-#define TITLE          "RPN calc 31"
-#define HEIGHT         385
-#define WIDTH          201   /* Yes really! */
-#define BUTTONS        30
+#define MODEL        "31"
+#define HEIGHT       385
+#define WIDTH        201   /* Yes really! */
+#define BUTTONS      30
 
-#define DIGITS         11
+#define DIGITS       11
 
-#define ROM_SIZE       04000
-#define MEMORY_SIZE    4
-#define ROM_BANKS      1
-
-#define True           1
-#define False          0
+#define ROM_SIZE     04000
+#define MEMORY_SIZE  4
+#define ROM_BANKS    1
 
 int i_rom [ROM_SIZE * ROM_BANKS];
 
+void v_init_state();
+
 void v_init_keypad(obutton *h_button[], oswitch *h_switch[]);
-#endif

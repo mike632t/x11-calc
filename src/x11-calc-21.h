@@ -23,26 +23,24 @@
  * 08 Aug 21         - Tidied up spelling errors in the comments - MT
  * 30 Sep 21         - Added the additional properties for the label colour
  *                     and alternate function colour - MT
- *
- * TO DO :           -
+ * 12 Oct 21         - Removed Title and replaced with model number - MT
+ *                   - Added init_state() - MT 
+ * 
  */
 
-#ifndef TITLE
-#define TITLE          "RPN calc 21"
-#define HEIGHT         385
-#define WIDTH          201
-#define BUTTONS        30
+#define MODEL        "21"
+#define HEIGHT       385
+#define WIDTH        201
+#define BUTTONS      30
 
-#define DIGITS         12
+#define DIGITS       12
 
-#define MEMORY_SIZE    1 /* Not used but can't be zero*/
-#define ROM_SIZE       02000
-#define ROM_BANKS      1
-
-#define True           1
-#define False          0
+#define MEMORY_SIZE  1 /* Not used but can't be zero*/
+#define ROM_SIZE     02000
+#define ROM_BANKS    1
 
 int i_rom [ROM_SIZE * ROM_BANKS];
-void v_init_keypad(obutton *h_button[], oswitch *h_switch[]);
-#endif
 
+void v_init_state();
+
+void v_init_keypad(obutton *h_button[], oswitch *h_switch[]);
