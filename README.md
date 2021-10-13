@@ -59,7 +59,7 @@ e.g:
     $ make MODEL=25
     
     $ ../bin/x11-calc-25
-    x11-calc-25: Version 0.2 [Commit ID: aff02dc] 12 Oct 21 00:00:00 (Build: 0058)
+    x11-calc-25: Version 0.2 [Commit ID: d3e8e4b] 14 Oct 21 00:15:42 (Build: 0058)
     ROM Size : 2048 words 
 
 ### Keyboard Shortcuts
@@ -102,7 +102,7 @@ old Intel Atom based netbook). I suspect that rewriting the display code to
 use  a custom font or a fixed size bitmap for each digit instead of drawing
 each segment individually might speed things up. 
 
-### Dependencies
+### Prerequisites
 
 The following packages are required to build and/or run the simulator.
 
@@ -110,7 +110,7 @@ The following packages are required to build and/or run the simulator.
 
 - Ubuntu : gcc, make, libx11-dev, libc6-dev, xfonts-base
 
-- Fedora : gcc, make, libx11-dev, libc6-dev, xorg-x11-xfonts-base ?
+- Fedora : gcc, make, libx11-dev, libc6-dev, xorg-x11-xfonts-base
 
 - Gentoo : gcc, make, libx11-dev, libc6-dev, font-misc-misc
 
