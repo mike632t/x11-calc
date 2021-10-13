@@ -164,6 +164,7 @@
  *
  */
 
+#define NAME           "x11-calc"
 #define VERSION        "0.2"
 #define BUILD          "0008"
 #define DATE           "14 Sep 21"
@@ -171,12 +172,13 @@
 
 #define DEBUG 1        /* Enable/disable debug*/
 
-#include <stdlib.h>    /* malloc(), etc. */
-#include <stdio.h>     /* fprintf(), etc. */
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include <stdarg.h>
 
-#include <X11/Xlib.h>  /* XOpenDisplay(), etc. */
-#include <X11/Xutil.h> /* XSizeHints etc. */
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
 
 #include "x11-calc-font.h"
 #include "x11-calc-label.h"
@@ -415,6 +417,31 @@ static void v_processor_clear_data_registers(oprocessor *h_processor) {
       v_reg_copy(h_processor, h_processor->mem[i_count], NULL); /* Copying nothing to a register clears it */
 }
 
+/* Restore saved processor state */
+void v_processor_restore(oprocessor *h_processor) {
+   FILE *h_datafile;
+   char *s_dir = getenv("HOME");
+   char s_filename[] = FILENAME;
+   char s_filetype[] = ".dat";
+   char *s_pathname;
+
+   if (h_processor != NULL) { /* Check processor defined */
+      if (s_dir == NULL) s_dir = ""; /* Use current folder if HOME not defined */
+      s_pathname = malloc((strlen(s_dir) + strlen(s_filename) + 
+         strlen(s_filetype) + 2) * sizeof(char*));
+      strcpy(s_pathname, s_dir);
+      strcat(s_pathname, "/.");
+      strcat(s_pathname, s_filename);
+      strcat(s_pathname, s_filetype);
+      h_datafile = fopen(s_pathname, "r");
+      if (h_datafile !=NULL) { /* If file exists and can be opened restore state */
+         v_warning("Continuous memory not implemented yet\n");
+      }
+      else
+         v_warning("Unable to open %s\n", s_pathname); /* Can't open data file . */
+   }
+}
+
 /* Reset processor */
 void v_processor_init(oprocessor *h_processor) {
    v_processor_clear_registers(h_processor, REGISTERS); /*Clear the CPU registers and stack */
@@ -436,6 +463,7 @@ void v_processor_init(oprocessor *h_processor) {
    h_processor->status[5] = False; /* TO DO - Check which flags should be set by default */
    /* h_processor->status[3] = True; /* Select radians */
    h_processor->flags[MODE] = True; /* Select run mode */
+   if (CONTINIOUS) v_processor_restore(h_processor);
 }
 
 /* Create a new processor , */
