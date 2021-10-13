@@ -92,7 +92,7 @@ each segment individually might speed things up.
 
 ### Dependencies
 
-The following packages are required to build and run the simulator.
+The following packages are required to build and/or run the simulator.
 
 - Debian : gcc, make, libx11-dev, libc6-dev, xfonts-base
 
