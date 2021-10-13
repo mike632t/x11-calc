@@ -19,6 +19,7 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * 26 Sep 21         - Initial version - MEJT
+ * 12 Oct 21         - Added macro definition for continuous memory - MT
  *
  */
 
@@ -32,9 +33,8 @@
 #define MEMORY_SIZE  16
 #define ROM_SIZE     04000
 #define ROM_BANKS    1
+#define CONTINIOUS   False
 
 int i_rom [ROM_SIZE * ROM_BANKS];
-
-void v_init_state();
 
 void v_init_keypad(obutton *h_button[], oswitch *h_switch[]);

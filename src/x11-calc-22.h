@@ -20,7 +20,7 @@
  *
  * 21 Sep 21   0.1   - Initial version - MT
  * 12 Oct 21         - Removed Title and replaced with model number - MT
- *                   - Added init_state() - MT
+ *                   - Added macro definition for continuous memory - MT
  *
  */
 
@@ -36,9 +36,8 @@
 #define MEMORY_SIZE  (10 + 6) /* 0 - 15 */
 #define ROM_SIZE     04000
 #define ROM_BANKS    1
+#define CONTINIOUS   False
 
 int i_rom [ROM_SIZE * ROM_BANKS];
-
-void v_init_state();
 
 void v_init_keypad(obutton *h_button[], oswitch *h_switch[]);
