@@ -45,10 +45,22 @@ examples in the owners handbook..
 
 ### Compiling
 
-To  build  the  simulator on Linux or Tru64 UNIX, change directory  to  the
-source folder and run 'make MODEL=nn', where nn is a valid model number.
+To  build the simulator on Linux check that you have all the  prerequisites
+installed  then  download the source code from github and unzip it  (a  new
+folder will be created to hold it automatically).  Then change directory to
+the folder containing the source code and run 'make MODEL=nn', where nn  is
+a valid model number.
 
-On VMS set default to the source folder and use '@make.com'.
+e.g:
+
+    $ wget https://github.com/mike632t/x11-calc/archive/refs/heads/master.zip
+    $ unzip master.zip
+    $ cd x11-calc-master/src
+    $ make MODEL=25
+    
+    $ ../bin/x11-calc-25
+    x11-calc-25: Version 0.2 [Commit ID: aff02dc] 12 Oct 21 00:00:00 (Build: 0058)
+    ROM Size : 2048 words 
 
 ### Keyboard Shortcuts
 
