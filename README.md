@@ -27,8 +27,7 @@ The  following issues were observed when checking the behaviour against the
 examples in the owners handbook..
 * The examples on pages 65, 66 and 76 only work if END is selected.
 
-##### HP 25 - Working
-* Not continuous memory.
+##### HP 25 - Working (with continuous memory).
 
 ##### HP 27 - Only keyboard working.
 
@@ -47,9 +46,9 @@ examples in the owners handbook..
 
 To  build the simulator on Linux check that you have all the  prerequisites
 installed  then  download the source code from github and unzip it  (a  new
-folder will be created to hold it automatically).  Then change directory to
-the folder containing the source code and run 'make MODEL=nn', where nn  is
-a valid model number.
+folder  will  be created to automatically).  Then change directory  to  the
+folder  containing the source code and run 'make MODEL=nn', where nn  is  a
+valid model number (21, 22, or 25 etc).
 
 e.g:
 
