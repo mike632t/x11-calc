@@ -14,11 +14,18 @@ it will only compile without modification on Linux (Debian 10), but as with
 earlier  versions of the intention is to be able to compile the code on VMS
 running on either VAX or Alpha processors, and Tru64 Unix running on Alpha.
 
+### Latest News
+
+Added continuous memory to models that support it.  The contents of program
+and  data registers are saved in a hidden file in the users' HOME directory
+when the program exits or the calculator is switched off, and restored when
+the application is loaded or is reset using 'Ctrl-C'.
+
 ### Status
 
 Currently very much work in progress. The CPU simulation code is now mostly
-complete but several important functions remain to be implemented and it is
-likely that the memory data structures will have to be revised.
+complete but several important features required by later calculator models
+have not yet be implemented.
 
 ##### HP21 - Working 
 
@@ -27,7 +34,7 @@ The  following issues were observed when checking the behaviour against the
 examples in the owners handbook..
 * The examples on pages 65, 66 and 76 only work if END is selected.
 
-##### HP 25 - Working (with continuous memory).
+##### HP 25 - Working (now with continuous memory).
 
 ##### HP 27 - Only keyboard working.
 
