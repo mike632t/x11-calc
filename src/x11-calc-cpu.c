@@ -157,17 +157,19 @@
  * 10 Oct 21         - Fixed bug in code to check the ROM size - MT
  *                   - Added 'keys -> a' and 'keys -> a' - MT
  *                   - Fixed bug in 'c -> data register(n)' - MT
+ * 14 Oct 21   0.4   - Added  processor_save() and processor_restore()  and
+ *                     modified  'clear data registers' to prevent it  from
+ *                     clearing  the  registers  if  continuous  memory  is
+ *                     enabled (bit of a 'kuldge') - MT
  *
- * To Do             - Overlay program memory storage onto data registers (
- *                     different data structures pointing at the same data).
- *
+ * To Do             - Don't restore or save ALL registers...
  *
  */
 
 #define NAME           "x11-calc"
-#define VERSION        "0.2"
-#define BUILD          "0008"
-#define DATE           "14 Sep 21"
+#define VERSION        "0.4"
+#define BUILD          "0087"
+#define DATE           "14 Oct 21"
 #define AUTHOR         "MT"
 
 #define DEBUG 1        /* Enable/disable debug*/
@@ -412,9 +414,11 @@ static void v_processor_clear_registers(oprocessor *h_processor, int i_registers
 /* Clear data registers */
 static void v_processor_clear_data_registers(oprocessor *h_processor) {
    int i_count;
-   h_processor->first = 0; h_processor->last = REG_SIZE - 1;
-   for (i_count = 0; i_count < MEMORY_SIZE; i_count++)
-      v_reg_copy(h_processor, h_processor->mem[i_count], NULL); /* Copying nothing to a register clears it */
+   if (!CONTINIOUS) {
+      h_processor->first = 0; h_processor->last = REG_SIZE - 1;
+      for (i_count = 0; i_count < MEMORY_SIZE; i_count++)
+         v_reg_copy(h_processor, h_processor->mem[i_count], NULL); /* Copying nothing to a register clears it */
+   }
 }
 
 /* Restore saved processor state */
@@ -424,8 +428,9 @@ void v_processor_restore(oprocessor *h_processor) {
    char s_filename[] = FILENAME;
    char s_filetype[] = ".dat";
    char *s_pathname;
+   int i_count, i_counter;
 
-   if (h_processor != NULL) { /* Check processor defined */
+   if ((h_processor != NULL) && CONTINIOUS) { /* Check processor defined */
       if (s_dir == NULL) s_dir = ""; /* Use current folder if HOME not defined */
       s_pathname = malloc((strlen(s_dir) + strlen(s_filename) + 
          strlen(s_filetype) + 2) * sizeof(char*));
@@ -435,7 +440,42 @@ void v_processor_restore(oprocessor *h_processor) {
       strcat(s_pathname, s_filetype);
       h_datafile = fopen(s_pathname, "r");
       if (h_datafile !=NULL) { /* If file exists and can be opened restore state */
-         v_warning("Continuous memory not implemented yet\n");
+         for (i_count = 0; i_count < MEMORY_SIZE; i_count++) {
+            for (i_counter = REG_SIZE - 1; i_counter >= 0 ; i_counter--) {
+               fscanf(h_datafile, "%x,", &h_processor->mem[i_count]->nibble[i_counter]);
+            }
+         }
+      }
+      else
+         v_warning("Unable to open %s\n", s_pathname); /* Can't open data file . */
+   }
+}
+
+/* Save processor state */
+void v_processor_save(oprocessor *h_processor) {
+   FILE *h_datafile;
+   char *s_dir = getenv("HOME");
+   char s_filename[] = FILENAME;
+   char s_filetype[] = ".dat";
+   char *s_pathname;
+   int i_count, i_counter;
+
+   if ((h_processor != NULL) && CONTINIOUS) { /* Check processor defined */
+      if (s_dir == NULL) s_dir = ""; /* Use current folder if HOME not defined */
+      s_pathname = malloc((strlen(s_dir) + strlen(s_filename) + 
+         strlen(s_filetype) + 2) * sizeof(char*));
+      strcpy(s_pathname, s_dir);
+      strcat(s_pathname, "/.");
+      strcat(s_pathname, s_filename);
+      strcat(s_pathname, s_filetype);
+      h_datafile = fopen(s_pathname, "w");
+      if (h_datafile !=NULL) { /* If file exists and can be opened restore state */
+         for (i_count = 0; i_count < MEMORY_SIZE; i_count++) {
+            for (i_counter = REG_SIZE - 1; i_counter >= 0 ; i_counter--) {
+               fprintf(h_datafile, "%02x,", h_processor->mem[i_count]->nibble[i_counter]);
+            }
+            fprintf(h_datafile,"\n");
+         }
       }
       else
          v_warning("Unable to open %s\n", s_pathname); /* Can't open data file . */
@@ -463,7 +503,7 @@ void v_processor_init(oprocessor *h_processor) {
    h_processor->status[5] = False; /* TO DO - Check which flags should be set by default */
    /* h_processor->status[3] = True; /* Select radians */
    h_processor->flags[MODE] = True; /* Select run mode */
-   if (CONTINIOUS) v_processor_restore(h_processor);
+   v_processor_restore(h_processor);
 }
 
 /* Create a new processor , */
