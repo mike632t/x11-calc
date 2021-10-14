@@ -136,6 +136,7 @@
  *                     code to work on VMS using a black and white  display
  *                     without being modified) - MT
  * 12 Oct 21         - Added routine to display warnings - MT
+ * 14 Oct 21   0.3   - Added support for continuous memory - MT 
  *
  * To Do             - Allow the the display and processor properties to be
  *                     model  specific, or use a separate calculator  class
@@ -154,9 +155,9 @@
  */
 
 #define NAME           "x11-calc"
-#define VERSION        "0.2"
-#define BUILD          "0058"
-#define DATE           "04 Oct 21"
+#define VERSION        "0.3"
+#define BUILD          "0065"
+#define DATE           "14 Oct 21"
 #define AUTHOR         "MT"
 
 #define DEBUG 0        /* Enable/disable debug*/
@@ -531,10 +532,13 @@ int main(int argc, char *argv[]){
                   if (!(h_switch_pressed(h_switch[0], x_event.xbutton.x, x_event.xbutton.y) == NULL)) {
                      h_switch[0]->state = !(h_switch[0]->state); /* Toggle switch */
                      i_switch_draw(x_display, x_application_window, i_screen, h_switch[0]);
-                     if (h_switch[0]->state)
+                     if (h_switch[0]->state) {
                         v_processor_init(h_processor); /* Reset the processor */
-                     else
+                     }
+                     else {
+                        v_processor_save(h_processor);
                         h_processor->enabled = False; /* Disable the processor */
+                     }
                   }
                   if (!(h_switch_pressed(h_switch[1], x_event.xbutton.x, x_event.xbutton.y) == NULL)) {
                      h_switch[1]->state = !(h_switch[1]->state); /* Toggle switch */
@@ -572,8 +576,9 @@ int main(int argc, char *argv[]){
       }
    }
 
-   /* Close connection to server. */
-   XDestroyWindow(x_display, x_application_window);
+
+   v_processor_save(h_processor); /* Save state */
+   XDestroyWindow(x_display, x_application_window); /* Close connection to server */
    XCloseDisplay(x_display);
    exit(0);
 }
