@@ -34,11 +34,11 @@ The  following issues were observed when checking the behaviour against the
 examples in the owners handbook..
 * The examples on pages 65, 66 and 76 only work if END is selected.
 
-##### HP 25 - Working (now with continuous memory).
+##### HP 25 - Working (now with continuous memory)
 
-##### HP 27 - Only keyboard working.
+##### HP 27 - Only keyboard working
 
-##### HP 29 - Only keyboard working.
+##### HP 29 - Working
 
 ##### HP 31 - Work in progress.
 * Add support for missing opcodes.
@@ -61,12 +61,12 @@ e.g:
 
     $ wget https://github.com/mike632t/x11-calc/archive/refs/heads/master.zip
     $ unzip master.zip
-    $ cd x11-calc-master/src
-    $ make MODEL=25
+    $ cd x11-calc-master
+    $ make all
     
-    $ ../bin/x11-calc-25
-    x11-calc-25: Version 0.2 [Commit ID: d3e8e4b] 14 Oct 21 00:15:42 (Build: 0058)
-    ROM Size : 2048 words 
+    $ ./bin/x11-calc-29
+    x11-calc-29: Version 0.4 [Commit ID: 81c55be] 16 Oct 21 21:15:00 (Build: 0067)
+    ROM Size : 4096 words 
 
 ### Keyboard Shortcuts
 
@@ -94,10 +94,6 @@ of the CPU registers .
 When in trace mode a jump to the same instruction produces no output.
 
 ### Known Issues
-
-Attempting to compile using a later version of 'gcc' will result in several
-warning  messages being generated due to the the use of 'ftime()' which has
-been deprecated.
 
 Need  to sort out colour mapping to allow program to run on a display  with
 less than 24 -bit colour - may get round to this be one day...
