@@ -107,7 +107,7 @@
  *                     command line - MT
  * 14 Sep 21         - Eliminated  the delay between ticks when the display
  *                     is blank - MT
- *             0.2   - It works !!
+ *             0.2   - HP21 simulator works !!
  * 15 Sep 21         - The  escape key now resets the simulator instead  of
  *                     exiting - MT
  * 16 Sep 21         - Improved the display flicker problem by updating the
@@ -124,6 +124,7 @@
  *  2 Oct 21         - Changed property names - MT
  *  4 Oct 21         - Added the ability to display the CPU registers using
  *                     Ctrl-R when in trace mode - MT
+ *  7 Oct 21   0.3   - HP25 simulator now working..
  * 10 Oct 21         - Allows  switches and buttons to be undefined if  not
  *                     used - MT
  * 11 Oct 21         - Most  text  messages are now defined in the  header,
@@ -136,7 +137,9 @@
  *                     code to work on VMS using a black and white  display
  *                     without being modified) - MT
  * 12 Oct 21         - Added routine to display warnings - MT
- * 14 Oct 21   0.3   - Added support for continuous memory - MT 
+ * 14 Oct 21         - Added support for continuous memory - MT 
+ * 16 Oct 21   0.4   - HP29 simulator works..!
+
  *
  * To Do             - Allow the the display and processor properties to be
  *                     model  specific, or use a separate calculator  class
@@ -155,9 +158,9 @@
  */
 
 #define NAME           "x11-calc"
-#define VERSION        "0.3"
-#define BUILD          "0065"
-#define DATE           "14 Oct 21"
+#define VERSION        "0.4"
+#define BUILD          "0067"
+#define DATE           "16 Oct 21"
 #define AUTHOR         "MT"
 
 #define DEBUG 0        /* Enable/disable debug*/
