@@ -157,10 +157,18 @@
  * 10 Oct 21         - Fixed bug in code to check the ROM size - MT
  *                   - Added 'keys -> a' and 'keys -> a' - MT
  *                   - Fixed bug in 'c -> data register(n)' - MT
- * 14 Oct 21   0.4   - Added  processor_save() and processor_restore()  and
+ * 14 Oct 21         - Added  processor_save() and processor_restore()  and
  *                     modified  'clear data registers' to prevent it  from
  *                     clearing  the  registers  if  continuous  memory  is
  *                     enabled (bit of a 'kuldge') - MT
+ * 16 Oct 21         - Checks for continuous memory when clearing registers
+ *                     only when executing an instruction - MT
+ *                   - Forgot to close the data file - MT
+ *                   - Fixed bug with program counter (do not decrement the
+ *                     program  counter  before checking for a delayed  ROM
+ *                     select) - MT
+ *             0.4   - HP29 simulator works..!
+ * 
  *
  * To Do             - Don't restore or save ALL registers...
  *
@@ -168,11 +176,11 @@
 
 #define NAME           "x11-calc"
 #define VERSION        "0.4"
-#define BUILD          "0087"
-#define DATE           "14 Oct 21"
+#define BUILD          "0092"
+#define DATE           "16 Oct 21"
 #define AUTHOR         "MT"
 
-#define DEBUG 1        /* Enable/disable debug*/
+#define DEBUG 0        /* Enable/disable debug*/
 
 #include <string.h>
 #include <stdlib.h>
@@ -414,11 +422,9 @@ static void v_processor_clear_registers(oprocessor *h_processor, int i_registers
 /* Clear data registers */
 static void v_processor_clear_data_registers(oprocessor *h_processor) {
    int i_count;
-   if (!CONTINIOUS) {
-      h_processor->first = 0; h_processor->last = REG_SIZE - 1;
-      for (i_count = 0; i_count < MEMORY_SIZE; i_count++)
-         v_reg_copy(h_processor, h_processor->mem[i_count], NULL); /* Copying nothing to a register clears it */
-   }
+   h_processor->first = 0; h_processor->last = REG_SIZE - 1;
+   for (i_count = 0; i_count < MEMORY_SIZE; i_count++)
+      v_reg_copy(h_processor, h_processor->mem[i_count], NULL); /* Copying nothing to a register clears it */
 }
 
 /* Restore saved processor state */
@@ -440,11 +446,13 @@ void v_processor_restore(oprocessor *h_processor) {
       strcat(s_pathname, s_filetype);
       h_datafile = fopen(s_pathname, "r");
       if (h_datafile !=NULL) { /* If file exists and can be opened restore state */
+         debug(fprintf(stderr,"Loading %s \n", s_pathname));
          for (i_count = 0; i_count < MEMORY_SIZE; i_count++) {
             for (i_counter = REG_SIZE - 1; i_counter >= 0 ; i_counter--) {
                fscanf(h_datafile, "%x,", &h_processor->mem[i_count]->nibble[i_counter]);
             }
          }
+         fclose(h_datafile);
       }
       else
          v_warning("Unable to open %s\n", s_pathname); /* Can't open data file . */
@@ -469,13 +477,15 @@ void v_processor_save(oprocessor *h_processor) {
       strcat(s_pathname, s_filename);
       strcat(s_pathname, s_filetype);
       h_datafile = fopen(s_pathname, "w");
-      if (h_datafile !=NULL) { /* If file exists and can be opened restore state */
+      if (h_datafile !=NULL) { /* If file exists and can be opened save state */
+         debug(fprintf(stderr,"Saving %s \n", s_pathname));
          for (i_count = 0; i_count < MEMORY_SIZE; i_count++) {
             for (i_counter = REG_SIZE - 1; i_counter >= 0 ; i_counter--) {
                fprintf(h_datafile, "%02x,", h_processor->mem[i_count]->nibble[i_counter]);
             }
             fprintf(h_datafile,"\n");
          }
+         fclose(h_datafile);
       }
       else
          v_warning("Unable to open %s\n", s_pathname); /* Can't open data file . */
@@ -484,6 +494,7 @@ void v_processor_save(oprocessor *h_processor) {
 
 /* Reset processor */
 void v_processor_init(oprocessor *h_processor) {
+   debug(fprintf(stderr,"Reset\n"));
    v_processor_clear_registers(h_processor, REGISTERS); /*Clear the CPU registers and stack */
    v_processor_clear_data_registers(h_processor); /* Clear the memory registers*/
    h_processor->rom_number = 0;
@@ -524,8 +535,8 @@ oprocessor *h_processor_create(int *h_rom){
 /* Delayed ROM select */
 static void v_delayed_rom(oprocessor *h_processor) { /* Delayed ROM select */
    if (h_processor->flags[DELAYED_ROM]) {
-      /** debug(fprintf(stdout,"select ROM = %02d (%05o)\n", h_processor->delayed_rom_number, h_processor->delayed_rom_number << 8 | (h_processor->pc & 00377))); */
-      h_processor->pc =(h_processor->delayed_rom_number << 8 | (h_processor->pc & 00377));
+      /** debug(fprintf(stdout,"select ROM = %02d (%05o)\n", h_processor->delayed_rom_number, h_processor->delayed_rom_number << 8 | (h_processor->pc & 0xff))); */
+      h_processor->pc =(h_processor->delayed_rom_number << 8 | (h_processor->pc & 0xff)); /* Note - Uses an eight bit address */
       h_processor->flags[DELAYED_ROM] = False; /* Clear flag */
    }
 }
@@ -542,8 +553,8 @@ void op_jsb(oprocessor *h_processor, int i_count){
    h_processor->stack[h_processor->sp] = h_processor->pc; /* Push program counter on the stack */
    h_processor->sp = (h_processor->sp + 1) & (STACK_SIZE - 1); /* Update stack pointer */
    h_processor->pc = ((h_processor->pc & 0xff00) | i_count); /* Note - Uses an eight bit address */
-   h_processor->pc--; /* Program counter will be auto incremented before next fetch */
    v_delayed_rom(h_processor);
+   h_processor->pc--; /* Program counter will be auto incremented before next fetch */
 }
 
 /* Return from subroutine */
@@ -558,11 +569,10 @@ void v_op_goto(oprocessor *h_processor){
       h_processor->pc, h_processor->rom[h_processor->pc], h_processor->rom[h_processor->pc]);
    if (!h_processor->flags[PREV_CARRY]) { /* Do if True */
       h_processor->pc = ((h_processor->pc & 0xfc00) | h_processor->rom[h_processor->pc]); /* Note - Uses a _ten_ bit address */
-      h_processor->pc--; /* Program counter will be auto incremented before next fetch */
       /* v_delayed_rom(h_processor); Not - applicable ?*/
+      h_processor->pc--; /* Program counter will be auto incremented before next fetch */
    }
 }
-
 
 /* Decode and execute a single instruction */
 void v_processor_tick(oprocessor *h_processor) {
@@ -613,10 +623,11 @@ void v_processor_tick(oprocessor *h_processor) {
                      h_processor->pc &= 0x0ff00;
                      i_addr = h_processor->pc + (h_processor->reg[A_REG]->nibble[2] << 4) + h_processor->reg[A_REG]->nibble[1];
                      if (i_addr < (ROM_SIZE * ROM_BANKS))
-                         h_processor->pc = i_addr - 1;
+                         h_processor->pc = i_addr;
                      else
                         v_error("Address %02o out of range at %05o in %s line : %d\n", i_addr, h_processor->pc, __FILE__, __LINE__);
                      v_delayed_rom(h_processor);
+                     h_processor->pc--; /* Program counter will be auto incremented before next fetch */
                   }
                   break;
                case 00420: /* binary */
@@ -670,7 +681,7 @@ void v_processor_tick(oprocessor *h_processor) {
                   break;
                case 01260: /* clear data registers */
                   if (h_processor->flags[TRACE]) fprintf(stdout, "clear data registers");
-                  v_processor_clear_data_registers(h_processor);
+                     if (!CONTINIOUS) v_processor_clear_data_registers(h_processor); 
                   break;
                case 01360: /* c -> data */
                   if (h_processor->flags[TRACE]) fprintf(stdout, "c -> data ");
@@ -1109,8 +1120,9 @@ void v_processor_tick(oprocessor *h_processor) {
          case 03: /* if nc go to */
             if (h_processor->flags[TRACE]) fprintf(stdout, "if nc go to %05o", (h_processor->pc & 0xff00) | i_opcode >> 2); /* Note - Uses an eight bit address */
             if (!h_processor->flags[PREV_CARRY]) {
-               h_processor->pc = ((h_processor->pc & 0xff00) | i_opcode >> 2) - 1;
+               h_processor->pc = (h_processor->pc & 0xff00) | i_opcode >> 2;
                v_delayed_rom(h_processor);
+               h_processor->pc--; /* Program counter will be auto incremented before next fetch */
             }
             break;
          default:
