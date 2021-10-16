@@ -20,8 +20,8 @@
  *
  * 09 Mar 14   0.1   - Initial verson - MT
  * 10 Mar 14         - Changed indexes to BCD hex values - MT
- * 10 Dec 18         - Alternate function key now LIGHT_BLUE, allowing it to
- *                     have a different from the alternate text - MT
+ * 10 Dec 18         - Alternate  function key now LIGHT_BLUE, allowing  it
+ *                     to be a different colour to the alternate text - MT
  * 26 Sep 21         - Replaced BCD hex key codes with octal values - MT
  *                   - Added shortcut key definitions - MT
  *  3 Oct 21         - Added switches and updated keys - MT
