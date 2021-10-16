@@ -54,8 +54,7 @@ examples in the owners handbook..
 To  build the simulator on Linux check that you have all the  prerequisites
 installed  then  download the source code from github and unzip it  (a  new
 folder  will  be created to automatically).  Then change directory  to  the
-folder  containing the source code and run 'make MODEL=nn', where nn  is  a
-valid model number (21, 22, or 25 etc).
+new folder run 'make all' to build all the available simulators.
 
 e.g:
 
