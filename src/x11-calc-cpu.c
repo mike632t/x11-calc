@@ -168,6 +168,8 @@
  *                     program  counter  before checking for a delayed  ROM
  *                     select) - MT
  *             0.4   - HP29 simulator works..!
+ *                   - Fixed bug in 'keys -> rom address' - MT
+ *             0.5   - HP27 simulator works (requires testing).
  * 
  *
  * To Do             - Don't restore or save ALL registers...
@@ -175,8 +177,8 @@
  */
 
 #define NAME           "x11-calc"
-#define VERSION        "0.4"
-#define BUILD          "0092"
+#define VERSION        "0.5"
+#define BUILD          "0096"
 #define DATE           "16 Oct 21"
 #define AUTHOR         "MT"
 
@@ -607,9 +609,13 @@ void v_processor_tick(oprocessor *h_processor) {
             case 01:
                switch (i_opcode){
                case 00020: /* keys -> rom address */
+                  debug(fprintf(stdout, "%05o %04o\tkeys -> rom address (%05o)\n", h_processor->pc, i_opcode, (((h_processor->pc + 1) & 0x0f00) + h_processor->code)));
                   if (h_processor->flags[TRACE]) fprintf(stdout, "keys -> rom address");
+                  h_processor->pc++;
                   h_processor->pc &= 0x0f00;
-                  h_processor->pc += h_processor->code - 1;
+                  v_delayed_rom(h_processor);
+                  h_processor->pc += h_processor->code;
+                  h_processor->pc--; /* Program counter will be auto incremented before next fetch */
                   break;
                case 00120: /* keys -> a */
                   if (h_processor->flags[TRACE]) fprintf(stdout, "keys -> a");
@@ -663,7 +669,7 @@ void v_processor_tick(oprocessor *h_processor) {
                }
                break;
             case 02: /* select rom */
-               if (h_processor->flags[TRACE]) fprintf(stdout, "select rom %02d", i_opcode >> 6);
+               if (h_processor->flags[TRACE]) fprintf(stdout, "select rom %02o", i_opcode >> 6);
                h_processor->pc = (i_opcode >> 6) * 256 + (h_processor->pc % 256);
                break;
             case 03:
@@ -715,7 +721,7 @@ void v_processor_tick(oprocessor *h_processor) {
                v_op_goto(h_processor);
                break;
             case 03: /* delayed select rom n */
-               if (h_processor->flags[TRACE]) fprintf(stdout, "delayed select rom %d", i_opcode >> 6);
+               if (h_processor->flags[TRACE]) fprintf(stdout, "delayed select rom %02o", i_opcode >> 6);
                h_processor->delayed_rom_number = i_opcode >> 6;
                h_processor->flags[DELAYED_ROM] = True;
             }
