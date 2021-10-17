@@ -27,7 +27,7 @@ Currently very much work in progress. The CPU simulation code is now mostly
 complete but several important features required by later calculator models
 have not yet be implemented.
 
-##### HP21 - Working 
+##### HP 21 - Working 
 
 ##### HP 22 - Working
 The  following issues were observed when checking the behaviour against the
@@ -36,18 +36,15 @@ examples in the owners handbook..
 
 ##### HP 25 - Working (now with continuous memory)
 
-##### HP 27 - Working (not finished testing)
+##### HP 27 - Completed (not finished testing)
 
 ##### HP 29 - Working
 
-##### HP 31 - Work in progress.
-* Add support for missing opcodes.
-* Implement on/off switch.
-* Fix display.
+##### HP 31 - Completed (not tested)
 
-##### HP 32 - Only keyboard working.
+##### HP 32 - Completed (not tested)
 
-##### HP 33 - Only keyboard working.
+##### HP 33 - Only keyboard working
 
 ### Compiling
 
