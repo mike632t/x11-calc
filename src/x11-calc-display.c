@@ -43,6 +43,7 @@
  * 10 Sep 21         - Updated  lookup  table with codes  used  to  display
  *                     error messages - MT
  *  1 Oct 21         - Converted flags to Boolean variables - MT
+ * 17 Oct 21         - Size of each digit depends on the number digits - MT
  *
  */
 
@@ -99,8 +100,10 @@ odisplay *h_display_create(int i_index, int i_left, int i_top, int i_width,
    h_display->width = i_width;
    h_display->height = i_height;
    for (i_count = 0; i_count < DIGITS; i_count++) {
-      /*h_display->segment[i_count] = h_segment_create(0, 0,  7 + 17 * i_count, 21, 17, 29, i_foreground, i_background); /* Spice  - 11 Digit display */
-      h_display->segment[i_count] = h_segment_create(0, 0,  5 + 16 * i_count, 21, 14, 29, i_foreground, i_background); /* Woodstock - 12 Digit display */
+      if (DIGITS < 12) /* Size of each digit depends on the number digits */
+         h_display->segment[i_count] = h_segment_create(0, 0,  3 + 18 * i_count, 18, 16, 33, i_foreground, i_background); /* Spice  - 11 Digit display */
+      else
+         h_display->segment[i_count] = h_segment_create(0, 0,  5 + 16 * i_count, 21, 14, 29, i_foreground, i_background); /* Woodstock - 12 Digit display */
       h_display->segment[i_count]->mask = DISPLAY_SPACE;
    }
    h_display->foreground = i_foreground;
@@ -158,23 +161,60 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
    int i_count;
 
    /* Draw display segments. */
-   for (i_count = 0; i_count < DIGITS; i_count++)
-      if (!(h_display->segment[i_count] == NULL)) {
-         if (h_processor->flags[DISPLAY_ENABLE] && h_processor->enabled) {
-            h_display->segment[i_count]->mask = c_digits[h_processor->reg[A_REG]->nibble[REG_SIZE - 1 - i_count]];
-            switch (h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x07) {
-            case 0x02: /* Sign */
-               if (h_processor->reg[A_REG]->nibble[REG_SIZE -1 - i_count])
-                  h_display->segment[i_count]->mask = DISPLAY_MINUS;
-               else
+   if (DIGITS < 12) { /* Spice series */
+      for (i_count = 0; i_count < DIGITS; i_count++) {
+         if (h_display->segment[i_count] != NULL) {
+            if (h_processor->flags[DISPLAY_ENABLE] && h_processor->enabled) {
+               if (i_count == 0)
                   h_display->segment[i_count]->mask = DISPLAY_SPACE;
-               break;
-            case 0x01: /* Number and decimal point */
-               h_display->segment[i_count]->mask = h_display->segment[i_count]->mask | DISPLAY_DECIMAL;
+               else
+                  h_display->segment[i_count]->mask = c_digits[h_processor->reg[A_REG]->nibble[REG_SIZE - 1 - i_count]];
+               if ((h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x04) != 0) {
+                  if (i_count > 1) {
+                     if (h_processor->reg[A_REG]->nibble[REG_SIZE - 1 - i_count]== 0x9)
+                        h_display->segment[i_count]->mask = DISPLAY_MINUS;
+                     else
+                        h_display->segment[i_count]->mask = DISPLAY_SPACE;
+                  }
+                  else
+                     if (i_count == 1) h_display->segment[0]->mask = DISPLAY_MINUS;
+               }
+               if ((h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x02) != 0) {
+                  if ((h_display->segment[i_count]->mask != DISPLAY_COMMA) && (h_display->segment[i_count]->mask != DISPLAY_SPACE))
+                     h_display->segment[i_count]->mask = h_display->segment[i_count]->mask | DISPLAY_COMMA;
+               }
+               if ((h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x01) != 0) {
+                  if (i_count == 0) 
+                     h_display->segment[i_count]->mask = DISPLAY_SPACE;
+                  else
+                     h_display->segment[i_count]->mask = h_display->segment[i_count]->mask | DISPLAY_DECIMAL;
+               }
             }
+            else
+               h_display->segment[i_count]->mask = DISPLAY_SPACE;
          }
-         else
-            h_display->segment[i_count]->mask = DISPLAY_SPACE;
       }
+   }
+   else { /* Woodstock series */
+      for (i_count = 0; i_count < DIGITS; i_count++) {
+         if (h_display->segment[i_count] != NULL) {
+            if (h_processor->flags[DISPLAY_ENABLE] && h_processor->enabled) {
+               h_display->segment[i_count]->mask = c_digits[h_processor->reg[A_REG]->nibble[REG_SIZE - 1 - i_count]];
+               switch (h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x07) {
+               case 0x02: /* Sign */
+                  if (h_processor->reg[A_REG]->nibble[REG_SIZE - 1 - i_count])
+                     h_display->segment[i_count]->mask = DISPLAY_MINUS;
+                  else
+                     h_display->segment[i_count]->mask = DISPLAY_SPACE;
+                  break;
+               case 0x01: /* Number and decimal point */
+                  h_display->segment[i_count]->mask = h_display->segment[i_count]->mask | DISPLAY_DECIMAL;
+               }
+            }
+            else
+               h_display->segment[i_count]->mask = DISPLAY_SPACE;
+         }
+      }
+   }
    return (True);
 }
