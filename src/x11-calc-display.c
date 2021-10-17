@@ -44,6 +44,8 @@
  *                     error messages - MT
  *  1 Oct 21         - Converted flags to Boolean variables - MT
  * 17 Oct 21         - Size of each digit depends on the number digits - MT
+ *                   - Uses separate display decoders used depending on the
+ *                     number of digits - MT 
  *
  */
 
@@ -184,7 +186,7 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
                      h_display->segment[i_count]->mask = h_display->segment[i_count]->mask | DISPLAY_COMMA;
                }
                if ((h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x01) != 0) {
-                  if (i_count == 0) 
+                  if (i_count == 0)
                      h_display->segment[i_count]->mask = DISPLAY_SPACE;
                   else
                      h_display->segment[i_count]->mask = h_display->segment[i_count]->mask | DISPLAY_DECIMAL;
