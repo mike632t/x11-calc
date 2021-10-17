@@ -18,7 +18,9 @@
 #
 #	Note separator (tab) at the beginning of the line CANNOT be a space..!
 #
-#	09 Oct 21   0.1	- Initial version - MT
+#	09 Oct 21   0.1   - Initial version - MT
+#  16 Oct 21         - 'make clean' removes any executable files as well as
+#                      any object files - MT 
 #
 
 PROGRAM	=  x11-calc
@@ -28,7 +30,7 @@ FILES		+= ./img/x11-calc-*.png
 MAKE		=  make
 
 
-all: clean hp21 hp22 hp25 hp29
+all: clean hp21 hp22 hp25 hp27 hp29
 
 hp21:
 	@$(MAKE) --no-print-directory -C ./src MODEL=21
@@ -54,11 +56,12 @@ hp32:
 hp33:
 	@$(MAKE) --no-print-directory -C ./src MODEL=33
 
-hp11:
-	@$(MAKE) --no-print-directory -C ./src MODEL=11
+#hp11:
+#	@$(MAKE) --no-print-directory -C ./src MODEL=11
 	
 clean:
 	@rm  -f ./src/*.o
+	@rm  -f ./bin/x11-calc-??
 
 backup:
 	@echo "$(PROGRAM)-`date +'%Y%m%d%H%M'`.tar.gz"; tar -czpf ..\/$(PROGRAM)-`date +'%Y%m%d%H%M'`.tar.gz $(FILES)
