@@ -490,7 +490,7 @@ int main(int argc, char *argv[]){
             else if (h_keyboard->key == (XK_R & 0x1f)) /* Ctrl-R to display internal CPU registers */
                v_fprint_state(stdout, h_processor);
             else if (h_keyboard->key == (XK_C & 0x1f)) { /* Ctrl-C to reset  */
-               v_processor_init(h_processor); b_run = True;
+               v_processor_reset(h_processor); b_run = True;
             }
             else { /* Check for matching button */
                int i_count;
@@ -539,7 +539,7 @@ int main(int argc, char *argv[]){
                      h_switch[0]->state = !(h_switch[0]->state); /* Toggle switch */
                      i_switch_draw(x_display, x_application_window, i_screen, h_switch[0]);
                      if (h_switch[0]->state) {
-                        v_processor_init(h_processor); /* Reset the processor */
+                        v_processor_reset(h_processor); /* Reset the processor */
                      }
                      else {
                         v_processor_save(h_processor);

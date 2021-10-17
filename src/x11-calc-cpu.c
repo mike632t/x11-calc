@@ -170,7 +170,9 @@
  *             0.4   - HP29 simulator works..!
  *                   - Fixed bug in 'keys -> rom address' - MT
  *             0.5   - HP27 simulator works (requires testing).
- * 
+ * 17 Oct 21         - Renamed init() to reset() and fixed bug in init() by
+ *                     consolidating  the code used to clear the  registers
+ *                     into reset() - MT
  *
  * To Do             - Don't restore or save ALL registers...
  *
@@ -178,7 +180,7 @@
 
 #define NAME           "x11-calc"
 #define VERSION        "0.5"
-#define BUILD          "0096"
+#define BUILD          "0097"
 #define DATE           "16 Oct 21"
 #define AUTHOR         "MT"
 
@@ -396,39 +398,6 @@ static void v_reg_shl(oprocessor *h_processor, oregister *h_register){
    h_processor->flags[PREV_CARRY] = h_processor->flags[CARRY] = False;
 }
 
-/* Clear flags */
-static void v_processor_clear_flags(oprocessor *h_processor) {
-   int i_count;
-   for (i_count = 0; i_count < FLAGS; i_count++)
-      h_processor->flags[i_count] = False; /* Clear the processor flags */
-}
-
-/* Clear status */
-static void v_processor_clear_status(oprocessor *h_processor) {
-   int i_count;
-   for (i_count = 0; i_count < (sizeof(h_processor->status) / sizeof(h_processor->status[0]) ); i_count++)
-      if ((i_count != 1) && (i_count != 2) && (i_count != 5) && (i_count != 15))
-         h_processor->status[i_count] = False; /* Clear the processor status word */
-}
-
-/* Clear registers */
-static void v_processor_clear_registers(oprocessor *h_processor, int i_registers) {
-   int i_count;
-   h_processor->first = 0; h_processor->last = REG_SIZE - 1;
-   for (i_count = 0; i_count < i_registers; i_count++)
-      v_reg_copy(h_processor, h_processor->reg[i_count], NULL); /* Copying nothing to a register clears it */
-   for (i_count = 0; i_count < STACK_SIZE; i_count++)
-      h_processor->stack[i_count] = 0; /* Clear the processor stack */
-}
-
-/* Clear data registers */
-static void v_processor_clear_data_registers(oprocessor *h_processor) {
-   int i_count;
-   h_processor->first = 0; h_processor->last = REG_SIZE - 1;
-   for (i_count = 0; i_count < MEMORY_SIZE; i_count++)
-      v_reg_copy(h_processor, h_processor->mem[i_count], NULL); /* Copying nothing to a register clears it */
-}
-
 /* Restore saved processor state */
 void v_processor_restore(oprocessor *h_processor) {
    FILE *h_datafile;
@@ -440,7 +409,7 @@ void v_processor_restore(oprocessor *h_processor) {
 
    if ((h_processor != NULL) && CONTINIOUS) { /* Check processor defined */
       if (s_dir == NULL) s_dir = ""; /* Use current folder if HOME not defined */
-      s_pathname = malloc((strlen(s_dir) + strlen(s_filename) + 
+      s_pathname = malloc((strlen(s_dir) + strlen(s_filename) +
          strlen(s_filetype) + 2) * sizeof(char*));
       strcpy(s_pathname, s_dir);
       strcat(s_pathname, "/.");
@@ -470,9 +439,9 @@ void v_processor_save(oprocessor *h_processor) {
    char *s_pathname;
    int i_count, i_counter;
 
-   if ((h_processor != NULL) && CONTINIOUS) { /* Check processor defined */
+   if ((h_processor != NULL) && CONTINIOUS) { /* Check processor defined and continuous memory enabled */
       if (s_dir == NULL) s_dir = ""; /* Use current folder if HOME not defined */
-      s_pathname = malloc((strlen(s_dir) + strlen(s_filename) + 
+      s_pathname = malloc((strlen(s_dir) + strlen(s_filename) +
          strlen(s_filetype) + 2) * sizeof(char*));
       strcpy(s_pathname, s_dir);
       strcat(s_pathname, "/.");
@@ -495,14 +464,22 @@ void v_processor_save(oprocessor *h_processor) {
 }
 
 /* Reset processor */
-void v_processor_init(oprocessor *h_processor) {
+void v_processor_reset(oprocessor *h_processor) {
+   int i_count;
    debug(fprintf(stderr,"Reset\n"));
-   v_processor_clear_registers(h_processor, REGISTERS); /*Clear the CPU registers and stack */
-   v_processor_clear_data_registers(h_processor); /* Clear the memory registers*/
+   h_processor->first = 0; h_processor->last = REG_SIZE - 1;
+   for (i_count = 0; i_count < REGISTERS - 2; i_count++) /*Clear the CPU registers and stack */
+      v_reg_copy(h_processor, h_processor->reg[i_count], NULL); /* Copying nothing to a register clears it */
+   for (i_count = 0; i_count < STACK_SIZE; i_count++) /* Clear the processor stack */
+      h_processor->stack[i_count] = 0;
+   for (i_count = 0; i_count < MEMORY_SIZE; i_count++) /*Clear memory */
+      v_reg_copy(h_processor, h_processor->mem[i_count], NULL); /* Copying nothing to a register clears it */
+   for (i_count = 0; i_count < (sizeof(h_processor->status) / sizeof(h_processor->status[0]) ); i_count++) /* Clear the processor status word */
+      h_processor->status[i_count] = False; /* Clear the processor flags */
+   for (i_count = 0; i_count < FLAGS; i_count++)
+      h_processor->flags[i_count] = False;
    h_processor->rom_number = 0;
    h_processor->delayed_rom_number = 0;
-   v_processor_clear_flags(h_processor); /* Clear processor flags */
-   v_processor_clear_status(h_processor); /* Clear processor status */
    h_processor->pc = 0;
    h_processor->sp = 0;
    h_processor->p = 0;
@@ -512,9 +489,7 @@ void v_processor_init(oprocessor *h_processor) {
    h_processor->code = 0;
    h_processor->keypressed = False;
    h_processor->enabled = True;
-
    h_processor->status[5] = False; /* TO DO - Check which flags should be set by default */
-   /* h_processor->status[3] = True; /* Select radians */
    h_processor->flags[MODE] = True; /* Select run mode */
    v_processor_restore(h_processor);
 }
@@ -530,7 +505,7 @@ oprocessor *h_processor_create(int *h_rom){
       h_processor->mem[i_count] = h_register_create(i_count); /* Allocate storage for the RAM */
    h_processor->rom = h_rom ; /* Address of ROM */
    h_processor->select = False;
-   v_processor_init(h_processor);
+   v_processor_reset(h_processor);
    return(h_processor);
 }
 
@@ -687,7 +662,12 @@ void v_processor_tick(oprocessor *h_processor) {
                   break;
                case 01260: /* clear data registers */
                   if (h_processor->flags[TRACE]) fprintf(stdout, "clear data registers");
-                     if (!CONTINIOUS) v_processor_clear_data_registers(h_processor); 
+                     if (!CONTINIOUS) {
+                        int i_count;
+                        h_processor->first = 0; h_processor->last = REG_SIZE - 1;
+                        for (i_count = 0; i_count < MEMORY_SIZE; i_count++)
+                           v_reg_copy(h_processor, h_processor->mem[i_count], NULL); /* Copying nothing to a register clears it */
+                     }
                   break;
                case 01360: /* c -> data */
                   if (h_processor->flags[TRACE]) fprintf(stdout, "c -> data ");
@@ -732,7 +712,14 @@ void v_processor_tick(oprocessor *h_processor) {
                switch (i_opcode) {
                case 00010: /* clear registers */
                   if (h_processor->flags[TRACE]) fprintf(stdout, "clear registers");
-                  v_processor_clear_registers(h_processor, REGISTERS - 2); /*Don't clear M or N */
+                  {
+                     int i_count;
+                     h_processor->first = 0; h_processor->last = REG_SIZE - 1;
+                     for (i_count = 0; i_count < REGISTERS - 2; i_count++) /* Don't clear M or N */
+                        v_reg_copy(h_processor, h_processor->reg[i_count], NULL); /* Copying nothing to a register clears it */
+                     for (i_count = 0; i_count < STACK_SIZE; i_count++) /* Clear the processor stack */
+                        h_processor->stack[i_count] = 0;
+                  }
                   break;
                case 00110: /* clear s */
                   if (h_processor->flags[TRACE]) fprintf(stdout, "clear s");

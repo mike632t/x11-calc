@@ -91,7 +91,7 @@ typedef struct {
 
 oprocessor *h_processor_create(int *h_rom);
 
-void v_processor_init(oprocessor *h_processor);
+void v_processor_reset(oprocessor *h_processor);
 
 void v_processor_save(oprocessor *h_processor);
 
