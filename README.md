@@ -79,7 +79,9 @@ corresponds to 'SST'.
 
 'f' and where applicable 'g' and 'h' correspond to the function keys.
 
-'Ctrl-Z' Quits, and 'Ctrl-C' does a reset.
+'Ctrl-Z'  Quits,  and  'Ctrl-C' does a reset.  For models  with  continuous
+memory 'Ctrl-Z' saves the current register contents, and 'Ctrl-C'  restores
+them to the original saved state.
 
 ### Debugging
 
