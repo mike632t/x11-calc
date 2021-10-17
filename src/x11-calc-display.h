@@ -1,10 +1,10 @@
 /*
- * x11-calc-display.h - RPN (Reverse Polish) calculator simulator. 
+ * x11-calc-display.h - RPN (Reverse Polish) calculator simulator.
  *
  * Copyright(C) 2013   MT
- * 
+ *
  * 10 Digit digit display functions.
- *      
+ *
  * Contains  the functions needed to create and display a 10 digit 7 seven
  * segment display element.
  *
@@ -25,14 +25,14 @@
  * 17 Aug 13         - Added constants for mask values - MT
  * 10 Mar 14         - Changed names of display masks to highlight their
  *                     association with the display module - MT
- * 30 Aug 20         - Base  the number of display segments on the  maximum 
+ * 30 Aug 20         - Base  the number of display segments on the  maximum
  *                     number of digits in the display - MT
  * 08 Aug 21         - Tidied up spelling errors in the comments - MT
  *
  */
 
 #include "x11-calc-cpu.h"
- 
+
 #define DISPLAY_ONE        0x0030
 #define DISPLAY_TWO        0x006d
 #define DISPLAY_THREE      0x0079
@@ -53,23 +53,23 @@
 #define DISPLAY_r          0x0044
 #define DISPLAY_o          0x005c
 #define DISPLAY_TEST       0x01ff
- 
+
 typedef struct { /* Calculator display structure. */
-   int index; 
+   int index;
    osegment* segment[DIGITS];
    int left;
-   int top; 
+   int top;
    int width;
-   int height; 
+   int height;
    unsigned int foreground;
    unsigned int background;
    unsigned int border;
 } odisplay;
 
-odisplay *h_display_create(int i_index, 
-   int i_left, int i_top, int i_width, int i_height, 
+odisplay *h_display_create(int i_index,
+   int i_left, int i_top, int i_width, int i_height,
    unsigned int i_foreground, unsigned int i_background, unsigned int i_border);
-   
+
 int i_display_draw(Display* x_display, int x_application_window, int i_screen, odisplay *h_display);
 
 int i_display_update(Display* x_display, int x_application_window, int i_screen, odisplay *h_display, oprocessor *h_processor);
