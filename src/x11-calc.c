@@ -143,6 +143,8 @@
  *                     the HP27 tests S3 even though it doesn't have a mode
  *                     select switch - go figure - MT
  *             0.5   - HP27 simulator works (requires testing).
+ *             0.6   - HP31 and HP32 simulators work (requires testing).
+
  *
  * To Do             - Allow the the display and processor properties to be
  *                     model  specific, or use a separate calculator  class
@@ -161,8 +163,8 @@
  */
 
 #define NAME           "x11-calc"
-#define VERSION        "0.5"
-#define BUILD          "0070"
+#define VERSION        "0.6"
+#define BUILD          "0071"
 #define DATE           "16 Oct 21"
 #define AUTHOR         "MT"
 
