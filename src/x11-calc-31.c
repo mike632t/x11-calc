@@ -53,7 +53,7 @@ void v_init_keypad(obutton *h_button[], oswitch *h_switch[]) {
 
    /* Define the switches. */
    h_switch[0] = h_switch_create(00000, "OFF", "ON ", h_alternate_font, 12, 67, 67, 10, True, MID_GREY, DARK_GREY);
-   h_switch[1] = h_switch_create(00000, "PRGM", "RUN", h_alternate_font, 120, 67, 67, 10, True, MID_GREY, DARK_GREY);
+   h_switch[1] = NULL;
 
    /* Define top row of keys. */ 
    h_button[0] = h_button_create(00064, 000, "/\xaf", "FIX", "", h_normal_font, h_small_font, h_alternate_font, 12, 89, 33, 30, False, BLACK, YELLOW, BLUE);
