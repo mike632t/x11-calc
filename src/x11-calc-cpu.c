@@ -173,14 +173,17 @@
  * 17 Oct 21         - Renamed init() to reset() and fixed bug in init() by
  *                     consolidating  the code used to clear the  registers
  *                     into reset() - MT
+ *                   - Modified  'p = p + 1' as woodstock and spice  series
+ *                     machines behave differently - MT
+ *             0.6   - HP31 and HP32 simulators work (requires testing).
  *
  * To Do             - Don't restore or save ALL registers...
  *
  */
 
 #define NAME           "x11-calc"
-#define VERSION        "0.5"
-#define BUILD          "0097"
+#define VERSION        "0.6"
+#define BUILD          "0099"
 #define DATE           "16 Oct 21"
 #define AUTHOR         "MT"
 
@@ -628,11 +631,14 @@ void v_processor_tick(oprocessor *h_processor) {
                   break;
                case 00620: /* p - 1 -> p */
                   if (h_processor->flags[TRACE]) fprintf(stdout, "p - 1 -> p");
-                  if (h_processor->p == 0 ) h_processor->p = REG_SIZE - 1; else h_processor->p--;
+                  if (h_processor->p == 0) h_processor->p = REG_SIZE - 1; else h_processor->p--;
                   break;
-               case 00720: /* p - 1 -> p */
-                  if (h_processor->flags[TRACE]) fprintf(stdout, "p - 1 -> p");
-                  if (h_processor->p == REG_SIZE ) h_processor->p = 0; else h_processor->p++;
+               case 00720: /* p + 1 -> p */
+                  if (h_processor->flags[TRACE]) fprintf(stdout, "p + 1 -> p");
+                  if (DIGITS < 12)
+                     if (h_processor->p == REG_SIZE - 1) h_processor->p = 0; else h_processor->p++; /* No idea why */
+                  else
+                     if (h_processor->p == REG_SIZE) h_processor->p = 0; else h_processor->p++;
                   break;
                case 01020: /* return */
                   if (h_processor->flags[TRACE]) fprintf(stdout, "return");
@@ -906,6 +912,7 @@ void v_processor_tick(oprocessor *h_processor) {
             h_processor->first = h_processor->p; h_processor->last = h_processor->p;
             s_field = "p";
             if (h_processor->p >= REG_SIZE) {
+               v_fprint_state(stderr, h_processor);
                v_error("Unexpected error in %s line : %d\n", __FILE__, __LINE__);
                h_processor->last = 0;
             }
