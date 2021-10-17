@@ -139,7 +139,10 @@
  * 12 Oct 21         - Added routine to display warnings - MT
  * 14 Oct 21         - Added support for continuous memory - MT 
  * 16 Oct 21   0.4   - HP29 simulator works..!
-
+ *                   - Undefined  switches should be off.  Rather strangely
+ *                     the HP27 tests S3 even though it doesn't have a mode
+ *                     select switch - go figure - MT
+ *             0.5   - HP27 simulator works (requires testing).
  *
  * To Do             - Allow the the display and processor properties to be
  *                     model  specific, or use a separate calculator  class
@@ -158,8 +161,8 @@
  */
 
 #define NAME           "x11-calc"
-#define VERSION        "0.4"
-#define BUILD          "0067"
+#define VERSION        "0.5"
+#define BUILD          "0070"
 #define DATE           "16 Oct 21"
 #define AUTHOR         "MT"
 
@@ -444,7 +447,7 @@ int main(int argc, char *argv[]){
    b_abort = False;
    i_count = 0;
 
-   if (h_switch[1] != NULL) h_processor->select = h_switch[1]->state; else h_processor->select = True; /* Allow switches to be undefined if not used */
+   if (h_switch[1] != NULL) h_processor->select = h_switch[1]->state; else h_processor->select = False; /* Allow switches to be undefined if not used */
 
    while (!b_abort) {
       i_count--;
