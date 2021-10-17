@@ -41,8 +41,10 @@ examples in the owners handbook..
 ##### HP 29 - Working
 
 ##### HP 31 - Completed (not tested)
+* Self test does not run.
 
 ##### HP 32 - Completed (not tested)
+* Self test does not run.
 
 ##### HP 33 - Only keyboard working
 
