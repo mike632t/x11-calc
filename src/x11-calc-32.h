@@ -32,8 +32,8 @@
 
 #define DIGITS       11
 
-#define ROM_SIZE     02000  
-#define MEMORY_SIZE  16
+#define ROM_SIZE     07000
+#define MEMORY_SIZE  17
 #define ROM_BANKS    1
 #define CONTINIOUS   False
 
