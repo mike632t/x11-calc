@@ -36,7 +36,7 @@ examples in the owners handbook..
 
 ##### HP 25 - Working (now with continuous memory)
 
-##### HP 27 - Only keyboard working
+##### HP 27 - Working (not finished testing)
 
 ##### HP 29 - Working
 
