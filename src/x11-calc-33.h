@@ -2,7 +2,7 @@
  * x11-calc-33.h - RPN (Reverse Polish) calculator simulator.
  *
  * Copyright(C) 2018   MT
- * 
+ *
  * Model specific constants and function prototypes.
  *
  * This  program is free software: you can redistribute it and/or modify it
@@ -17,24 +17,25 @@
  *
  * You  should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  * 13 Jun 13   0.1   - Initial version - MT
  * 30 Aug 20         - Moved functions to separate source file - MT
  * 12 Oct 21         - Removed Title and replaced with model number - MT
  *                   - Added macro definition for continuous memory - MT
- *                      
- * TO DO :           - 
+ * 18 Oct 21         - Updated number of memory registers and ROM size - MT
+ *
+ * TO DO :           -
  */
 
-#define MODEL        "32"
+#define MODEL        "33"
 #define HEIGHT       385
 #define WIDTH        201   /* Yes really! */
 #define BUTTONS      30
 
 #define DIGITS       11
 
-#define ROM_SIZE     02000  
-#define MEMORY_SIZE  8 /* Can't be zero*/
+#define ROM_SIZE     010000
+#define MEMORY_SIZE  24
 #define ROM_BANKS    1
 #define CONTINIOUS   True
 
