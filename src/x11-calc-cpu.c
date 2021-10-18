@@ -176,6 +176,7 @@
  *                   - Modified  'p = p + 1' as woodstock and spice  series
  *                     machines behave differently - MT
  *             0.6   - HP31 and HP32 simulators work (requires testing).
+ *                   - Added dummy 'rom checksum' instruction - MT 
  *
  * To Do             - Don't restore or save ALL registers...
  *
@@ -183,7 +184,7 @@
 
 #define NAME           "x11-calc"
 #define VERSION        "0.6"
-#define BUILD          "0099"
+#define BUILD          "0100"
 #define DATE           "16 Oct 21"
 #define AUTHOR         "MT"
 
@@ -660,6 +661,7 @@ void v_processor_tick(oprocessor *h_processor) {
                      int i_addr;
                      if (h_processor->flags[TRACE]) fprintf(stdout, "c -> addr ");
                      i_addr = (h_processor->reg[C_REG]->nibble[1] << 4) + h_processor->reg[C_REG]->nibble[0];
+                     h_processor->addr = i_addr;
                      if (i_addr < MEMORY_SIZE)
                         h_processor->addr = i_addr;
                      else
@@ -676,9 +678,12 @@ void v_processor_tick(oprocessor *h_processor) {
                      }
                   break;
                case 01360: /* c -> data */
-                  if (h_processor->flags[TRACE]) fprintf(stdout, "c -> data ");
+                  if (h_processor->flags[TRACE]) fprintf(stdout, "c -> data");
                   h_processor->first = 0; h_processor->last = REG_SIZE - 1;
                   v_reg_copy(h_processor, h_processor->mem[h_processor->addr], h_processor->reg[C_REG]);
+                  break;
+               case 01460: /* rom checksum */
+                  if (h_processor->flags[TRACE]) fprintf(stdout, "rom checksum");
                   break;
                case 01760: /* hi I'm woodstock */
                   if (h_processor->flags[TRACE]) fprintf(stdout, "hi I'm woodstock");
