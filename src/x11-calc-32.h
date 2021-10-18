@@ -22,6 +22,7 @@
  * 30 Aug 20         - Moved functions to separate source file - MT
  * 12 Oct 21         - Removed Title and replaced with model number - MT
  *                   - Added macro definition for continuous memory - MT
+ * 17 Oct 21         - Additional register storage used by self test - MT
  *                      
  */
 
@@ -33,7 +34,7 @@
 #define DIGITS       11
 
 #define ROM_SIZE     07000
-#define MEMORY_SIZE  17
+#define MEMORY_SIZE  20    /* Additional register storage needed for self test */
 #define ROM_BANKS    1
 #define CONTINIOUS   False
 
