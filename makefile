@@ -28,7 +28,7 @@ FILES		+= ./img/x11-calc-*.png
 MAKE		=  make
 
 
-all: clean hp21 hp22 hp25 hp27 hp29 hp31 hp32
+all: clean hp21 hp22 hp25 hp27 hp29 hp31 hp32 hp33
 
 hp21:
 	@$(MAKE) --no-print-directory -C ./src MODEL=21
