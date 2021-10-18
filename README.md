@@ -41,12 +41,14 @@ examples in the owners handbook..
 ##### HP 29 - Working
 
 ##### HP 31 - Completed (not tested)
-* Self test does not run.
+* Fails self test
 
 ##### HP 32 - Completed (not tested)
-* Self test does not run.
+* Fails self test
 
-##### HP 33 - Only keyboard working
+##### HP 33 - Mostly working
+* Self test does not run (terminates simulation).
+* Some minor issues with the display decoder still to fix
 
 ### Compiling
 
