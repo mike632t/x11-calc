@@ -48,10 +48,11 @@
 #define DISPLAY_DECIMAL    0x0080
 #define DISPLAY_COMMA      0x0100
 #define DISPLAY_COLON      0x0200
-#define DISPLAY_E          0x004f
-#define DISPLAY_P          0x0067
 #define DISPLAY_r          0x0044
+#define DISPLAY_c          0x004c
 #define DISPLAY_o          0x005c
+#define DISPLAY_P          0x0067
+#define DISPLAY_E          0x004f
 #define DISPLAY_TEST       0x01ff
 
 typedef struct { /* Calculator display structure. */

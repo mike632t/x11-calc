@@ -46,6 +46,8 @@
  * 17 Oct 21         - Size of each digit depends on the number digits - MT
  *                   - Uses separate display decoders used depending on the
  *                     number of digits - MT 
+ * 19 Oct 21         - Now displays program steps correctly on Spice series
+ *                     simulators - MT
  *
  */
 
@@ -155,9 +157,9 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
                               DISPLAY_EIGHT,
                               DISPLAY_NINE,
                               DISPLAY_r,
-                              DISPLAY_SPACE,
+                              DISPLAY_c,
                               DISPLAY_o,
-                              DISPLAY_SPACE,
+                              DISPLAY_P,
                               DISPLAY_E,
                               DISPLAY_SPACE };
    int i_count;
@@ -182,7 +184,9 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
                      if (i_count == 1) h_display->segment[0]->mask = DISPLAY_MINUS;
                }
                if ((h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x02) != 0) {
-                  if ((h_display->segment[i_count]->mask != DISPLAY_COMMA) && (h_display->segment[i_count]->mask != DISPLAY_SPACE))
+                  if ((h_display->segment[i_count]->mask != DISPLAY_COMMA) 
+                     && (h_display->segment[i_count]->mask != DISPLAY_SPACE)
+                     && (h_display->segment[i_count]->mask != DISPLAY_MINUS))
                      h_display->segment[i_count]->mask = h_display->segment[i_count]->mask | DISPLAY_COMMA;
                }
                if ((h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x01) != 0) {
