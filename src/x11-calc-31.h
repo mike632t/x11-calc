@@ -21,6 +21,8 @@
  * 21 Sep 21   0.1   - Initial version - MT
  * 12 Oct 21         - Removed Title and replaced with model number - MT
  *                   - Added macro definition for continuous memory - MT
+ * 20 Oct 21         - Defined SPICE symbol, allows conditional compilation
+ *                     of model dependent code - MT
  *
  */
 
@@ -34,6 +36,7 @@
 #define ROM_SIZE     04000
 #define MEMORY_SIZE  4
 #define ROM_BANKS    1
+#define SPICE        True
 #define CONTINIOUS   False
 
 int i_rom [ROM_SIZE * ROM_BANKS];

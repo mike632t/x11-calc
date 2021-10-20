@@ -24,6 +24,8 @@
  *                   - Added macro definition for continuous memory - MT
  * 17 Oct 21         - Added additional registers that are used for working
  *                     storage - MT
+ * 20 Oct 21         - Defined SPICE symbol, allows conditional compilation
+ *                     of model dependent code - MT
  *                      
  */
 
@@ -37,6 +39,7 @@
 #define ROM_SIZE     07000
 #define MEMORY_SIZE  20
 #define ROM_BANKS    1
+#define SPICE        True
 #define CONTINIOUS   False
 
 int i_rom [ROM_SIZE * ROM_BANKS];
