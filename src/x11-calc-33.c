@@ -29,6 +29,7 @@
  * 26 Sep 21         - Replaced BCD hex key codes with octal values - MT
  *                   - Added shortcut key definitions - MT
  * 18 Oct 21         - Added key codes and ROM contents - MT
+ * 20 Oct 21         - Assigned space bar to single step - MT
  *                      
  * TO DO :           - 
  */
@@ -67,7 +68,7 @@ void v_init_keypad(obutton *h_button[], oswitch *h_switch[]) {
    h_switch[1] = h_switch_create(00000, "PRGM", "RUN", h_alternate_font, 120, 67, 67, 10, True, MID_GREY, DARK_GREY);
 
    /* Define top row of keys. */ 
-   h_button[0] = h_button_create(00064, 000, "SST", "FIX", "BST", h_normal_font, h_small_font, h_alternate_font, 12, 89, 33, 30, False, BLACK, YELLOW, BLUE);
+   h_button[0] = h_button_create(00064, ' ', "SST", "FIX", "BST", h_normal_font, h_small_font, h_alternate_font, 12, 89, 33, 30, False, BLACK, YELLOW, BLUE);
    h_button[1] = h_button_create(00063, 000, "GSB", "SCI", "RTN", h_normal_font, h_small_font, h_alternate_font, 48, 89, 33, 30, False, BLACK, YELLOW, BLUE);
    h_button[2] = h_button_create(00062, 000, "GTO", "ENG", "NOP", h_normal_font, h_small_font, h_alternate_font, 84, 89, 33, 30, False, BLACK, YELLOW, BLUE);
    h_button[3] = h_button_create(00061, 'f', "f", "", "", h_normal_font, h_small_font, h_alternate_font, 120, 89, 33, 30, False, YELLOW, BACKGROUND, YELLOW);
