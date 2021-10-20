@@ -40,15 +40,12 @@ examples in the owners handbook..
 
 ##### HP 29 - Working
 
-##### HP 31 - Completed (not tested)
-* Fails self test
+##### HP 31 - Working
 
-##### HP 32 - Completed (not tested)
-* Fails self test
+##### HP 32 - Completed (not finished testing)
+* Hangs after self test
 
-##### HP 33 - Mostly working
-* Self test does not run (terminates simulation).
-* Some minor issues with the display decoder still to fix
+##### HP 33 - Working
 
 ### Compiling
 
@@ -121,4 +118,3 @@ The following packages are required to build and/or run the simulator.
 - Arch   : gcc, make, libx11-dev, libc6-dev, xorg-fonts-misc ?
 
 - Alpine : gcc, make, libx11-dev, libc6-dev, font-misc-misc ?
-
