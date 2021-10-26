@@ -34,7 +34,7 @@
  *
  * TO DO :           -
  */
-#define  COMMIT_ID "[Commit ID: $Format:%h$]"
+#define COMMIT_ID "[Commit ID: $Format:%h$]"
 
 #ifdef HP21
 #include "x11-calc-21.h"
@@ -55,6 +55,8 @@
 #elif HP11
 #include "x11-calc-11.h"
 #endif
+
+#define __TIME__     "00:00:00"
 
 #define FILENAME     NAME "-" MODEL
 #define TITLE        "RPN calc " MODEL

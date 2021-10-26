@@ -32,6 +32,7 @@
  *                     (necessary as clearing status bit 15 when the key is
  *                     released does NOT work!) - MT
  * 30 Sep 21         - Added properties for enable and select - MT
+ * 26 Oct 21         - Added definition for processor_load() - MT
  */
 
 #ifndef REGISTERS
@@ -92,6 +93,10 @@ typedef struct {
 oprocessor *h_processor_create(int *h_rom);
 
 void v_processor_reset(oprocessor *h_processor);
+
+void v_processor_load(oprocessor *h_processor, char *s_pathname);
+
+void v_processor_restore(oprocessor *h_processor);
 
 void v_processor_save(oprocessor *h_processor);
 

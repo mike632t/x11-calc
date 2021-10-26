@@ -143,13 +143,13 @@
  *                     the HP27 tests S3 even though it doesn't have a mode
  *                     select switch - go figure - MT
  *             0.5   - HP27 simulator works (requires testing).
- *             0.6   - HP31 and HP32 simulators work (requires testing).
-
+ *             0.6   - HP31 and HP32 simulators work (require testing).
+ * 26 Oct 21   0.7   - Added the ability to allow the user to specify which
+ *                     file should be used when restoring the initial state
+ *                     of  the registers on the command line (only  applies
+ *                     to models with continuous memory) - MT
  *
- * To Do             - Allow the the display and processor properties to be
- *                     model  specific, or use a separate calculator  class
- *                     for each model?
- *                   - Combine error and warning routines (add severity  to
+ * To Do             - Combine error and warning routines (add severity  to
  *                     parameters).
  *                   - Parse command line in a separate routine.
  *                   - Save trace and single step options and restore when
@@ -231,7 +231,7 @@ int main(int argc, char *argv[]){
    XEvent x_event;
    XSizeHints *h_size_hint;
    Atom wm_delete;
-
+   
    oswitch *h_switch[2];
    /* oswitch *h_selected = NULL; */
    obutton *h_button[BUTTONS]; /* Array to hold pointers to buttons. */
@@ -244,6 +244,7 @@ int main(int argc, char *argv[]){
    char *s_font; /* Font description. */
 
    char *s_title = TITLE; /* Windows title. */
+   char *s_pathname = NULL;
 
    unsigned int i_window_width = WIDTH; /* Window width in pixels. */
    unsigned int i_window_height = HEIGHT; /* Window height in pixels. */
@@ -362,8 +363,15 @@ int main(int argc, char *argv[]){
    }
 #endif
 
-   if (argc > 1 ) v_error(INVALID_COMMAND, FILENAME); /* There shouldn't be any command lime parameters */
+   if (argc > 2) v_error(INVALID_COMMAND, FILENAME); /* There should never be more than one command lime parameter */
    
+   if (argc > 1) {
+      if (CONTINIOUS) 
+         s_pathname = argv[1]; /* Set path name if a parameter was passed and continuous memory is enabled */
+      else
+         v_error(INVALID_COMMAND, FILENAME); /* There shouldn't any command lime parameters */
+   }
+      
    i_wait(200); /* Sleep for 200 milliseconds to 'debounce' keyboard! */
 
    v_version(False);
@@ -444,6 +452,10 @@ int main(int argc, char *argv[]){
 
    fprintf(stderr, "ROM Size : %4u words \n", (unsigned)(sizeof(i_rom) / sizeof i_rom[0]));
    h_processor = h_processor_create(i_rom);
+   if (s_pathname == NULL)
+      v_processor_restore(h_processor);
+   else
+      v_processor_load(h_processor, s_pathname); /* Load user specified settings */   
 
    /* Main program event loop. */
    b_abort = False;
@@ -492,7 +504,12 @@ int main(int argc, char *argv[]){
             else if (h_keyboard->key == (XK_R & 0x1f)) /* Ctrl-R to display internal CPU registers */
                v_fprint_state(stdout, h_processor);
             else if (h_keyboard->key == (XK_C & 0x1f)) { /* Ctrl-C to reset  */
-               v_processor_reset(h_processor); b_run = True;
+               v_processor_reset(h_processor);
+               if (s_pathname == NULL)
+                  v_processor_restore(h_processor); /* Load current saved settings */
+               else
+                  v_processor_load(h_processor, s_pathname); /* Load user specified settings */   
+               b_run = True;
             }
             else { /* Check for matching button */
                int i_count;
@@ -542,9 +559,10 @@ int main(int argc, char *argv[]){
                      i_switch_draw(x_display, x_application_window, i_screen, h_switch[0]);
                      if (h_switch[0]->state) {
                         v_processor_reset(h_processor); /* Reset the processor */
+                        v_processor_restore(h_processor); /* Restore saved settings */
                      }
                      else {
-                        v_processor_save(h_processor);
+                        v_processor_save(h_processor); /* Save current settings */
                         h_processor->enabled = False; /* Disable the processor */
                      }
                   }
