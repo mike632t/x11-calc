@@ -50,9 +50,8 @@ FILES		+= x11-calc-*.png
 OBJECTS	= $(SOURCES:.c=.o)
 OUTPUT	= $(PROGRAM).out
 LIBS		= -lX11 -lm
-INCLUDE	= src
-FLAGS		= -Wall -pedantic -ansi -std=gnu99 -fcommon
-FLAGS		+= -Wno-comment -Wno-deprecated-declarations
+FLAGS		= -fcommon -Wall -pedantic -ansi -std=gnu99 
+FLAGS		+= -Wno-comment -Wno-deprecated-declarations -Wno-builtin-macro-redefined
 FLAGS		+= -no-pie
 #FLAGS		+= -g # For debugging
 CC			= gcc
@@ -67,7 +66,7 @@ SOURCES 	+= x11-calc-$(MODEL).c
 
 $(OBJECTS) : $(SOURCES)
 	@echo $(PROGRAM)-$(MODEL)
-	@$(CC) $(FLAGS) -c $(SOURCES) -I $(INCLUDE)
+	@$(CC) $(FLAGS) -c $(SOURCES)
 
 clean:
 	@rm -f $(PROGRAM)-$(MODEL).o
