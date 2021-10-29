@@ -412,7 +412,7 @@ void v_processor_load(oprocessor *h_processor, char *s_pathname) {
    FILE *h_datafile;
    int i_count, i_counter;
 
-   if ((h_processor != NULL) && (s_pathname != NULL)  /* Check processor and pathname are defined */ 
+   if ((h_processor != NULL) && (s_pathname != NULL)  /* Check processor and pathname are defined */
       && CONTINIOUS) { /* and continuous memory is enabled */
       h_datafile = fopen(s_pathname, "r");
       if (h_datafile !=NULL) { /* If file exists and can be opened restore state */
