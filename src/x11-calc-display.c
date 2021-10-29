@@ -49,6 +49,8 @@
  * 19 Oct 21         - Fixed display of program steps Spice series - MT
  * 20 OCt 21         - Conditionally  compiles the display formatting  code
  *                     for the SPICE or WOODSTOCK series machines - MT
+ * 29 Oct 21         - Fixed bug is SPICE display, only shows minus sign if
+ *                     there are two consecutive commas in the display - MT
  *
  */
 
@@ -182,14 +184,15 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
                      h_display->segment[i_count]->mask = DISPLAY_SPACE;
                }
                else
-                  if (i_count == 1) h_display->segment[0]->mask = DISPLAY_MINUS;
+                  if (i_count == 1) h_display->segment[0]->mask = DISPLAY_MINUS; /* Negative value */
             }
             if ((h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x02) != 0) {
                if ((h_display->segment[i_count]->mask != DISPLAY_COMMA)
                   && (h_display->segment[i_count]->mask != DISPLAY_SPACE)
                   && (h_display->segment[i_count]->mask != DISPLAY_MINUS))
                   h_display->segment[i_count]->mask = h_display->segment[i_count]->mask | DISPLAY_COMMA;
-               if (i_count == 1) h_display->segment[0]->mask = DISPLAY_MINUS;
+               if ((i_count == 1) && ((h_processor->reg[B_REG]->nibble[REG_SIZE - 3] & 0x02) != 0))
+                  h_display->segment[0]->mask = DISPLAY_MINUS; /* Self test */
 
             }
             if ((h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x01) != 0) {
