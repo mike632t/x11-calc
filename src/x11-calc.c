@@ -137,7 +137,7 @@
  *                     code to work on VMS using a black and white  display
  *                     without being modified) - MT
  * 12 Oct 21         - Added routine to display warnings - MT
- * 14 Oct 21         - Added support for continuous memory - MT 
+ * 14 Oct 21         - Added support for continuous memory - MT
  * 16 Oct 21   0.4   - HP29 simulator works..!
  *                   - Undefined  switches should be off.  Rather strangely
  *                     the HP27 tests S3 even though it doesn't have a mode
@@ -148,6 +148,7 @@
  *                     file should be used when restoring the initial state
  *                     of  the registers on the command line (only  applies
  *                     to models with continuous memory) - MT
+ * 29 Oct 21         - Draw display when window is exposed - MT
  *
  * To Do             - Combine error and warning routines (add severity  to
  *                     parameters).
@@ -170,7 +171,7 @@
 
 #define DEBUG 0        /* Enable/disable debug*/
 
-#define INTERVAL 100     /* Number of ticks to execute before updating the display */
+#define INTERVAL 25    /* Number of ticks to execute before updating the display */
 
 #include <stdarg.h>    /* strlen(), etc. */
 #include <string.h>    /* strlen(), etc. */
@@ -231,7 +232,7 @@ int main(int argc, char *argv[]){
    XEvent x_event;
    XSizeHints *h_size_hint;
    Atom wm_delete;
-   
+
    oswitch *h_switch[2];
    /* oswitch *h_selected = NULL; */
    obutton *h_button[BUTTONS]; /* Array to hold pointers to buttons. */
@@ -279,7 +280,7 @@ int main(int argc, char *argv[]){
             exit(0);
          }
          else if ((!strncmp(argv[i_count], "/HELP", i_index)) | (!strncmp(argv[i_count], "/?", i_index))) {
-            fprintf(stdout, HELP_TEXT, FILENAME); 
+            fprintf(stdout, HELP_TEXT, FILENAME);
             exit(0);
          }
          else /* If we get here then the we have an invalid option */
@@ -364,17 +365,17 @@ int main(int argc, char *argv[]){
 #endif
 
    if (argc > 2) v_error(INVALID_COMMAND, FILENAME); /* There should never be more than one command lime parameter */
-   
+
    if (argc > 1) {
-      if (CONTINIOUS) 
+      if (CONTINIOUS)
          s_pathname = argv[1]; /* Set path name if a parameter was passed and continuous memory is enabled */
       else
          v_error(INVALID_COMMAND, FILENAME); /* There shouldn't any command lime parameters */
    }
-      
+
    i_wait(200); /* Sleep for 200 milliseconds to 'debounce' keyboard! */
 
-   v_version(False);
+   v_version();
 
    /* Open the display and create a new window. */
    if (!(x_display = XOpenDisplay(s_display_name))) v_error ("Cannot connect to X server '%s'.\n", s_display_name);
@@ -412,7 +413,7 @@ int main(int argc, char *argv[]){
          &i_window_width,
          &i_window_height,
          &i_window_border,
-         &i_colour_depth) == False) 
+         &i_colour_depth) == False)
       v_error(DISPLAY_ERROR);
 
    /* Check colour depth. */
@@ -432,8 +433,14 @@ int main(int argc, char *argv[]){
    if (!(h_large_font = XLoadQueryFont(x_display, s_font))) v_error(FONT_ERROR, s_font);
 
    v_init_keypad(h_button, h_switch); /* Create buttons. */
+
    h_display = h_display_create(0, 2, 4, 197, 61, RED, DARK_RED, RED_BACKGROUND); /* Create display */
-   h_keyboard = h_keyboard_create(x_display);
+
+#ifdef linux
+
+   h_keyboard = h_keyboard_create(x_display); /* Only works with Linux */
+
+#endif
 
    /* Select kind of events we are interested in. */
    XSelectInput(x_display, x_application_window, FocusChangeMask | ExposureMask |
@@ -447,15 +454,12 @@ int main(int argc, char *argv[]){
    XMapWindow(x_display, x_application_window);
    XRaiseWindow(x_display, x_application_window); /* Raise window - ensures expose event is raised? */
 
-   /* Flush all pending requests to the X server, and wait until they are processed by the X server. */
-   XSync(x_display, False);
-
    fprintf(stderr, "ROM Size : %4u words \n", (unsigned)(sizeof(i_rom) / sizeof i_rom[0]));
    h_processor = h_processor_create(i_rom);
    if (s_pathname == NULL)
       v_processor_restore(h_processor);
    else
-      v_processor_load(h_processor, s_pathname); /* Load user specified settings */   
+      v_processor_load(h_processor, s_pathname); /* Load user specified settings */
 
    /* Main program event loop. */
    b_abort = False;
@@ -471,7 +475,6 @@ int main(int argc, char *argv[]){
          i_count = INTERVAL;
          i_wait(INTERVAL / 2); /* Sleep for 0.5 ms per tick */
       }
-      /* XFlush(x_display); */
 
       if (h_processor->pc == i_breakpoint) b_trace = b_step = True;/* Breakpoint */
       h_processor->flags[TRACE] = b_trace;
@@ -491,6 +494,9 @@ int main(int argc, char *argv[]){
                h_processor->keypressed = False; /* Don't clear the status bit here!! */
             }
             break;
+
+#ifdef linux
+
          case KeyPress :
             h_key_pressed(h_keyboard, x_display, x_event.xkey.keycode, x_event.xkey.state); /* Attempts to translate a key code into a character. */
             if (h_keyboard->key == (XK_Z & 0x1f)) /* Ctrl-z to exit  */
@@ -508,7 +514,7 @@ int main(int argc, char *argv[]){
                if (s_pathname == NULL)
                   v_processor_restore(h_processor); /* Load current saved settings */
                else
-                  v_processor_load(h_processor, s_pathname); /* Load user specified settings */   
+                  v_processor_load(h_processor, s_pathname); /* Load user specified settings */
                b_run = True;
             }
             else { /* Check for matching button */
@@ -537,6 +543,9 @@ int main(int argc, char *argv[]){
                }
             }
             break;
+
+#endif
+
          case ButtonPress :
             if (x_event.xbutton.button == 1) {
                int i_count;
@@ -586,7 +595,7 @@ int main(int argc, char *argv[]){
             }
             break;
          case Expose : /* Draw or redraw the window. */
-            /** i_display_draw(x_display, x_application_window, i_screen, h_display);/* Redraw display. */
+            i_display_draw(x_display, x_application_window, i_screen, h_display);/* Draw display. */
             i_switch_draw(x_display, x_application_window, i_screen, h_switch[0]);
             i_switch_draw(x_display, x_application_window, i_screen, h_switch[1]);
             {
