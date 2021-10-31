@@ -16,7 +16,7 @@ running on either VAX or Alpha processors, and Tru64 Unix running on Alpha.
 
 ### Latest News
 
-Added continuous memory to models that support it.  .
+Successfully tested on the Raspberry Pi 3 and Raspberry Pi 4.
 
 ### Status
 
