@@ -87,7 +87,7 @@ osegment *h_segment_create(int i_index, int i_mask, int i_left, int i_top,
 
    osegment *h_segment; /* Ponter to segment. */
 
-   /* Attempt to allcoate memory for a segment. */
+   /* Attempt to allocate memory for a segment. */
    if ((h_segment = malloc (sizeof(*h_segment)))==NULL) v_error("Memory allocation failed!");
 
    h_segment->index = i_index;
@@ -103,14 +103,7 @@ osegment *h_segment_create(int i_index, int i_mask, int i_left, int i_top,
    return (h_segment);
 }
 
-/*
- * segment_draw (display, window, screen, segment)
- *
- * Draws the a segment on the screen.
- *
- */
-
-int i_segment_draw(Display *h_display, int x_application_window, int i_screen, osegment *h_segment){
+int i_segment_draw(Display *h_display, int x_application_window, int i_screen, osegment *h_segment){ /* Draws all the segments */
 
    int i_left, i_right, i_upper, i_lower;
    int i_offset;
@@ -136,6 +129,7 @@ int i_segment_draw(Display *h_display, int x_application_window, int i_screen, o
 
    /* Fill in the background for each active display segment. */
    XSetForeground(h_display, DefaultGC(h_display, i_screen),i_shade( h_segment->foreground));
+
    if (h_segment->mask & SEG_A) {/* Draw the segment A.  */
       XDrawLine(h_display, x_application_window, DefaultGC(h_display, i_screen), i_left, i_upper, i_right, i_upper);
       XFillRectangle(h_display, x_application_window, DefaultGC(h_display, i_screen), i_left + 1, i_upper - 1, i_right - i_left - 1, 3);
@@ -171,16 +165,16 @@ int i_segment_draw(Display *h_display, int x_application_window, int i_screen, o
       XFillRectangle(h_display, x_application_window, DefaultGC(h_display, i_screen), i_left + 1, i_offset - 1, i_right - i_left - 1, 3);
    }
 
-   if (h_segment->mask & SEG_DECIMAL) { /* Draw a decimal point seperator.  */
+   if (h_segment->mask & SEG_DECIMAL) { /* Draw a decimal point separator.  */
       XFillRectangle(h_display, x_application_window, DefaultGC(h_display, i_screen), i_right + 3, i_lower - 1, 3, 3);
    }
 
-   if (h_segment->mask & SEG_COMMA) { /* Draw a comma seperator.  */
+   if (h_segment->mask & SEG_COMMA) { /* Draw a comma separator.  */
       XFillRectangle(h_display, x_application_window, DefaultGC(h_display, i_screen), i_right + 3, i_lower - 1, 3, 3);
       XDrawLine(h_display, x_application_window, DefaultGC(h_display, i_screen), i_right + 3, i_lower + 2, i_right + 3, i_lower + 2);
    }
 
-   if (h_segment->mask & SEG_COLON) { /* Draw a colon seperator.  */
+   if (h_segment->mask & SEG_COLON) { /* Draw a colon separator.  */
       XFillRectangle(h_display, x_application_window, DefaultGC(h_display, i_screen), i_right + 3, i_offset - 4, 3, 3);
       XFillRectangle(h_display, x_application_window, DefaultGC(h_display, i_screen), i_right + 3, i_offset + 2, 3, 3);
    }
@@ -200,7 +194,6 @@ int i_segment_draw(Display *h_display, int x_application_window, int i_screen, o
    }
 
    if (h_segment->mask & SEG_D) {/* Draw the segment D.  */
-      XSetForeground(h_display, DefaultGC(h_display, i_screen), h_segment->foreground);
       XDrawLine(h_display, x_application_window, DefaultGC(h_display, i_screen), i_left + 1, i_lower, i_right - 1, i_lower);
    }
 
@@ -216,19 +209,19 @@ int i_segment_draw(Display *h_display, int x_application_window, int i_screen, o
       XDrawLine(h_display, x_application_window, DefaultGC(h_display, i_screen), i_left + 1, i_offset, i_right - 1, i_offset);
    }
 
-   if (h_segment->mask & SEG_DECIMAL) { /* Draw a decimal point seperator.  */
+   if (h_segment->mask & SEG_DECIMAL) { /* Draw a decimal point separator.  */
       XDrawLine(h_display, x_application_window, DefaultGC(h_display, i_screen), i_right + 3, i_lower, i_right + 5, i_lower);
       XDrawLine(h_display, x_application_window, DefaultGC(h_display, i_screen), i_right + 4, i_lower - 1, i_right + 4, i_lower + 1);
    }
 
-   if (h_segment->mask & SEG_COMMA) { /* Draw a comma seperator.  */
+   if (h_segment->mask & SEG_COMMA) { /* Draw a comma separator.  */
       XDrawLine(h_display, x_application_window, DefaultGC(h_display, i_screen), i_right + 3, i_lower, i_right + 5, i_lower);
       XDrawLine(h_display, x_application_window, DefaultGC(h_display, i_screen), i_right + 4, i_lower - 1, i_right + 4, i_lower + 1);
       XDrawLine(h_display, x_application_window, DefaultGC(h_display, i_screen), i_right + 3, i_lower + 3, i_right + 4, i_lower + 3);
       XDrawLine(h_display, x_application_window, DefaultGC(h_display, i_screen), i_right + 2, i_lower + 4, i_right + 3, i_lower + 4);
    }
 
-   if (h_segment->mask & SEG_COLON) { /* Draw a decimal point seperator.  */
+   if (h_segment->mask & SEG_COLON) { /* Draw a decimal point separator.  */
       XDrawLine(h_display, x_application_window, DefaultGC(h_display, i_screen), i_right + 3, i_offset - 3, i_right + 5, i_offset - 3);
       XDrawLine(h_display, x_application_window, DefaultGC(h_display, i_screen), i_right + 4, i_offset - 4, i_right + 4, i_offset - 2);
       XDrawLine(h_display, x_application_window, DefaultGC(h_display, i_screen), i_right + 3, i_offset + 3, i_right + 5, i_offset + 3);
@@ -237,5 +230,3 @@ int i_segment_draw(Display *h_display, int x_application_window, int i_screen, o
 
    return(True);
 }
-
-
