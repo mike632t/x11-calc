@@ -103,7 +103,7 @@ saved to the data file in the user's HOME folder.
 ### Debugging
 
 You  can  start the simulation in trace mode using '-t', or in single  step
-mode using '-s', and set a breakpoint using '&#8209;b <octal address>'.
+mode using '-s', and set a breakpoint using '&#8209;b &lt;octal address&gt;'.
 
 'Ctrl-T'  also toggles trace mode when running, 'Ctrl-S' executes the  next
 instruction, 'Ctrl-Q' resumes execution, and 'Ctrl-R' displays the contents
