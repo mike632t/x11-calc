@@ -102,18 +102,18 @@ saved to the data file in the user's HOME folder.
 
 ### Debugging
 
-You  can  start the simulation in trace mode using '-t', or in single  step
-mode using '-s', and set a breakpoint using '&#8209;b &lt;octal address&gt;'.
+You  can  start the simulation in trace mode using '&#8209;t', or in single  step
+mode using '&#8209;s', and set a breakpoint using '&#8209;b &lt;octal address&gt;'.
 
-'Ctrl-T'  also toggles trace mode when running, 'Ctrl-S' executes the  next
-instruction, 'Ctrl-Q' resumes execution, and 'Ctrl-R' displays the contents
+'Ctrl&#8209;T'  also toggles trace mode when running, 'Ctrl&#8209;S' executes the  next
+instruction, 'Ctrl&#8209;Q' resumes execution, and 'Ctrl&#8209;R' displays the contents
 of the CPU registers .
 
 When in trace mode a jump to the same instruction produces no output.
 
 ### Known Issues
 
-The simulators requires a 24 -bit colour display.
+The simulators requires a 24&#8209;bit colour display.
 
 On a Raspberry Pi the display is not updated properly if either FKMS or KMS
 graphics overlays are enabled.  The following entries in '/boot/config.txt'
@@ -126,14 +126,10 @@ should be commented out as shown.
 
 The following packages are required to build and/or run the simulator.
 
-- Debian : gcc, make, libx11-dev, libc6-dev, xfonts-base
+- Debian : gcc, make, libx11&#8209;dev, libc6&#8209;dev, xfonts&#8209;base
 
-- Ubuntu : gcc, make, libx11-dev, libc6-dev, xfonts-base
+- Ubuntu : gcc, make, libx11&#8209;dev, libc6&#8209;dev, xfonts&#8209;base
 
-- Fedora : gcc, make, libx11-dev, libc6-dev, xorg-x11-xfonts-base
+- Fedora : gcc, make, libx11&#8209;dev, libc6&#8209;dev, xorg&#8209;x11&#8209;xfonts&#8209;base
 
-- Gentoo : gcc, make, libx11-dev, libc6-dev, font-misc-misc
-
-- Arch   : gcc, make, libx11-dev, libc6-dev, xorg-fonts-misc ?
-
-- Alpine : gcc, make, libx11-dev, libc6-dev, font-misc-misc ?
+- Gentoo : gcc, make, libx11&#8209;dev, libc6&#8209;dev, font&#8209;misc&#8209;misc
