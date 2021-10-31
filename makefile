@@ -22,7 +22,7 @@
 #
 
 PROGRAM	=  x11-calc
-FILES		=  ./src/*.c ./src/*.h ./src/makefile 
+FILES		=  ./src/*.c ./src/*.h ./src/makefile
 FILES		+= *.md LICENSE makefile .gitignore .gitattributes
 FILES		+= ./img/x11-calc-*.png
 MAKE		=  make
@@ -47,16 +47,16 @@ hp29:
 
 hp31:
 	@$(MAKE) --no-print-directory -C ./src MODEL=31
-	
+
 hp32:
 	@$(MAKE) --no-print-directory -C ./src MODEL=32
-	
+
 hp33:
 	@$(MAKE) --no-print-directory -C ./src MODEL=33
 
 #hp11:
 #	@$(MAKE) --no-print-directory -C ./src MODEL=11
-	
+
 clean:
 	@rm  -f ./src/*.o
 
