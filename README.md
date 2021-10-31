@@ -16,16 +16,11 @@ running on either VAX or Alpha processors, and Tru64 Unix running on Alpha.
 
 ### Latest News
 
-Added continuous memory to models that support it.  The contents of program
-and  data registers are saved in a hidden file in the users' HOME directory
-when the program exits or the calculator is switched off, and restored when
-the application is loaded or is reset using 'Ctrl-C'.
+Added continuous memory to models that support it.  .
 
 ### Status
 
-Currently very much work in progress. The CPU simulation code is now mostly
-complete but several important features required by later calculator models
-have not yet be implemented.
+Mostly working, next goal is to be able simulate the HP34C.
 
 ##### HP 21 - Working
 
@@ -84,21 +79,18 @@ them to the original saved state.
 
 ### Loading and saving
 
-For  models with continuous memory the contents of the registers and memory
-are saved to 'hidden' data file in the user's HOME folder.
+For  models with continuous memory the contents of program memory and  data
+registers are saved in a hidden file in the users' HOME directory when  the
+program  exits  or the calculator is switched off, and restored  from  this
+hidden file when the simulator is loaded or reset using 'Ctrl&#8209;C'
 
     ~/.x11-calc-nn.dat
 
-The  current simulator state is saved when the simulator is switched off or
-the program exits.
-
 When  starting the simulator the name of the data file used to restore  the
 saved state can be specified on the command line allowing previously  saved
-copies of programs to be loaded automatically when the simulator starts.
-
-If a data file is specified on the command line 'Ctrl-C' will use this file
-when resetting the simulator to it's initial state, but any changes will be
-saved to the data file in the user's HOME folder.
+copies of programs to be loaded automatically when the simulator starts  or
+the  simulator is reset using 'Ctrl&#8209;C'.  However, any changes will be saved
+in hidden data file.
 
 ### Debugging
 
