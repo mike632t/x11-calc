@@ -31,37 +31,63 @@
  *                     time if required - MT
  *                   - Defined  title and original filename based on  model
  *                     number - MT
+ * 29 Oct 21         - Included files and token defined separately for each
+ *                     model - MT
  *
  * TO DO :           -
  */
 #define COMMIT_ID "[Commit ID: $Format:%h$]"
 
+/** #define __TIME__     "00:00:00" /* Release only */
+
 #ifdef HP21
+#define FILENAME     "x11-calc-21"
+#define TITLE        "RPN calc 21"
 #include "x11-calc-21.h"
+
 #elif HP22
+#define FILENAME     "x11-calc-22"
+#define TITLE        "RPN calc 22"
 #include "x11-calc-22.h"
+
 #elif HP25
+#define FILENAME     "x11-calc-25"
+#define TITLE        "RPN calc 25C"
 #include "x11-calc-25.h"
+
 #elif HP27
+#define FILENAME     "x11-calc-27"
+#define TITLE        "RPN calc 27"
 #include "x11-calc-27.h"
+
 #elif HP29
+#define FILENAME     "x11-calc-29"
+#define TITLE        "RPN calc 29C"
 #include "x11-calc-29.h"
+
 #elif HP31
+#define FILENAME     "x11-calc-31"
+#define TITLE        "RPN calc 31"
 #include "x11-calc-31.h"
+
 #elif HP32
+#define FILENAME     "x11-calc-32"
+#define TITLE        "RPN calc 32"
 #include "x11-calc-32.h"
+
 #elif HP33
+#define FILENAME     "x11-calc-33"
+#define TITLE        "RPN calc 33C"
 #include "x11-calc-33.h"
+
 #elif HP11
+#define FILENAME     "x11-calc-11"
+#define TITLE        "RPN calc 11"
 #include "x11-calc-11.h"
 #endif
 
-#define __TIME__     "00:00:00"
-
-#define FILENAME     NAME "-" MODEL
-#define TITLE        "RPN calc " MODEL
-
 #ifdef vms
+
 #define COLOUR_DEPTH 1
 #define HELP_TEXT    "Usage: %s [OPTION]... \n"\
                      "An RPN Calculator simulation for X11.\n\n"\
@@ -90,7 +116,9 @@
 #define INVALID_RANGE         "out of range -- '%s' \n"
 #define MISSING_ARGUMENT      "option requires an argument -- '%s'\n"
 #define INVALID_ARGUMENT      "expected argument not -- '%c' \n"
+
 #endif
+
 #define UNRECOGNIZED_OPTION   "unrecognized option '%s'\n"
 #define LICENCE_TEXT          "Copyright(C) %s %s\n"\
                               "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\n"\
@@ -107,4 +135,3 @@ void v_about(); /* Display help text */
 void v_error(const char *s_fmt, ...); /* Print formatted error message */
 
 void v_warning(const char *s_fmt, ...); /* Print formatted warning message and return */
-
