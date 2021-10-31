@@ -1,6 +1,6 @@
 ## x11-calc - Another RPN (Reverse Polish) calculator.
 
-![HP21](./img/x11-calc-21.png) ![HP22](./img/x11-calc-22.png) ![HP25](./img/x11-calc-25.png) 
+![HP21](./img/x11-calc-21.png) ![HP22](./img/x11-calc-22.png) ![HP25](./img/x11-calc-25.png)
 
 ![HP27](./img/x11-calc-27.png) ![HP29](./img/x11-calc-29.png)
 
@@ -27,7 +27,7 @@ Currently very much work in progress. The CPU simulation code is now mostly
 complete but several important features required by later calculator models
 have not yet be implemented.
 
-##### HP 21 - Working 
+##### HP 21 - Working
 
 ##### HP 22 - Working
 The  following issues were observed when checking the behaviour against the
@@ -39,6 +39,7 @@ examples in the owners handbook..
 ##### HP 27 - Completed (not finished testing)
 
 ##### HP 29 - Working
+* All registers behave as continuous memory (not correct)
 
 ##### HP 31 - Working
 
@@ -60,10 +61,10 @@ e.g:
     $ unzip master.zip
     $ cd x11-calc-master
     $ make all
-    
+
     $ ./bin/x11-calc-29
     x11-calc-29: Version 0.4 [Commit ID: 81c55be] 16 Oct 21 21:15:00 (Build: 0067)
-    ROM Size : 4096 words 
+    ROM Size : 4096 words
 
 ### Keyboard Shortcuts
 
@@ -73,7 +74,7 @@ The following keyboard shortcuts should work:
 (when using numeric key pad you need to use numlock as usual).
 
 'Esc' is 'Clx', 'c' is CHS, 'e' is 'EEX' and on programmable models 'Space'
-corresponds to 'SST'. 
+corresponds to 'SST'.
 
 'f' and where applicable 'g' and 'h' correspond to the function keys.
 
@@ -81,27 +82,45 @@ corresponds to 'SST'.
 memory 'Ctrl-Z' saves the current register contents, and 'Ctrl-C'  restores
 them to the original saved state.
 
+### Loading and saving
+
+For  models with continuous memory the contents of the registers and memory
+are saved to 'hidden' data file in the user's HOME folder.
+
+    ~/.x11-calc-nn.dat
+
+The  current simulator state is saved when the simulator is switched off or
+the program exits.
+
+When  starting the simulator the name of the data file used to restore  the
+saved state can be specified on the command line allowing previously  saved
+copies of programs to be loaded automatically when the simulator starts.
+
+If a data file is specified on the command line 'Ctrl-C' will use this file
+when resetting the simulator to it's initial state, but any changes will be
+saved to the data file in the user's HOME folder.
+
 ### Debugging
 
-You  can  start the simulation in trace mode using '-t', or in single  step 
+You  can  start the simulation in trace mode using '-t', or in single  step
 mode using '-s', and set a breakpoint using '-b <octal address>'.
 
 'Ctrl-T'  also toggles trace mode when running, 'Ctrl-S' executes the  next
 instruction, 'Ctrl-Q' resumes execution, and 'Ctrl-R' displays the contents
-of the CPU registers .  
+of the CPU registers .
 
 When in trace mode a jump to the same instruction produces no output.
 
 ### Known Issues
 
-Need  to sort out colour mapping to allow program to run on a display  with
-less than 24 -bit colour - may get round to this be one day...
+The simulators requires a 24 -bit colour display.
 
-The  X11 implementation on the Raspberry Pi 4 is just too slow to draw  the
-display without it flickering (but it works well on the Jetson Nano, and an
-old Intel Atom based netbook). I suspect that rewriting the display code to
-use  a custom font or a fixed size bitmap for each digit instead of drawing
-each segment individually might speed things up. 
+On a Raspberry Pi the display is not updated properly if either FKMS or KMS
+graphics overlays are enabled.  The following entries in '/boot/config.txt'
+should be commented out as shown.
+
+    #dtoverlay=vc4-fkms-v3d
+    #dtoverlay=vc4-kms-v3d
 
 ### Prerequisites
 
