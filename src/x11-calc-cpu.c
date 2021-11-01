@@ -278,7 +278,7 @@ void v_fprint_state(FILE *h_file, oprocessor *h_processor) {
 
 /* Create a new register , */
 oregister *h_register_create(char c_id){
-   oregister *h_register; /* Pointer to register. */
+   oregister *h_register; /* Pointer to register */
    int i_count, i_temp;
    if ((h_register = malloc (sizeof(*h_register))) == NULL) {
       fprintf(stderr, "Run-time error\t: %s line : %d : %s", __FILE__, __LINE__, "Memory allocation failed!\n");
@@ -425,7 +425,7 @@ void v_processor_load(oprocessor *h_processor, char *s_pathname) {
          fclose(h_datafile);
       }
       else
-         v_warning("Unable to open %s\n", s_pathname); /* Can't open data file . */
+         v_warning("Unable to open %s\n", s_pathname); /* Can't open data file */
    }
 }
 
@@ -458,7 +458,7 @@ void v_processor_save(oprocessor *h_processor) {
          fclose(h_datafile);
       }
       else
-         v_warning("Unable to open %s\n", s_pathname); /* Can't open data file . */
+         v_warning("Unable to open %s\n", s_pathname); /* Can't open data file */
    }
 }
 
@@ -514,7 +514,7 @@ void v_processor_reset(oprocessor *h_processor) {
 oprocessor *h_processor_create(int *h_rom){
    oprocessor *h_processor;
    int i_count;
-   if ((h_processor = malloc(sizeof(*h_processor)))==NULL) v_error("Memory allocation failed!"); /* Attempt to allocate memory to hold the processor structure. */
+   if ((h_processor = malloc(sizeof(*h_processor)))==NULL) v_error("Memory allocation failed!"); /* Attempt to allocate memory to hold the processor structure */
    for (i_count = 0; i_count < REGISTERS; i_count++)
       h_processor->reg[i_count] = h_register_create((i_count + 1) * -1); /* Allocate storage for the registers */
    for (i_count = 0; i_count < MEMORY_SIZE; i_count++)
@@ -669,7 +669,7 @@ void v_processor_tick(oprocessor *h_processor) {
                break;
             case 03:
                switch (i_opcode) {
-               case 01160: /* c -> addr  */
+               case 01160: /* c -> addr */
                   {
                      int i_addr;
                      if (h_processor->flags[TRACE]) fprintf(stdout, "c -> addr ");
@@ -798,16 +798,16 @@ void v_processor_tick(oprocessor *h_processor) {
                case 01010: /* stack -> a */
                   if (h_processor->flags[TRACE]) fprintf(stdout, "stack -> a");
                      h_processor->first = 0; h_processor->last = REG_SIZE - 1;
-                     v_reg_copy(h_processor, h_processor->reg[A_REG], h_processor->reg[Y_REG]); /* T = Z  */
-                     v_reg_copy(h_processor, h_processor->reg[Y_REG], h_processor->reg[Z_REG]); /* T = Z  */
-                     v_reg_copy(h_processor, h_processor->reg[Z_REG], h_processor->reg[T_REG]); /* T = Z  */
+                     v_reg_copy(h_processor, h_processor->reg[A_REG], h_processor->reg[Y_REG]); /* T = Z */
+                     v_reg_copy(h_processor, h_processor->reg[Y_REG], h_processor->reg[Z_REG]); /* T = Z */
+                     v_reg_copy(h_processor, h_processor->reg[Z_REG], h_processor->reg[T_REG]); /* T = Z */
                   break;
                case 01110: /* down rotate */
                   if (h_processor->flags[TRACE]) fprintf(stdout, "stack -> a");
                      h_processor->first = 0; h_processor->last = REG_SIZE - 1;
-                     v_reg_exch(h_processor, h_processor->reg[T_REG], h_processor->reg[C_REG]); /* T = Z  */
-                     v_reg_exch(h_processor, h_processor->reg[C_REG], h_processor->reg[Y_REG]); /* T = Z  */
-                     v_reg_exch(h_processor, h_processor->reg[Y_REG], h_processor->reg[Z_REG]); /* T = Z  */
+                     v_reg_exch(h_processor, h_processor->reg[T_REG], h_processor->reg[C_REG]); /* T = Z */
+                     v_reg_exch(h_processor, h_processor->reg[C_REG], h_processor->reg[Y_REG]); /* T = Z */
+                     v_reg_exch(h_processor, h_processor->reg[Y_REG], h_processor->reg[Z_REG]); /* T = Z */
                   break;
                case 01210: /* y -> a */
                   if (h_processor->flags[TRACE]) fprintf(stdout, "y -> a");
@@ -817,9 +817,9 @@ void v_processor_tick(oprocessor *h_processor) {
                case 01310: /* c -> stack */
                   if (h_processor->flags[TRACE]) fprintf(stdout, "stack -> a");
                      h_processor->first = 0; h_processor->last = REG_SIZE - 1;
-                     v_reg_copy(h_processor, h_processor->reg[T_REG], h_processor->reg[Z_REG]); /* T = Z  */
-                     v_reg_copy(h_processor, h_processor->reg[Z_REG], h_processor->reg[Y_REG]); /* T = Z  */
-                     v_reg_copy(h_processor, h_processor->reg[Y_REG], h_processor->reg[C_REG]); /* T = Z  */
+                     v_reg_copy(h_processor, h_processor->reg[T_REG], h_processor->reg[Z_REG]); /* T = Z */
+                     v_reg_copy(h_processor, h_processor->reg[Z_REG], h_processor->reg[Y_REG]); /* T = Z */
+                     v_reg_copy(h_processor, h_processor->reg[Y_REG], h_processor->reg[C_REG]); /* T = Z */
                   break;
                case 01410: /* decimal */
                   if (h_processor->flags[TRACE]) fprintf(stdout, "decimal");
@@ -853,7 +853,7 @@ void v_processor_tick(oprocessor *h_processor) {
                if (h_processor->flags[TRACE]) fprintf(stdout, "c -> data register(%d)", h_processor->addr);
                if ((h_processor->addr) < MEMORY_SIZE) {
                   h_processor->first = 0; h_processor->last = REG_SIZE - 1;
-                  v_reg_copy(h_processor, h_processor->mem[h_processor->addr], h_processor->reg[C_REG]); /* C -> reg(n)  */
+                  v_reg_copy(h_processor, h_processor->mem[h_processor->addr], h_processor->reg[C_REG]); /* C -> reg(n) */
                }
                else
                   v_error("Address %02o out of range at %05o in %s line : %d\n", i_opcode >> 6, h_processor->pc, __FILE__, __LINE__);
@@ -902,7 +902,7 @@ void v_processor_tick(oprocessor *h_processor) {
                 * 00454 if p <>  9  01554 if p <> 10  01454 if p <> 11
                 * 00254 if p <> 12  01154 if p <> 13  N/A   if p <> 14
                 * N/A   if p <> 15
-                */
+               */
                if (h_processor->flags[TRACE]) fprintf(stdout, "if p # %d", i_tst_p[i_opcode >> 6]);
                h_processor->flags[CARRY] = (h_processor->p == i_tst_p[i_opcode >> 6]);
                v_op_inc_pc(h_processor); /* Increment program counter */
@@ -932,7 +932,7 @@ void v_processor_tick(oprocessor *h_processor) {
          i_field = (i_opcode >> 2) & 7;
 
          switch (i_field) {
-         case 0: /* 000   P  : determined by P register             ([P]) */
+         case 0: /* 000   P  : determined by P register             ([P])       */
             h_processor->first = h_processor->p; h_processor->last = h_processor->p;
             s_field = "p";
             if (h_processor->p >= REG_SIZE) {
@@ -943,7 +943,6 @@ void v_processor_tick(oprocessor *h_processor) {
             break;
          case 1: /* 100  WP  : word up to and including P register  ([0 .. P])  */
             h_processor->first =  0; h_processor->last =  h_processor->p; /* break; bug in orig??? */
-            s_field = "wp";
             s_field = "wp";
             if (h_processor->p >= REG_SIZE) {
                v_error("Unexpected error in %s line : %d\n", __FILE__, __LINE__);
