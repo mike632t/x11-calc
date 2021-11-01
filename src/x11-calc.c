@@ -149,6 +149,10 @@
  *                     of  the registers on the command line (only  applies
  *                     to models with continuous memory) - MT
  * 29 Oct 21         - Draw display when window is exposed - MT
+ * 01 Nov 21         - Explicitly define the cursor - MT
+ *                   - Attempts  to center the window on the display.  Most
+ *                     window managers ignore this, but it does work if the
+ *                     application is invoked directly by startx - MT
  *
  * To Do             - Combine error and warning routines (add severity  to
  *                     parameters).
@@ -173,15 +177,16 @@
 
 #define INTERVAL 25    /* Number of ticks to execute before updating the display */
 
-#include <stdarg.h>    /* strlen(), etc. */
-#include <string.h>    /* strlen(), etc. */
-#include <stdio.h>     /* fprintf(), etc. */
-#include <stdlib.h>    /* getenv(), etc. */
+#include <stdarg.h>    /* strlen(), etc */
+#include <string.h>    /* strlen(), etc */
+#include <stdio.h>     /* fprintf(), etc */
+#include <stdlib.h>    /* getenv(), etc */
 
-#include <ctype.h>     /* isprint(), etc. */
+#include <ctype.h>     /* isprint(), etc */
 
-#include <X11/Xlib.h>  /* XOpenDisplay(), etc. */
-#include <X11/Xutil.h> /* XSizeHints etc. */
+#include <X11/Xlib.h>  /* XOpenDisplay(), etc */
+#include <X11/Xutil.h> /* XSizeHints etc */
+#include <X11/cursorfont.h>
 
 #include "x11-calc-font.h"
 #include "x11-calc-button.h"
@@ -199,8 +204,8 @@
 #include "gcc-debug.h" /* print() */
 #include "gcc-wait.h"  /* i_wait() */
 
-void v_version() { /* Display version information */
-
+void v_version() /* Display version information */
+{
    fprintf(stderr, "%s: Version %s %s", FILENAME, VERSION, COMMIT_ID);
    if (__DATE__[4] == ' ') fprintf(stderr, " 0"); else fprintf(stderr, " %c", __DATE__[4]);
    fprintf(stderr, "%c %c%c%c %s %s", __DATE__[5],
@@ -208,7 +213,8 @@ void v_version() { /* Display version information */
    fprintf(stderr, " (Build: %s)\n", BUILD );
 }
 
-void v_error(const char *s_fmt, ...) { /* Print formatted error message and exit */
+void v_error(const char *s_fmt, ...) /* Print formatted error message and exit */
+{
    va_list t_args;
    va_start(t_args, s_fmt);
    fprintf(stderr, "%s : ", FILENAME);
@@ -217,7 +223,8 @@ void v_error(const char *s_fmt, ...) { /* Print formatted error message and exit
    exit(-1);
 }
 
-void v_warning(const char *s_fmt, ...) { /* Print formatted warning message and return */
+void v_warning(const char *s_fmt, ...) /* Print formatted warning message and return */
+{
    va_list t_args;
    va_start(t_args, s_fmt);
    fprintf(stderr, "%s : ", FILENAME);
@@ -225,35 +232,39 @@ void v_warning(const char *s_fmt, ...) { /* Print formatted warning message and 
    va_end(t_args);
 }
 
+
 int main(int argc, char *argv[]){
 
-   Display *x_display; /* Pointer to X display structure. */
-   Window x_application_window; /* Application window structure. */
+   Display *x_display; /* Pointer to X display structure */
+   Window x_application_window; /* Application window structure */
+   Cursor x_cursor;
    XEvent x_event;
    XSizeHints *h_size_hint;
    Atom wm_delete;
 
    oswitch *h_switch[2];
    /* oswitch *h_selected = NULL; */
-   obutton *h_button[BUTTONS]; /* Array to hold pointers to buttons. */
+   obutton *h_button[BUTTONS]; /* Array to hold pointers to buttons */
    obutton *h_pressed = NULL;
-   odisplay *h_display; /* Pointer to display structure. */
+   odisplay *h_display; /* Pointer to display structure */
    okeyboard *h_keyboard;
    oprocessor *h_processor;
 
-   char *s_display_name = ""; /* Just use the default display. */
-   char *s_font; /* Font description. */
+   char *s_display_name = ""; /* Just use the default display */
+   char *s_font; /* Font description */
 
-   char *s_title = TITLE; /* Windows title. */
+   char *s_title = TITLE; /* Windows title */
    char *s_pathname = NULL;
 
-   unsigned int i_window_width = WIDTH; /* Window width in pixels. */
-   unsigned int i_window_height = HEIGHT; /* Window height in pixels. */
-   unsigned int i_window_border = 4; /* Window's border width. */
-   unsigned int i_colour_depth; /* Window's colour depth. */
-   unsigned int i_background_colour; /* Window's background colour. */
+   unsigned int i_screen_width; /* Screen width */
+   unsigned int i_screen_height; /* Screen height */
+   unsigned int i_window_width = WIDTH; /* Window width in pixels */
+   unsigned int i_window_height = HEIGHT; /* Window height in pixels */
+   unsigned int i_window_border = 4; /* Window's border width */
+   unsigned int i_colour_depth; /* Window's colour depth */
+   unsigned int i_background_colour; /* Window's background colour */
    int i_window_left, i_window_top; /* Window's top-left corner */
-   int i_screen; /* Default screen number. */
+   int i_screen; /* Default screen number */
 
    char b_trace = False; /* Trace flag */
    char b_step = False; /* Single step flag flag */
@@ -377,26 +388,29 @@ int main(int argc, char *argv[]){
 
    v_version();
 
-   /* Open the display and create a new window. */
+   /* Open the display and create a new window */
    if (!(x_display = XOpenDisplay(s_display_name))) v_error ("Cannot connect to X server '%s'.\n", s_display_name);
 
-   /* Get the default screen for our X server. */
+   /* Get the default screen for our X server */
    i_screen = DefaultScreen(x_display);
+   i_screen_width = DisplayWidth(x_display, i_screen);
+   i_screen_height = DisplayHeight(x_display, i_screen);
 
-   /* Set the background colour. */
+   /* Set the background colour */
    i_background_colour = BACKGROUND;
 
-   /* Create the application window, as a child of the root window. */
+   /* Create the application window, as a child of the root window */
    x_application_window = XCreateSimpleWindow(x_display,
       RootWindow(x_display, i_screen),
-      i_window_width, i_window_height,  /* Window position -igore ? */
-      i_window_width, /* Window width. */
-      i_window_height, /* Window height. */
+      //i_window_width, i_window_height,  /* Window position -ignored ? */
+      (i_screen_width - i_window_width) / 2 , (i_screen_height - i_window_height) / 2, /* Window position -ignored ? */
+      i_window_width, /* Window width */
+      i_window_height, /* Window height */
       i_window_border, /* Border width - ignored ? */
-      BlackPixel(x_display, i_screen), /* Preferred method. */
+      BlackPixel(x_display, i_screen), /* Preferred method */
       i_background_colour);
 
-   /* Set application window size. */
+   /* Set application window size */
    h_size_hint = XAllocSizeHints();
    h_size_hint->flags = PMinSize | PMaxSize;
    h_size_hint->min_height = i_window_height;
@@ -404,9 +418,9 @@ int main(int argc, char *argv[]){
    h_size_hint->max_height = i_window_height;
    h_size_hint->max_width = i_window_width;
    XSetWMNormalHints(x_display, x_application_window, h_size_hint);
-   XStoreName(x_display, x_application_window, s_title); /* Set the window title. */
+   XStoreName(x_display, x_application_window, s_title); /* Set the window title */
 
-   /* Get window geometry. */
+   /* Get window geometry */
    if (XGetGeometry(x_display, x_application_window,
          &RootWindow(x_display, i_screen),
          &i_window_left, &i_window_top,
@@ -416,23 +430,23 @@ int main(int argc, char *argv[]){
          &i_colour_depth) == False)
       v_error(DISPLAY_ERROR);
 
-   /* Check colour depth. */
+   /* Check colour depth */
    if (i_colour_depth != COLOUR_DEPTH) v_error(COLOUR_ERROR, COLOUR_DEPTH);
 
-   /* Load fonts. */
-   s_font = NORMAL_TEXT; /* Normal text font. */
+   /* Load fonts */
+   s_font = NORMAL_TEXT; /* Normal text font */
    if (!(h_normal_font = XLoadQueryFont(x_display, s_font))) v_error(FONT_ERROR, s_font);
 
-   s_font = SMALL_TEXT; /* Small text font. */
+   s_font = SMALL_TEXT; /* Small text font */
    if (!(h_small_font = XLoadQueryFont(x_display, s_font))) v_error(FONT_ERROR, s_font);
 
-   s_font = ALTERNATE_TEXT; /* Alternate text font. */
+   s_font = ALTERNATE_TEXT; /* Alternate text font */
    if (!(h_alternate_font = XLoadQueryFont(x_display, s_font))) v_error(FONT_ERROR, s_font);
 
-   s_font = LARGE_TEXT; /* Large text font. */
+   s_font = LARGE_TEXT; /* Large text font */
    if (!(h_large_font = XLoadQueryFont(x_display, s_font))) v_error(FONT_ERROR, s_font);
 
-   v_init_keypad(h_button, h_switch); /* Create buttons. */
+   v_init_keypad(h_button, h_switch); /* Create buttons */
 
    h_display = h_display_create(0, 2, 4, 197, 61, RED, DARK_RED, RED_BACKGROUND); /* Create display */
 
@@ -442,17 +456,20 @@ int main(int argc, char *argv[]){
 
 #endif
 
-   /* Select kind of events we are interested in. */
+   /* Select kind of events we are interested in */
    XSelectInput(x_display, x_application_window, FocusChangeMask | ExposureMask |
       KeyPressMask | KeyReleaseMask | ButtonPressMask |
       ButtonReleaseMask | StructureNotifyMask | SubstructureNotifyMask);
 
    wm_delete = XInternAtom(x_display, "WM_DELETE_WINDOW", False); /* Create a windows delete message 'atom'. */
-   XSetWMProtocols(x_display, x_application_window, &wm_delete, 1); /* Tell the display to pass wm_delete messages to the application window. */
+   XSetWMProtocols(x_display, x_application_window, &wm_delete, 1); /* Tell the display to pass wm_delete messages to the application window */
 
    /* Show window on display */
    XMapWindow(x_display, x_application_window);
    XRaiseWindow(x_display, x_application_window); /* Raise window - ensures expose event is raised? */
+
+   x_cursor = XCreateFontCursor(x_display, XC_arrow);
+   XDefineCursor(x_display, x_application_window, x_cursor); /* Define the default X cursor */
 
    fprintf(stderr, "ROM Size : %4u words \n", (unsigned)(sizeof(i_rom) / sizeof i_rom[0]));
    h_processor = h_processor_create(i_rom);
@@ -461,7 +478,7 @@ int main(int argc, char *argv[]){
    else
       v_processor_load(h_processor, s_pathname); /* Load user specified settings */
 
-   /* Main program event loop. */
+   /* Main program event loop */
    b_abort = False;
    i_count = 0;
 
@@ -498,7 +515,7 @@ int main(int argc, char *argv[]){
 #ifdef linux
 
          case KeyPress :
-            h_key_pressed(h_keyboard, x_display, x_event.xkey.keycode, x_event.xkey.state); /* Attempts to translate a key code into a character. */
+            h_key_pressed(h_keyboard, x_display, x_event.xkey.keycode, x_event.xkey.state); /* Attempts to translate a key code into a character */
             if (h_keyboard->key == (XK_Z & 0x1f)) /* Ctrl-z to exit  */
                b_abort = True;
             else if (h_keyboard->key == (XK_Q & 0x1f)) /* Ctrl-Q to resume */
@@ -594,13 +611,13 @@ int main(int argc, char *argv[]){
                }
             }
             break;
-         case Expose : /* Draw or redraw the window. */
-            i_display_draw(x_display, x_application_window, i_screen, h_display);/* Draw display. */
+         case Expose : /* Draw or redraw the window */
+            i_display_draw(x_display, x_application_window, i_screen, h_display);/* Draw display */
             i_switch_draw(x_display, x_application_window, i_screen, h_switch[0]);
             i_switch_draw(x_display, x_application_window, i_screen, h_switch[1]);
             {
                int i_count;
-               for (i_count = 0; i_count < BUTTONS; i_count++) /* Draw buttons. */
+               for (i_count = 0; i_count < BUTTONS; i_count++) /* Draw buttons */
                   i_button_draw(x_display, x_application_window, i_screen, h_button[i_count]);
             }
             break;
@@ -613,7 +630,10 @@ int main(int argc, char *argv[]){
 
 
    v_processor_save(h_processor); /* Save state */
+
+   XFreeCursor (x_display, x_cursor); /* Free cursor */
    XDestroyWindow(x_display, x_application_window); /* Close connection to server */
    XCloseDisplay(x_display);
+
    exit(0);
 }
