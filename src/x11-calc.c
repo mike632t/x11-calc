@@ -516,7 +516,7 @@ int main(int argc, char *argv[]){
 
          case KeyPress :
             h_key_pressed(h_keyboard, x_display, x_event.xkey.keycode, x_event.xkey.state); /* Attempts to translate a key code into a character */
-            if (h_keyboard->key == (XK_Z & 0x1f)) /* Ctrl-z to exit  */
+            if (h_keyboard->key == (XK_Z & 0x1f)) /* Ctrl-z to exit */
                b_abort = True;
             else if (h_keyboard->key == (XK_Q & 0x1f)) /* Ctrl-Q to resume */
                b_step = !(b_run  = True);
@@ -526,7 +526,7 @@ int main(int argc, char *argv[]){
                b_trace = !b_trace;
             else if (h_keyboard->key == (XK_R & 0x1f)) /* Ctrl-R to display internal CPU registers */
                v_fprint_state(stdout, h_processor);
-            else if (h_keyboard->key == (XK_C & 0x1f)) { /* Ctrl-C to reset  */
+            else if (h_keyboard->key == (XK_C & 0x1f)) { /* Ctrl-C to reset */
                v_processor_reset(h_processor);
                if (s_pathname == NULL)
                   v_processor_restore(h_processor); /* Load current saved settings */
