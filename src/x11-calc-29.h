@@ -21,20 +21,54 @@
  * 09 Mar 14         - Initial version - MEJT
  * 12 Oct 21         - Removed Title and replaced with model number - MT
  *                   - Added macro definition for continuous memory - MT
+ * 04 Nov 21         - Allows size of the window to be changed by modifying
+ *                     the value of SCALE at compile time - MT
  *
  */
 
-#define MODEL        "29"
-#define HEIGHT       385
-#define WIDTH        201 /* Yes really! */
-#define BUTTONS      30
+#define MODEL           "29"
+#define SCALE           1.33
+#define HEIGHT          385 * SCALE
+#define WIDTH           200 * SCALE
+#define BUTTONS         30
 
-#define DIGITS       12
+#define DIGITS          12
 
-#define MEMORY_SIZE  48
-#define ROM_SIZE     04000
-#define ROM_BANKS    2
-#define CONTINIOUS   True
+#define DISPLAY_LEFT    0
+#define DISPLAY_TOP     4 * SCALE
+#define DISPLAY_WIDTH   200 * SCALE
+#define DISPLAY_HEIGHT  61 * SCALE
+
+#define KEYBOARD_ROW_0  67 * SCALE
+#define KEYBOARD_ROW_1  89 * SCALE
+#define KEYBOARD_ROW_2  132 * SCALE
+#define KEYBOARD_ROW_3  175 * SCALE
+#define KEYBOARD_ROW_4  218 * SCALE
+#define KEYBOARD_ROW_5  261 * SCALE
+#define KEYBOARD_ROW_6  304 * SCALE
+#define KEYBOARD_ROW_7  347 * SCALE
+
+#define KEYBOARD_COL_A  12 * SCALE
+#define KEYBOARD_COL_B  48 * SCALE
+#define KEYBOARD_COL_C  84 * SCALE
+#define KEYBOARD_COL_D  120 * SCALE
+#define KEYBOARD_COL_E  156 * SCALE
+
+#define KEYBOARD_COL_1  12 * SCALE
+#define KEYBOARD_COL_2  52 * SCALE
+#define KEYBOARD_COL_3  100 * SCALE
+#define KEYBOARD_COL_4  147 * SCALE
+
+#define SMALL_KEY_WIDTH 33 * SCALE
+#define NUM_KEY_WIDTH   41 * SCALE
+#define ENTER_KEY_WIDTH 69 * SCALE
+#define KEY_HEIGHT      30 * SCALE
+#define SWITCH_HEIGHT   10 * SCALE
+
+#define MEMORY_SIZE     48
+#define ROM_SIZE        04000
+#define ROM_BANKS       2
+#define CONTINIOUS      True
 
 int i_rom [ROM_SIZE * ROM_BANKS];
 

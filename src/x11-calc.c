@@ -153,6 +153,9 @@
  *                   - Attempts  to center the window on the display.  Most
  *                     window managers ignore this, but it does work if the
  *                     application is invoked directly by startx - MT
+ * 02 Nov 21         - Allows size of the window to be changed by modifying
+ *                     the value of SCALE at compile time - MT
+ * 03 Nov 21         - Temporarily comment out code to define cursor - MT
  *
  * To Do             - Combine error and warning routines (add severity  to
  *                     parameters).
@@ -237,7 +240,7 @@ int main(int argc, char *argv[]){
 
    Display *x_display; /* Pointer to X display structure */
    Window x_application_window; /* Application window structure */
-   Cursor x_cursor;
+   /** Cursor x_cursor; /* Application cursor */
    XEvent x_event;
    XSizeHints *h_size_hint;
    Atom wm_delete;
@@ -402,7 +405,6 @@ int main(int argc, char *argv[]){
    /* Create the application window, as a child of the root window */
    x_application_window = XCreateSimpleWindow(x_display,
       RootWindow(x_display, i_screen),
-      //i_window_width, i_window_height,  /* Window position -ignored ? */
       (i_screen_width - i_window_width) / 2 , (i_screen_height - i_window_height) / 2, /* Window position -ignored ? */
       i_window_width, /* Window width */
       i_window_height, /* Window height */
@@ -448,7 +450,7 @@ int main(int argc, char *argv[]){
 
    v_init_keypad(h_button, h_switch); /* Create buttons */
 
-   h_display = h_display_create(0, 2, 4, 197, 61, RED, DARK_RED, RED_BACKGROUND); /* Create display */
+   h_display = h_display_create(0, DISPLAY_LEFT, DISPLAY_TOP, DISPLAY_WIDTH, DISPLAY_HEIGHT, RED, DARK_RED, RED_BACKGROUND); /* Create display */
 
 #ifdef linux
 
@@ -468,7 +470,7 @@ int main(int argc, char *argv[]){
    XMapWindow(x_display, x_application_window);
    XRaiseWindow(x_display, x_application_window); /* Raise window - ensures expose event is raised? */
 
-   x_cursor = XCreateFontCursor(x_display, XC_arrow);
+   /** x_cursor = XCreateFontCursor(x_display, XC_arrow);
    XDefineCursor(x_display, x_application_window, x_cursor); /* Define the default X cursor */
 
    fprintf(stderr, "ROM Size : %4u words \n", (unsigned)(sizeof(i_rom) / sizeof i_rom[0]));
@@ -631,7 +633,7 @@ int main(int argc, char *argv[]){
 
    v_processor_save(h_processor); /* Save state */
 
-   XFreeCursor (x_display, x_cursor); /* Free cursor */
+   /** XFreeCursor (x_display, x_cursor); /* Free cursor */
    XDestroyWindow(x_display, x_application_window); /* Close connection to server */
    XCloseDisplay(x_display);
 

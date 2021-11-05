@@ -37,20 +37,20 @@
 #  30 Sep 21	0.9	- Builds label and switch 'classes' - MT
 #   3 Oct 21	0.10	- Fixed issue with backup file name - MT
 #   9 Oct 21	0.11	- Moved source code and executable files into separate
-#							  folders - MT 
+#							  folders - MT
 #
 
 MODEL		= 25
 PROGRAM	= x11-calc
-SOURCES 	= x11-calc.c x11-calc-cpu.c x11-calc-display.c x11-calc-segment.c 
-SOURCES 	+= x11-calc-button.c x11-calc-switch.c x11-calc-label.c x11-calc-colour.c 
+SOURCES 	= x11-calc.c x11-calc-cpu.c x11-calc-display.c x11-calc-segment.c
+SOURCES 	+= x11-calc-button.c x11-calc-switch.c x11-calc-label.c x11-calc-colour.c
 SOURCES 	+= x11-keyboard.c gcc-wait.c
 FILES		= *.c *.h LICENSE README.md makefile x11-calc-instruction-set.md .gitignore .gitattributes
 FILES		+= x11-calc-*.png
 OBJECTS	= $(SOURCES:.c=.o)
 OUTPUT	= $(PROGRAM).out
 LIBS		= -lX11 -lm
-FLAGS		= -fcommon -Wall -pedantic -ansi -std=gnu99 
+FLAGS		= -fcommon -Wall -pedantic -ansi -std=gnu99
 FLAGS		+= -Wno-comment -Wno-deprecated-declarations -Wno-builtin-macro-redefined
 FLAGS		+= -no-pie
 #FLAGS		+= -g # For debugging

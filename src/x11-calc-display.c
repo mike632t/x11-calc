@@ -106,13 +106,15 @@ odisplay *h_display_create(int i_index, int i_left, int i_top, int i_width,
    h_display->top = i_top;
    h_display->width = i_width;
    h_display->height = i_height;
-   for (i_count = 0; i_count < DIGITS; i_count++) {
-      if (DIGITS < 12) /* Size of each digit depends on the number digits */
-         h_display->segment[i_count] = h_segment_create(0, 0,  3 + 18 * i_count, 18, 16, 33, i_foreground, i_background); /* Spice  - 11 Digit display */
-      else
-         h_display->segment[i_count] = h_segment_create(0, 0,  5 + 16 * i_count, 21, 14, 29, i_foreground, i_background); /* Woodstock - 12 Digit display */
+#ifdef SPICE
+   for (i_count = 0; i_count < DIGITS; i_count++)
+      h_display->segment[i_count] = h_segment_create(0, 0,  ((3 + 18 * i_count) * SCALE) - 2, 18 * SCALE, 16 * SCALE, 33 * SCALE, i_foreground, i_background); /* Spice  - 11 Digit display */
+#else
+   for (i_count = 0; i_count < DIGITS; i_count++)
+      h_display->segment[i_count] = h_segment_create(0, 0,  ((5 + 16 * i_count) * SCALE), 21 * SCALE, 14 * SCALE, 29 * SCALE, i_foreground, i_background); /* Woodstock - 12 Digit display */
+#endif
+   for (i_count = 0; i_count < DIGITS; i_count++)
       h_display->segment[i_count]->mask = DISPLAY_SPACE;
-   }
    h_display->foreground = i_foreground;
    h_display->background = i_background;
    h_display->border = i_border;
@@ -167,7 +169,6 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
                               DISPLAY_SPACE };
    int i_count;
 
-   /* Draw display segments. */
 #ifdef SPICE
    for (i_count = 0; i_count < DIGITS; i_count++) {
       if (h_display->segment[i_count] != NULL) {
