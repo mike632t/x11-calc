@@ -236,11 +236,22 @@ void v_warning(const char *s_fmt, ...) /* Print formatted warning message and re
 }
 
 
+void v_set_blank_cursor(Display *x_display, Window x_application_window, Cursor *x_cursor)
+{
+   Pixmap x_blank;
+   XColor x_Color;
+   char c_pixmap_data[1] = {0}; /* An empty pixmap */
+
+   x_blank = XCreateBitmapFromData (x_display, x_application_window, c_pixmap_data, 1, 1); /* Create an empty bitmap */
+   (*x_cursor) = XCreatePixmapCursor(x_display, x_blank, x_blank, &x_Color, &x_Color, 0, 0); /* Use the empty pixmap to create a blank cursor */
+   XFreePixmap (x_display, x_blank); /* Free up pixmap */
+}
+
 int main(int argc, char *argv[]){
 
    Display *x_display; /* Pointer to X display structure */
    Window x_application_window; /* Application window structure */
-   /** Cursor x_cursor; /* Application cursor */
+   Cursor x_cursor; /* Application cursor */
    XEvent x_event;
    XSizeHints *h_size_hint;
    Atom wm_delete;
@@ -271,6 +282,7 @@ int main(int argc, char *argv[]){
 
    char b_trace = False; /* Trace flag */
    char b_step = False; /* Single step flag flag */
+   char b_cursor = True; /* Draw a cursor */
    char b_run = True; /* Run flag controls CPU instruction execution in main loop */
    char b_abort = False; /*Abort flag controls execution of main loop */
 
@@ -286,6 +298,10 @@ int main(int argc, char *argv[]){
                argv[i_count][i_index] = argv[i_count][i_index] - 32; /* TO DO - Assumes 8-bit ASCII encoding */
          if (!strncmp(argv[i_count], "/STEP", i_index))
             b_trace = True; /* Start in single step mode */
+         else if (!strncmp(argv[i_count], "/CURSOR", i_index))
+            b_cursor = True; /* Enable tracing */
+         else if (!strncmp(argv[i_count], "/NOCURSOR", i_index))
+            b_trace = False; /* Enable tracing */
          else if (!strncmp(argv[i_count], "/TRACE", i_index))
             b_trace = True; /* Enable tracing */
          else if (!strncmp(argv[i_count], "/VERSION", i_index)) {
@@ -351,7 +367,13 @@ int main(int argc, char *argv[]){
                if (i_index == 2)
                  b_abort = True; /* '--' terminates command line processing */
                else
-                  if (!strncmp(argv[i_count], "--version", i_index)) {
+                  if (!strncmp(argv[i_count], "--no-cursor", i_index)) {
+                     b_cursor = False; /* Don't draw a cursor - unless drawn by the window manager */
+                  }
+                  else if (!strncmp(argv[i_count], "--cursor", i_index)) {
+                     b_cursor = True; /* Draw cursor */
+                  }
+                  else if (!strncmp(argv[i_count], "--version", i_index)) {
                      v_version(); /* Display version information */
                      fprintf(stderr, LICENCE_TEXT, __DATE__ +7, AUTHOR);
                      exit(0);
@@ -435,6 +457,13 @@ int main(int argc, char *argv[]){
    /* Check colour depth */
    if (i_colour_depth != COLOUR_DEPTH) v_error(COLOUR_ERROR, COLOUR_DEPTH);
 
+   if (b_cursor)
+      x_cursor = XCreateFontCursor(x_display, XC_arrow); /* Create a 'default' cursor */
+   else
+      v_set_blank_cursor(x_display, x_application_window, &x_cursor); /* Get a blank cursor */
+
+   XDefineCursor(x_display, x_application_window, x_cursor); /* Define the desired X cursor */
+
    /* Load fonts */
    s_font = NORMAL_TEXT; /* Normal text font */
    if (!(h_normal_font = XLoadQueryFont(x_display, s_font))) v_error(FONT_ERROR, s_font);
@@ -469,9 +498,6 @@ int main(int argc, char *argv[]){
    /* Show window on display */
    XMapWindow(x_display, x_application_window);
    XRaiseWindow(x_display, x_application_window); /* Raise window - ensures expose event is raised? */
-
-   /** x_cursor = XCreateFontCursor(x_display, XC_arrow);
-   XDefineCursor(x_display, x_application_window, x_cursor); /* Define the default X cursor */
 
    fprintf(stderr, "ROM Size : %4u words \n", (unsigned)(sizeof(i_rom) / sizeof i_rom[0]));
    h_processor = h_processor_create(i_rom);

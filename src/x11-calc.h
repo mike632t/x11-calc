@@ -91,6 +91,8 @@
 #define COLOUR_DEPTH 1
 #define HELP_TEXT    "Usage: %s [OPTION]... \n"\
                      "An RPN Calculator simulation for X11.\n\n"\
+                     "  /cursor                  display cursor (default)\n"\
+                     "  /nocursor                hide cursor\n"\
                      "  /step                    trace execution\n"\
                      "  /trace                   trace execution\n"\
                      "  /version                 output version information and exit\n\n"\
@@ -106,6 +108,8 @@
                      "  -b  ADDR                 set break-point (octal)\n"\
                      "  -s, --step               start in single step\n"\
                      "  -t, --trace              trace execution\n"\
+                     "      --cursor             display cursor (default)\n"\
+                     "      --no-cursor          hide cursor\n"\
                      "      --help               display this help and exit\n"\
                      "      --version            output version information and exit\n\n"
 #define HELP_COMMAND "Try '%s --help' for more information.\n"
