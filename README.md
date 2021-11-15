@@ -16,7 +16,7 @@ running on either VAX or Alpha processors, and Tru64 Unix running on Alpha.
 
 ### Latest News
 
-Successfully tested on the Raspberry Pi 3 and Raspberry Pi 4.
+Added the ability for the user to exit by holding down the off switch.
 
 ### Status
 
@@ -92,6 +92,11 @@ copies of programs to be loaded automatically when the simulator starts  or
 the  simulator is reset using 'Ctrl&#8209;C'.  However, any changes will be saved
 in hidden data file.
 
+### Exiting
+
+Clicking  on the On/Off switch will turn the simulator on and off,  but  if
+you hold down the off switch down for two seconds the program will exit.
+
 ### Debugging
 
 You  can  start the simulation in trace mode using '&#8209;t', or in single  step
@@ -105,7 +110,7 @@ When in trace mode a jump to the same instruction produces no output.
 
 ### Known Issues
 
-The simulators requires a 24&#8209;bit colour display.
+The simulators require a 24&#8209;bit colour display.
 
 On a Raspberry Pi the display is not updated properly if either FKMS or KMS
 graphics overlays are enabled.  The following entries in '/boot/config.txt'
@@ -113,6 +118,20 @@ should be commented out as shown.
 
     #dtoverlay=vc4-fkms-v3d
     #dtoverlay=vc4-kms-v3d
+
+### Tested
+
+- Debian 10 (Buster), GCC 8.3.0, x64
+
+- Debian 10 (Buster), GCC 8.3.0, arm
+
+- Debian 9 (Stretch), GCC 6.3.0, arm
+
+- Debian 5 (Lenny), GCC 4.2.4, alpha
+
+- Fedora 34, GCC 11.2.1, x64
+
+- Ubuntu 20.04, GCC 9.3.0, x64
 
 ### Prerequisites
 
