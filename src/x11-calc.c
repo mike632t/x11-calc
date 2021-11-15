@@ -156,6 +156,8 @@
  * 02 Nov 21         - Allows size of the window to be changed by modifying
  *                     the value of SCALE at compile time - MT
  * 03 Nov 21         - Temporarily comment out code to define cursor - MT
+ * 15 Nov 21         - Holding down the off switch for two seconds will end
+ *                     the simulation - MT
  *
  * To Do             - Combine error and warning routines (add severity  to
  *                     parameters).
@@ -176,7 +178,7 @@
 #define DATE           "16 Oct 21"
 #define AUTHOR         "MT"
 
-#define DEBUG 0        /* Enable/disable debug*/
+#define DEBUG 1        /* Enable/disable debug*/
 
 #define INTERVAL 25    /* Number of ticks to execute before updating the display */
 
@@ -186,6 +188,8 @@
 #include <stdlib.h>    /* getenv(), etc */
 
 #include <ctype.h>     /* isprint(), etc */
+
+#include <sys/timeb.h>
 
 #include <X11/Xlib.h>  /* XOpenDisplay(), etc */
 #include <X11/Xutil.h> /* XSizeHints etc */
@@ -247,6 +251,13 @@ void v_set_blank_cursor(Display *x_display, Window x_application_window, Cursor 
    XFreePixmap (x_display, x_blank); /* Free up pixmap */
 }
 
+long l_now() /* Returns the current time in ms (since 1 )*/
+{
+   struct timeb h_time;
+   ftime(&h_time);
+   return ((1000 * h_time.time) + h_time.millitm);
+}
+
 int main(int argc, char *argv[]){
 
    Display *x_display; /* Pointer to X display structure */
@@ -289,6 +300,8 @@ int main(int argc, char *argv[]){
    int i_offset, i_count, i_index;
    int i_current = -1; /* Current program counter */
    int i_breakpoint = -1; /* Break-point */
+
+   long l_time = 0; /* Current time in milliseconds */
 
 #ifdef vms /* Parse DEC style command line options */
    for (i_count = 1; i_count < argc; i_count++) {
@@ -519,6 +532,7 @@ int main(int argc, char *argv[]){
          i_display_draw(x_display, x_application_window, i_screen, h_display); /* Redraw display */
          i_count = INTERVAL;
          i_wait(INTERVAL / 2); /* Sleep for 0.5 ms per tick */
+         if ((l_time > 0) && (l_now() > (l_time + 2000))) b_abort = True;
       }
 
       if (h_processor->pc == i_breakpoint) b_trace = b_step = True;/* Breakpoint */
@@ -595,19 +609,17 @@ int main(int argc, char *argv[]){
             if (x_event.xbutton.button == 1) {
                int i_count;
                for (i_count = 0; i_count < sizeof(h_button) / sizeof(*h_button); i_count++) {
-               /* for (i_count = 0; i_count < BUTTONS; i_count++){ /* Check buttons pressed */
                   h_pressed = h_button_pressed(h_button[i_count], x_event.xbutton.x, x_event.xbutton.y);
                   if (!(h_pressed == NULL)) {
                      h_pressed->state = True;
                      i_button_draw(x_display, x_application_window, i_screen, h_pressed);
                      h_processor->code = h_pressed->index;
                      h_processor->keypressed = True;
-                     /* h_processor->status[15] = True; */
                      debug(fprintf(stderr, "Button pressed - keycode(%.2X).\n", h_pressed->index));
                      break;
                   }
                }
-               if (h_pressed == NULL) {
+               if (h_pressed == NULL) { /* It wasn't a button that was pressed check the switches */
                   if (!(h_switch_pressed(h_switch[0], x_event.xbutton.x, x_event.xbutton.y) == NULL)) {
                      h_switch[0]->state = !(h_switch[0]->state); /* Toggle switch */
                      i_switch_draw(x_display, x_application_window, i_screen, h_switch[0]);
@@ -618,13 +630,15 @@ int main(int argc, char *argv[]){
                      else {
                         v_processor_save(h_processor); /* Save current settings */
                         h_processor->enabled = False; /* Disable the processor */
+                        l_time = l_now();
                      }
+                     debug(fprintf(stderr, "Switch pressed (%s).\n", h_switch[0]->state ? "On" : "Off"));
                   }
                   if (!(h_switch_pressed(h_switch[1], x_event.xbutton.x, x_event.xbutton.y) == NULL)) {
                      h_switch[1]->state = !(h_switch[1]->state); /* Toggle switch */
                      i_switch_draw(x_display, x_application_window, i_screen, h_switch[1]);
                      h_processor->select = h_switch[1]->state;
-                     debug(fprintf(stderr, "Switch clicked (%s).\n", h_processor->select ? "On" : "Off"));
+                     debug(fprintf(stderr, "Switch pressed (%s).\n", h_switch[1]->state ? "On" : "Off"));
                   }
                }
             }
@@ -636,6 +650,15 @@ int main(int argc, char *argv[]){
                   i_button_draw(x_display, x_application_window, i_screen, h_pressed);
                   h_processor->keypressed = False; /* Don't clear the status bit here!! */
                   debug(fprintf(stderr, "Button released - keycode(%.2X).\n", h_pressed->index));
+               }
+               if (h_pressed == NULL) { /* It wasn't a button that was released check the switches */
+                  if (!(h_switch_pressed(h_switch[0], x_event.xbutton.x, x_event.xbutton.y) == NULL)) {
+                     l_time = 0; /* Reset timer value */
+                     debug(fprintf(stderr, "Switch released (%s).\n", h_switch[0]->state ? "On" : "Off"));
+                  }
+                  if (!(h_switch_pressed(h_switch[1], x_event.xbutton.x, x_event.xbutton.y) == NULL)) {
+                     debug(fprintf(stderr, "Switch released (%s).\n", h_switch[1]->state ? "On" : "Off"));
+                  }
                }
             }
             break;
