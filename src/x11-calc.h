@@ -33,10 +33,14 @@
  *                     number - MT
  * 29 Oct 21         - Included files and token defined separately for each
  *                     model - MT
+ * 15 Nov 21         - Made the user interface scale constant common across
+ *                     all models - MT
  *
  * TO DO :           -
  */
 #define COMMIT_ID "[Commit ID: $Format:%h$]"
+
+#define SCALE           1.0
 
 /** #define __TIME__     "00:00:00" /* Release only */
 
