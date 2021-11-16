@@ -35,12 +35,15 @@
  *                     model - MT
  * 15 Nov 21         - Made the user interface scale constant common across
  *                     all models - MT
+ * 16 Nov 21         - Can now define the horizontal and vertical scales to
+ *                     independently of each other - MT
  *
  * TO DO :           -
  */
 #define COMMIT_ID "[Commit ID: $Format:%h$]"
 
-#define SCALE           1.0
+#define SCALE_WIDTH     1
+#define SCALE_HEIGHT    1
 
 /** #define __TIME__     "00:00:00" /* Release only */
 

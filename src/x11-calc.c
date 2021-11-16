@@ -64,7 +64,7 @@
  *                     brief interval (just like the real thing) - MT
  * 10 Dec 18         - Alternate  function key now LIGHT_BLUE, allowing  it
  *                     to be a different colour to the alternate text - MT
- * 11 Dec 28         - Tidied up comments again - MT
+ * 11 Dec 18         - Tidied up comments again - MT
  * 23 Aug 20         - Modified the debug code (again), optional debug code
  *                     executed using the debug() macro, with print() being
  *                     used to print diagnostic messages - MT
@@ -155,7 +155,6 @@
  *                     application is invoked directly by startx - MT
  * 02 Nov 21         - Allows size of the window to be changed by modifying
  *                     the value of SCALE at compile time - MT
- * 03 Nov 21         - Temporarily comment out code to define cursor - MT
  * 15 Nov 21         - Holding down the off switch for two seconds will end
  *                     the simulation - MT
  *

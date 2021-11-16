@@ -51,7 +51,8 @@
  *                     for the SPICE or WOODSTOCK series machines - MT
  * 29 Oct 21         - Fixed bug is SPICE display, only shows minus sign if
  *                     there are two consecutive commas in the display - MT
- *
+ * 16 Nov 21         - Can now define the horizontal and vertical scales to
+ *                     independently of each other - MT
  */
 
 #define VERSION        "0.1"
@@ -108,10 +109,10 @@ odisplay *h_display_create(int i_index, int i_left, int i_top, int i_width,
    h_display->height = i_height;
 #ifdef SPICE
    for (i_count = 0; i_count < DIGITS; i_count++)
-      h_display->segment[i_count] = h_segment_create(0, 0,  ((3 + 18 * i_count) * SCALE) - 2, 18 * SCALE, 16 * SCALE, 33 * SCALE, i_foreground, i_background); /* Spice  - 11 Digit display */
+      h_display->segment[i_count] = h_segment_create(0, 0,  ((3 + 18 * i_count) * SCALE_WIDTH) - 2, 18 * SCALE_HEIGHT, 16 * SCALE_WIDTH, 33 * SCALE_HEIGHT, i_foreground, i_background); /* Spice  - 11 Digit display */
 #else
    for (i_count = 0; i_count < DIGITS; i_count++)
-      h_display->segment[i_count] = h_segment_create(0, 0,  ((5 + 16 * i_count) * SCALE), 21 * SCALE, 14 * SCALE, 29 * SCALE, i_foreground, i_background); /* Woodstock - 12 Digit display */
+      h_display->segment[i_count] = h_segment_create(0, 0,  ((5 + 16 * i_count) * SCALE_WIDTH), 21 * SCALE_HEIGHT, 14 * SCALE_WIDTH, 29 * SCALE_HEIGHT, i_foreground, i_background); /* Woodstock - 12 Digit display */
 #endif
    for (i_count = 0; i_count < DIGITS; i_count++)
       h_display->segment[i_count]->mask = DISPLAY_SPACE;

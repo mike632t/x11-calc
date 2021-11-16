@@ -28,46 +28,47 @@
  *                     of model dependent code - MT
  * 04 Nov 21         - Allows size of the window to be changed by modifying
  *                     the value of SCALE at compile time - MT
- *
+ * 16 Nov 21         - Can now define the horizontal and vertical scales to
+ *                     independently of each other - MT
  */
 
 #define MODEL           "32"
-#define HEIGHT          385 * SCALE
-#define WIDTH           200 * SCALE
+#define HEIGHT          385 * SCALE_HEIGHT
+#define WIDTH           200 * SCALE_WIDTH
 #define BUTTONS         30
 
 #define DIGITS          11
 
 #define DISPLAY_LEFT    0
-#define DISPLAY_TOP     4 * SCALE
-#define DISPLAY_WIDTH   200 * SCALE
-#define DISPLAY_HEIGHT  61 * SCALE
+#define DISPLAY_TOP     4 * SCALE_HEIGHT
+#define DISPLAY_WIDTH   200 * SCALE_WIDTH
+#define DISPLAY_HEIGHT  61 * SCALE_HEIGHT
 
-#define KEYBOARD_ROW_0  67 * SCALE
-#define KEYBOARD_ROW_1  89 * SCALE
-#define KEYBOARD_ROW_2  132 * SCALE
-#define KEYBOARD_ROW_3  175 * SCALE
-#define KEYBOARD_ROW_4  218 * SCALE
-#define KEYBOARD_ROW_5  261 * SCALE
-#define KEYBOARD_ROW_6  304 * SCALE
-#define KEYBOARD_ROW_7  347 * SCALE
+#define KEYBOARD_ROW_0  67 * SCALE_HEIGHT
+#define KEYBOARD_ROW_1  89 * SCALE_HEIGHT
+#define KEYBOARD_ROW_2  132 * SCALE_HEIGHT
+#define KEYBOARD_ROW_3  175 * SCALE_HEIGHT
+#define KEYBOARD_ROW_4  218 * SCALE_HEIGHT
+#define KEYBOARD_ROW_5  261 * SCALE_HEIGHT
+#define KEYBOARD_ROW_6  304 * SCALE_HEIGHT
+#define KEYBOARD_ROW_7  347 * SCALE_HEIGHT
 
-#define KEYBOARD_COL_A  12 * SCALE
-#define KEYBOARD_COL_B  48 * SCALE
-#define KEYBOARD_COL_C  84 * SCALE
-#define KEYBOARD_COL_D  120 * SCALE
-#define KEYBOARD_COL_E  156 * SCALE
+#define KEYBOARD_COL_A  12 * SCALE_WIDTH
+#define KEYBOARD_COL_B  48 * SCALE_WIDTH
+#define KEYBOARD_COL_C  84 * SCALE_WIDTH
+#define KEYBOARD_COL_D  120 * SCALE_WIDTH
+#define KEYBOARD_COL_E  156 * SCALE_WIDTH
 
-#define KEYBOARD_COL_1  12 * SCALE
-#define KEYBOARD_COL_2  52 * SCALE
-#define KEYBOARD_COL_3  100 * SCALE
-#define KEYBOARD_COL_4  147 * SCALE
+#define KEYBOARD_COL_1  12 * SCALE_WIDTH
+#define KEYBOARD_COL_2  52 * SCALE_WIDTH
+#define KEYBOARD_COL_3  100 * SCALE_WIDTH
+#define KEYBOARD_COL_4  147 * SCALE_WIDTH
 
-#define SMALL_KEY_WIDTH 33 * SCALE
-#define NUM_KEY_WIDTH   41 * SCALE
-#define ENTER_KEY_WIDTH 69 * SCALE
-#define KEY_HEIGHT      30 * SCALE
-#define SWITCH_HEIGHT   10 * SCALE
+#define SMALL_KEY_WIDTH 33 * SCALE_WIDTH
+#define NUM_KEY_WIDTH   41 * SCALE_WIDTH
+#define ENTER_KEY_WIDTH 69 * SCALE_WIDTH
+#define KEY_HEIGHT      30 * SCALE_HEIGHT
+#define SWITCH_HEIGHT   10 * SCALE_HEIGHT
 
 #define ROM_SIZE        07000
 #define MEMORY_SIZE     20
