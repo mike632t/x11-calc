@@ -20,10 +20,13 @@ $! You  should have received a copy of the GNU General Public License along
 $! with this program.  If not, see <http://www.gnu.org/licenses/>.
 $!
 $! 23 Jul 13         - Initial version - MT
+$! 17 Nov 21         - Deletes any old files - MT
 $!
 $  on error then goto Quit
-$  cc x11-calc, x11-calc-21, x11-calc-cpu, x11-calc-segment, x11-calc-display, x11-calc-button, x11-calc-colour, gcc-wait
-$  link x11-calc, x11-calc-21, x11-calc-cpu, x11-calc-segment, x11-calc-display, x11-calc-button, x11-calc-colour, gcc-wait, x11-lib.opt/opt
+$  del x11-calc-33.exe;* /nolog /noconfirm
+$  cc x11-calc, x11-calc-33, x11-calc-cpu, x11-calc-segment, x11-calc-display, x11-calc-button, x11-calc-colour, x11-calc-switch, gcc-wait
+$  link x11-calc-33, x11-calc, x11-calc-cpu, x11-calc-segment, x11-calc-display, x11-calc-button, x11-calc-colour, x11-calc-switch, gcc-wait, x11-lib.opt/opt
 $  del *.obj;* /nolog /noconfim
 $Quit:
 $  exit
+
