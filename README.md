@@ -38,8 +38,8 @@ examples in the owners handbook..
 
 ##### HP 31 - Working
 
-##### HP 32 - Completed (not finished testing)
-* Hangs after self test
+##### HP 32 - Completed
+* Working but hangs after self test completes
 
 ##### HP 33 - Working
 
@@ -63,7 +63,7 @@ e.g:
 
 ### Keyboard Shortcuts
 
-The following keyboard shortcuts should work:
+The following keyboard shortcuts should work on Linux:
 
 '0' - '9', '+'. '-'. '*'. '/' and 'Enter' should do what you expect them to
 (when using numeric key pad you need to use numlock as usual).
@@ -115,6 +115,8 @@ when the simulation is powered off.
 
 On  UNIX/Linux a 24&#8209;bit colour display is required, while on VMS  the
 simulator requires a black and white display.
+
+Keyboard shortcuts only work on Linux.
 
 On a Raspberry Pi the display is not updated properly if either FKMS or KMS
 graphics overlays are enabled.  The following entries in '/boot/config.txt'
