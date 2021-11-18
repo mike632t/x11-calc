@@ -137,6 +137,8 @@ should be commented out as shown.
 
 - Ubuntu 20.04, GCC 9.3.0, x64
 
+- VAX/VMS 5.4-3, VAXC 3.2, VAX (simh)
+
 ### Prerequisites
 
 The following packages are required to build and/or run the simulator.
