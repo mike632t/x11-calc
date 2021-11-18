@@ -9,10 +9,9 @@
 Written in C using X11.
 
 Use  of any language extensions or non standard language features has  been
-avoided in order to try to make the code as portable as possible. Currently
-it will only compile without modification on Linux (Debian 10), but as with
-earlier  versions of the intention is to be able to compile the code on VMS
-running on either VAX or Alpha processors, and Tru64 Unix running on Alpha.
+avoided in order to try to make the code as portable as possible.
+
+Currently compiles without modification on Linux, VAX/VMS, and  Tru64 Unix.
 
 ### Latest News
 
