@@ -80,7 +80,6 @@
 
 #include "gcc-debug.h"
 
-
 /*
  * display_create (index, text, left, top, width, height,
  *                margin, header, footer,
