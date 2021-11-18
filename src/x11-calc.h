@@ -37,6 +37,8 @@
  *                     all models - MT
  * 16 Nov 21         - Can now define the horizontal and vertical scales to
  *                     independently of each other - MT
+ * 17 Nov 21         - Defined text messages as constant strings instead of
+ *                     macros - MT
  *
  * TO DO :           -
  */
@@ -46,6 +48,18 @@
 #define SCALE_HEIGHT    1
 
 /** #define __TIME__     "00:00:00" /* Release only */
+
+#ifdef vms
+
+#define FILENAME     "x11-calc-33"
+#define TITLE        "RPN calc 33C"
+#include "x11-calc-33.h"
+
+#define COLOUR_DEPTH 1
+
+#else
+
+#define COLOUR_DEPTH 24
 
 #ifdef HP21
 #define FILENAME     "x11-calc-21"
@@ -93,51 +107,7 @@
 #include "x11-calc-11.h"
 #endif
 
-#ifdef vms
-
-#define COLOUR_DEPTH 1
-#define HELP_TEXT    "Usage: %s [OPTION]... \n"\
-                     "An RPN Calculator simulation for X11.\n\n"\
-                     "  /cursor                  display cursor (default)\n"\
-                     "  /nocursor                hide cursor\n"\
-                     "  /step                    trace execution\n"\
-                     "  /trace                   trace execution\n"\
-                     "  /version                 output version information and exit\n\n"\
-                     "  /?, /help                display this help and exit\n"\
-#define HELP_COMMAND "Try '%s /help' for more information.\n"
-
-#define INVALID_COMMAND       "invalid parameter(s)\n"
-#define INVALID_OPTION        "invalid option %s\n"
-#else
-#define COLOUR_DEPTH 24
-#define HELP_TEXT    "Usage: %s [OPTION]... \n"\
-                     "An RPN Calculator simulation for X11.\n\n"\
-                     "  -b  ADDR                 set break-point (octal)\n"\
-                     "  -s, --step               start in single step\n"\
-                     "  -t, --trace              trace execution\n"\
-                     "      --cursor             display cursor (default)\n"\
-                     "      --no-cursor          hide cursor\n"\
-                     "      --help               display this help and exit\n"\
-                     "      --version            output version information and exit\n\n"
-#define HELP_COMMAND "Try '%s --help' for more information.\n"
-
-#define INVALID_COMMAND       "invalid operand(s)\n"
-#define INVALID_OPTION        "invalid option -- '%c'\n"
-#define INVALID_ADDRESS       "not an octal address -- '%s' \n"
-#define INVALID_RANGE         "out of range -- '%s' \n"
-#define MISSING_ARGUMENT      "option requires an argument -- '%s'\n"
-#define INVALID_ARGUMENT      "expected argument not -- '%c' \n"
-
 #endif
-
-#define UNRECOGNIZED_OPTION   "unrecognized option '%s'\n"
-#define LICENCE_TEXT          "Copyright(C) %s %s\n"\
-                              "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\n"\
-                              "This is free software: you are free to change and redistribute it.\n"\
-                              "There is NO WARRANTY, to the extent permitted by law.\n"
-#define DISPLAY_ERROR         "Unable to get display properties.\n"
-#define COLOUR_ERROR          "Requires a %d-bit colour display.\n"
-#define FONT_ERROR            "Cannot load font '%s'.\n"
 
 void v_version(); /* Display version information */
 

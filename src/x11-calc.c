@@ -157,8 +157,14 @@
  *                     the value of SCALE at compile time - MT
  * 15 Nov 21         - Holding down the off switch for two seconds will end
  *                     the simulation - MT
+ * 17 Nov 21         - Defined text messages as string constants instead of
+ *                     macros and moved them into this file to get the code
+ *                     to compile using VAXC.  I would have preferred to be
+ *                     able to define them in a separate language  specific
+ *                     module but can't figure out how - MT
  *
- * To Do             - Combine error and warning routines (add severity  to
+ * To Do             - Check messages!!!
+ *                   - Combine error and warning routines (add severity  to
  *                     parameters).
  *                   - Parse command line in a separate routine.
  *                   - Save trace and single step options and restore when
@@ -188,11 +194,15 @@
 
 #include <ctype.h>     /* isprint(), etc */
 
-#include <sys/timeb.h>
-
 #include <X11/Xlib.h>  /* XOpenDisplay(), etc */
 #include <X11/Xutil.h> /* XSizeHints etc */
 #include <X11/cursorfont.h>
+
+#ifndef vms
+#include <sys/timeb.h>
+#else
+#include <timeb.h>
+#endif
 
 #include "x11-calc-font.h"
 #include "x11-calc-button.h"
@@ -209,6 +219,51 @@
 
 #include "gcc-debug.h" /* print() */
 #include "gcc-wait.h"  /* i_wait() */
+
+#ifdef unix
+
+const char * c_msg_usage = "Usage: %s [OPTION]... [FILE]\n\
+An RPN Calculator simulation for X11.\n\n\
+  -b  ADDR                 set break-point (octal)\n\
+  -s, --step               start in single step\n\
+  -t, --trace              trace execution\n\
+      --cursor             display cursor (default)\n\
+      --no-cursor          hide cursor\n\
+      --help               display this help and exit\n\
+      --version            output version information and exit\n\n";
+const char * h_err_invalid_operand = "invalid operand(s)\n";
+const char * h_err_invalid_option = "invalid option -- '%c'\n";
+const char * h_err_unrecognised_option = "unrecognised option '%s'\n";
+const char * h_err_invalid_address = "not an octal address -- '%s' \n";
+const char * h_err_address_range = "out of range -- '%s' \n";
+const char * h_err_missing_argument = "option requires an argument -- '%s'\n";
+const char * h_err_invalid_argument = "expected argument not -- '%c' \n";
+
+#else
+
+const char * c_msg_usage = "Usage: %s [OPTION...] [FILE]\n\
+An RPN Calculator simulation for X11.\n\n\
+  /cursor                  display cursor (default)\n\
+  /nocursor                hide cursor\n\
+  /step                    trace execution\n\
+  /trace                   trace execution\n\
+  /version                 output version information and exit\n\n\
+  /?, /help                display this help and exit\n";
+
+const char * h_err_invalid_operand = "invalid parameter(s)\n";
+const char * h_err_invalid_option = "invalid option %s\n";
+
+#endif
+
+const char * h_msg_licence = "Copyright(C) %s %s\n\
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\n\
+This is free software: you are free to change and redistribute it.\n\
+There is NO WARRANTY, to the extent permitted by law.\n";
+
+const char * h_err_display = "Cannot connect to X server '%s'.\n";
+const char * h_err_display_properties = "Unable to get display properties.\n";
+const char * h_err_display_colour = "Requires a %d-bit colour display.\n";
+const char * h_err_font = "Cannot load font '%s'.\n";
 
 void v_version() /* Display version information */
 {
@@ -318,15 +373,16 @@ int main(int argc, char *argv[]){
             b_trace = True; /* Enable tracing */
          else if (!strncmp(argv[i_count], "/VERSION", i_index)) {
             v_version; /* Display version information */
-            fprintf(stderr, LICENCE_TEXT, __DATE__ +7, AUTHOR);
+            fprintf(stdout, h_msg_licence, __DATE__ +7, AUTHOR);
             exit(0);
          }
          else if ((!strncmp(argv[i_count], "/HELP", i_index)) | (!strncmp(argv[i_count], "/?", i_index))) {
-            fprintf(stdout, HELP_TEXT, FILENAME);
+            fprintf(stdout, c_msg_usage, FILENAME);
             exit(0);
          }
-         else /* If we get here then the we have an invalid option */
-            v_error(INVALID_OPTION HELP_COMMAND, argv[i_count] , FILENAME);
+         else { /* If we get here then the we have an invalid option */
+            v_error(h_err_invalid_option, argv[i_count]);
+         }
          if (argv[i_count][1] != 0) {
             for (i_index = i_count; i_index < argc - 1; i_index++) argv[i_index] = argv[i_index + 1];
             argc--; i_count--;
@@ -342,18 +398,18 @@ int main(int argc, char *argv[]){
             switch (argv[i_count][i_index]) {
             case 'b': /* Breakpoint */
                if (argv[i_count][i_index + 1] != 0)
-                  v_error(INVALID_ARGUMENT, argv[i_count][i_index + 1], FILENAME);
+                  v_error(h_err_invalid_argument, argv[i_count][i_index + 1]);
                else {
                   if (i_count + 1 < argc) {
                      i_breakpoint = 0;
                      for (i_offset = 0; i_offset < strlen(argv[i_count + 1]); i_offset++) { /* Parse octal number */
                         if ((argv[i_count + 1][i_offset] < '0') || (argv[i_count + 1][i_offset] > '7'))
-                           v_error(INVALID_ADDRESS , argv[i_count + 1], FILENAME);
+                           v_error(h_err_invalid_address , argv[i_count + 1]);
                         else
                            i_breakpoint = i_breakpoint * 8 + argv[i_count + 1][i_offset] - '0';
                      }
                      if ((i_breakpoint < 0)  || (i_breakpoint > (unsigned)(sizeof(i_rom) / sizeof i_rom[0]))) { /* Check address range */
-                        v_error(INVALID_ADDRESS HELP_COMMAND, argv[i_count + 1], FILENAME);
+                        v_error(h_err_address_range, argv[i_count + 1]);
                      }
                      else {
                         if (i_count + 2 < argc) /* Remove the parameter from the arguments */
@@ -363,7 +419,7 @@ int main(int argc, char *argv[]){
                      }
                   }
                   else {
-                     v_error(MISSING_ARGUMENT HELP_COMMAND, argv[i_count], FILENAME);
+                     v_error(h_err_missing_argument, argv[i_count]);
                   }
                }
                i_index = strlen(argv[i_count]) - 1;
@@ -387,19 +443,19 @@ int main(int argc, char *argv[]){
                   }
                   else if (!strncmp(argv[i_count], "--version", i_index)) {
                      v_version(); /* Display version information */
-                     fprintf(stderr, LICENCE_TEXT, __DATE__ +7, AUTHOR);
+                     fprintf(stdout, h_msg_licence, __DATE__ +7, AUTHOR);
                      exit(0);
                   }
                   else if (!strncmp(argv[i_count], "--help", i_index)) {
-                     fprintf(stdout, HELP_TEXT, FILENAME);
+                     fprintf(stdout, c_msg_usage, FILENAME);
                      exit(0);
                   }
                   else  /* If we get here then the we have an invalid long option */
-                     v_error(UNRECOGNIZED_OPTION HELP_COMMAND, argv[i_count], FILENAME);
+                     v_error(h_err_unrecognised_option , argv[i_count]);
                i_index--; /* Leave index pointing at end of string (so argv[i_count][i_index] = 0) */
                break;
             default: /* If we get here the single letter option is unknown */
-               v_error(INVALID_OPTION HELP_COMMAND, argv[i_count][i_index], FILENAME);
+               v_error(h_err_invalid_option, argv[i_count][i_index]);
             }
             i_index++; /* Parse next letter in option */
          }
@@ -412,13 +468,13 @@ int main(int argc, char *argv[]){
    }
 #endif
 
-   if (argc > 2) v_error(INVALID_COMMAND, FILENAME); /* There should never be more than one command lime parameter */
+   if (argc > 2) v_error(h_err_invalid_operand); /* There should never be more than one command lime parameter */
 
    if (argc > 1) {
       if (CONTINIOUS)
          s_pathname = argv[1]; /* Set path name if a parameter was passed and continuous memory is enabled */
       else
-         v_error(INVALID_COMMAND, FILENAME); /* There shouldn't any command lime parameters */
+         v_error(h_err_invalid_operand); /* There shouldn't any command lime parameters */
    }
 
    i_wait(200); /* Sleep for 200 milliseconds to 'debounce' keyboard! */
@@ -426,7 +482,7 @@ int main(int argc, char *argv[]){
    v_version();
 
    /* Open the display and create a new window */
-   if (!(x_display = XOpenDisplay(s_display_name))) v_error ("Cannot connect to X server '%s'.\n", s_display_name);
+   if (!(x_display = XOpenDisplay(s_display_name))) v_error (h_err_display, s_display_name);
 
    /* Get the default screen for our X server */
    i_screen = DefaultScreen(x_display);
@@ -464,10 +520,10 @@ int main(int argc, char *argv[]){
          &i_window_height,
          &i_window_border,
          &i_colour_depth) == False)
-      v_error(DISPLAY_ERROR);
+      v_error(h_err_display_properties);
 
    /* Check colour depth */
-   if (i_colour_depth != COLOUR_DEPTH) v_error(COLOUR_ERROR, COLOUR_DEPTH);
+   if (i_colour_depth != COLOUR_DEPTH) v_error(h_err_display_colour, COLOUR_DEPTH);
 
    if (b_cursor)
       x_cursor = XCreateFontCursor(x_display, XC_arrow); /* Create a 'default' cursor */
@@ -478,16 +534,16 @@ int main(int argc, char *argv[]){
 
    /* Load fonts */
    s_font = NORMAL_TEXT; /* Normal text font */
-   if (!(h_normal_font = XLoadQueryFont(x_display, s_font))) v_error(FONT_ERROR, s_font);
+   if (!(h_normal_font = XLoadQueryFont(x_display, s_font))) v_error(h_err_font, s_font);
 
    s_font = SMALL_TEXT; /* Small text font */
-   if (!(h_small_font = XLoadQueryFont(x_display, s_font))) v_error(FONT_ERROR, s_font);
+   if (!(h_small_font = XLoadQueryFont(x_display, s_font))) v_error(h_err_font, s_font);
 
    s_font = ALTERNATE_TEXT; /* Alternate text font */
-   if (!(h_alternate_font = XLoadQueryFont(x_display, s_font))) v_error(FONT_ERROR, s_font);
+   if (!(h_alternate_font = XLoadQueryFont(x_display, s_font))) v_error(h_err_font, s_font);
 
    s_font = LARGE_TEXT; /* Large text font */
-   if (!(h_large_font = XLoadQueryFont(x_display, s_font))) v_error(FONT_ERROR, s_font);
+   if (!(h_large_font = XLoadQueryFont(x_display, s_font))) v_error(h_err_font, s_font);
 
    v_init_keypad(h_button, h_switch); /* Create buttons */
 
