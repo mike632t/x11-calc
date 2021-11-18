@@ -23,12 +23,11 @@ $! 23 Jul 13         - Initial version - MT
 $! 17 Nov 21         - Define filename as a variable - MT
 $!
 $  on error then goto Done
-$  on warning then goto Done
 $  on control_Y then goto Done
 $  _filename := "x11-calc-33"
 $  if f$search("''_filename'.exe") .nes. "" then delete '_filename.exe;* /nolog /noconfirm
 $  cc /lis x11-calc, '_filename, x11-calc-cpu, x11-calc-segment, x11-calc-display, x11-calc-button, x11-calc-colour, x11-calc-switch, gcc-wait
 $  link '_filename, x11-calc, x11-calc-cpu, x11-calc-segment, x11-calc-display, x11-calc-button, x11-calc-colour, x11-calc-switch, gcc-wait, x11-lib.opt/opt
 $  del *.obj;* /nolog /noconfim
-Done:
+$Done:
 $  exit
