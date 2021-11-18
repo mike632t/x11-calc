@@ -182,6 +182,7 @@
  *                     message) - MT
  * 26 Oct 21   0.7   - Added processor_load() to load saved registers  from
  *                     a file - MT
+ * 17 Nov 21   0.8   - Fixed pathname on VMS - MT
  *
  * To Do             - Don't restore or save ALL registers...
  *
@@ -440,10 +441,16 @@ void v_processor_save(oprocessor *h_processor) {
 
    if ((h_processor != NULL) && CONTINIOUS) { /* Check processor defined and continuous memory enabled */
       if (s_dir == NULL) s_dir = ""; /* Use current folder if HOME not defined */
+#ifdef unix
       s_pathname = malloc((strlen(s_dir) + strlen(s_filename) +
          strlen(s_filetype) + 2) * sizeof(char*));
       strcpy(s_pathname, s_dir);
       strcat(s_pathname, "/.");
+#else
+      s_pathname = malloc((strlen(s_dir) + strlen(s_filename) +
+         strlen(s_filetype)) * sizeof(char*));
+      strcpy(s_pathname, s_dir);
+#endif
       strcat(s_pathname, s_filename);
       strcat(s_pathname, s_filetype);
       h_datafile = fopen(s_pathname, "w");
@@ -471,10 +478,16 @@ void v_processor_restore(oprocessor *h_processor) {
 
    if ((h_processor != NULL) && CONTINIOUS) { /* Check processor defined */
       if (s_dir == NULL) s_dir = ""; /* Use current folder if HOME not defined */
+#ifdef unix
       s_pathname = malloc((strlen(s_dir) + strlen(s_filename) +
          strlen(s_filetype) + 2) * sizeof(char*));
       strcpy(s_pathname, s_dir);
       strcat(s_pathname, "/.");
+#else
+      s_pathname = malloc((strlen(s_dir) + strlen(s_filename) +
+         strlen(s_filetype)) * sizeof(char*));
+      strcpy(s_pathname, s_dir);
+#endif
       strcat(s_pathname, s_filename);
       strcat(s_pathname, s_filetype);
       v_processor_load(h_processor, s_pathname); /* Load settings */
