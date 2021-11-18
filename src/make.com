@@ -1,4 +1,4 @@
-$    Verify := 'f$verify(0,0)
+$  Verify := 'f$verify(0,0)
 $!
 $! MAKE.COM
 $!
@@ -20,13 +20,15 @@ $! You  should have received a copy of the GNU General Public License along
 $! with this program.  If not, see <http://www.gnu.org/licenses/>.
 $!
 $! 23 Jul 13         - Initial version - MT
-$! 17 Nov 21         - Deletes any old files - MT
+$! 17 Nov 21         - Define filename as a variable - MT
 $!
-$  on error then goto Quit
-$  del x11-calc-33.exe;* /nolog /noconfirm
-$  cc x11-calc, x11-calc-33, x11-calc-cpu, x11-calc-segment, x11-calc-display, x11-calc-button, x11-calc-colour, x11-calc-switch, gcc-wait
-$  link x11-calc-33, x11-calc, x11-calc-cpu, x11-calc-segment, x11-calc-display, x11-calc-button, x11-calc-colour, x11-calc-switch, gcc-wait, x11-lib.opt/opt
+$  on error then goto Done
+$  on warning then goto Done
+$  on control_Y then goto Done
+$  _filename := "x11-calc-33"
+$  if f$search("''_filename'.exe") .nes. "" then delete '_filename.exe;* /nolog /noconfirm
+$  cc /lis x11-calc, '_filename, x11-calc-cpu, x11-calc-segment, x11-calc-display, x11-calc-button, x11-calc-colour, x11-calc-switch, gcc-wait
+$  link '_filename, x11-calc, x11-calc-cpu, x11-calc-segment, x11-calc-display, x11-calc-button, x11-calc-colour, x11-calc-switch, gcc-wait, x11-lib.opt/opt
 $  del *.obj;* /nolog /noconfim
-$Quit:
+Done:
 $  exit
-
