@@ -16,7 +16,8 @@ running on either VAX or Alpha processors, and Tru64 Unix running on Alpha.
 
 ### Latest News
 
-Added the ability for the user to exit by holding down the off switch.
+17/11 - Compiles without modification on VAX/VMS!
+15/11 - Added the ability for the user to exit by holding down the off switch.
 
 ### Status
 
@@ -34,7 +35,6 @@ examples in the owners handbook..
 ##### HP 27 - Completed (not finished testing)
 
 ##### HP 29 - Working
-* All registers behave as continuous memory (not correct)
 
 ##### HP 31 - Working
 
@@ -110,7 +110,11 @@ When in trace mode a jump to the same instruction produces no output.
 
 ### Known Issues
 
-The simulators require a 24&#8209;bit colour display.
+On  models with continuous memory the state of all the registers  is  saved
+when the simulation is powered off.
+
+On  UNIX/Linux a 24&#8209;bit colour display is required, while on VMS  the
+simulator requires a black and white display.
 
 On a Raspberry Pi the display is not updated properly if either FKMS or KMS
 graphics overlays are enabled.  The following entries in '/boot/config.txt'
