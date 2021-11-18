@@ -27,13 +27,11 @@ Mostly working, next goal is to be able simulate the HP34C.
 ##### HP 21 - Working
 
 ##### HP 22 - Working
-The  following issues were observed when checking the behaviour against the
-examples in the owners handbook..
 * The examples on pages 65, 66 and 76 only work if END is selected.
 
-##### HP 25 - Working (now with continuous memory)
+##### HP 25 - Working
 
-##### HP 27 - Completed (not finished testing)
+##### HP 27 - Completed (not tested)
 
 ##### HP 29 - Working
 
