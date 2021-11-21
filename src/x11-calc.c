@@ -162,6 +162,8 @@
  *                     to compile using VAXC.  I would have preferred to be
  *                     able to define them in a separate language  specific
  *                     module but can't figure out how - MT
+ * 21 Nov 21   0.8   - Mapped backspace key to escape - MT
+
  *
  * To Do             - Check messages!!!
  *                   - Combine error and warning routines (add severity  to
@@ -178,9 +180,9 @@
  */
 
 #define NAME           "x11-calc"
-#define VERSION        "0.6"
-#define BUILD          "0071"
-#define DATE           "16 Oct 21"
+#define VERSION        "0.8"
+#define BUILD          "0077"
+#define DATE           "21 Nov 21"
 #define AUTHOR         "MT"
 
 #define DEBUG 1        /* Enable/disable debug*/
@@ -613,6 +615,7 @@ int main(int argc, char *argv[]){
 
          case KeyPress :
             h_key_pressed(h_keyboard, x_display, x_event.xkey.keycode, x_event.xkey.state); /* Attempts to translate a key code into a character */
+            if (h_keyboard->key == (XK_BackSpace & 0x1f)) h_keyboard->key = XK_Escape & 0x1f; /* Map backspace to escape */
             if (h_keyboard->key == (XK_Z & 0x1f)) /* Ctrl-z to exit */
                b_abort = True;
             else if (h_keyboard->key == (XK_Q & 0x1f)) /* Ctrl-Q to resume */
@@ -649,6 +652,7 @@ int main(int argc, char *argv[]){
             break;
          case KeyRelease :
             h_key_released(h_keyboard, x_display, x_event.xkey.keycode, x_event.xkey.state);
+            if (h_keyboard->key == (XK_BackSpace & 0x1f)) h_keyboard->key = XK_Escape & 0x1f; /* Map backspace to escape */
             if (h_pressed != NULL) {
                if (h_keyboard->key == h_pressed->key) {
                   h_pressed->state = False;
