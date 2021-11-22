@@ -68,8 +68,8 @@ The following keyboard shortcuts should work on Linux:
 '0' - '9', '+'. '-'. '*'. '/' and 'Enter' should do what you expect them to
 (when using numeric key pad you need to use numlock as usual).
 
-'Esc' is 'Clx', 'c' is CHS, 'e' is 'EEX' and on programmable models 'Space'
-corresponds to 'SST'.
+'Esc' or 'Backspace' is 'Clx', 'c' is CHS, 'e' is 'EEX' and on programmable
+models 'Space' corresponds to 'SST'.
 
 'f' and where applicable 'g' and 'h' correspond to the function keys.
 
@@ -90,7 +90,7 @@ When  starting the simulator the name of the data file used to restore  the
 saved state can be specified on the command line allowing previously  saved
 copies of programs to be loaded automatically when the simulator starts  or
 the  simulator is reset using 'Ctrl&#8209;C'.  However, any changes will be saved
-in hidden data file.
+in the hidden data file.
 
 ### Exiting
 
