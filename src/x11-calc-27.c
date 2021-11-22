@@ -25,6 +25,7 @@
  * 16 Oct 21         - Added ROM contents and key codes - MT
  * 04 Nov 21         - Allows size of the window to be changed by modifying
  *                     the value of SCALE at compile time - MT
+ * 22 Nov 21         - Fixed function key colour - MT
  *
  */
 
@@ -66,7 +67,7 @@ void v_init_keypad(obutton *h_button[], oswitch *h_switch[]) {
    h_button[1] = h_button_create(00262, 000, " x ", "SCI", " s ", h_normal_font, h_small_font, h_alternate_font, KEYBOARD_COL_B, KEYBOARD_ROW_1, SMALL_KEY_WIDTH, KEY_HEIGHT, False, GREEN, YELLOW, BLACK);
    h_button[2] = h_button_create(00261, 000, " % ", "ENG", "d%", h_normal_font, h_small_font, h_alternate_font, KEYBOARD_COL_C, KEYBOARD_ROW_1, SMALL_KEY_WIDTH, KEY_HEIGHT, False, GREEN, YELLOW, BLACK);
    h_button[3] = h_button_create(00260, 'f', "f", "", "", h_normal_font, h_small_font, h_alternate_font, KEYBOARD_COL_D, KEYBOARD_ROW_1, SMALL_KEY_WIDTH, KEY_HEIGHT, False, YELLOW, BACKGROUND, YELLOW);
-   h_button[4] = h_button_create(00264, 'g', "g", "", "", h_normal_font, h_small_font, h_alternate_font, KEYBOARD_COL_E, KEYBOARD_ROW_1, SMALL_KEY_WIDTH, KEY_HEIGHT, False, LIGHT_BLUE, BACKGROUND, LIGHT_BLUE);
+   h_button[4] = h_button_create(00264, 'g', "g", "", "", h_normal_font, h_small_font, h_alternate_font, KEYBOARD_COL_E, KEYBOARD_ROW_1, SMALL_KEY_WIDTH, KEY_HEIGHT, False, BLACK, BACKGROUND, BLACK);
 
    /* Define second row of keys. */
    h_button[5] = h_button_create(00103, 000, "X-Y", "n", "r", h_normal_font, h_small_font, h_alternate_font, KEYBOARD_COL_A, KEYBOARD_ROW_2, SMALL_KEY_WIDTH, KEY_HEIGHT, False, GREEN, YELLOW, BLACK);
