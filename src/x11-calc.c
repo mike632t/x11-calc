@@ -172,7 +172,6 @@
  *                   - Save trace and single step options and restore when
  *                     resetting the processor...
  *                   - Load ROMs from a separate file?
- *                   - Fix display update problem on Raspberry Pi.
  *                   - Allow VMS users to set breakpoints?
  *                   - Free up allocated memory on exit.
  *                   - Sort out colour mapping.
@@ -185,7 +184,7 @@
 #define DATE           "21 Nov 21"
 #define AUTHOR         "MT"
 
-#define DEBUG 1        /* Enable/disable debug*/
+#define DEBUG 0        /* Enable/disable debug*/
 
 #define INTERVAL 25    /* Number of ticks to execute before updating the display */
 
