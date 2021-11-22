@@ -27,12 +27,12 @@
  * 03 Oct 21         - Added switches and updated keys - MT
  *                   - Fixed button positions - MT
  * 04 Nov 21         - Allows size of the window to be changed by modifying
- *                     the value of SCALE at compile time - MT *
+ *                     the value of SCALE at compile time - MT
  */
 
 #define VERSION        "0.1"
-#define BUILD          "0001"
-#define DATE           "21 Sep 21"
+#define BUILD          "0008"
+#define DATE           "04 Nov 21"
 #define AUTHOR         "MT"
 
 #define DEBUG 0        /* Enable/disable debug*/

@@ -32,16 +32,14 @@
  * 20 Oct 21         - Assigned space bar to single step - MT
  * 02 Nov 21         - Allows size of the window to be changed by modifying
  *                     the value of SCALE at compile time - MT
- *
- * TO DO :           -
  */
 
 #define VERSION        "0.1"
-#define BUILD          "0007"
-#define DATE           "10 Aug 21"
+#define BUILD          "0010"
+#define DATE           "02 Nov 21"
 #define AUTHOR         "MT"
 
-#define DEBUG 1
+#define DEBUG 0
 
 #include <stdarg.h>    /* strlen(), etc. */
 #include <stdio.h>     /* fprintf(), etc. */
