@@ -183,18 +183,17 @@
  * 26 Oct 21   0.7   - Added processor_load() to load saved registers  from
  *                     a file - MT
  * 17 Nov 21   0.8   - Fixed pathname on VMS - MT
- *
- * To Do             - Don't restore or save ALL registers...
+ * 22 Nov 21         - Only saves the state of continuous registers - MT
  *
  */
 
 #define NAME           "x11-calc"
 #define VERSION        "0.6"
-#define BUILD          "0100"
-#define DATE           "16 Oct 21"
+#define BUILD          "0102"
+#define DATE           "22 Nov 21"
 #define AUTHOR         "MT"
 
-#define DEBUG 1        /* Enable/disable debug*/
+#define DEBUG 0        /* Enable/disable debug*/
 
 #include <string.h>
 #include <stdlib.h>
@@ -213,6 +212,10 @@
 
 #include "gcc-debug.h" /* print() */
 #include "gcc-wait.h"  /* i_wait() */
+
+#if CONTINIOUS
+static int i_persistant[] = PERSISTENT;
+#endif
 
 /* Print the contents of a register */
 static void v_fprint_register(FILE *h_file, oregister *h_register) {
@@ -410,17 +413,17 @@ static void v_reg_shl(oprocessor *h_processor, oregister *h_register){
 
 /* Load saved processor state */
 void v_processor_load(oprocessor *h_processor, char *s_pathname) {
+#if CONTINIOUS
    FILE *h_datafile;
    int i_count, i_counter;
 
-   if ((h_processor != NULL) && (s_pathname != NULL)  /* Check processor and pathname are defined */
-      && CONTINIOUS) { /* and continuous memory is enabled */
+   if ((h_processor != NULL) && (s_pathname != NULL)) { /* Check processor and pathname are defined */
       h_datafile = fopen(s_pathname, "r");
       if (h_datafile !=NULL) { /* If file exists and can be opened restore state */
          debug(fprintf(stderr,"Loading %s \n", s_pathname));
-         for (i_count = 0; i_count < MEMORY_SIZE; i_count++) {
+         for (i_count = 0; i_count < (sizeof(i_persistant) / sizeof(i_persistant[0])); i_count++) {
             for (i_counter = REG_SIZE - 1; i_counter >= 0 ; i_counter--) {
-               fscanf(h_datafile, "%x,", &h_processor->mem[i_count]->nibble[i_counter]);
+               fscanf(h_datafile, "%x,", &h_processor->mem[i_persistant[i_count]]->nibble[i_counter]);
             }
          }
          fclose(h_datafile);
@@ -428,10 +431,12 @@ void v_processor_load(oprocessor *h_processor, char *s_pathname) {
       else
          v_warning("Unable to open %s\n", s_pathname); /* Can't open data file */
    }
+#endif
 }
 
 /* Save processor state */
 void v_processor_save(oprocessor *h_processor) {
+#if CONTINIOUS
    FILE *h_datafile;
    char *s_dir = getenv("HOME");
    char s_filename[] = FILENAME;
@@ -439,7 +444,7 @@ void v_processor_save(oprocessor *h_processor) {
    char *s_pathname;
    int i_count, i_counter;
 
-   if ((h_processor != NULL) && CONTINIOUS) { /* Check processor defined and continuous memory enabled */
+   if (h_processor != NULL) { /* Check processor defined and continuous memory enabled */
       if (s_dir == NULL) s_dir = ""; /* Use current folder if HOME not defined */
 #ifdef unix
       s_pathname = malloc((strlen(s_dir) + strlen(s_filename) +
@@ -456,9 +461,9 @@ void v_processor_save(oprocessor *h_processor) {
       h_datafile = fopen(s_pathname, "w");
       if (h_datafile !=NULL) { /* If file exists and can be opened save state */
          debug(fprintf(stderr,"Saving %s \n", s_pathname));
-         for (i_count = 0; i_count < MEMORY_SIZE; i_count++) {
+         for (i_count = 0; i_count < (sizeof(i_persistant) / sizeof(i_persistant[0])); i_count++) {
             for (i_counter = REG_SIZE - 1; i_counter >= 0 ; i_counter--) {
-               fprintf(h_datafile, "%02x,", h_processor->mem[i_count]->nibble[i_counter]);
+               fprintf(h_datafile, "%02x,", h_processor->mem[i_persistant[i_count]]->nibble[i_counter]);
             }
             fprintf(h_datafile,"\n");
          }
@@ -467,6 +472,7 @@ void v_processor_save(oprocessor *h_processor) {
       else
          v_warning("Unable to open %s\n", s_pathname); /* Can't open data file */
    }
+#endif
 }
 
 /* Restore saved processor state */

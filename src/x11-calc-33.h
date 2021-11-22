@@ -29,7 +29,7 @@
  *                     the value of SCALE at compile time - MT
  * 16 Nov 21         - Can now define the horizontal and vertical scales to
  *                     independently of each other - MT
- * TO DO :           -
+ * 22 Nov 21         - Only saves the state of continuous registers - MT
  */
 
 #define MODEL           "33"
@@ -71,10 +71,12 @@
 #define SWITCH_HEIGHT   10 * SCALE_HEIGHT
 
 #define ROM_SIZE        010000
-#define MEMORY_SIZE     36
+#define MEMORY_SIZE     21
 #define ROM_BANKS       1
 #define SPICE           True
 #define CONTINIOUS      True
+
+#define PERSISTENT { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20}
 
 int i_rom [ROM_SIZE * ROM_BANKS];
 
