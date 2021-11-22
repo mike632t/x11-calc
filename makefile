@@ -19,10 +19,11 @@
 #	Note separator (tab) at the beginning of the line CANNOT be a space..!
 #
 #	09 Oct 21   0.1   - Initial version - MT
+#  22 Nov 21   0.2   - Added data files to backups - MT
 #
 
 PROGRAM	=  x11-calc
-FILES		=  ./src/*.c ./src/*.h ./src/makefile
+FILES		=  ./src/*.c ./src/*.h ./prg/*.dat ./src/makefile
 FILES		+= *.md LICENSE makefile .gitignore .gitattributes
 FILES		+= ./img/x11-calc-*.png
 MAKE		=  make
