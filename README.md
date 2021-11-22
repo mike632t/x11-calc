@@ -33,6 +33,8 @@ Mostly working, next goal is to be able simulate the HP34C.
 ##### HP 27 - Completed (not tested)
 
 ##### HP 29 - Working
+* Only saves persistent registers (Note - Breaks compatibility with earlier
+versions).
 
 ##### HP 31 - Working
 
