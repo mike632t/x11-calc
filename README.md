@@ -89,8 +89,8 @@ hidden file when the simulator is loaded or reset using 'Ctrl&#8209;C'
 When  starting the simulator the name of the data file used to restore  the
 saved state can be specified on the command line allowing previously  saved
 copies of programs to be loaded automatically when the simulator starts  or
-the  simulator is reset using 'Ctrl&#8209;C'.  However, any changes will be saved
-in the hidden data file.
+the  simulator is reset using 'Ctrl&#8209;C'.  However, any changes will be
+saved in the hidden data file.
 
 ### Exiting
 
