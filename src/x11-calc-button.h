@@ -24,35 +24,38 @@
  * 08 Aug 21         - Tidied up spelling errors in the comments - MT
  * 18 Sep 21         - Added keycode to the button properties and a  method
  *                     to determine if this corrisponds to a button - MT
- *
+ * 23 Nov 21         - Added an additional parameter to allow the alternate
+ *                     function text to be defined - MT
  */
 
 typedef struct { /* Calculator button structure. */
    int index;
    char key; /* Key code corisponding to button */
-   char* text; /* Text on face of button */
-   char* label; /* Label on button */
-   char* alternate; /* Alternate text above button */
-   XFontStruct* text_font; /* Pointer to font. */
-   XFontStruct* label_font; /* Pointer to shifted font. */
-   XFontStruct* alternate_font; /* Pointer to alternate font. */
+   char* text; /* Text */
+   char* function; /* Function Text */
+   char* alternate; /* Alternate Function Text */
+   char* label; /* Label Text */
+   XFontStruct* text_font; /* Pointer to text font. */
+   XFontStruct* function_font; /* Pointer to function font. */
+   XFontStruct* label_font; /* Pointer to label font. */
    int left;
    int top;
    int width;
    int height;
    char state;
    unsigned int colour; /* Button colour */
+   unsigned int function_colour;
    unsigned int label_colour;
-   unsigned int alternate_colour;
 } obutton;
 
 obutton *h_button_key_pressed(obutton *h_button, char c_key);
 
 obutton *h_button_pressed(obutton *h_button, int i_xpos, int i_ypos);
 
-obutton *h_button_create(int i_index, char c_key, char* s_text,char* s_label ,char* s_alternate,
-   XFontStruct *h_normal_font, XFontStruct *h_shift_font, XFontStruct *h_alternate_font,
+obutton *h_button_create(int i_index, char c_key,
+   char* s_text, char* s_function ,char* s_alternate ,char* s_label,
+   XFontStruct *h_normal_font, XFontStruct *h_shift_font, XFontStruct *h_label_font,
    int i_left, int i_top, int i_width, int i_height, int i_state,
-   unsigned int i_colour, unsigned int i_label_colour, unsigned int i_alternate_colour);
+   unsigned int i_colour, unsigned int i_function_colour, unsigned int i_label_colour);
 
 int i_button_draw(Display *h_display, int x_application_window, int i_screen,obutton *h_button);
