@@ -44,8 +44,8 @@ typedef struct { /* Calculator button structure. */
    int height;
    char state;
    unsigned int colour; /* Button colour */
-   unsigned int function_colour;
-   unsigned int label_colour;
+   unsigned int function_colour;  /* Function key colour */
+   unsigned int alternate_colour; /* Alternate function key colour */
 } obutton;
 
 obutton *h_button_key_pressed(obutton *h_button, char c_key);

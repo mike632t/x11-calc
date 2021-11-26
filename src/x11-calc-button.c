@@ -33,8 +33,8 @@
  * 10 Oct 21         - Allow use of NULL pointers - MT
  * 23 Nov 21         - Added an additional parameter to allow the alternate
  *                     function text to be defined (can't draw it yet) - MT
- *
- * TO DO             - Add an alternate function text
+ * 25 Nov 21         - Can now draw the alternate function text next to the
+ *                     function text if it exists - MT
  *
  */
 
@@ -110,12 +110,12 @@ obutton *h_button_create(int i_index, char c_key,
    char* s_text, char* s_function ,char* s_alternate ,char* s_label,
    XFontStruct *h_normal_font, XFontStruct *h_shift_font, XFontStruct *h_label_font,
    int i_left, int i_top, int i_width, int i_height, int i_state,
-   unsigned int i_colour, unsigned int i_function_colour, unsigned int i_label_colour) {
+   unsigned int i_colour, unsigned int i_function_colour, unsigned int i_alternate_colour) {
 
    obutton *h_button; /* Ponter to button. */
 
    /* Attempt to allcoate memory for a button. */
-   if ((h_button = malloc (sizeof(*h_button)))==NULL) v_error("Memory allocation failed!");
+   if ((h_button = malloc (sizeof(*h_button)))==NULL) v_error("Memory allocation failed in %s line : %d\n", __FILE__, __LINE__);
 
    h_button->index = i_index;
    h_button->key = c_key;
@@ -135,7 +135,7 @@ obutton *h_button_create(int i_index, char c_key,
    h_button->state = i_state;
    h_button->colour = i_colour;
    h_button->function_colour = i_function_colour;
-   h_button->label_colour = i_label_colour;
+   h_button->alternate_colour = i_alternate_colour;
    return(h_button);
 }
 
@@ -147,19 +147,8 @@ int i_button_draw(Display *h_display, int x_application_window, int i_screen, ob
    int i_offset;
 
    if (h_button != NULL) {
-      /* Set label foreground colour and font. */
-      XSetForeground(h_display, DefaultGC(h_display, i_screen), h_button->function_colour);
-      XSetFont(h_display, DefaultGC(h_display, i_screen), h_button->function_font->fid);
 
-      /* Find position of the label. */
-      i_indent = 1 + h_button->left + (h_button->width - XTextWidth(h_button->function_font, h_button->function, strlen(h_button->function))) / 2;
-      i_upper = h_button->top - (h_button->function_font->descent + 1); /* Draw label 1 pixel above button. */
-
-      /* Draw the label. */
-      XDrawString(h_display, x_application_window, DefaultGC(h_display, i_screen), i_indent, i_upper ,h_button->function, strlen(h_button->function));
-
-      /* Set button background colour - as forground colour! */
-      XSetForeground(h_display, DefaultGC(h_display, i_screen), DARK_TEXT);
+      XSetForeground(h_display, DefaultGC(h_display, i_screen), DARK_TEXT); /* Set button background colour - as foreground colour! */
 
       /* Draw the button background on the window. */
       i_upper = h_button->top;
@@ -175,8 +164,7 @@ int i_button_draw(Display *h_display, int x_application_window, int i_screen, ob
       i_lower++;
       XDrawLine(h_display, x_application_window, DefaultGC(h_display, i_screen), i_indent , i_lower, i_extent, i_lower);
 
-      /* Set the foreground colour. */
-      XSetForeground(h_display, DefaultGC(h_display, i_screen), h_button->colour);
+      XSetForeground(h_display, DefaultGC(h_display, i_screen), h_button->colour); /* Set the foreground colour. */
 
       /* Draw the button face on the background.  */
       i_lower = i_lower - 3;
@@ -188,8 +176,7 @@ int i_button_draw(Display *h_display, int x_application_window, int i_screen, ob
       i_lower = i_lower + 2;
       XDrawLine(h_display, x_application_window, DefaultGC(h_display, i_screen), i_indent + 3, i_lower, i_extent -3 , i_lower);
 
-      /* Set the highlight colour. */
-      /* Select approprite colour for highlight (or lowlight) depending on button state. */
+      /* Select appropriate colour for high-light (or low-light) depending on button state. */
       if ((h_button->state)) { /* Set the foreground colour to darker tint of the base colour. */
          if (((h_button->colour & 0xff) + (h_button->colour >> 8 & 0xff) + (h_button->colour >> 16 & 0xff)) > 384)
             XSetForeground(h_display, DefaultGC(h_display, i_screen), i_shade(h_button->colour));
@@ -200,17 +187,12 @@ int i_button_draw(Display *h_display, int x_application_window, int i_screen, ob
       i_indent++; i_extent--; i_upper--;
       XDrawLine(h_display, x_application_window, DefaultGC(h_display, i_screen), i_indent , i_upper, i_extent , i_upper);
 
-      /* Set the foreground colour to lighter tint of the base colour. */
-      XSetForeground(h_display, DefaultGC(h_display, i_screen), i_tint(h_button->colour));
-
-      /* Find middle of button. */
-      i_offset = h_button->top + 2 + h_button->height /2;
-
-      /* Find vertical position of text */
-      i_upper = i_upper + (1 + i_offset - i_upper + h_button->text_font->ascent + h_button->text_font->descent) / 2 - h_button->text_font->descent;
+      XSetForeground(h_display, DefaultGC(h_display, i_screen), i_tint(h_button->colour)); /* Set the foreground colour to lighter tint of the base colour. */
+      i_offset = h_button->top + 2 + h_button->height /2; /* Find middle of button. */
+      i_upper = i_upper + (1 + i_offset - i_upper + h_button->text_font->ascent + h_button->text_font->descent) / 2 - h_button->text_font->descent; /* Find vertical position of text */
       i_lower = i_offset + (i_lower - i_offset + h_button->label_font->ascent + h_button->label_font->descent) / 2 - h_button->label_font->descent;
 
-      if ((h_button->state)){
+      if ((h_button->state)){ /* Is the button pressed? */
          i_offset--;
          i_upper--;
       }
@@ -225,24 +207,42 @@ int i_button_draw(Display *h_display, int x_application_window, int i_screen, ob
       else
          XSetForeground(h_display, DefaultGC(h_display, i_screen), LIGHT_TEXT);
 
-      /* Set the text font. */
-      XSetFont(h_display, DefaultGC(h_display, i_screen), h_button->text_font->fid);
+      XSetFont(h_display, DefaultGC(h_display, i_screen), h_button->text_font->fid); /* Set the text font. */
+      i_indent = 1 + h_button->left + (h_button->width - XTextWidth(h_button->text_font, h_button->text, strlen(h_button->text))) / 2; /* Find position of the text. */
+      XDrawString(h_display, x_application_window, DefaultGC(h_display, i_screen), i_indent, i_upper ,h_button->text, strlen(h_button->text)); /* Draw the main text. */
 
-      /* Find position of the text. */
-      i_indent = 1 + h_button->left + (h_button->width - XTextWidth(h_button->text_font, h_button->text, strlen(h_button->text))) / 2;
+      /* Draw label text */
+      if (!strlen(h_button->alternate))
+         XSetForeground(h_display, DefaultGC(h_display, i_screen), h_button->alternate_colour); /* No alternate function defined so use the alternate function colour for the label */
+      XSetFont(h_display, DefaultGC(h_display, i_screen), h_button->label_font->fid); /* Select the label text font */
+      i_indent = 1 + h_button->left + (h_button->width - XTextWidth(h_button->label_font, h_button->label, strlen(h_button->label))) / 2; /* Find position of the label text */
+      XDrawString(h_display, x_application_window, DefaultGC(h_display, i_screen), i_indent, i_lower, h_button->label, strlen(h_button->label)); /* Draw the label text */
 
-      /* Draw the main text. */
-      XDrawString(h_display, x_application_window, DefaultGC(h_display, i_screen), i_indent, i_upper ,h_button->text, strlen(h_button->text));
+      /* Draw function */
+      if (strlen(h_button->alternate))
+      {
+         XSetFont(h_display, DefaultGC(h_display, i_screen), h_button->function_font->fid); /* Select the function text font */
+         /** XSetFont(h_display, DefaultGC(h_display, i_screen), h_button->label_font->fid); /* Select the label text font */
 
-      /* Set label text foreground colour and font. */
-      XSetForeground(h_display, DefaultGC(h_display, i_screen), h_button->label_colour);
-      XSetFont(h_display, DefaultGC(h_display, i_screen), h_button->label_font->fid);
+         XSetForeground(h_display, DefaultGC(h_display, i_screen), h_button->alternate_colour); /* Use the function text colour */
+         i_indent = 3 + h_button->left + (h_button->width / 2)
+            + (XTextWidth(h_button->function_font, h_button->function, strlen(h_button->function)) + XTextWidth(h_button->function_font, h_button->alternate, strlen(h_button->alternate))) / 2
+            - XTextWidth(h_button->function_font, h_button->alternate, strlen(h_button->alternate)); /* Find position of the alternate text. */
+         i_upper = h_button->top - (h_button->function_font->descent + 1); /* Draw function 1 pixel above button */
+         XDrawString(h_display, x_application_window, DefaultGC(h_display, i_screen), i_indent, i_upper ,h_button->alternate, strlen(h_button->alternate)); /* Draw the function text */
+         XSetForeground(h_display, DefaultGC(h_display, i_screen), h_button->function_colour); /* Use the function text colour */
+         i_indent = i_indent - 2 - XTextWidth(h_button->function_font, h_button->function, strlen(h_button->function)); /* Find position of the function text. */
+      }
+      else
+      {
+         XSetForeground(h_display, DefaultGC(h_display, i_screen), h_button->function_colour); /* Use the function text colour */
+         XSetFont(h_display, DefaultGC(h_display, i_screen), h_button->function_font->fid); /* Select the function text font */
+         i_indent = 1 + h_button->left + (h_button->width - XTextWidth(h_button->function_font, h_button->function, strlen(h_button->function))) / 2; /* Find position of the function text. */
+         i_upper = h_button->top - (h_button->function_font->descent + 1); /* Draw function 1 pixel above button */
+      }
+      XDrawString(h_display, x_application_window, DefaultGC(h_display, i_screen), i_indent, i_upper ,h_button->function, strlen(h_button->function)); /* Draw the function text */
 
-      /* Find position of the label text. */
-      i_indent = 1 + h_button->left + (h_button->width - XTextWidth(h_button->label_font, h_button->label, strlen(h_button->label))) / 2;
 
-      /* Draw the text. */
-      XDrawString(h_display, x_application_window, DefaultGC(h_display, i_screen), i_indent, i_lower, h_button->label, strlen(h_button->label));
    }
    return(True);
 }
