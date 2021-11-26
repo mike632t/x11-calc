@@ -74,8 +74,6 @@
 #define ROM_BANKS       1
 #define CONTINIOUS      True
 
-#define PERSISTENT { 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15}
-
 int i_rom [ROM_SIZE * ROM_BANKS];
 
 void v_init_keypad(obutton *h_button[], oswitch *h_switch[]);
