@@ -39,6 +39,7 @@
  *                     independently of each other - MT
  * 17 Nov 21         - Defined text messages as constant strings instead of
  *                     macros - MT
+ * 25 Nov 21         - Added HP34C - MT
  *
  * TO DO :           -
  */
@@ -100,6 +101,11 @@
 #define FILENAME     "x11-calc-33"
 #define TITLE        "RPN calc 33C"
 #include "x11-calc-33.h"
+
+#elif HP34
+#define FILENAME     "x11-calc-34"
+#define TITLE        "RPN calc 34C"
+#include "x11-calc-34.h"
 
 #elif HP11
 #define FILENAME     "x11-calc-11"
