@@ -43,7 +43,7 @@ versions).
 
 ##### HP 33 - Working
 
-##### HP 34 - Coming soon!
+##### HP 34 - Partially working
 
 ### Compiling
 
