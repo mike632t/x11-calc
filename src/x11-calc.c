@@ -306,7 +306,7 @@ void v_set_blank_cursor(Display *x_display, Window x_application_window, Cursor 
    XFreePixmap (x_display, x_blank); /* Free up pixmap */
 }
 
-long l_now() /* Returns the current time in ms (since 1 )*/
+long l_now() /* Returns the current time in ms (since 1 Jan 1970 )*/
 {
    struct timeb h_time;
    ftime(&h_time);
