@@ -73,8 +73,6 @@ typedef struct {
    int *rom;
    int first;
    int last;
-   unsigned int rom_number;         /* ROM number */
-   unsigned int delayed_rom_number; /* Delayed ROM number */
    unsigned char flags[FLAGS];      /* Processor flags + TRACE flag*/
    unsigned char status[16];        /* Status (S0 - S15) */
    unsigned int stack[STACK_SIZE];  /* Call stack */
@@ -85,6 +83,8 @@ typedef struct {
    unsigned int addr;               /* Address register */
    unsigned int base;               /* Current arithmetic base */
    unsigned int code;               /* Key code */
+   unsigned int bank;               /* Bank number */
+   unsigned int rom_number;         /* Delayed ROM number */
    unsigned char keypressed;        /* Key pressed */
    unsigned char select;            /* Save switch state */
    unsigned char enabled;           /* Enabled */
