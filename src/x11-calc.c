@@ -148,6 +148,7 @@
  *                     file should be used when restoring the initial state
  *                     of  the registers on the command line (only  applies
  *                     to models with continuous memory) - MT
+ *                   - HP 33C simulator works.
  * 29 Oct 21         - Draw display when window is exposed - MT
  * 01 Nov 21         - Explicitly define the cursor - MT
  *                   - Attempts  to center the window on the display.  Most
@@ -162,8 +163,9 @@
  *                     to compile using VAXC.  I would have preferred to be
  *                     able to define them in a separate language  specific
  *                     module but can't figure out how - MT
- * 21 Nov 21   0.8   - Mapped backspace key to escape - MT
+ * 21 Nov 21         - Mapped backspace key to escape - MT
  * 28 Nov 21         - Made the trace flag a processor property - MT
+ *             0.8   - HP34 simulator works (require testing).
  *
  * To Do             - Check messages!!!
  *                   - Combine error and warning routines (add severity  to
@@ -180,8 +182,8 @@
 
 #define NAME           "x11-calc"
 #define VERSION        "0.8"
-#define BUILD          "0078"
-#define DATE           "21 Nov 21"
+#define BUILD          "0079"
+#define DATE           "28 Nov 21"
 #define AUTHOR         "MT"
 
 #define DEBUG 0        /* Enable/disable debug*/
