@@ -15,6 +15,8 @@ Currently compiles without modification on Linux, VAX/VMS, and  Tru64 Unix.
 
 ### Latest News
 
+28/11 - HP34C working !!
+
 17/11 - Compiles without modification on VAX/VMS!
 
 15/11 - Holding down the off switch exits.
@@ -30,7 +32,8 @@ Mostly working, next goal is to be able simulate the HP34C.
 
 ##### HP 25 - Working
 
-##### HP 27 - Completed (not tested)
+##### HP 27 - Completed
+* Not tested.
 
 ##### HP 29 - Working
 * Only saves persistent registers (Note - Breaks compatibility with earlier
@@ -43,7 +46,8 @@ versions).
 
 ##### HP 33 - Working
 
-##### HP 34 - Partially working
+##### HP 34 - Working
+* More testing needed to be sure.
 
 ### Compiling
 
