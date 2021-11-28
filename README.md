@@ -6,7 +6,7 @@
 
 ![HP31](./img/x11-calc-31.png) ![HP32](./img/x11-calc-32.png) ![HP33](./img/x11-calc-33.png) ![HP34](./img/x11-calc-34.png)
 
-Written in C using X11.
+Written in C using just X11.
 
 Use  of any language extensions or non standard language features has  been
 avoided in order to try to make the code as portable as possible.
@@ -36,8 +36,6 @@ Mostly working, next goal is to be able simulate the HP34C.
 * Not tested.
 
 ##### HP 29 - Working
-* Only saves persistent registers (Note - Breaks compatibility with earlier
-versions).
 
 ##### HP 31 - Working
 
@@ -46,8 +44,8 @@ versions).
 
 ##### HP 33 - Working
 
-##### HP 34 - Working
-* More testing needed to be sure.
+##### HP 34 - Mostly working
+* Problem with RCL (i)
 
 ### Compiling
 
