@@ -201,6 +201,7 @@
  *                   - Fixed bug when implementing the p register and moved
  *                     the code to modify p into a couple of functions - MT
  *                   - Fixed missing break in bank switch - MT
+ *                   - Removed unnecessary data validation - MT
  */
 
 #define NAME           "x11-calc"
@@ -376,7 +377,7 @@ static void v_reg_sub(oprocessor *h_processor, oregister *h_destination, oregist
       }
       else
          h_processor->flags[CARRY] = False;
-      if (i_temp < 0) v_error("Invalid data (%02x) at %1o-%04o in %s line : %d\n", i_temp, h_processor->bank, h_processor->pc, __FILE__, __LINE__);
+      /* if (i_temp < 0) v_error("Invalid data (%02x) at %1o-%04o in %s line : %d\n", i_temp, h_processor->bank, h_processor->pc, __FILE__, __LINE__); */
       if (h_destination != NULL) h_destination->nibble[i_count] = i_temp; /* Destination can be null */
    }
 }
