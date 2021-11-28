@@ -45,7 +45,6 @@ Mostly working, next goal is to be able simulate the HP34C.
 ##### HP 33 - Working
 
 ##### HP 34 - Mostly working
-* Problem with RCL (i)
 
 ### Compiling
 
