@@ -163,7 +163,7 @@
  *                     able to define them in a separate language  specific
  *                     module but can't figure out how - MT
  * 21 Nov 21   0.8   - Mapped backspace key to escape - MT
-
+ * 28 Nov 21         - Made the trace flag a processor property - MT
  *
  * To Do             - Check messages!!!
  *                   - Combine error and warning routines (add severity  to
@@ -180,7 +180,7 @@
 
 #define NAME           "x11-calc"
 #define VERSION        "0.8"
-#define BUILD          "0077"
+#define BUILD          "0078"
 #define DATE           "21 Nov 21"
 #define AUTHOR         "MT"
 
@@ -570,6 +570,8 @@ int main(int argc, char *argv[]){
 
    fprintf(stderr, "ROM Size : %4u words \n", (unsigned)(sizeof(i_rom) / sizeof i_rom[0]));
    h_processor = h_processor_create(i_rom);
+   h_processor->trace = b_trace;
+
    if (s_pathname == NULL)
       v_processor_restore(h_processor);
    else
@@ -587,11 +589,15 @@ int main(int argc, char *argv[]){
          i_display_update(x_display, x_application_window, i_screen, h_display, h_processor);
          i_display_draw(x_display, x_application_window, i_screen, h_display); /* Redraw display */
          i_count = INTERVAL;
+#ifdef SPICE
+         i_wait(INTERVAL / 3); /* Sleep for 0.33 ms per tick */
+#else
          i_wait(INTERVAL / 2); /* Sleep for 0.5 ms per tick */
+#endif
          if ((l_time > 0) && (l_now() > (l_time + 2000))) b_abort = True;
       }
 
-      if (h_processor->pc == i_breakpoint) b_trace = b_step = True;/* Breakpoint */
+      if (h_processor->pc == i_breakpoint) h_processor->trace = b_step = True;/* Breakpoint */
       h_processor->flags[TRACE] = b_trace;
       if (h_processor->pc == i_current) h_processor->flags[TRACE] = False; /* Don't trace busy loops */
       if (b_run) {
@@ -620,11 +626,11 @@ int main(int argc, char *argv[]){
             else if (h_keyboard->key == (XK_Q & 0x1f)) /* Ctrl-Q to resume */
                b_step = !(b_run  = True);
             else if (h_keyboard->key == (XK_S & 0x1f)) /* Ctrl-S or space to single step */
-               b_trace = b_step = b_run = True;
+               h_processor->trace = b_step = b_run = True;
             else if (h_keyboard->key == (XK_T & 0x1f)) /* Ctrl-T to toggle tracing */
-               b_trace = !b_trace;
+               h_processor->trace = !h_processor->trace;
             else if (h_keyboard->key == (XK_R & 0x1f)) /* Ctrl-R to display internal CPU registers */
-               v_fprint_state(stdout, h_processor);
+               v_fprint_registers(stdout, h_processor);
             else if (h_keyboard->key == (XK_C & 0x1f)) { /* Ctrl-C to reset */
                v_processor_reset(h_processor);
                if (s_pathname == NULL)
