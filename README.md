@@ -115,13 +115,12 @@ When in trace mode a jump to the same instruction produces no output.
 
 ### Known Issues
 
-On  models with continuous memory the state of all the registers  is  saved
-when the simulation is powered off.
+Unable to select radians on HP-29C.
+
+Keyboard shortcuts only work on Linux.
 
 On  UNIX/Linux a 24&#8209;bit colour display is required, while on VMS  the
 simulator requires a black and white display.
-
-Keyboard shortcuts only work on Linux.
 
 On a Raspberry Pi the display is not updated properly if either FKMS or KMS
 graphics overlays are enabled.  The following entries in '/boot/config.txt'
