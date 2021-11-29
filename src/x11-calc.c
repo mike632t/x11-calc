@@ -573,6 +573,7 @@ int main(int argc, char *argv[]){
    fprintf(stderr, "ROM Size : %4u words \n", (unsigned)(sizeof(i_rom) / sizeof i_rom[0]));
    h_processor = h_processor_create(i_rom);
    h_processor->trace = b_trace;
+   h_processor->step = b_step;
 
    if (s_pathname == NULL)
       v_processor_restore(h_processor);
@@ -599,13 +600,13 @@ int main(int argc, char *argv[]){
          if ((l_time > 0) && (l_now() > (l_time + 2000))) b_abort = True;
       }
 
-      if (h_processor->pc == i_breakpoint) h_processor->trace = b_step = True;/* Breakpoint */
+      if (h_processor->pc == i_breakpoint) h_processor->trace = h_processor->step = True;/* Breakpoint */
       h_processor->flags[TRACE] = b_trace;
       if (h_processor->pc == i_current) h_processor->flags[TRACE] = False; /* Don't trace busy loops */
       if (b_run) {
          i_current = h_processor->pc; v_processor_tick(h_processor);
       }
-      if (b_step) b_run = False;
+      if (h_processor->step) b_run = False;
 
       while (XPending(x_display)) {
          XNextEvent(x_display, &x_event);
@@ -626,9 +627,9 @@ int main(int argc, char *argv[]){
             if (h_keyboard->key == (XK_Z & 0x1f)) /* Ctrl-z to exit */
                b_abort = True;
             else if (h_keyboard->key == (XK_Q & 0x1f)) /* Ctrl-Q to resume */
-               b_step = !(b_run  = True);
+               h_processor->step = !(b_run  = True);
             else if (h_keyboard->key == (XK_S & 0x1f)) /* Ctrl-S or space to single step */
-               h_processor->trace = b_step = b_run = True;
+               h_processor->trace = h_processor->step = b_run = True;
             else if (h_keyboard->key == (XK_T & 0x1f)) /* Ctrl-T to toggle tracing */
                h_processor->trace = !h_processor->trace;
             else if (h_keyboard->key == (XK_R & 0x1f)) /* Ctrl-R to display internal CPU registers */
