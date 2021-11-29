@@ -36,6 +36,7 @@ Mostly working, next goal is to be able simulate the HP34C.
 * Not tested.
 
 ##### HP 29 - Working
+* Can't select radians
 
 ##### HP 31 - Working
 
