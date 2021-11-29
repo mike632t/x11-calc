@@ -44,9 +44,7 @@ Mostly working, next goal is to be able simulate the HP34C.
 
 ##### HP 33 - Working
 
-##### HP 34 - Being tested
-* Register arithmetic, solve, and short programs tested successfully
-* Integration doesn't work.
+##### HP 34 - Working
 
 ### Compiling
 
