@@ -202,6 +202,13 @@
  *                     the code to modify p into a couple of functions - MT
  *                   - Fixed missing break in bank switch - MT
  *                   - Removed unnecessary data validation - MT
+ *                   - Made the single step flag a processor property - MT
+ *                   - Saves the last opcode executed - MT
+ *                   - Incrementing the p register now works properly!
+ *                     Literally the only way to get it to work properly is
+ *                     to check the previous opcode if the current value is
+ *                     zero and ignore it if it is the same. I would really
+ *                     like to know why it works this way - MT
  */
 
 #define NAME           "x11-calc"
@@ -555,18 +562,21 @@ void v_processor_reset(oprocessor *h_processor) {
       h_processor->status[i_count] = False; /* Clear the processor flags */
    for (i_count = 0; i_count < FLAGS; i_count++)
       h_processor->flags[i_count] = False;
-   h_processor->bank = 0;
    h_processor->rom_number = 0;
+   h_processor->opcode = 0;
+   h_processor->bank = 0;
    h_processor->pc = 0;
    h_processor->sp = 0;
-   h_processor->p = 0;
    h_processor->f = 0;
+   h_processor->p = 0;
    h_processor->addr = 0;
    h_processor->base = 10;
    h_processor->code = 0;
    h_processor->keypressed = False;
    h_processor->enabled = True;
    h_processor->trace = False;
+   h_processor->step = False;
+
    h_processor->status[5] = True; /* TO DO - Check which flags should be set by default */
    h_processor->flags[MODE] = True; /* Select run mode */
 }
@@ -598,14 +608,16 @@ static void v_delayed_rom(oprocessor *h_processor) { /* Delayed ROM select */
 /* Increment ptr register */
 static void v_op_inc_p(oprocessor *h_processor) {
 #ifdef SPICE
-   static char b_flag = False; /* This seems a bit over complicated! */
-   if (h_processor->p == REG_SIZE - 1) {
-      b_flag = True;
+   if (h_processor->p == REG_SIZE - 1)
       h_processor->p = 0;
-   }
    else {
-      if (!b_flag) h_processor->p++;
-      b_flag = False;
+      if (h_processor->p > 0)
+         h_processor->p++;
+      else {
+         /* Literally the only way is to work out if 'P' should be
+          * incremented when it is zero is to check the previous opcode !! */
+         if (h_processor->opcode != 00720) h_processor->p++;
+      }
    }
 #else
    if (h_processor->p == REG_SIZE) h_processor->p = 0; else h_processor->p++;
@@ -1238,6 +1250,7 @@ void v_processor_tick(oprocessor *h_processor) {
       if (h_processor->trace) {
          fprintf(stdout, "\n");
       }
+      h_processor->opcode = i_opcode;
       v_op_inc_pc(h_processor); /* Increment program counter */
    }
 }

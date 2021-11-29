@@ -77,19 +77,21 @@ typedef struct {
    unsigned char flags[FLAGS];      /* Processor flags*/
    unsigned char status[16];        /* Status (S0 - S15) */
    unsigned int stack[STACK_SIZE];  /* Call stack */
+   unsigned int opcode;             /* Last opcode */
+   unsigned int bank;               /* Bank number */
    unsigned int pc;                 /* Program counter */
    unsigned int sp;                 /* Stack pointer */
-   unsigned int p;                  /* P register */
    unsigned int f;                  /* F register */
+   unsigned int p;                  /* P register */
    unsigned int addr;               /* Address register */
    unsigned int base;               /* Current arithmetic base */
    unsigned int code;               /* Key code */
-   unsigned int bank;               /* Bank number */
    unsigned int rom_number;         /* Delayed ROM number */
    unsigned char keypressed;        /* Key pressed */
    unsigned char select;            /* Save switch state */
    unsigned char enabled;           /* Enabled */
    unsigned char trace;             /* Trace flag */
+   unsigned char step;              /* Step flag */
 } oprocessor;
 
 oprocessor *h_processor_create(int *h_rom);
