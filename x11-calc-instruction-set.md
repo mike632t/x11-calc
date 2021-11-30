@@ -45,7 +45,6 @@ Ten processor flags are available (F 0 - F 9)
     F 6        ???
     F 7        ???
     F 8        Timer.
-    F 9        Trace enabled (implementation specific!).
 
 ### Processor status word
 
@@ -150,13 +149,13 @@ bits of each opcode into three groups.
     | n | n | n | n | n | f | f | f | 1 | 0 |
     +---+---+---+---+---+---+---+---+---+---+
 
-Where fff is the field modifier. 
+Where fff is the field modifier.
 
      13   12  11  10  9   8   7   6   5   4   3   2   1   0
     +---+---+---+---+---+---+---+---+---+---+---+---+---+---+
     | s | m | m | m | m | m | m | m | m | m | m | s | e | e |
     +---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-    
+
     000   P : determined by P register             ([P])
     001  WP : word up to and including P register  ([0 .. P])
     010  XS : exponent and sign                    ([0 .. 2])
