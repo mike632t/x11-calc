@@ -26,11 +26,13 @@
  * 04 Nov 21         - Allows size of the window to be changed by modifying
  *                     the value of SCALE at compile time - MT
  * 23 Nov 21         - Added the alternate function text - MT
+ * 29 Nov 21         - Fixed labels for trig modes (they aren't in the same
+ *                     order as on the HP25) - MT
  */
 
 #define VERSION        "0.1"
 #define BUILD          "0006"
-#define DATE           "23 Nov 21"
+#define DATE           "28 Nov 21"
 #define AUTHOR         "MT"
 
 #define DEBUG 0        /* Enable/disable debug*/
@@ -75,9 +77,9 @@ void v_init_keypad(obutton *h_button[], oswitch *h_switch[]) {
 
    /* Define third row of keys. */
    h_button[10] = h_button_create(00323, 015, "ENTER", "PREFIX", "", "", h_normal_font, h_small_font, h_alternate_font, KEYBOARD_COL_A, KEYBOARD_ROW_3, ENTER_KEY_WIDTH, KEY_HEIGHT, False, BLACK, YELLOW, BLUE);
-   h_button[11] = h_button_create(00321, 'c', "CHS", "PRGM", "", "DEG", h_normal_font, h_small_font, h_alternate_font, KEYBOARD_COL_C, KEYBOARD_ROW_3, SMALL_KEY_WIDTH, KEY_HEIGHT, False, BLACK, YELLOW, BLUE);
+   h_button[11] = h_button_create(00321, 'c', "CHS", "PRGM", "", "GRD", h_normal_font, h_small_font, h_alternate_font, KEYBOARD_COL_C, KEYBOARD_ROW_3, SMALL_KEY_WIDTH, KEY_HEIGHT, False, BLACK, YELLOW, BLUE);
    h_button[12] = h_button_create(00320, 'e', "EEX", "REG", "", "RAD", h_normal_font, h_small_font, h_alternate_font, KEYBOARD_COL_D, KEYBOARD_ROW_3, SMALL_KEY_WIDTH, KEY_HEIGHT, False, BLACK, YELLOW, BLUE);
-   h_button[13] = h_button_create(00324, 033, "CLX", "E", "", "GRD", h_normal_font, h_small_font, h_alternate_font, KEYBOARD_COL_E, KEYBOARD_ROW_3, SMALL_KEY_WIDTH, KEY_HEIGHT, False, BLACK, YELLOW, BLUE);
+   h_button[13] = h_button_create(00324, 033, "CLX", "E", "", "DEG", h_normal_font, h_small_font, h_alternate_font, KEYBOARD_COL_E, KEYBOARD_ROW_3, SMALL_KEY_WIDTH, KEY_HEIGHT, False, BLACK, YELLOW, BLUE);
 
    /* Define fourth row of keys. */
    h_button[14] = h_button_create(00143, '-', "-", "X\x1a\x59", "", "X\x1b\x30", h_large_font, h_small_font, h_alternate_font, KEYBOARD_COL_1, KEYBOARD_ROW_4, SMALL_KEY_WIDTH, KEY_HEIGHT, False, BEIGE, YELLOW, BLUE);
