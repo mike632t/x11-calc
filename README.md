@@ -27,8 +27,6 @@ Currently compiles without modification on Linux, VAX/VMS, and  Tru64 Unix.
 
 ### Status
 
-Mostly working, next goal is to be able simulate the HP34C.
-
 ##### HP 21 - Working
 
 ##### HP 22 - Working
