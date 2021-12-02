@@ -209,6 +209,9 @@
  *                     to check the previous opcode if the current value is
  *                     zero and ignore it if it is the same. I would really
  *                     like to know why it works this way - MT
+ * 02 Dec 21         - Modified  check above to compare previous opcode with
+ *                     the current opcode (not a hard coded value) - MT
+ *                   - Removed any references to TRACE - MT
  */
 
 #define NAME           "x11-calc"
@@ -272,11 +275,11 @@ static void v_fprint_status(FILE *h_file, oprocessor *h_processor) {
 /* Display the current processor flags */
 static void v_fprint_flags(FILE *h_file, oprocessor *h_processor) {
    int i_count, i_temp = 0;
-   for (i_count = 0; i_count < TRACE; i_count++) /* Ignore TRACE flag */
+   for (i_count = 0; i_count <= FLAGS; i_count++)
       i_temp += h_processor->flags[i_count] << i_count;
    fprintf(h_file, "Ox%02x (", i_temp);
-   for (i_count = 0; i_count < TRACE; i_count++)
-      fprintf(h_file, "%d", h_processor->flags[TRACE - 1 - i_count]);
+   for (i_count = 0; i_count <= FLAGS; i_count++)
+      fprintf(h_file, "%d", h_processor->flags[FLAGS - i_count]);
    fprintf(h_file, ")  ");
 }
 
@@ -608,6 +611,8 @@ static void v_delayed_rom(oprocessor *h_processor) { /* Delayed ROM select */
 /* Increment ptr register */
 static void v_op_inc_p(oprocessor *h_processor) {
 #ifdef SPICE
+   int i_opcode;
+   i_opcode = h_processor->rom[h_processor->bank * ROM_SIZE + h_processor->pc];
    if (h_processor->p == REG_SIZE - 1)
       h_processor->p = 0;
    else {
@@ -616,7 +621,8 @@ static void v_op_inc_p(oprocessor *h_processor) {
       else {
          /* Literally the only way is to work out if 'P' should be
           * incremented when it is zero is to check the previous opcode !! */
-         if (h_processor->opcode != 00720) h_processor->p++;
+         if (h_processor->opcode != i_opcode)
+            h_processor->p++;
       }
    }
 #else
@@ -768,7 +774,7 @@ void v_processor_tick(oprocessor *h_processor) {
                         h_processor->addr = i_addr;
                      else {
                         h_processor->addr = MEMORY_SIZE - 1;
-                        /* v_warning("Address (%02o) out of range at %1o-%04o in %s line : %d\n", i_addr, h_processor->bank, h_processor->pc, __FILE__, __LINE__); */
+                        /** v_warning("Address (%02o) out of range at %1o-%04o in %s line : %d\n", i_addr, h_processor->bank, h_processor->pc, __FILE__, __LINE__); /* Print warning */
                      }
                   }
                   break;
@@ -789,7 +795,6 @@ void v_processor_tick(oprocessor *h_processor) {
                case 01460: /* rom checksum */
                   if (h_processor->trace) fprintf(stdout, "rom checksum");
                   h_processor->status[5] = False;
-                  /* h_processor->flags[CARRY] = True; */
                   h_processor->sp = (h_processor->sp - 1) & (STACK_SIZE - 1); /* Update stack pointer */
                   h_processor->pc = h_processor->stack[h_processor->sp]; /* Pop program counter on the stack */
                   break;

@@ -61,7 +61,6 @@
 #define BANK_SWITCH    4
 #define DISPLAY_ENABLE 5
 #define TIMER          8
-#define TRACE          9
 
 typedef struct {
    char id;
