@@ -15,7 +15,9 @@ Currently compiles without modification on Linux, VAX/VMS, and  Tru64 Unix.
 
 ### Latest News
 
-28/11 - HP34C working !!
+02/12 - Added HP37.
+
+28/11 - HP34C now working!!
 
 17/11 - Compiles without modification on VAX/VMS!
 
@@ -45,6 +47,9 @@ Mostly working, next goal is to be able simulate the HP34C.
 ##### HP 33 - Working
 
 ##### HP 34 - Working
+
+##### HP 37 - Completed
+* Not tested.
 
 ### Compiling
 
