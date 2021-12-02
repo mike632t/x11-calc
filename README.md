@@ -113,7 +113,7 @@ When in trace mode a jump to the same instruction produces no output.
 
 ### Known Issues
 
-Unable to select radians on HP-29C.
+HP32 hangs after self test.
 
 Keyboard shortcuts only work on Linux.
 
