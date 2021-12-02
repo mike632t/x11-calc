@@ -1,8 +1,12 @@
 ## x11-calc - Another RPN (Reverse Polish) calculator.
 
-![HP21](./img/x11-calc-21.png) ![HP22](./img/x11-calc-22.png) ![HP25](./img/x11-calc-25.png) ![HP27](./img/x11-calc-27.png) ![HP29](./img/x11-calc-29.png)
+![HP21](./img/x11-calc-21.png) ![HP22](./img/x11-calc-22.png) ![HP25](./img/x11-calc-25.png)
 
-![HP31](./img/x11-calc-31.png) ![HP32](./img/x11-calc-32.png) ![HP33](./img/x11-calc-33.png) ![HP34](./img/x11-calc-34.png) ![HP37](./img/x11-calc-37.png)
+![HP27](./img/x11-calc-27.png) ![HP29](./img/x11-calc-29.png)
+
+![HP31](./img/x11-calc-31.png) ![HP32](./img/x11-calc-32.png) ![HP33](./img/x11-calc-33.png) ![HP34](./img/x11-calc-34.png)
+
+![HP37](./img/x11-calc-37.png)
 
 Written in C using just X11.
 
