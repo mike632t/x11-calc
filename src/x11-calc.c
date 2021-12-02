@@ -166,6 +166,8 @@
  * 21 Nov 21         - Mapped backspace key to escape - MT
  * 28 Nov 21         - Made the trace flag a processor property - MT
  *             0.8   - HP34 simulator works (require testing).
+ * 02 Dec 21         - Removed any references to TRACE and fixed the bug in
+ *                     the CPU status that broke radians on the HP29 - MT
  *
  * To Do             - Check messages!!!
  *                   - Combine error and warning routines (add severity  to
@@ -601,8 +603,8 @@ int main(int argc, char *argv[]){
       }
 
       if (h_processor->pc == i_breakpoint) h_processor->trace = h_processor->step = True;/* Breakpoint */
-      h_processor->flags[TRACE] = b_trace;
-      if (h_processor->pc == i_current) h_processor->flags[TRACE] = False; /* Don't trace busy loops */
+      h_processor->trace = b_trace;
+      if (h_processor->pc == i_current) h_processor->trace = False; /* Don't trace busy loops */
       if (b_run) {
          i_current = h_processor->pc; v_processor_tick(h_processor);
       }
@@ -652,7 +654,6 @@ int main(int argc, char *argv[]){
 
                      h_processor->code = h_pressed->index;
                      h_processor->keypressed = True;
-                     /* h_processor->status[15] = True; */
                      break;
                   }
                }
