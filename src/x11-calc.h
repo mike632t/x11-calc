@@ -114,7 +114,7 @@
 
 #elif HP38
 #define FILENAME     "x11-calc-38"
-#define TITLE        "RPN calc 38E"
+#define TITLE        "RPN calc 38C"
 #include "x11-calc-38.h"
 
 #elif HP11
