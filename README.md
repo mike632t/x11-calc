@@ -6,7 +6,7 @@
 
 ![HP31](./img/x11-calc-31.png) ![HP32](./img/x11-calc-32.png) ![HP33](./img/x11-calc-33.png) ![HP34](./img/x11-calc-34.png)
 
-![HP37](./img/x11-calc-37.png)
+![HP37](./img/x11-calc-37.png) ![HP38](./img/x11-calc-38.png)
 
 Written in C using just X11.
 
@@ -16,6 +16,8 @@ avoided in order to try to make the code as portable as possible.
 Currently compiles without modification on Linux, VAX/VMS, and  Tru64 Unix.
 
 ### Latest News
+
+04/12 - Added HP38C.
 
 02/12 - Added HP37.
 
@@ -35,7 +37,7 @@ Currently compiles without modification on Linux, VAX/VMS, and  Tru64 Unix.
 ##### HP 25 - Working
 
 ##### HP 27 - Completed
-* Not tested.
+* Not fully tested.
 
 ##### HP 29 - Working
 
@@ -49,7 +51,10 @@ Currently compiles without modification on Linux, VAX/VMS, and  Tru64 Unix.
 ##### HP 34 - Working
 
 ##### HP 37 - Completed
-* Not tested.
+* Not fully tested.
+
+##### HP 38 - Completed
+* Not fully tested.
 
 ### Compiling
 

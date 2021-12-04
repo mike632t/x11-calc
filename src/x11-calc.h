@@ -89,12 +89,12 @@
 
 #elif HP31
 #define FILENAME     "x11-calc-31"
-#define TITLE        "RPN calc 31"
+#define TITLE        "RPN calc 31E"
 #include "x11-calc-31.h"
 
 #elif HP32
 #define FILENAME     "x11-calc-32"
-#define TITLE        "RPN calc 32"
+#define TITLE        "RPN calc 32E"
 #include "x11-calc-32.h"
 
 #elif HP33
@@ -109,8 +109,13 @@
 
 #elif HP37
 #define FILENAME     "x11-calc-37"
-#define TITLE        "RPN calc 37"
+#define TITLE        "RPN calc 37E"
 #include "x11-calc-37.h"
+
+#elif HP38
+#define FILENAME     "x11-calc-38"
+#define TITLE        "RPN calc 38E"
+#include "x11-calc-38.h"
 
 #elif HP11
 #define FILENAME     "x11-calc-11"
