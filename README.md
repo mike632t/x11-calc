@@ -17,15 +17,11 @@ Currently compiles without modification on Linux, VAX/VMS, and  Tru64 Unix.
 
 ### Latest News
 
-04/12 - Added HP38C.
+04/12 - HP38C working but not tested.
 
-02/12 - Added HP37.
+02/12 - HP37E working but not tested.
 
 28/11 - HP34C now working!!
-
-17/11 - Compiles without modification on VAX/VMS!
-
-15/11 - Holding down the off switch exits.
 
 ### Status
 
@@ -37,7 +33,6 @@ Currently compiles without modification on Linux, VAX/VMS, and  Tru64 Unix.
 ##### HP 25 - Working
 
 ##### HP 27 - Completed
-* Not fully tested.
 
 ##### HP 29 - Working
 
@@ -51,10 +46,13 @@ Currently compiles without modification on Linux, VAX/VMS, and  Tru64 Unix.
 ##### HP 34 - Working
 
 ##### HP 37 - Completed
-* Not fully tested.
+* Not fully tested
 
 ##### HP 38 - Completed
-* Not fully tested.
+* Not fully tested
+
+##### HP 67 - Work in progress
+
 
 ### Compiling
 
