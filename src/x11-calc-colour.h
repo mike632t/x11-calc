@@ -1,10 +1,10 @@
 /*
- * x11-calc-colour.h - RPN (Reverse Polish) calculator simulator. 
+ * x11-calc-colour.h - RPN (Reverse Polish) calculator simulator.
  *
  * Copyright(C) 2013   MT
- * 
+ *
  * Colour constants and function prototypes.
- * 
+ *
  * This  program is free software: you can redistribute it and/or modify it
  * under  the terms of the GNU General Public License as published  by  the
  * Free  Software Foundation, either version 3 of the License, or (at  your
@@ -24,7 +24,7 @@
  *                     of  a cheat to allow me to test the code using  simh
  *                     as it doesn't support a colour display) - MT
  * 28 Sep 21         - Added mid grey - MT
- *
+ * 06 Dec 21         - Changed green to a slightly lighter colour - MT
  */
 
 #if defined(vms)
@@ -63,7 +63,7 @@
 #define MID_GRAY       0xa9a9a9 /* Mid gray numeric keys. */
 #define LIGHT_GREY     0xcecfc6 /* Light gray numeric keys. */
 #define LIGHT_GRAY     0xcecfc6 /* Light gray numeric keys. */
-#define GREEN          0x736a34 /* Green function keys. */
+#define GREEN          0x948639 /* Green function keys. */
 #define YELLOW         0xf5a434 /* Yellow shift key. */
 #define BLUE           0x4aa0b0 /* Blue alternate text. */
 #define LIGHT_BLUE     0x4aa0b0 /* Blue shift key. */

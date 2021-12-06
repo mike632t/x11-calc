@@ -1,10 +1,10 @@
 /*
- * x11-calc-colour.c - RPN (Reverse Polish) calculator simulator. 
+ * x11-calc-colour.c - RPN (Reverse Polish) calculator simulator.
  *
  * Copyright(C) 2013   MT
- * 
+ *
  * Colour manipulation functions.
- *           
+ *
  * Implements  the routines needed to manipulate colour values to  generate
  * different colour tints used for shading etc.
  *
@@ -23,17 +23,17 @@
  *
  * 02 Jul 13         - Initial version - MT
  * 15 Dec 18         - Changed debug macro and added an error macro - MT
- *
+ * 06 Dec 21         - Changed green to a slightly lighter shade - MT
  */
 
 #define VERSION        "0.1"
-#define BUILD          "0001"
-#define DATE           "02 Jul 13"
- 
+#define BUILD          "0003"
+#define DATE           "06 Dec 21"
+
 #define DEBUG 0        /* Enable/disable debug*/
- 
+
 #include "gcc-debug.h"
- 
+
 /*
  * shade(colour)
  *
@@ -46,7 +46,7 @@
 unsigned int i_shade(unsigned int i_colour){
 
    unsigned int i_red, i_green, i_blue;
-   
+
    /* Find an approprite darker shade of blue. */
    i_blue = ((i_colour & 0xff) /3) * 2;
 
@@ -74,25 +74,25 @@ unsigned int i_shade(unsigned int i_colour){
 unsigned int i_tint(unsigned int i_colour){
 
    unsigned int i_red, i_green, i_blue, i_gray;
-   
+
    /* Find an approprite lighter shade of blue. */
    i_blue = i_colour & 0xff;
    if (i_blue > 127) i_blue = (i_blue >> 1) | i_blue; else i_blue = i_blue << 1;
-      
+
    /* Find an approprite lighter shade of green. */
    i_colour = i_colour >> 8;
    i_green = i_colour & 0xff;
    if (i_green > 127) i_green = (i_green >> 1) | i_green; else i_green = i_green << 1;
-   
+
    /* Find an approprite lighter shade of red. */
    i_colour = i_colour >> 8;
    i_red = i_colour & 0xff;
    if (i_red > 127) i_red = (i_red >> 1) | i_red; else i_red = i_red << 1;
-   
+
    i_gray = (i_red + i_green + i_blue)/3;
    if (i_gray > 127) i_gray = 0xff; else i_gray = 0x7f;
 
-   /* Combine the red, blue and green values to give a lighter tint of the 
+   /* Combine the red, blue and green values to give a lighter tint of the
       original colour. */
    return((((i_red << 8) | i_green) << 8) | i_blue);
 }
