@@ -35,12 +35,16 @@
  *                     function text to be defined (can't draw it yet) - MT
  * 25 Nov 21         - Can now draw the alternate function text next to the
  *                     function text if it exists - MT
+ * 06 Dec 21         - Put the alternate function labels below the key when
+ *                     compiling the HP67 simulation - MT
+ *                   - Label text colour now explicitly defined to allow it
+ *                     to be different from the main text colour- MT
  *
  */
 
 #define VERSION        "0.1"
-#define BUILD          "0006"
-#define DATE           "14 Jul 13"
+#define BUILD          "0011"
+#define DATE           "06 Dec 21"
 #define AUTHOR         "MT"
 
 #define DEBUG 0        /* Enable/disable debug*/
@@ -110,7 +114,8 @@ obutton *h_button_create(int i_index, char c_key,
    char* s_text, char* s_function ,char* s_alternate ,char* s_label,
    XFontStruct *h_normal_font, XFontStruct *h_shift_font, XFontStruct *h_label_font,
    int i_left, int i_top, int i_width, int i_height, int i_state,
-   unsigned int i_colour, unsigned int i_function_colour, unsigned int i_alternate_colour) {
+   unsigned int i_colour, unsigned int i_function_colour,
+   unsigned int i_shifted_colour, unsigned int i_label_colour) {
 
    obutton *h_button; /* Ponter to button. */
 
@@ -135,7 +140,8 @@ obutton *h_button_create(int i_index, char c_key,
    h_button->state = i_state;
    h_button->colour = i_colour;
    h_button->function_colour = i_function_colour;
-   h_button->alternate_colour = i_alternate_colour;
+   h_button->shifted_colour = i_shifted_colour;
+   h_button->label_colour = i_label_colour;
    return(h_button);
 }
 
@@ -212,8 +218,9 @@ int i_button_draw(Display *h_display, int x_application_window, int i_screen, ob
       XDrawString(h_display, x_application_window, DefaultGC(h_display, i_screen), i_indent, i_upper ,h_button->text, strlen(h_button->text)); /* Draw the main text. */
 
       /* Draw label text */
+      XSetForeground(h_display, DefaultGC(h_display, i_screen), h_button->label_colour);
       if (!strlen(h_button->alternate))
-         XSetForeground(h_display, DefaultGC(h_display, i_screen), h_button->alternate_colour); /* No alternate function defined so use the alternate function colour for the label */
+         XSetForeground(h_display, DefaultGC(h_display, i_screen), h_button->shifted_colour); /* No alternate function defined so use the alternate function colour for the label */
       XSetFont(h_display, DefaultGC(h_display, i_screen), h_button->label_font->fid); /* Select the label text font */
       i_indent = 1 + h_button->left + (h_button->width - XTextWidth(h_button->label_font, h_button->label, strlen(h_button->label))) / 2; /* Find position of the label text */
       XDrawString(h_display, x_application_window, DefaultGC(h_display, i_screen), i_indent, i_lower, h_button->label, strlen(h_button->label)); /* Draw the label text */
@@ -224,11 +231,14 @@ int i_button_draw(Display *h_display, int x_application_window, int i_screen, ob
          XSetFont(h_display, DefaultGC(h_display, i_screen), h_button->function_font->fid); /* Select the function text font */
          /** XSetFont(h_display, DefaultGC(h_display, i_screen), h_button->label_font->fid); /* Select the label text font */
 
-         XSetForeground(h_display, DefaultGC(h_display, i_screen), h_button->alternate_colour); /* Use the function text colour */
+         XSetForeground(h_display, DefaultGC(h_display, i_screen), h_button->shifted_colour); /* Use the function text colour */
          i_indent = 3 + h_button->left + (h_button->width / 2)
             + (XTextWidth(h_button->function_font, h_button->function, strlen(h_button->function)) + XTextWidth(h_button->function_font, h_button->alternate, strlen(h_button->alternate))) / 2
             - XTextWidth(h_button->function_font, h_button->alternate, strlen(h_button->alternate)); /* Find position of the alternate text. */
          i_upper = h_button->top - (h_button->function_font->descent + 1); /* Draw function 1 pixel above button */
+#ifdef HP67
+         i_upper += KBD_ROW;
+#endif
          XDrawString(h_display, x_application_window, DefaultGC(h_display, i_screen), i_indent, i_upper ,h_button->alternate, strlen(h_button->alternate)); /* Draw the function text */
          XSetForeground(h_display, DefaultGC(h_display, i_screen), h_button->function_colour); /* Use the function text colour */
          i_indent = i_indent - 2 - XTextWidth(h_button->function_font, h_button->function, strlen(h_button->function)); /* Find position of the function text. */
@@ -239,6 +249,9 @@ int i_button_draw(Display *h_display, int x_application_window, int i_screen, ob
          XSetFont(h_display, DefaultGC(h_display, i_screen), h_button->function_font->fid); /* Select the function text font */
          i_indent = 1 + h_button->left + (h_button->width - XTextWidth(h_button->function_font, h_button->function, strlen(h_button->function))) / 2; /* Find position of the function text. */
          i_upper = h_button->top - (h_button->function_font->descent + 1); /* Draw function 1 pixel above button */
+#ifdef HP67
+         i_upper += KBD_ROW;
+#endif
       }
       XDrawString(h_display, x_application_window, DefaultGC(h_display, i_screen), i_indent, i_upper ,h_button->function, strlen(h_button->function)); /* Draw the function text */
 

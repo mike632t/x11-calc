@@ -26,6 +26,8 @@
  *                     to determine if this corrisponds to a button - MT
  * 23 Nov 21         - Added an additional parameter to allow the alternate
  *                     function text to be defined - MT
+ * 06 Dec 21         - Label text colour now explicitly defined to allow it
+ *                     to be different from the main text colour- MT
  */
 
 typedef struct { /* Calculator button structure. */
@@ -45,7 +47,8 @@ typedef struct { /* Calculator button structure. */
    char state;
    unsigned int colour; /* Button colour */
    unsigned int function_colour;  /* Function key colour */
-   unsigned int alternate_colour; /* Alternate function key colour */
+   unsigned int shifted_colour; /* Alternate function key colour */
+   unsigned int label_colour; /* Shifted function key colour */
 } obutton;
 
 obutton *h_button_key_pressed(obutton *h_button, char c_key);
@@ -56,6 +59,7 @@ obutton *h_button_create(int i_index, char c_key,
    char* s_text, char* s_function ,char* s_alternate ,char* s_label,
    XFontStruct *h_normal_font, XFontStruct *h_shift_font, XFontStruct *h_label_font,
    int i_left, int i_top, int i_width, int i_height, int i_state,
-   unsigned int i_colour, unsigned int i_function_colour, unsigned int i_label_colour);
+   unsigned int i_colour, unsigned int i_function_colour,
+   unsigned int i_shifted_colour, unsigned int i_label_colour);
 
 int i_button_draw(Display *h_display, int x_application_window, int i_screen,obutton *h_button);
