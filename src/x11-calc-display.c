@@ -96,11 +96,11 @@
 odisplay *h_display_create(int i_index, int i_left, int i_top, int i_width,
    int i_height, unsigned int i_foreground, unsigned int i_background, unsigned int i_border){
 
-   odisplay *h_display; /* Ponter to display. */
+   odisplay *h_display; /* Pointer to display. */
    int i_count;
 
    /* Attempt to allocate memory for a display. */
-   if ((h_display = malloc (sizeof(*h_display)))==NULL) v_error("Memory allocation failed!");
+   if ((h_display = malloc(sizeof(*h_display)))==NULL) v_error("Memory allocation failed!");
    h_display->index = i_index;
    h_display->left = i_left;
    h_display->top = i_top;
