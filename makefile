@@ -64,8 +64,8 @@ hp37:
 hp38:
 	@$(MAKE) --no-print-directory -C ./src MODEL=38
 
-#hp11:
-#	@$(MAKE) --no-print-directory -C ./src MODEL=11
+hp67:
+	@$(MAKE) --no-print-directory -C ./src MODEL=67
 
 clean:
 	@rm  -f ./src/*.o
