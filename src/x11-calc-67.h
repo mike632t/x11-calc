@@ -56,9 +56,9 @@
 #define SWITCH_HEIGHT   10 * SCALE_HEIGHT
 
 #define ROM_SIZE        010000
-#define MEMORY_SIZE     21
-#define ROM_BANKS       1
-#define CONTINIOUS      True
+#define MEMORY_SIZE     72
+#define ROM_BANKS       2
+#define CONTINIOUS      False
 
 int i_rom [ROM_SIZE * ROM_BANKS];
 
