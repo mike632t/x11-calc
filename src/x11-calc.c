@@ -168,6 +168,7 @@
  *             0.8   - HP34 simulator works (require testing).
  * 02 Dec 21         - Removed any references to TRACE and fixed the bug in
  *                     the CPU status that broke radians on the HP29 - MT
+ * 07 Dec 21         - Fixed bug in trace - MT
  *
  * To Do             - Check messages!!!
  *                   - Combine error and warning routines (add severity  to
@@ -603,7 +604,6 @@ int main(int argc, char *argv[]){
       }
 
       if (h_processor->pc == i_breakpoint) h_processor->trace = h_processor->step = True;/* Breakpoint */
-      h_processor->trace = b_trace;
       if (h_processor->pc == i_current) h_processor->trace = False; /* Don't trace busy loops */
       if (b_run) {
          i_current = h_processor->pc; v_processor_tick(h_processor);
@@ -620,9 +620,7 @@ int main(int argc, char *argv[]){
                h_processor->keypressed = False; /* Don't clear the status bit here!! */
             }
             break;
-
 #ifdef linux
-
          case KeyPress :
             h_key_pressed(h_keyboard, x_display, x_event.xkey.keycode, x_event.xkey.state); /* Attempts to translate a key code into a character */
             if (h_keyboard->key == (XK_BackSpace & 0x1f)) h_keyboard->key = XK_Escape & 0x1f; /* Map backspace to escape */
