@@ -31,6 +31,8 @@
  *                     independently of each other - MT
  * 22 Nov 21         - Only saves the state of continuous registers - MT
  * 06 Dec 21         - Simplified keyboard constants - MT
+ *                   - Fixed number of digits and added new CLASSIC display
+ *                     type definition - MT
  */
 
 #define MODEL           "67"
@@ -38,7 +40,7 @@
 #define WIDTH           200 * SCALE_WIDTH
 #define BUTTONS         35
 
-#define DIGITS          14
+#define DIGITS          15
 
 #define DISPLAY_LEFT    0 * SCALE_WIDTH
 #define DISPLAY_TOP     4 * SCALE_HEIGHT
@@ -58,6 +60,7 @@
 #define ROM_SIZE        010000
 #define MEMORY_SIZE     72
 #define ROM_BANKS       2
+#define CLASSIC         True
 #define CONTINIOUS      False
 
 int i_rom [ROM_SIZE * ROM_BANKS];
