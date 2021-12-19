@@ -119,7 +119,7 @@ obutton *h_button_create(int i_index, char c_key,
 
    obutton *h_button; /* Ponter to button. */
 
-   /* Attempt to allcoate memory for a button. */
+   /* Attempt to allocate memory for a button. */
    if ((h_button = malloc (sizeof(*h_button)))==NULL) v_error("Memory allocation failed in %s line : %d\n", __FILE__, __LINE__);
 
    h_button->index = i_index;
