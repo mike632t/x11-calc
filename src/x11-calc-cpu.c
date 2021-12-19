@@ -212,6 +212,15 @@
  * 02 Dec 21         - Modified  check above to compare previous opcode with
  *                     the current opcode (not a hard coded value) - MT
  *                   - Removed any references to TRACE - MT
+ * 11 Dec 21         - Print flags as a hex value - MT
+ *                   - Started to add additional instructions and processor
+ *                     flags to support the HP67 - MT
+ * 17 Dec 21         - Fixed bug in clear data registers - MT
+ * 19 Dec 21         - Unused load register routine deleted - MT
+ *                   - Bank switch sets flag - MT
+ *                   - Jump to subroutine and return now saves and restores
+ *                     the current bank number (it is amazing that this bug
+ *                     didn't cause problems earlier) - MT
  */
 
 #define NAME           "x11-calc"
@@ -220,7 +229,7 @@
 #define DATE           "25 Nov 21"
 #define AUTHOR         "MT"
 
-#define DEBUG 0        /* Enable/disable debug*/
+#define DEBUG  0       /* Enable/disable debug*/
 
 #include <string.h>
 #include <stdlib.h>
@@ -265,7 +274,7 @@ static void v_fprint_register(FILE *h_file, oregister *h_register) {
 /* Display the current processor status word */
 static void v_fprint_status(FILE *h_file, oprocessor *h_processor) {
    int i_count, i_temp = 0;
-   for (i_count = (sizeof(h_processor->status) / sizeof(*h_processor->status) - 1); i_count >= 0; i_count--) {
+   for (i_count = STATUS_BITS - 1; i_count >= 0; i_count--) {
       i_temp <<= 1;
       if (h_processor->status[i_count]) i_temp |= 1;
    }
@@ -277,10 +286,8 @@ static void v_fprint_flags(FILE *h_file, oprocessor *h_processor) {
    int i_count, i_temp = 0;
    for (i_count = 0; i_count <= FLAGS; i_count++)
       i_temp += h_processor->flags[i_count] << i_count;
-   fprintf(h_file, "Ox%02x (", i_temp);
-   for (i_count = 0; i_count <= FLAGS; i_count++)
-      fprintf(h_file, "%d", h_processor->flags[FLAGS - i_count]);
-   fprintf(h_file, ")  ");
+   fprintf(h_file, "0x%04X%12c", i_temp, ' ');
+
 }
 
 /* Display current register contents */
@@ -326,16 +333,6 @@ oregister *h_register_create(char c_id){
    for (i_count = 0; i_count < i_temp; i_count++)
       h_register->nibble[i_count] = 0;
    return (h_register);
-}
-
-/* Load a register */
-void v_reg_load(oregister *h_register, ...) {
-   int i_count, i_temp;
-   va_list t_args;
-   va_start(t_args, h_register);
-   i_temp = sizeof(h_register->nibble) / sizeof(*h_register->nibble) - 1;
-   for (i_count = i_temp; i_count >= 0; i_count--)
-      h_register->nibble[i_count]  = va_arg(t_args, int);
 }
 
 /* Exchange the contents of two registers */
@@ -444,6 +441,13 @@ static void v_reg_shl(oprocessor *h_processor, oregister *h_register){
       else
          h_register->nibble[i_count] = h_register->nibble[i_count - 1];
    h_processor->flags[PREV_CARRY] = h_processor->flags[CARRY] = False;
+}
+
+/* Increment program counter */
+static void v_op_inc_pc(oprocessor *h_processor) {
+   if (h_processor->pc++ >= ((ROM_SIZE * ROM_BANKS) - 1)) h_processor->pc = 0;
+   h_processor->flags[PREV_CARRY] = h_processor->flags[CARRY];
+   h_processor->flags[CARRY] = False;
 }
 
 /* Load saved processor state */
@@ -561,9 +565,9 @@ void v_processor_reset(oprocessor *h_processor) {
       h_processor->stack[i_count] = 0;
    for (i_count = 0; i_count < MEMORY_SIZE; i_count++) /*Clear memory */
       v_reg_copy(h_processor, h_processor->mem[i_count], NULL); /* Copying nothing to a register clears it */
-   for (i_count = 0; i_count < (sizeof(h_processor->status) / sizeof(h_processor->status[0]) ); i_count++) /* Clear the processor status word */
-      h_processor->status[i_count] = False; /* Clear the processor flags */
-   for (i_count = 0; i_count < FLAGS; i_count++)
+   for (i_count = 0; i_count < STATUS_BITS; i_count++) /* Clear the processor status word */
+      h_processor->status[i_count] = False;
+   for (i_count = 0; i_count < FLAGS; i_count++) /* Clear the processor flags */
       h_processor->flags[i_count] = False;
    h_processor->rom_number = 0;
    h_processor->opcode = 0;
@@ -581,7 +585,6 @@ void v_processor_reset(oprocessor *h_processor) {
    h_processor->step = False;
 
    h_processor->status[5] = True; /* TO DO - Check which flags should be set by default */
-   h_processor->flags[MODE] = True; /* Select run mode */
 }
 
 /* Create a new processor , */
@@ -635,16 +638,9 @@ static void v_op_dec_p(oprocessor *h_processor) {
    if (h_processor->p == 0) h_processor->p = REG_SIZE - 1; else h_processor->p--;
 }
 
-/* Increment program counter */
-static void v_op_inc_pc(oprocessor *h_processor) {
-   if (h_processor->pc++ >= ((ROM_SIZE * ROM_BANKS) - 1)) h_processor->pc = 0;
-   h_processor->flags[PREV_CARRY] = h_processor->flags[CARRY];
-   h_processor->flags[CARRY] = False;
-}
-
 /* Jump to subroutine */
 void op_jsb(oprocessor *h_processor, int i_count){
-   h_processor->stack[h_processor->sp] = h_processor->pc; /* Push program counter on the stack */
+   h_processor->stack[h_processor->sp] = h_processor->bank * ROM_SIZE + h_processor->pc; /* Push current address on the stack */
    h_processor->sp = (h_processor->sp + 1) & (STACK_SIZE - 1); /* Update stack pointer */
    h_processor->pc = ((h_processor->pc & 0xff00) | i_count); /* Note - Uses an eight bit address */
    v_delayed_rom(h_processor);
@@ -675,23 +671,95 @@ void v_processor_tick(oprocessor *h_processor) {
    if (h_processor->enabled) {
       if (h_processor->trace)
          fprintf(stdout, "%1o-%04o %04o  ", h_processor->bank, h_processor->pc, h_processor->rom[h_processor->bank * ROM_SIZE + h_processor->pc]);
-      if (h_processor->keypressed)
-         h_processor->status[15] = True; /* Set status bit if key pressed */
-      if (h_processor->select)
-         h_processor->status[3] = True; /* Set status bit based on switch position */
-#ifndef SPICE /* Setting S(5) breaks the self test on Spice machines */
-      h_processor->status[5] = True; /* Low Power (Woodstock)/ Self Test (Spice) */
+      if (h_processor->keypressed) h_processor->status[15] = True; /* Set status bit if key pressed */
+#ifdef HP67 /* HP67 seems to use a  different status bit for the keyboard status */
+      //h_processor->status[11] = !h_processor->select; /* Set status bit based on switch position */
+      h_processor->flags[MODE] = h_processor->select; /* Set the program mode flag based on switch position */
+#else
+      h_processor->status[3] = h_processor->select; /* Set status bit based on switch position */
 #endif
-
+#ifdef SPICE /* Setting S(5) breaks the self test on Spice machines */
+      h_processor->status[5] = False; /* Self Test */
+#else
+      h_processor->status[5] = True; /* Low Power */
+#endif
       i_opcode = h_processor->rom[h_processor->bank * ROM_SIZE + h_processor->pc]; /* Get next instruction */
-
       switch (i_opcode & 03) {
       case 00: /* Special operations */
          switch ((i_opcode >> 2) & 03) {
          case 00: /* Group 0 */
             switch ((i_opcode >> 4) & 03) {
-            case 00: /* nop */
-               if (h_processor->trace) fprintf(stdout, "nop");
+            case 00:
+               switch (i_opcode){
+               case 00000: /* nop */
+                  if (h_processor->trace) fprintf(stdout, "nop");
+                  break;
+#ifdef HP67
+               /*
+                * 00100   Test ready
+                * 00300   Test W/PGM switch
+                * 00400   Set key pressed
+                * 00500   Test if a key was pressed
+                * 01000   Set default function keys
+                * 01100   Test if default function keys set
+                * 01200   Set merge flag
+                * 01300   Test merge flag
+                * 01400   Set waiting for card side 2 flag
+                * 01500   Test waiting for card side 2 flag
+                * 01700   Read/Write data to/from card via RAM $99 and $9B
+                */
+               case 00100: /* test motor on */
+                  /** if (!h_processor->trace)
+                     debug(fprintf(stdout, "\n%1o-%04o %04o  ", h_processor->bank, h_processor->pc, h_processor->rom[h_processor->bank * ROM_SIZE + h_processor->pc]);
+                        h_processor->step = h_processor->trace = True); */
+                  if (h_processor->trace) fprintf(stdout, "test motor on");
+                  h_processor->status[3] = True; /* device always ready */
+                  h_processor->crc[CARD] = False;
+                  break;
+               case 00300: /* test mode flag */
+                  if (h_processor->trace) fprintf(stdout, "test mode flag (%d)", !h_processor->flags[MODE] );
+                  h_processor->status[3] = !h_processor->flags[MODE]; /* Test the PRGM/RUN switch */
+                  break;
+               case 00400: /* set key pressed flag */
+                  if (h_processor->trace) fprintf(stdout, "set key pressed flag");
+                  h_processor->crc[ANYKEY] = True; /* Sets the any key pressed flag */
+                  break;
+               case 00500: /* test key pressed flag */ /* f -x- */
+                  if (h_processor->trace) fprintf(stdout, "test key pressed flag");
+                  h_processor->status[3] = h_processor->crc[ANYKEY];
+                  if (h_processor->crc[ANYKEY]) h_processor->crc[ANYKEY] = False;
+                  break;
+               case 01000: /* set default function flag */
+                  if (h_processor->trace) fprintf(stdout, "set flag 4");
+                  h_processor->crc[FUNCTION] = True;
+                  break;
+               case 01100: /* test default function key flag */
+                  if (h_processor->trace) fprintf(stdout, "test flag 4");
+                  h_processor->status[3] = h_processor->crc[FUNCTION];
+                  if (h_processor->crc[FUNCTION]) h_processor->crc[FUNCTION] = False;
+                  break;
+               case 01200: /* set merge flag */
+                  if (h_processor->trace) fprintf(stdout, "set merge flag");
+                  h_processor->crc[MERGE] = True;
+                  break;
+               case 01300: /* test merge flag */
+                  if (h_processor->trace) fprintf(stdout, "clear flag 0");
+                  h_processor->status[3] = h_processor->crc[MERGE];
+                  if (h_processor->crc[MERGE]) h_processor->crc[MERGE] = False;
+                  break;
+               case 01400: /* set waiting flag */
+                  if (h_processor->trace) fprintf(stdout, "clear waiting flag");
+                  h_processor->crc[PAUSE] = True;
+                  break;
+               case 01500: /* test pause flag ? */
+                  if (h_processor->trace) fprintf(stdout, "clear flag 1");
+                  h_processor->status[3] = h_processor->crc[PAUSE];
+                  if (h_processor->crc[PAUSE]) h_processor->crc[PAUSE] = False;
+                  break;
+#endif
+               default:
+                  v_error("Unexpected opcode (%04o) at %1o-%04o in %s line : %d\n", i_opcode, h_processor->bank, h_processor->pc, __FILE__, __LINE__);
+               }
                break;
             case 01:
                switch (i_opcode){
@@ -722,6 +790,9 @@ void v_processor_tick(oprocessor *h_processor) {
                      h_processor->pc--; /* Program counter will be auto incremented before next fetch */
                   }
                   break;
+               case 00320: /* reset twf */
+                  if (h_processor->trace) fprintf(stdout, "reset twf");
+                  break;
                case 00420: /* binary */
                   if (h_processor->trace) fprintf(stdout, "binary");
                   h_processor->base = 16;
@@ -748,7 +819,8 @@ void v_processor_tick(oprocessor *h_processor) {
                case 01020: /* return */
                   if (h_processor->trace) fprintf(stdout, "return");
                   h_processor->sp = (h_processor->sp - 1) & (STACK_SIZE - 1); /* Update stack pointer */
-                  h_processor->pc = h_processor->stack[h_processor->sp]; /* Pop program counter fron the stack */
+                  h_processor->pc = h_processor->stack[h_processor->sp] & (ROM_SIZE - 1); /* Pop program counter from the stack */
+                  h_processor->bank = h_processor->stack[h_processor->sp] / ROM_SIZE; /* Get new bank number */
                   break;
                default:
                   v_error("Unexpected opcode (%04o) at %1o-%04o in %s line : %d\n", i_opcode, h_processor->bank, h_processor->pc, __FILE__, __LINE__);
@@ -760,8 +832,45 @@ void v_processor_tick(oprocessor *h_processor) {
                break;
             case 03:
                switch (i_opcode) {
+#ifdef HP67
+               /*
+                * 00060   Set display digits
+                * 00160   Test display digits
+                * 00260   Motor on
+                * 00360   Motor off
+                * 00560   Test if card inserted
+                * 00660   Set card write mode
+                * 00760   Set card read mode
+                */
+               case 00560: /* test card inserted */
+                  if (h_processor->trace) fprintf(stdout, "test card inserted");
+                  h_processor->status[3] = h_processor->crc[CARD]; /* Test if card is inserted */
+                  break;
+               case 00060: /* set display digits */
+                  if (h_processor->trace) fprintf(stdout, "set display digits");
+                  h_processor->crc[DISPLAY] = True;
+                  break;
+               case 00160: /* test display digits */
+                  if (h_processor->trace) fprintf(stdout, "test display digits");
+                  h_processor->status[3] = h_processor->crc[DISPLAY];
+                  if (h_processor->crc[DISPLAY]) h_processor->crc[DISPLAY] = False;
+                  break;
+
+#endif
+#ifdef TODO
+               case 00260: /* card reader motor on */
+                  if (h_processor->trace) fprintf(stdout, "card motor on");
+                  break;
+               case 00360: /* card reader motor off */
+                  if (h_processor->trace) fprintf(stdout, "card motor off");
+                  break;
+               case 00760: /* card reader write mode */
+                  if (h_processor->trace) fprintf(stdout, "write mode");
+                  break;
+#endif
                case 01060: /* bank switch */
                   if (h_processor->trace) fprintf(stdout, "bank switch");
+                  h_processor->flags[BANK_SWITCH] = (!h_processor->flags[BANK_SWITCH]);
                   h_processor->bank ^=  1; /* Toggle bank number */
                   break;
                case 01160: /* c -> addr */
@@ -779,12 +888,13 @@ void v_processor_tick(oprocessor *h_processor) {
                   }
                   break;
                case 01260: /* clear data registers */
-                  if (h_processor->trace) fprintf(stdout, "clear data registers");
-                  if (!CONTINIOUS) {
+                  {
                      int i_count;
+                     if (h_processor->trace) fprintf(stdout, "clear data registers");
                      h_processor->first = 0; h_processor->last = REG_SIZE - 1;
-                     for (i_count = 0; i_count < MEMORY_SIZE; i_count++)
-                        v_reg_copy(h_processor, h_processor->mem[i_count], NULL); /* Copying nothing to a register clears it */
+                     for (i_count = h_processor->addr & ~0x0f; i_count < (h_processor->addr & ~0x0f) + 16; i_count++)
+                        if (i_count < MEMORY_SIZE) /* Check memory size */
+                           v_reg_copy(h_processor, h_processor->mem[i_count], NULL); /* Copying nothing to a register clears it */
                   }
                   break;
                case 01360: /* c -> data */
@@ -813,7 +923,7 @@ void v_processor_tick(oprocessor *h_processor) {
                h_processor->status[i_opcode >> 6] = True;
                break;
             case 01: /* if 1 = s(n) */
-               if (h_processor->trace) fprintf(stdout, "if 1 = s %d", i_opcode >> 6);
+               if (h_processor->trace) fprintf(stdout, "if 1 = s(%d)", i_opcode >> 6);
                h_processor->flags[CARRY] = !h_processor->status[i_opcode >> 6];
                v_op_inc_pc(h_processor); /* Increment program counter */
                v_op_goto(h_processor);
@@ -987,7 +1097,7 @@ void v_processor_tick(oprocessor *h_processor) {
                h_processor->status[i_opcode >> 6] = False;
                break;
             case 01: /* if 0 = s(n) */
-               if (h_processor->trace) fprintf(stdout, "if 0 = s %d ", i_opcode >> 6);
+               if (h_processor->trace) fprintf(stdout, "if 0 = s(%d) ", i_opcode >> 6);
                h_processor->flags[CARRY] = h_processor->status[i_opcode >> 6];
                v_op_inc_pc(h_processor); /* Increment program counter */
                v_op_goto(h_processor);
@@ -1020,7 +1130,6 @@ void v_processor_tick(oprocessor *h_processor) {
             break;
          }
          break;
-
       case 01: /* jsb */
          if (h_processor->trace) fprintf(stdout, "jsb %05o", ((h_processor->pc & 0xff00) | i_opcode >> 2)); /* Note - uses and eight bit address */
          op_jsb(h_processor, (i_opcode >> 2));
@@ -1256,6 +1365,7 @@ void v_processor_tick(oprocessor *h_processor) {
          fprintf(stdout, "\n");
       }
       h_processor->opcode = i_opcode;
-      v_op_inc_pc(h_processor); /* Increment program counter */
+      if (h_processor->trace) debug(v_fprint_registers(stdout, h_processor));
+      v_op_inc_pc(h_processor); /* Increment program counter (also updates CARRY flag) */
    }
 }
