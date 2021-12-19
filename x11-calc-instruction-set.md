@@ -36,15 +36,17 @@ decremented, shifted left or right and tested.
 
 Ten processor flags are available (F 0 - F 9)
 
-    F 0        Selects Run / Program mode.
+    F 0        Run / Program mode.
     F 1        Carry.
     F 2        Prev Carry.
     F 3        Delayed ROM select.
     F 4        ROM select
+
     F 5        Display enabled
     F 6        ???
     F 7        ???
     F 8        Timer.
+    F 9        ???
 
 ### Processor status word
 
@@ -53,15 +55,18 @@ Comprises of 16 status bits (S 0 - S 15)
     S 0        Not used.
     S 1  *     Scientific notation (clear for fixed point notation).
     S 2  *     Auto Enter (if set entering digit will push 'X').
-    S 3  *     Switch position (set if on).
+    S 3  *     Switch position (WOODSTOCK/SPICE) / ? (HP67)
+
     S 4
-    S 5  *     Power OK (clear for lower power)
+    S 5  *     Power OK (WOODSTOCK) / Self test (SPICE)
     S 6        ?
     S 7        ?
+
     S 8        ?
     S 9        f prefix pressed
     S 10       g prefix pressed
-    S 11       ?
+    S 11       Switch position (set if off) (HP67)
+
     S 12       ?
     S 13       Set if function key has been pressed.
     S 14       Set if EEX has been pressed?
@@ -137,6 +142,7 @@ bits of each opcode into three groups.
             (where nn=   0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15
                     p=   4,  8, 12,  2,  9,  1,  6,  3,  1, 13,  5,  0, 11, 10,  7,  4)
 
+
 ### Jump subroutine
 
     x xxx xxx x01  jsb
@@ -203,3 +209,26 @@ The field modifier is used to select which part of the register to use.
 ### Conditional Go To
 
     n nnn nnn n11  if n/c goto nnnnnnnn
+
+
+### Card Reader Circuit instructions
+
+    00060   Set display digits
+    00100   Test ready
+    00160   Test display digits
+    00260   Motor On
+    00300   Test W/PGM switch
+    00360   Motor Off
+    00400   A key was pressed
+    00500   Test of a key was pressed
+    00560   Test if card inserted
+    00660   Set card write mode
+    00760   Set card read mode
+    01000   Set default function keys
+    01100   Test if default function keys set
+    01200   Set merge flag
+    01300   Test merge flag
+    01400   Set waiting for card side 2 flag
+    01500   Test waiting for card side 2 flag
+    01700   Read/Write data to/from card via RAM $99 and $9B
+
