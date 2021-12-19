@@ -225,8 +225,8 @@
 
 #define NAME           "x11-calc"
 #define VERSION        "0.9"
-#define BUILD          "0111"
-#define DATE           "25 Nov 21"
+#define BUILD          "0117"
+#define DATE           "19 Dec 21"
 #define AUTHOR         "MT"
 
 #define DEBUG  0       /* Enable/disable debug*/
