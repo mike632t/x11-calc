@@ -56,8 +56,8 @@
  */
 
 #define VERSION        "0.1"
-#define BUILD          "0005"
-#define DATE           "30 Aug 20"
+#define BUILD          "0017"
+#define DATE           "16 Nov 21"
 #define AUTHOR         "MT"
 
 #define DEBUG 0        /* Enable/disable debug*/
@@ -106,7 +106,10 @@ odisplay *h_display_create(int i_index, int i_left, int i_top, int i_width,
    h_display->top = i_top;
    h_display->width = i_width;
    h_display->height = i_height;
-#ifdef SPICE
+#if CLASSIC
+   for (i_count = 0; i_count < DIGITS; i_count++)
+      h_display->segment[i_count] = h_segment_create(0, 0,  ((4 + 13 * i_count) * SCALE_WIDTH), 21 * SCALE_HEIGHT, 11 * SCALE_WIDTH, 33 * SCALE_HEIGHT, i_foreground, i_background); /* Classic  - 15 Digit display */
+#elif SPICE
    for (i_count = 0; i_count < DIGITS; i_count++)
       h_display->segment[i_count] = h_segment_create(0, 0,  ((3 + 18 * i_count) * SCALE_WIDTH) - 2, 18 * SCALE_HEIGHT, 16 * SCALE_WIDTH, 33 * SCALE_HEIGHT, i_foreground, i_background); /* Spice  - 11 Digit display */
 #else
@@ -169,7 +172,54 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
                               DISPLAY_SPACE };
    int i_count;
 
-#ifdef SPICE
+#if CLASSIC
+   for (i_count = 0; i_count < DIGITS; i_count++) {
+      if (h_display->segment[i_count] != NULL) {
+         if (h_processor->flags[DISPLAY_ENABLE] && h_processor->enabled)
+         {
+            switch (i_count) {
+            case 0: /* Ignore */
+               break;
+            case 12: /* Sign */
+               if (h_processor->reg[A_REG]->nibble[REG_SIZE - i_count] == 0x0F)
+                  h_display->segment[i_count]->mask = DISPLAY_SPACE;
+               else {
+                  if (h_processor->reg[A_REG]->nibble[REG_SIZE - i_count] & 0x01)
+                     h_display->segment[0]->mask = DISPLAY_SPACE;
+                  else
+                     h_display->segment[0]->mask = DISPLAY_MINUS;
+                  if (h_processor->reg[A_REG]->nibble[REG_SIZE - i_count] >> 1)
+                     h_display->segment[i_count]->mask = DISPLAY_MINUS;
+                  else
+                     h_display->segment[i_count]->mask = DISPLAY_SPACE;
+               }
+               break;
+            default:
+               switch (h_processor->reg[B_REG]->nibble[REG_SIZE - i_count] & 0x0F) {
+               case 0x03: /* Decimal point */
+                  h_display->segment[i_count]->mask = DISPLAY_DECIMAL;
+                  break;
+               case 0x0F:
+               case 0x02:
+               case 0x01: /* Space */
+                     h_display->segment[i_count]->mask = DISPLAY_SPACE;
+                  break;
+               case 0x09:
+               case 0x04:
+               case 0x00: /* Number */
+                  h_display->segment[i_count]->mask = c_digits[h_processor->reg[A_REG]->nibble[REG_SIZE - i_count]];
+                  break;
+               default:
+                  v_fprint_registers(stderr, h_processor);
+                  v_warning("Unexpected output format specified in %s line : %d\n", __FILE__, __LINE__);
+               }
+            }
+         }
+         else
+            h_display->segment[i_count]->mask = DISPLAY_SPACE;
+      }
+   }
+#elif SPICE
    for (i_count = 0; i_count < DIGITS; i_count++) {
       if (h_display->segment[i_count] != NULL) {
          if (h_processor->flags[DISPLAY_ENABLE] && h_processor->enabled) {
