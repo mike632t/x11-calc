@@ -34,6 +34,8 @@
  *                     the value of SCALE at compile time - MT
  * 23 Nov 21         - Added the alternate function text - MT
  * 06 Dec 21         - Simplified keyboard constants - MT
+ * 10 Dec 21         - Keyboard shortcuts for labels now uppercase to avoid
+ *                     conflicting with existing shortcuts - MT
  */
 
 #define VERSION        "0.1"
@@ -81,15 +83,15 @@ void v_init_keypad(obutton *h_button[], oswitch *h_switch[]) {
    i_height = KEY_HEIGHT;
    i_width = KEY_SMALL;
    i_count = 0;
-   h_button[i_count++] = h_button_create(00244, 'a', "A", "a", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, GREEN, YELLOW, BLUE, BLACK);
+   h_button[i_count++] = h_button_create(00244, 'A', "A", "a", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, GREEN, YELLOW, BLUE, BLACK);
    i_left += (KEY_SMALL + KEY_GAP);
-   h_button[i_count++] = h_button_create(00243, 'b', "B", "b", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, GREEN, YELLOW, BLUE, BLACK);
+   h_button[i_count++] = h_button_create(00243, 'B', "B", "b", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, GREEN, YELLOW, BLUE, BLACK);
    i_left += (KEY_SMALL + KEY_GAP);
-   h_button[i_count++] = h_button_create(00242, 'c', "C", "c", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, GREEN, YELLOW, BLUE, BLACK);
+   h_button[i_count++] = h_button_create(00242, 'C', "C", "c", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, GREEN, YELLOW, BLUE, BLACK);
    i_left += (KEY_SMALL + KEY_GAP);
-   h_button[i_count++] = h_button_create(00241, 'd', "D", "d", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, GREEN, YELLOW, BLUE, BLACK);
+   h_button[i_count++] = h_button_create(00241, 'D', "D", "d", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, GREEN, YELLOW, BLUE, BLACK);
    i_left += (KEY_SMALL + KEY_GAP);
-   h_button[i_count++] = h_button_create(00240, 'e', "E", "e", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, GREEN, YELLOW, BLUE, BLACK);
+   h_button[i_count++] = h_button_create(00240, 'E', "E", "e", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, GREEN, YELLOW, BLUE, BLACK);
 
    /* Define second row of keys. */
    i_top += KBD_ROW;
@@ -165,7 +167,7 @@ void v_init_keypad(obutton *h_button[], oswitch *h_switch[]) {
    i_width = KEY_NUMERIC;
    h_button[i_count++] = h_button_create(00142, '1', "1", "-R", "-P", "PSE", h_large_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, LIGHT_GRAY, YELLOW, BLUE, BLACK);
    i_left += (KEY_NUMERIC + 2 * KEY_GAP + 1);
-   h_button[i_count++] = h_button_create(00141, '2', "2", "-D", "-R", "Pi", h_large_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, LIGHT_GRAY, YELLOW, BLUE, BLACK);
+   h_button[i_count++] = h_button_create(00141, '2', "2", "-D", "-R", "\x1c", h_large_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, LIGHT_GRAY, YELLOW, BLUE, BLACK);
    i_left += (KEY_NUMERIC + 2 * KEY_GAP + 1);
    h_button[i_count++] = h_button_create(00140, '3', "3", "-H", "-HMS", "REG", h_large_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, LIGHT_GRAY, YELLOW, BLUE, BLACK);
 
