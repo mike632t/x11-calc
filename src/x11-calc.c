@@ -169,15 +169,17 @@
  * 02 Dec 21         - Removed any references to TRACE and fixed the bug in
  *                     the CPU status that broke radians on the HP29 - MT
  * 07 Dec 21         - Fixed bug in trace - MT
+ * 16 Dec 21         - Since later models use more complex tests to monitor
+ *                     user input detecting and suppressing the output from
+ *                     a 'busy wait' loop isn't useful so I removed it - MT
+ * 17 Dec 21         - Counts number of ticks elapsed when holding down the
+ *                     off switch instead of counting the number of seconds
+ *                     which is more accurate and removes the dependency on
+ *                     time.h - MT
  *
- * To Do             - Check messages!!!
- *                   - Combine error and warning routines (add severity  to
- *                     parameters).
- *                   - Parse command line in a separate routine.
- *                   - Save trace and single step options and restore when
- *                     resetting the processor...
- *                   - Load ROMs from a separate file?
+ * To Do             - Parse command line in a separate routine.
  *                   - Allow VMS users to set breakpoints?
+ *                   - Load ROMs from a separate file?
  *                   - Free up allocated memory on exit.
  *                   - Sort out colour mapping.
  *
@@ -185,13 +187,14 @@
 
 #define NAME           "x11-calc"
 #define VERSION        "0.8"
-#define BUILD          "0079"
-#define DATE           "28 Nov 21"
+#define BUILD          "0083"
+#define DATE           "17 Dec 21"
 #define AUTHOR         "MT"
 
 #define DEBUG 0        /* Enable/disable debug*/
 
 #define INTERVAL 25    /* Number of ticks to execute before updating the display */
+#define DELAY 300      /* Number of intervals to wait before exiting (must be a multiple of 6) */
 
 #include <stdarg.h>    /* strlen(), etc */
 #include <string.h>    /* strlen(), etc */
@@ -203,12 +206,6 @@
 #include <X11/Xlib.h>  /* XOpenDisplay(), etc */
 #include <X11/Xutil.h> /* XSizeHints etc */
 #include <X11/cursorfont.h>
-
-#ifndef vms
-#include <sys/timeb.h>
-#else
-#include <timeb.h>
-#endif
 
 #include "x11-calc-font.h"
 #include "x11-calc-button.h"
@@ -280,25 +277,24 @@ void v_version() /* Display version information */
    fprintf(stderr, " (Build: %s)\n", BUILD );
 }
 
-void v_error(const char *s_fmt, ...) /* Print formatted error message and exit */
+void v_warning(const char *s_format, ...) /* Print formatted warning message and exit */
 {
    va_list t_args;
-   va_start(t_args, s_fmt);
+   va_start(t_args, s_format);
    fprintf(stderr, "%s : ", FILENAME);
-   vfprintf(stderr, s_fmt, t_args);
+   vfprintf(stderr, s_format, t_args);
+   va_end(t_args);
+}
+
+void v_error(const char *s_format, ...) /* Print formatted error message and exit */
+{
+   va_list t_args;
+   va_start(t_args, s_format);
+   fprintf(stderr, "%s : ", FILENAME);
+   vfprintf(stderr, s_format, t_args);
    va_end(t_args);
    exit(-1);
 }
-
-void v_warning(const char *s_fmt, ...) /* Print formatted warning message and return */
-{
-   va_list t_args;
-   va_start(t_args, s_fmt);
-   fprintf(stderr, "%s : ", FILENAME);
-   vfprintf(stderr, s_fmt, t_args);
-   va_end(t_args);
-}
-
 
 void v_set_blank_cursor(Display *x_display, Window x_application_window, Cursor *x_cursor)
 {
@@ -309,13 +305,6 @@ void v_set_blank_cursor(Display *x_display, Window x_application_window, Cursor 
    x_blank = XCreateBitmapFromData (x_display, x_application_window, c_pixmap_data, 1, 1); /* Create an empty bitmap */
    (*x_cursor) = XCreatePixmapCursor(x_display, x_blank, x_blank, &x_Color, &x_Color, 0, 0); /* Use the empty pixmap to create a blank cursor */
    XFreePixmap (x_display, x_blank); /* Free up pixmap */
-}
-
-long l_now() /* Returns the current time in ms (since 1 Jan 1970 )*/
-{
-   struct timeb h_time;
-   ftime(&h_time);
-   return ((1000 * h_time.time) + h_time.millitm);
 }
 
 int main(int argc, char *argv[]){
@@ -358,10 +347,8 @@ int main(int argc, char *argv[]){
    char b_abort = False; /*Abort flag controls execution of main loop */
 
    int i_offset, i_count, i_index;
-   int i_current = -1; /* Current program counter */
    int i_breakpoint = -1; /* Break-point */
-
-   long l_time = 0; /* Current time in milliseconds */
+   int i_ticks = -1;
 
 #ifdef vms /* Parse DEC style command line options */
    for (i_count = 1; i_count < argc; i_count++) {
@@ -410,7 +397,7 @@ int main(int argc, char *argv[]){
                      i_breakpoint = 0;
                      for (i_offset = 0; i_offset < strlen(argv[i_count + 1]); i_offset++) { /* Parse octal number */
                         if ((argv[i_count + 1][i_offset] < '0') || (argv[i_count + 1][i_offset] > '7'))
-                           v_error(h_err_invalid_address , argv[i_count + 1]);
+                           v_error(h_err_invalid_address, argv[i_count + 1]);
                         else
                            i_breakpoint = i_breakpoint * 8 + argv[i_count + 1][i_offset] - '0';
                      }
@@ -457,7 +444,7 @@ int main(int argc, char *argv[]){
                      exit(0);
                   }
                   else  /* If we get here then the we have an invalid long option */
-                     v_error(h_err_unrecognised_option , argv[i_count]);
+                     v_error(h_err_unrecognised_option, argv[i_count]);
                i_index--; /* Leave index pointing at end of string (so argv[i_count][i_index] = 0) */
                break;
             default: /* If we get here the single letter option is unknown */
@@ -597,17 +584,16 @@ int main(int argc, char *argv[]){
          i_count = INTERVAL;
 #ifdef SPICE
          i_wait(INTERVAL / 3); /* Sleep for 0.33 ms per tick */
+         if (i_ticks > 0) i_ticks -= 2;
 #else
          i_wait(INTERVAL / 2); /* Sleep for 0.5 ms per tick */
+         if (i_ticks > 0) i_ticks -= 3;
 #endif
-         if ((l_time > 0) && (l_now() > (l_time + 2000))) b_abort = True;
+         if (i_ticks == 0) b_abort = True;
       }
 
       if (h_processor->pc == i_breakpoint) h_processor->trace = h_processor->step = True;/* Breakpoint */
-      if (h_processor->pc == i_current) h_processor->trace = False; /* Don't trace busy loops */
-      if (b_run) {
-         i_current = h_processor->pc; v_processor_tick(h_processor);
-      }
+      if (b_run) v_processor_tick(h_processor);
       if (h_processor->step) b_run = False;
 
       while (XPending(x_display)) {
@@ -668,9 +654,7 @@ int main(int argc, char *argv[]){
                }
             }
             break;
-
 #endif
-
          case ButtonPress :
             if (x_event.xbutton.button == 1) {
                int i_count;
@@ -696,7 +680,7 @@ int main(int argc, char *argv[]){
                      else {
                         v_processor_save(h_processor); /* Save current settings */
                         h_processor->enabled = False; /* Disable the processor */
-                        l_time = l_now();
+                        i_ticks = DELAY; /* Set count down */
                      }
                      debug(fprintf(stderr, "Switch pressed (%s).\n", h_switch[0]->state ? "On" : "Off"));
                   }
@@ -719,7 +703,7 @@ int main(int argc, char *argv[]){
                }
                if (h_pressed == NULL) { /* It wasn't a button that was released check the switches */
                   if (!(h_switch_pressed(h_switch[0], x_event.xbutton.x, x_event.xbutton.y) == NULL)) {
-                     l_time = 0; /* Reset timer value */
+                     i_ticks = -1;
                      debug(fprintf(stderr, "Switch released (%s).\n", h_switch[0]->state ? "On" : "Off"));
                   }
                   if (!(h_switch_pressed(h_switch[1], x_event.xbutton.x, x_event.xbutton.y) == NULL)) {

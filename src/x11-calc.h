@@ -131,4 +131,4 @@ void v_about(); /* Display help text */
 
 void v_error(const char *s_fmt, ...); /* Print formatted error message */
 
-void v_warning(const char *s_fmt, ...); /* Print formatted warning message and return */
+void v_warning(const char *s_fmt, ...); /* Print formatted warning message */
