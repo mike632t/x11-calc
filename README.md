@@ -17,6 +17,8 @@ Currently compiles without modification on Linux, VAX/VMS, and  Tru64 Unix.
 
 ### Latest News
 
+20/12 - HP67  mostly working!!
+
 04/12 - HP38C working but not tested.
 
 02/12 - HP37E working but not tested.
@@ -51,8 +53,8 @@ Currently compiles without modification on Linux, VAX/VMS, and  Tru64 Unix.
 ##### HP 38 - Completed
 * Not fully tested
 
-##### HP 67 - Work in progress
-
+##### HP 67 - Mostly working
+* I'm just working on the last three opcodes. (Executing one if these three card reader related instructions causes the simulator to exit).
 
 ### Compiling
 
