@@ -64,7 +64,7 @@
 #define TIMER           8
 #define FLAGS           9
 
-#ifdef HP67
+#if defined(HAWKEYE)
 #define MERGE           0              /* Merge flag (F0) */
 #define PAUSE           1
 #define DISPLAY         1
@@ -87,7 +87,7 @@ typedef struct {
    int *rom;
    int first;
    int last;
-#ifdef HP67
+#if defined(HAWKEYE)
    unsigned char crc[STATES];          /* Card reader states */
 #endif
    unsigned char flags[FLAGS];         /* Processor flags*/
