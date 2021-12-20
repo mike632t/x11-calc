@@ -5,7 +5,7 @@ Written in C using just X11.
 Use  of any language extensions or non standard language features has  been
 avoided in order to try to make the code as portable as possible.
 
-Should compiles without modification on Linux, VAX/VMS, and  Tru64 Unix.
+Should compile without modification on Linux, VAX/VMS, and  Tru64 Unix.
 
 ![HP21](./img/x11-calc-21.png) ![HP22](./img/x11-calc-22.png) ![HP25](./img/x11-calc-25.png) ![HP27](./img/x11-calc-27.png) ![HP29](./img/x11-calc-29.png) ![HP67](./img/x11-calc-67.png)
 
