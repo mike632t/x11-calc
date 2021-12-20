@@ -62,8 +62,8 @@
 #define ROM_SIZE        010000
 #define MEMORY_SIZE     51
 #define ROM_BANKS       2
-#define SPICE           True
-#define CONTINIOUS      True
+#define SPICE
+#define CONTINIOUS
 
 int i_rom [ROM_SIZE * ROM_BANKS];
 

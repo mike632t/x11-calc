@@ -67,7 +67,7 @@
 #define MEMORY_SIZE     16
 #define ROM_SIZE        06000
 #define ROM_BANKS       1
-#define CONTINIOUS      False
+#define WOODSTOCK
 
 int i_rom [ROM_SIZE * ROM_BANKS];
 
