@@ -1,5 +1,5 @@
 /*
- * x11-calc-33.c - RPN (Reverse Polish) calculator simulator.
+ * x11-calc-67.c - RPN (Reverse Polish) calculator simulator.
  *
  * Copyright(C) 2018   MT
  *
@@ -18,29 +18,15 @@
  * You  should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * 13 Jun 13   0.1   - Initial version - MT
- * 10 Mar 14         - Changed indexes to BCD hex values - MT
- * 10 Dec 18         - Alternate  function key now LIGHT_BLUE, allowing  it
- *                     to be a different color to the alternate text - MT
- * 31 Aug 20         - Made  version(), about(), and error() model specific
- *                     so that the name reflects the model number - MT
- *                   - Modified version() to display a leading zero in  the
- *                     date instead of a space - MT
- * 26 Sep 21         - Replaced BCD hex key codes with octal values - MT
- *                   - Added shortcut key definitions - MT
- * 18 Oct 21         - Added key codes and ROM contents - MT
- * 20 Oct 21         - Assigned space bar to single step - MT
- * 02 Nov 21         - Allows size of the window to be changed by modifying
- *                     the value of SCALE at compile time - MT
- * 23 Nov 21         - Added the alternate function text - MT
- * 06 Dec 21         - Simplified keyboard constants - MT
+ * 06 Dec 21   0.1   - Initial version - MT
+ *                   - Simplified keyboard constants - MT
  * 10 Dec 21         - Keyboard shortcuts for labels now uppercase to avoid
  *                     conflicting with existing shortcuts - MT
  */
 
 #define VERSION        "0.1"
-#define BUILD          "0011"
-#define DATE           "23 Nov 21"
+#define BUILD          "0003"
+#define DATE           "06 Dec 21"
 #define AUTHOR         "MT"
 
 #define DEBUG 0
