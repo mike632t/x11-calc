@@ -40,11 +40,12 @@ Ten processor flags are available (F 0 - F 9)
     F 1        Carry.
     F 2        Prev Carry.
     F 3        Delayed ROM select.
-    F 4        ROM select
 
+    F 4        ROM select
     F 5        Display enabled
     F 6        ???
     F 7        ???
+
     F 8        Timer.
     F 9        ???
 
