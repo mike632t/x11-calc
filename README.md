@@ -22,12 +22,6 @@ Should compile without modification on Linux, VAX/VMS, and  Tru64 Unix.
 
 20/12 - HP67  mostly working!!
 
-04/12 - HP38C working but not tested.
-
-02/12 - HP37E working but not tested.
-
-28/11 - HP34C now working!!
-
 ### Status
 
 ##### HP 21 - Working
@@ -38,6 +32,7 @@ Should compile without modification on Linux, VAX/VMS, and  Tru64 Unix.
 ##### HP 25 - Working
 
 ##### HP 27 - Completed
+* Not fully tested
 
 ##### HP 29 - Working
 
@@ -87,7 +82,9 @@ The following keyboard shortcuts should work on Linux:
 'Esc' or 'Backspace' is 'Clx', 'c' is CHS, 'e' is 'EEX' and on programmable
 models 'Space' corresponds to 'SST'.
 
-'f' and where applicable 'g' and 'h' correspond to the function keys.
+'A' - 'E' correspond to the function keys where they exist.
+
+'f' and where applicable 'g' and 'h' correspond to the shift keys.
 
 'Ctrl-Z'  Quits,  and  'Ctrl-C' does a reset.  For models  with  continuous
 memory 'Ctrl-Z' saves the current register contents, and 'Ctrl-C'  restores
@@ -126,19 +123,21 @@ When in trace mode a jump to the same instruction produces no output.
 
 ### Known Issues
 
-HP32 hangs after self test.
-
-Keyboard shortcuts only work on Linux.
-
-On  UNIX/Linux a 24&#8209;bit colour display is required, while on VMS  the
+* On  UNIX/Linux a 24&#8209;bit colour display is required, while on VMS  the
 simulator requires a black and white display.
 
-On a Raspberry Pi the display is not updated properly if either FKMS or KMS
+* Keyboard shortcuts only work on Linux.
+
+* On a Raspberry Pi the display is not updated properly if either FKMS or KMS
 graphics overlays are enabled.  The following entries in '/boot/config.txt'
 should be commented out as shown.
 
     #dtoverlay=vc4-fkms-v3d
     #dtoverlay=vc4-kms-v3d
+
+* HP32 hangs after self test.
+
+* HP67 is unable to read or write to magnetic cards.
 
 ### Tested
 
