@@ -221,6 +221,11 @@
  *                   - Jump to subroutine and return now saves and restores
  *                     the current bank number (it is amazing that this bug
  *                     didn't cause problems earlier) - MT
+ * 20 Dec 21         - Discovered that on the HP67 when the program counter
+ *                     is less then 02000 the result is an implicit  switch
+ *                     to bank 0 (this may be true for other models) - MT
+ *
+ * To Do             - Test implicit bank switching behaviour.
  */
 
 #define NAME           "x11-calc"
@@ -673,7 +678,8 @@ void v_processor_tick(oprocessor *h_processor) {
          fprintf(stdout, "%1o-%04o %04o  ", h_processor->bank, h_processor->pc, h_processor->rom[h_processor->bank * ROM_SIZE + h_processor->pc]);
       if (h_processor->keypressed) h_processor->status[15] = True; /* Set status bit if key pressed */
 #ifdef HP67 /* HP67 seems to use a  different status bit for the keyboard status */
-      //h_processor->status[11] = !h_processor->select; /* Set status bit based on switch position */
+      /** h_processor->status[11] = !h_processor->select; /* Set status bit based on switch position */
+      /** if (h_processor->keypressed) h_processor->crc[ANYKEY] = True; /* Set the crc flag if key pressed */
       h_processor->flags[MODE] = h_processor->select; /* Set the program mode flag based on switch position */
 #else
       h_processor->status[3] = h_processor->select; /* Set status bit based on switch position */
@@ -1366,6 +1372,9 @@ void v_processor_tick(oprocessor *h_processor) {
       }
       h_processor->opcode = i_opcode;
       if (h_processor->trace) debug(v_fprint_registers(stdout, h_processor));
+#ifdef HP67
+      if ((h_processor->pc < 02000) && (h_processor->bank > 0)) h_processor->bank = 0; /* Implicit bank switch !! */
+#endif
       v_op_inc_pc(h_processor); /* Increment program counter (also updates CARRY flag) */
    }
 }
