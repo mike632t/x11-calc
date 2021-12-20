@@ -131,7 +131,6 @@ Keyboard shortcuts only work on Linux.
 On a Raspberry Pi the display is not updated properly if either FKMS or KMS
 graphics overlays are enabled.  The following entries in '/boot/config.txt'
 should be commented out as shown.
- 
 
     #dtoverlay=vc4-fkms-v3d
     #dtoverlay=vc4-kms-v3d
