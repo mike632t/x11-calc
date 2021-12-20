@@ -123,21 +123,21 @@ When in trace mode a jump to the same instruction produces no output.
 
 ### Known Issues
 
-* On  UNIX/Linux a 24&#8209;bit colour display is required, while on VMS  the
+On  UNIX/Linux a 24&#8209;bit colour display is required, while on VMS  the
 simulator requires a black and white display.
 
-* Keyboard shortcuts only work on Linux.
+Keyboard shortcuts only work on Linux.
 
-* On a Raspberry Pi the display is not updated properly if either FKMS or KMS
+On a Raspberry Pi the display is not updated properly if either FKMS or KMS
 graphics overlays are enabled.  The following entries in '/boot/config.txt'
 should be commented out as shown.
 
     #dtoverlay=vc4-fkms-v3d
     #dtoverlay=vc4-kms-v3d
 
-* HP32 hangs after self test.
+HP32 hangs after self test.
 
-* HP67 is unable to read or write to magnetic cards.
+HP67 is unable to read or write to magnetic cards.
 
 ### Tested
 
