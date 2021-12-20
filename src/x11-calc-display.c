@@ -53,6 +53,7 @@
  *                     there are two consecutive commas in the display - MT
  * 16 Nov 21         - Can now define the horizontal and vertical scales to
  *                     independently of each other - MT
+ * 20 Dec 21         - Updated display for HP67 - MT
  */
 
 #define VERSION        "0.1"
@@ -106,10 +107,10 @@ odisplay *h_display_create(int i_index, int i_left, int i_top, int i_width,
    h_display->top = i_top;
    h_display->width = i_width;
    h_display->height = i_height;
-#if CLASSIC
+#if defined(CLASSIC)
    for (i_count = 0; i_count < DIGITS; i_count++)
       h_display->segment[i_count] = h_segment_create(0, 0,  ((4 + 13 * i_count) * SCALE_WIDTH), 21 * SCALE_HEIGHT, 11 * SCALE_WIDTH, 33 * SCALE_HEIGHT, i_foreground, i_background); /* Classic  - 15 Digit display */
-#elif SPICE
+#elif defined(SPICE)
    for (i_count = 0; i_count < DIGITS; i_count++)
       h_display->segment[i_count] = h_segment_create(0, 0,  ((3 + 18 * i_count) * SCALE_WIDTH) - 2, 18 * SCALE_HEIGHT, 16 * SCALE_WIDTH, 33 * SCALE_HEIGHT, i_foreground, i_background); /* Spice  - 11 Digit display */
 #else
@@ -154,6 +155,9 @@ int i_display_draw(Display* x_display, int x_application_window, int i_screen, o
 
 int i_display_update(Display* x_display, int x_application_window, int i_screen, odisplay *h_display, oprocessor *h_processor){
 
+   int i_count;
+
+#if defined(CLASSIC)
    static int c_digits [] = { DISPLAY_ZERO,
                               DISPLAY_ONE,
                               DISPLAY_TWO,
@@ -165,14 +169,12 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
                               DISPLAY_EIGHT,
                               DISPLAY_NINE,
                               DISPLAY_r,
-                              DISPLAY_c,
+                              DISPLAY_C,
                               DISPLAY_o,
-                              DISPLAY_P,
+                              DISPLAY_d,
                               DISPLAY_E,
                               DISPLAY_SPACE };
-   int i_count;
 
-#if CLASSIC
    for (i_count = 0; i_count < DIGITS; i_count++) {
       if (h_display->segment[i_count] != NULL) {
          if (h_processor->flags[DISPLAY_ENABLE] && h_processor->enabled)
@@ -219,7 +221,25 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
             h_display->segment[i_count]->mask = DISPLAY_SPACE;
       }
    }
-#elif SPICE
+#else
+   static int c_digits [] = { DISPLAY_ZERO,
+                              DISPLAY_ONE,
+                              DISPLAY_TWO,
+                              DISPLAY_THREE,
+                              DISPLAY_FOUR,
+                              DISPLAY_FIVE,
+                              DISPLAY_SIX,
+                              DISPLAY_SEVEN,
+                              DISPLAY_EIGHT,
+                              DISPLAY_NINE,
+                              DISPLAY_r,
+                              DISPLAY_c,
+                              DISPLAY_o,
+                              DISPLAY_P,
+                              DISPLAY_E,
+                              DISPLAY_SPACE };
+
+#if defined(SPICE)
    for (i_count = 0; i_count < DIGITS; i_count++) {
       if (h_display->segment[i_count] != NULL) {
          if (h_processor->flags[DISPLAY_ENABLE] && h_processor->enabled) {
@@ -277,6 +297,7 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
             h_display->segment[i_count]->mask = DISPLAY_SPACE;
       }
    }
+#endif
 #endif
    return (True);
 }
