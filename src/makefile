@@ -40,7 +40,7 @@
 #							  folders - MT
 #
 
-MODEL		= 67
+MODEL		= 21
 PROGRAM	= x11-calc
 SOURCES 	= x11-calc.c x11-calc-cpu.c x11-calc-display.c x11-calc-segment.c
 SOURCES 	+= x11-calc-button.c x11-calc-switch.c x11-calc-label.c x11-calc-colour.c
