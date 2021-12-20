@@ -40,6 +40,8 @@
  * 17 Nov 21         - Defined text messages as constant strings instead of
  *                     macros - MT
  * 25 Nov 21         - Added HP34C - MT
+ * 06 Dev 21         - Added HP67 - MT
+ * 20 Dec 21         - Changed all #ifdef to #if defined() - MT
  *
  * TO DO :           -
  */
@@ -50,7 +52,7 @@
 
 /** #define __TIME__     "00:00:00" /* Release only */
 
-#ifdef vms
+#if defined(vms)
 
 #define FILENAME     "x11-calc-33"
 #define TITLE        "RPN calc 33C"
@@ -62,62 +64,62 @@
 
 #define COLOUR_DEPTH 24
 
-#ifdef HP21
+#if defined(HP21)
 #define FILENAME     "x11-calc-21"
 #define TITLE        "RPN calc 21"
 #include "x11-calc-21.h"
 
-#elif HP22
+#elif defined(HP22)
 #define FILENAME     "x11-calc-22"
 #define TITLE        "RPN calc 22"
 #include "x11-calc-22.h"
 
-#elif HP25
+#elif defined(HP25)
 #define FILENAME     "x11-calc-25"
 #define TITLE        "RPN calc 25C"
 #include "x11-calc-25.h"
 
-#elif HP27
+#elif defined(HP27)
 #define FILENAME     "x11-calc-27"
 #define TITLE        "RPN calc 27"
 #include "x11-calc-27.h"
 
-#elif HP29
+#elif defined(HP29)
 #define FILENAME     "x11-calc-29"
 #define TITLE        "RPN calc 29C"
 #include "x11-calc-29.h"
 
-#elif HP67
+#elif defined(HP67)
 #define FILENAME     "x11-calc-67"
 #define TITLE        "RPN calc 67"
 #include "x11-calc-67.h"
 
-#elif HP31
+#elif defined(HP31)
 #define FILENAME     "x11-calc-31"
 #define TITLE        "RPN calc 31E"
 #include "x11-calc-31.h"
 
-#elif HP32
+#elif defined(HP32)
 #define FILENAME     "x11-calc-32"
 #define TITLE        "RPN calc 32E"
 #include "x11-calc-32.h"
 
-#elif HP33
+#elif defined(HP33)
 #define FILENAME     "x11-calc-33"
 #define TITLE        "RPN calc 33C"
 #include "x11-calc-33.h"
 
-#elif HP34
+#elif defined(HP34)
 #define FILENAME     "x11-calc-34"
 #define TITLE        "RPN calc 34C"
 #include "x11-calc-34.h"
 
-#elif HP37
+#elif defined(HP37)
 #define FILENAME     "x11-calc-37"
 #define TITLE        "RPN calc 37E"
 #include "x11-calc-37.h"
 
-#elif HP38
+#elif defined(HP38)
 #define FILENAME     "x11-calc-38"
 #define TITLE        "RPN calc 38C"
 #include "x11-calc-38.h"

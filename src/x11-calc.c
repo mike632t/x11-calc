@@ -176,6 +176,7 @@
  *                     off switch instead of counting the number of seconds
  *                     which is more accurate and removes the dependency on
  *                     time.h - MT
+ * 20 Dec 21         - Changed all #ifdef to #if defined() - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Allow VMS users to set breakpoints?
@@ -223,7 +224,7 @@
 #include "gcc-debug.h" /* print() */
 #include "gcc-wait.h"  /* i_wait() */
 
-#ifdef unix
+#if defined(unix)
 
 const char * c_msg_usage = "Usage: %s [OPTION]... [FILE]\n\
 An RPN Calculator simulation for X11.\n\n\
@@ -350,7 +351,7 @@ int main(int argc, char *argv[]){
    int i_breakpoint = -1; /* Break-point */
    int i_ticks = -1;
 
-#ifdef vms /* Parse DEC style command line options */
+#if defined(vms) /* Parse DEC style command line options */
    for (i_count = 1; i_count < argc; i_count++) {
       if (argv[i_count][0] == '/') {
          for (i_index = 0; argv[i_count][i_index]; i_index++) /* Convert option to uppercase */
@@ -460,20 +461,14 @@ int main(int argc, char *argv[]){
       }
    }
 #endif
-
+#if defined(CONTINIOUS)
    if (argc > 2) v_error(h_err_invalid_operand); /* There should never be more than one command lime parameter */
-
-   if (argc > 1) {
-      if (CONTINIOUS)
-         s_pathname = argv[1]; /* Set path name if a parameter was passed and continuous memory is enabled */
-      else
-         v_error(h_err_invalid_operand); /* There shouldn't any command lime parameters */
-   }
-
+   if (argc > 1) s_pathname = argv[1]; /* Set path name if a parameter was passed and continuous memory is enabled */
+#else
+   if (argc > 1) v_error(h_err_invalid_operand); /* There shouldn't any command lime parameters */
+#endif
    i_wait(200); /* Sleep for 200 milliseconds to 'debounce' keyboard! */
-
    v_version();
-
    /* Open the display and create a new window */
    if (!(x_display = XOpenDisplay(s_display_name))) v_error (h_err_display, s_display_name);
 
@@ -542,10 +537,8 @@ int main(int argc, char *argv[]){
 
    h_display = h_display_create(0, DISPLAY_LEFT, DISPLAY_TOP, DISPLAY_WIDTH, DISPLAY_HEIGHT, RED, DARK_RED, RED_BACKGROUND); /* Create display */
 
-#ifdef linux
-
+#if defined(linux)
    h_keyboard = h_keyboard_create(x_display); /* Only works with Linux */
-
 #endif
 
    /* Select kind of events we are interested in */
@@ -582,7 +575,10 @@ int main(int argc, char *argv[]){
          i_display_update(x_display, x_application_window, i_screen, h_display, h_processor);
          i_display_draw(x_display, x_application_window, i_screen, h_display); /* Redraw display */
          i_count = INTERVAL;
-#ifdef SPICE
+#if defined(HAWKEYE)
+         i_wait(INTERVAL / 4); /* Sleep for 0.33 ms per tick */
+         if (i_ticks > 0) i_ticks -= 1;
+#elif defined(SPICE)
          i_wait(INTERVAL / 3); /* Sleep for 0.33 ms per tick */
          if (i_ticks > 0) i_ticks -= 2;
 #else
@@ -606,7 +602,7 @@ int main(int argc, char *argv[]){
                h_processor->keypressed = False; /* Don't clear the status bit here!! */
             }
             break;
-#ifdef linux
+#if defined(linux)
          case KeyPress :
             h_key_pressed(h_keyboard, x_display, x_event.xkey.keycode, x_event.xkey.state); /* Attempts to translate a key code into a character */
             if (h_keyboard->key == (XK_BackSpace & 0x1f)) h_keyboard->key = XK_Escape & 0x1f; /* Map backspace to escape */
