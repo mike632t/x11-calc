@@ -254,7 +254,7 @@
 #include "gcc-debug.h" /* print() */
 #include "gcc-wait.h"  /* i_wait() */
 
-#ifdef PERSISTENT
+#if defined(PERSISTENT)
 static int i_persistant[] = PERSISTENT;
 #endif
 
@@ -457,7 +457,7 @@ static void v_op_inc_pc(oprocessor *h_processor) {
 
 /* Load saved processor state */
 void v_processor_load(oprocessor *h_processor, char *s_pathname) {
-#if CONTINIOUS
+#if defined(CONTINIOUS)
    FILE *h_datafile;
    int i_count, i_counter;
 
@@ -465,7 +465,7 @@ void v_processor_load(oprocessor *h_processor, char *s_pathname) {
       h_datafile = fopen(s_pathname, "r");
       if (h_datafile !=NULL) { /* If file exists and can be opened restore state */
          debug(fprintf(stderr,"Loading %s \n", s_pathname));
-#ifdef PERSISTENT
+#if defined(PERSISTENT)
          for (i_count = 0; i_count < (sizeof(i_persistant) / sizeof(i_persistant[0])); i_count++) {
             for (i_counter = REG_SIZE - 1; i_counter >= 0 ; i_counter--) {
                fscanf(h_datafile, "%x,", &h_processor->mem[i_persistant[i_count]]->nibble[i_counter]);
@@ -487,7 +487,7 @@ void v_processor_load(oprocessor *h_processor, char *s_pathname) {
 
 /* Save processor state */
 void v_processor_save(oprocessor *h_processor) {
-#if CONTINIOUS
+#if defined(CONTINIOUS)
    FILE *h_datafile;
    char *s_dir = getenv("HOME");
    char s_filename[] = FILENAME;
@@ -497,7 +497,7 @@ void v_processor_save(oprocessor *h_processor) {
 
    if (h_processor != NULL) { /* Check processor defined and continuous memory enabled */
       if (s_dir == NULL) s_dir = ""; /* Use current folder if HOME not defined */
-#ifdef unix
+#if defined(unix)
       s_pathname = malloc((strlen(s_dir) + strlen(s_filename) +
          strlen(s_filetype) + 2) * sizeof(char*));
       strcpy(s_pathname, s_dir);
@@ -512,7 +512,7 @@ void v_processor_save(oprocessor *h_processor) {
       h_datafile = fopen(s_pathname, "w");
       if (h_datafile !=NULL) { /* If file exists and can be opened save state */
          debug(fprintf(stderr,"Saving %s \n", s_pathname));
-#ifdef PERSISTENT
+#if defined(PERSISTENT)
          for (i_count = 0; i_count < (sizeof(i_persistant) / sizeof(i_persistant[0])); i_count++) {
             for (i_counter = REG_SIZE - 1; i_counter >= 0 ; i_counter--) {
                fprintf(h_datafile, "%02x,", h_processor->mem[i_persistant[i_count]]->nibble[i_counter]);
@@ -535,7 +535,7 @@ void v_processor_save(oprocessor *h_processor) {
 
 /* Restore saved processor state */
 void v_processor_restore(oprocessor *h_processor) {
-#if CONTINIOUS
+#if defined(CONTINIOUS)
    char *s_dir = getenv("HOME");
    char s_filename[] = FILENAME;
    char s_filetype[] = ".dat";
@@ -543,7 +543,7 @@ void v_processor_restore(oprocessor *h_processor) {
 
    if (h_processor != NULL) { /* Check processor defined */
       if (s_dir == NULL) s_dir = ""; /* Use current folder if HOME not defined */
-#ifdef unix
+#if defined(unix)
       s_pathname = malloc((strlen(s_dir) + strlen(s_filename) +
          strlen(s_filetype) + 2) * sizeof(char*));
       strcpy(s_pathname, s_dir);
@@ -618,7 +618,7 @@ static void v_delayed_rom(oprocessor *h_processor) { /* Delayed ROM select */
 
 /* Increment ptr register */
 static void v_op_inc_p(oprocessor *h_processor) {
-#ifdef SPICE
+#if defined(SPICE)
    int i_opcode;
    i_opcode = h_processor->rom[h_processor->bank * ROM_SIZE + h_processor->pc];
    if (h_processor->p == REG_SIZE - 1)
@@ -677,14 +677,12 @@ void v_processor_tick(oprocessor *h_processor) {
       if (h_processor->trace)
          fprintf(stdout, "%1o-%04o %04o  ", h_processor->bank, h_processor->pc, h_processor->rom[h_processor->bank * ROM_SIZE + h_processor->pc]);
       if (h_processor->keypressed) h_processor->status[15] = True; /* Set status bit if key pressed */
-#ifdef HP67 /* HP67 seems to use a  different status bit for the keyboard status */
-      /** h_processor->status[11] = !h_processor->select; /* Set status bit based on switch position */
-      /** if (h_processor->keypressed) h_processor->crc[ANYKEY] = True; /* Set the crc flag if key pressed */
+#if defined(HAWKEYE) /* Seems to use a flag rather then the status word for the switch position */
       h_processor->flags[MODE] = h_processor->select; /* Set the program mode flag based on switch position */
 #else
       h_processor->status[3] = h_processor->select; /* Set status bit based on switch position */
 #endif
-#ifdef SPICE /* Setting S(5) breaks the self test on Spice machines */
+#if defined(SPICE) /* Setting S(5) breaks the self test on Spice machines */
       h_processor->status[5] = False; /* Self Test */
 #else
       h_processor->status[5] = True; /* Low Power */
@@ -700,7 +698,7 @@ void v_processor_tick(oprocessor *h_processor) {
                case 00000: /* nop */
                   if (h_processor->trace) fprintf(stdout, "nop");
                   break;
-#ifdef HP67
+#if defined(HAWKEYE)
                /*
                 * 00100   Test ready
                 * 00300   Test W/PGM switch
@@ -759,6 +757,11 @@ void v_processor_tick(oprocessor *h_processor) {
                   break;
                case 01500: /* test pause flag ? */
                   if (h_processor->trace) fprintf(stdout, "clear flag 1");
+                  h_processor->status[3] = h_processor->crc[PAUSE];
+                  if (h_processor->crc[PAUSE]) h_processor->crc[PAUSE] = False;
+                  break;
+               case 01700: /* read from or write to card */
+                  if (h_processor->trace) fprintf(stdout, "card read write");
                   h_processor->status[3] = h_processor->crc[PAUSE];
                   if (h_processor->crc[PAUSE]) h_processor->crc[PAUSE] = False;
                   break;
@@ -838,7 +841,7 @@ void v_processor_tick(oprocessor *h_processor) {
                break;
             case 03:
                switch (i_opcode) {
-#ifdef HP67
+#if defined(HAWKEYE)
                /*
                 * 00060   Set display digits
                 * 00160   Test display digits
@@ -848,10 +851,6 @@ void v_processor_tick(oprocessor *h_processor) {
                 * 00660   Set card write mode
                 * 00760   Set card read mode
                 */
-               case 00560: /* test card inserted */
-                  if (h_processor->trace) fprintf(stdout, "test card inserted");
-                  h_processor->status[3] = h_processor->crc[CARD]; /* Test if card is inserted */
-                  break;
                case 00060: /* set display digits */
                   if (h_processor->trace) fprintf(stdout, "set display digits");
                   h_processor->crc[DISPLAY] = True;
@@ -861,17 +860,21 @@ void v_processor_tick(oprocessor *h_processor) {
                   h_processor->status[3] = h_processor->crc[DISPLAY];
                   if (h_processor->crc[DISPLAY]) h_processor->crc[DISPLAY] = False;
                   break;
-
-#endif
-#ifdef TODO
                case 00260: /* card reader motor on */
-                  if (h_processor->trace) fprintf(stdout, "card motor on");
+                  if (h_processor->trace) fprintf(stdout, "motor on");
                   break;
                case 00360: /* card reader motor off */
-                  if (h_processor->trace) fprintf(stdout, "card motor off");
+                  if (h_processor->trace) fprintf(stdout, "motor off");
                   break;
-               case 00760: /* card reader write mode */
-                  if (h_processor->trace) fprintf(stdout, "write mode");
+               case 00560: /* test card inserted */
+                  if (h_processor->trace) fprintf(stdout, "test card inserted");
+                  h_processor->status[3] = h_processor->crc[CARD]; /* Test if card is inserted */
+                  break;
+               case 00660: /* card reader set write mode */
+                  if (h_processor->trace) fprintf(stdout, "set write mode");
+                  break;
+               case 00760: /* card reader set read mode */
+                  if (h_processor->trace) fprintf(stdout, "set read mode");
                   break;
 #endif
                case 01060: /* bank switch */
@@ -1372,7 +1375,7 @@ void v_processor_tick(oprocessor *h_processor) {
       }
       h_processor->opcode = i_opcode;
       if (h_processor->trace) debug(v_fprint_registers(stdout, h_processor));
-#ifdef HP67
+#if defined(HAWKEYE)
       if ((h_processor->pc < 02000) && (h_processor->bank > 0)) h_processor->bank = 0; /* Implicit bank switch !! */
 #endif
       v_op_inc_pc(h_processor); /* Increment program counter (also updates CARRY flag) */
