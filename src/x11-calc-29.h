@@ -26,6 +26,7 @@
  * 16 Nov 21         - Can now define the horizontal and vertical scales to
  *                     independently of each other - MT
  * 22 Nov 21         - Only saves the state of continuous registers - MT
+ * 21 Dev 21         - Fixed number of banks and ROM size - MT
  */
 
 #define MODEL           "29"
@@ -67,8 +68,8 @@
 #define SWITCH_HEIGHT   10 * SCALE_HEIGHT
 
 #define MEMORY_SIZE     48
-#define ROM_SIZE        04000
-#define ROM_BANKS       2
+#define ROM_SIZE        010000
+#define ROM_BANKS       1
 #define WOODSTOCK
 #define CONTINIOUS
 
