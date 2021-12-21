@@ -224,8 +224,8 @@
  * 20 Dec 21         - Discovered that on the HP67 when the program counter
  *                     is less then 02000 the result is an implicit  switch
  *                     to bank 0 (this may be true for other models) - MT
+ * 21 Dec 21         - Fixed implicit bank switching - MT
  *
- * To Do             - Test implicit bank switching behaviour.
  */
 
 #define NAME           "x11-calc"
@@ -234,7 +234,7 @@
 #define DATE           "19 Dec 21"
 #define AUTHOR         "MT"
 
-#define DEBUG  0       /* Enable/disable debug*/
+#define DEBUG  1       /* Enable/disable debug*/
 
 #include <string.h>
 #include <stdlib.h>
@@ -1375,9 +1375,9 @@ void v_processor_tick(oprocessor *h_processor) {
       }
       h_processor->opcode = i_opcode;
       if (h_processor->trace) debug(v_fprint_registers(stdout, h_processor));
+      v_op_inc_pc(h_processor); /* Increment program counter (also updates CARRY flag) */
 #if defined(HAWKEYE)
       if ((h_processor->pc < 02000) && (h_processor->bank > 0)) h_processor->bank = 0; /* Implicit bank switch !! */
 #endif
-      v_op_inc_pc(h_processor); /* Increment program counter (also updates CARRY flag) */
    }
 }
