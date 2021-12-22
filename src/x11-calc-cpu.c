@@ -225,16 +225,18 @@
  *                     is less then 02000 the result is an implicit  switch
  *                     to bank 0 (this may be true for other models) - MT
  * 21 Dec 21         - Fixed implicit bank switching - MT
+ *                   - Modified 'clear data registers' to allow the HP67 to
+ *                     behave as if it has continuous memory - MT
  *
  */
 
 #define NAME           "x11-calc"
 #define VERSION        "0.9"
-#define BUILD          "0117"
-#define DATE           "19 Dec 21"
+#define BUILD          "0120"
+#define DATE           "21 Dec 21"
 #define AUTHOR         "MT"
 
-#define DEBUG  1       /* Enable/disable debug*/
+#define DEBUG  0       /* Enable/disable debug*/
 
 #include <string.h>
 #include <stdlib.h>
@@ -574,6 +576,11 @@ void v_processor_reset(oprocessor *h_processor) {
       h_processor->status[i_count] = False;
    for (i_count = 0; i_count < FLAGS; i_count++) /* Clear the processor flags */
       h_processor->flags[i_count] = False;
+#if defined(HAWKEYE)
+   for (i_count = 0; i_count < STATES; i_count++) /* Clear the processor flags */
+      h_processor->crc[i_count] = False;
+   h_processor->crc[READY] = -4;
+#endif
    h_processor->rom_number = 0;
    h_processor->opcode = 0;
    h_processor->bank = 0;
@@ -900,10 +907,18 @@ void v_processor_tick(oprocessor *h_processor) {
                   {
                      int i_count;
                      if (h_processor->trace) fprintf(stdout, "clear data registers");
-                     h_processor->first = 0; h_processor->last = REG_SIZE - 1;
-                     for (i_count = h_processor->addr & ~0x0f; i_count < (h_processor->addr & ~0x0f) + 16; i_count++)
-                        if (i_count < MEMORY_SIZE) /* Check memory size */
-                           v_reg_copy(h_processor, h_processor->mem[i_count], NULL); /* Copying nothing to a register clears it */
+#if defined(HAWKEYE)
+                     if (h_processor->crc[READY])
+                        h_processor->crc[READY]++;
+                     else
+#endif
+                     {
+                        debug(fprintf(stderr, "clear data registers (%d)\n", h_processor->addr & ~0x0f));
+                        h_processor->first = 0; h_processor->last = REG_SIZE - 1;
+                        for (i_count = h_processor->addr & ~0x0f; i_count < (h_processor->addr & ~0x0f) + 16; i_count++)
+                           if (i_count < MEMORY_SIZE) /* Check memory size */
+                              v_reg_copy(h_processor, h_processor->mem[i_count], NULL); /* Copying nothing to a register clears it */
+                     }
                   }
                   break;
                case 01360: /* c -> data */

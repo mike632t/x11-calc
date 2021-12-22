@@ -34,6 +34,11 @@
  * 30 Sep 21         - Added properties for enable and select - MT
  * 26 Oct 21         - Added definition for processor_load() - MT
  * 28 Nov 21         - Made the trace flag a processor property - MT
+ * 11 Dec 21         - Started to add additional instructions and processor
+ *                     flags to support the HP67 - MT
+ * 21 Dec 21         - Added the READY flag to allow the HP67 to behave  as
+ *                     if it has continuous memory - MT
+ *
  */
 
 #ifndef REGISTERS
@@ -67,13 +72,15 @@
 #if defined(HAWKEYE)
 #define MERGE           0              /* Merge flag (F0) */
 #define PAUSE           1
-#define DISPLAY         1
+#define DISPLAY         2
 #define CARD            3              /* Card inserted */
 
 #define ANYKEY          4              /* Key pressed */
 #define MOTOR           5              /* Motor on */
 #define FUNCTION        6              /* Default function flag */
-#define STATES          7
+#define READY           7
+
+#define STATES          8
 #endif
 
 typedef struct {

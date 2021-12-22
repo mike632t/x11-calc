@@ -49,6 +49,7 @@
 #define ROM_SIZE        010000
 #define MEMORY_SIZE     72
 #define ROM_BANKS       2
+#define CONTINIOUS
 #define CLASSIC
 #define HAWKEYE
 
