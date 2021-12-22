@@ -177,6 +177,7 @@
  *                     which is more accurate and removes the dependency on
  *                     time.h - MT
  * 20 Dec 21         - Changed all #ifdef to #if defined() - MT
+ * 22 Dec 21         - Uses model numbers for conditional compilation - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Allow VMS users to set breakpoints?
@@ -575,10 +576,10 @@ int main(int argc, char *argv[]){
          i_display_update(x_display, x_application_window, i_screen, h_display, h_processor);
          i_display_draw(x_display, x_application_window, i_screen, h_display); /* Redraw display */
          i_count = INTERVAL;
-#if defined(HAWKEYE)
+#if defined(HP67)
          i_wait(INTERVAL / 4); /* Sleep for 0.33 ms per tick */
          if (i_ticks > 0) i_ticks -= 1;
-#elif defined(SPICE)
+#elif defined(HP31) || defined(HP32) || defined(HP33) || defined(HP34) || defined(HP37) || defined(HP38)
          i_wait(INTERVAL / 3); /* Sleep for 0.33 ms per tick */
          if (i_ticks > 0) i_ticks -= 2;
 #else

@@ -55,6 +55,7 @@
  *                     independently of each other - MT
  * 20 Dec 21         - Updated display for HP67 - MT
  * 21 Dec 21         - Only displays warning messages if DEBUG is true - MT
+ * 22 Dec 21         - Uses model numbers for conditional compilation - MT
  */
 
 #define VERSION        "0.1"
@@ -110,13 +111,13 @@ odisplay *h_display_create(int i_index, int i_left, int i_top, int i_width,
    h_display->height = i_height;
 #if defined(CLASSIC)
    for (i_count = 0; i_count < DIGITS; i_count++)
-      h_display->segment[i_count] = h_segment_create(0, 0,  ((4 + 13 * i_count) * SCALE_WIDTH), 21 * SCALE_HEIGHT, 11 * SCALE_WIDTH, 33 * SCALE_HEIGHT, i_foreground, i_background); /* Classic  - 15 Digit display */
-#elif defined(SPICE)
+      h_display->segment[i_count] = h_segment_create(0, 0,  ((4 + 13 * i_count) * SCALE_WIDTH), 21 * SCALE_HEIGHT, 11 * SCALE_WIDTH, 33 * SCALE_HEIGHT, i_foreground, i_background); /* 15 Digit display */
+#elif defined(HP31) || defined(HP32) || defined(HP33) || defined(HP34) || defined(HP37) || defined(HP38)
    for (i_count = 0; i_count < DIGITS; i_count++)
-      h_display->segment[i_count] = h_segment_create(0, 0,  ((3 + 18 * i_count) * SCALE_WIDTH) - 2, 18 * SCALE_HEIGHT, 16 * SCALE_WIDTH, 33 * SCALE_HEIGHT, i_foreground, i_background); /* Spice  - 11 Digit display */
+      h_display->segment[i_count] = h_segment_create(0, 0,  ((3 + 18 * i_count) * SCALE_WIDTH) - 2, 18 * SCALE_HEIGHT, 16 * SCALE_WIDTH, 33 * SCALE_HEIGHT, i_foreground, i_background); /* 11 Digit display */
 #else
    for (i_count = 0; i_count < DIGITS; i_count++)
-      h_display->segment[i_count] = h_segment_create(0, 0,  ((5 + 16 * i_count) * SCALE_WIDTH), 21 * SCALE_HEIGHT, 14 * SCALE_WIDTH, 29 * SCALE_HEIGHT, i_foreground, i_background); /* Woodstock - 12 Digit display */
+      h_display->segment[i_count] = h_segment_create(0, 0,  ((5 + 16 * i_count) * SCALE_WIDTH), 21 * SCALE_HEIGHT, 14 * SCALE_WIDTH, 29 * SCALE_HEIGHT, i_foreground, i_background); /* 12 Digit display */
 #endif
    for (i_count = 0; i_count < DIGITS; i_count++)
       h_display->segment[i_count]->mask = DISPLAY_SPACE;
@@ -240,7 +241,7 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
                               DISPLAY_E,
                               DISPLAY_SPACE };
 
-#if defined(SPICE)
+#if defined(HP31) || defined(HP32) || defined(HP33) || defined(HP34) || defined(HP37) || defined(HP38)
    for (i_count = 0; i_count < DIGITS; i_count++) {
       if (h_display->segment[i_count] != NULL) {
          if (h_processor->flags[DISPLAY_ENABLE] && h_processor->enabled) {

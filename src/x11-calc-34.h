@@ -19,6 +19,8 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * 23 Nov 21   0.1   - Initial version - MT
+ * 22 Dec 21         - Removed SPICE symbol - MT
+ *
  */
 
 #define MODEL           "34"
@@ -62,7 +64,6 @@
 #define ROM_SIZE        010000
 #define ROM_BANKS       2
 #define MEMORY_SIZE     78
-#define SPICE
 #define CONTINIOUS
 
 int i_rom [ROM_SIZE * ROM_BANKS];

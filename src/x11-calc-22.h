@@ -70,7 +70,6 @@
 #define MEMORY_SIZE     (10 + 6) /* 0 - 15 */
 #define ROM_SIZE        04000
 #define ROM_BANKS       1
-#define WOODSTOCK
 
 int i_rom [ROM_SIZE * ROM_BANKS];
 

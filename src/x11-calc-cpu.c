@@ -227,6 +227,7 @@
  * 21 Dec 21         - Fixed implicit bank switching - MT
  *                   - Modified 'clear data registers' to allow the HP67 to
  *                     behave as if it has continuous memory - MT
+ * 22 Dec 21         - Uses model numbers for conditional compilation - MT
  *
  */
 
@@ -576,7 +577,7 @@ void v_processor_reset(oprocessor *h_processor) {
       h_processor->status[i_count] = False;
    for (i_count = 0; i_count < FLAGS; i_count++) /* Clear the processor flags */
       h_processor->flags[i_count] = False;
-#if defined(HAWKEYE)
+#if defined(HP67)
    for (i_count = 0; i_count < STATES; i_count++) /* Clear the processor flags */
       h_processor->crc[i_count] = False;
    h_processor->crc[READY] = -4;
@@ -625,7 +626,7 @@ static void v_delayed_rom(oprocessor *h_processor) { /* Delayed ROM select */
 
 /* Increment ptr register */
 static void v_op_inc_p(oprocessor *h_processor) {
-#if defined(SPICE)
+#if defined(HP31) || defined(HP32) || defined(HP33) || defined(HP34) || defined(HP37) || defined(HP38)
    int i_opcode;
    i_opcode = h_processor->rom[h_processor->bank * ROM_SIZE + h_processor->pc];
    if (h_processor->p == REG_SIZE - 1)
@@ -684,12 +685,12 @@ void v_processor_tick(oprocessor *h_processor) {
       if (h_processor->trace)
          fprintf(stdout, "%1o-%04o %04o  ", h_processor->bank, h_processor->pc, h_processor->rom[h_processor->bank * ROM_SIZE + h_processor->pc]);
       if (h_processor->keypressed) h_processor->status[15] = True; /* Set status bit if key pressed */
-#if defined(HAWKEYE) /* Seems to use a flag rather then the status word for the switch position */
+#if defined(HP67) /* Seems to use a flag rather then the status word for the switch position */
       h_processor->flags[MODE] = h_processor->select; /* Set the program mode flag based on switch position */
 #else
       h_processor->status[3] = h_processor->select; /* Set status bit based on switch position */
 #endif
-#if defined(SPICE) /* Setting S(5) breaks the self test on Spice machines */
+#if defined(HP31) || defined(HP32) || defined(HP33) || defined(HP34) || defined(HP37) || defined(HP38) /* Setting S(5) breaks the self test */
       h_processor->status[5] = False; /* Self Test */
 #else
       h_processor->status[5] = True; /* Low Power */
@@ -705,7 +706,7 @@ void v_processor_tick(oprocessor *h_processor) {
                case 00000: /* nop */
                   if (h_processor->trace) fprintf(stdout, "nop");
                   break;
-#if defined(HAWKEYE)
+#if defined(HP67)
                /*
                 * 00100   Test ready
                 * 00300   Test W/PGM switch
@@ -848,7 +849,7 @@ void v_processor_tick(oprocessor *h_processor) {
                break;
             case 03:
                switch (i_opcode) {
-#if defined(HAWKEYE)
+#if defined(HP67)
                /*
                 * 00060   Set display digits
                 * 00160   Test display digits
@@ -907,7 +908,7 @@ void v_processor_tick(oprocessor *h_processor) {
                   {
                      int i_count;
                      if (h_processor->trace) fprintf(stdout, "clear data registers");
-#if defined(HAWKEYE)
+#if defined(HP67) && defined(CONTINIOUS)
                      if (h_processor->crc[READY])
                         h_processor->crc[READY]++;
                      else
@@ -1388,10 +1389,10 @@ void v_processor_tick(oprocessor *h_processor) {
       if (h_processor->trace) {
          fprintf(stdout, "\n");
       }
-      h_processor->opcode = i_opcode;
-      if (h_processor->trace) debug(v_fprint_registers(stdout, h_processor));
+      if (h_processor->trace) debug(v_fprint_registers(stdout, h_processor)); /* Display CPU state before updating the CARRY flag */
+      h_processor->opcode = i_opcode; /* Keep track of the previous opcode so you know when to increment 'P' */
       v_op_inc_pc(h_processor); /* Increment program counter (also updates CARRY flag) */
-#if defined(HAWKEYE)
+#if defined(HP67)
       if ((h_processor->pc < 02000) && (h_processor->bank > 0)) h_processor->bank = 0; /* Implicit bank switch !! */
 #endif
    }

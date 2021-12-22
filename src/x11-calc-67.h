@@ -51,7 +51,6 @@
 #define ROM_BANKS       2
 #define CONTINIOUS
 #define CLASSIC
-#define HAWKEYE
 
 int i_rom [ROM_SIZE * ROM_BANKS];
 
