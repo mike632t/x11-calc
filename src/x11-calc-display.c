@@ -47,18 +47,19 @@
  *                   - Uses separate display decoders used depending on the
  *                     number of digits - MT
  * 19 Oct 21         - Fixed display of program steps Spice series - MT
- * 20 OCt 21         - Conditionally  compiles the display formatting  code
+ * 20 Oct 21         - Conditionally  compiles the display formatting  code
  *                     for the SPICE or WOODSTOCK series machines - MT
  * 29 Oct 21         - Fixed bug is SPICE display, only shows minus sign if
  *                     there are two consecutive commas in the display - MT
  * 16 Nov 21         - Can now define the horizontal and vertical scales to
  *                     independently of each other - MT
  * 20 Dec 21         - Updated display for HP67 - MT
+ * 21 Dec 21         - Only displays warning messages if DEBUG is true - MT
  */
 
 #define VERSION        "0.1"
-#define BUILD          "0017"
-#define DATE           "16 Nov 21"
+#define BUILD          "0019"
+#define DATE           "21 Dec 21"
 #define AUTHOR         "MT"
 
 #define DEBUG 0        /* Enable/disable debug*/
@@ -212,8 +213,8 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
                   h_display->segment[i_count]->mask = c_digits[h_processor->reg[A_REG]->nibble[REG_SIZE - i_count]];
                   break;
                default:
-                  v_fprint_registers(stderr, h_processor);
-                  v_warning("Unexpected output format specified in %s line : %d\n", __FILE__, __LINE__);
+                  debug(v_fprint_registers(stderr, h_processor);
+                  v_warning("Unexpected output format specified in %s line : %d\n", __FILE__, __LINE__));
                }
             }
          }
