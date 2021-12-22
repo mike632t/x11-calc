@@ -5,7 +5,7 @@ Written in C using just X11.
 Use  of any language extensions or non standard language features has  been
 avoided in order to try to make the code as portable as possible.
 
-Should compile without modification on Linux, VAX/VMS, and  Tru64 Unix.
+Should compile without modification on Linux, VAX/VMS, and Tru64 Unix.
 
 ![HP21](./img/x11-calc-21.png) ![HP22](./img/x11-calc-22.png) ![HP25](./img/x11-calc-25.png)
 
@@ -20,7 +20,7 @@ Should compile without modification on Linux, VAX/VMS, and  Tru64 Unix.
 
 ### Latest News
 
-20/12 - HP67  mostly working!!
+20/12 - Completed HP67!!
 
 ### Status
 
@@ -32,27 +32,28 @@ Should compile without modification on Linux, VAX/VMS, and  Tru64 Unix.
 ##### HP 25 - Working
 
 ##### HP 27 - Completed
-* Not fully tested
+* Not fully tested.
 
 ##### HP 29 - Working
 
 ##### HP 31 - Working
 
 ##### HP 32 - Completed
-* Working but hangs after self test completes
+* Working but hangs after self test completes.
 
 ##### HP 33 - Working
 
 ##### HP 34 - Working
 
 ##### HP 37 - Completed
-* Not fully tested
+* Not fully tested.
 
 ##### HP 38 - Completed
-* Not fully tested
+* Not fully tested.
 
 ##### HP 67 - Mostly working
-* Currently there is no way to read or write to magnetic cards.
+* Cannot read or write to magnetic cards.
+* Has continuous memory.
 
 ### Compiling
 
@@ -135,11 +136,17 @@ should be commented out as shown.
     #dtoverlay=vc4-fkms-v3d
     #dtoverlay=vc4-kms-v3d
 
-HP32 hangs after self test.
-
 HP67 is unable to read or write to magnetic cards.
 
+HP32 hangs after self test.
+
 ### Tested
+
+- Fedora 34, GCC 11.2.1, x64
+
+- Gentoo, GCC 11.2.0, x64
+
+- Ubuntu 20.04, GCC 9.3.0, x64
 
 - Debian 10 (Buster), GCC 8.3.0, x64
 
@@ -149,20 +156,16 @@ HP67 is unable to read or write to magnetic cards.
 
 - Debian 5 (Lenny), GCC 4.2.4, alpha
 
-- Fedora 34, GCC 11.2.1, x64
-
-- Ubuntu 20.04, GCC 9.3.0, x64
-
 - VAX/VMS 5.4-3, VAXC 3.2, VAX (simh)
 
 ### Prerequisites
 
 The following packages are required to build and/or run the simulator.
 
-- Debian : gcc, make, libx11&#8209;dev, libc6&#8209;dev, xfonts&#8209;base
-
-- Ubuntu : gcc, make, libx11&#8209;dev, libc6&#8209;dev, xfonts&#8209;base
-
 - Fedora : gcc, make, libx11&#8209;dev, libc6&#8209;dev, xorg&#8209;x11&#8209;xfonts&#8209;base
 
 - Gentoo : gcc, make, libx11&#8209;dev, libc6&#8209;dev, font&#8209;misc&#8209;misc
+
+- Debian : gcc, make, libx11&#8209;dev, libc6&#8209;dev, xfonts&#8209;base
+
+- Ubuntu : gcc, make, libx11&#8209;dev, libc6&#8209;dev, xfonts&#8209;base
