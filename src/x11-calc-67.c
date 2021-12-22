@@ -22,6 +22,7 @@
  *                   - Simplified keyboard constants - MT
  * 10 Dec 21         - Keyboard shortcuts for labels now uppercase to avoid
  *                     conflicting with existing shortcuts - MT
+ * 21 Dec 21         - Added keyboard shortcut for single step - MT
  */
 
 #define VERSION        "0.1"
@@ -90,7 +91,7 @@ void v_init_keypad(obutton *h_button[], oswitch *h_switch[]) {
    i_left += (KEY_SMALL + KEY_GAP);
    h_button[i_count++] = h_button_create(00221, 000, "(i)", "RND", "", "X-I", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, GREEN, YELLOW, BLACK, BLACK);
    i_left += (KEY_SMALL + KEY_GAP);
-   h_button[i_count++] = h_button_create(00220, 000, "SST", "LBL", "f", "BST", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, GREEN, YELLOW, BLUE, BLACK);
+   h_button[i_count++] = h_button_create(00220, ' ', "SST", "LBL", "f", "BST", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, GREEN, YELLOW, BLUE, BLACK);
 
    /* Define third row of keys. */
    i_top += KBD_ROW;
