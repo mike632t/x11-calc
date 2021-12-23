@@ -23,6 +23,8 @@
  * 10 Dec 21         - Keyboard shortcuts for labels now uppercase to avoid
  *                     conflicting with existing shortcuts - MT
  * 21 Dec 21         - Added keyboard shortcut for single step - MT
+ * 22 Dec 21         - Added keyboard shortcuts for shift keys - MT
+ *
  */
 
 #define VERSION        "0.1"
@@ -96,15 +98,15 @@ void v_init_keypad(obutton *h_button[], oswitch *h_switch[]) {
    /* Define third row of keys. */
    i_top += KBD_ROW;
    i_left = KBD_LEFT;
-   h_button[i_count++] = h_button_create(00024, 000, "f", "", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, YELLOW, BACKGROUND, YELLOW, YELLOW);
+   h_button[i_count++] = h_button_create(00024, 'f', "f", "", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, YELLOW, BACKGROUND, YELLOW, YELLOW);
    i_left += (KEY_SMALL + KEY_GAP);
-   h_button[i_count++] = h_button_create(00023, 000, "g", "", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, LIGHT_BLUE, BACKGROUND, LIGHT_BLUE, LIGHT_BLUE);
+   h_button[i_count++] = h_button_create(00023, 'g', "g", "", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, LIGHT_BLUE, BACKGROUND, LIGHT_BLUE, LIGHT_BLUE);
    i_left += (KEY_SMALL + KEY_GAP);
    h_button[i_count++] = h_button_create(00022, 000, "STO", "DSZ", "(i) ", "STO I", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, GREEN, YELLOW, BLUE, BLACK);
    i_left += (KEY_SMALL + KEY_GAP);
    h_button[i_count++] = h_button_create(00021, 000, "RCL", " ISZ", "(i)", "RCL I", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, GREEN, YELLOW, BLUE, BLACK);
    i_left += (KEY_SMALL + KEY_GAP);
-   h_button[i_count++] = h_button_create(00020, 000, "h", "", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, BLACK, BLACK, BLACK, BLACK);
+   h_button[i_count++] = h_button_create(00020, 'h', "h", "", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, BLACK, BLACK, BLACK, BLACK);
 
    /* Define fourth row of keys. */
    i_top += KBD_ROW;
