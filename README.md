@@ -180,12 +180,18 @@ please create a new issue (https://github.com/mike632t/x11-calc/issues).
 
 Your problem report should contain:
 
-- System  details (preferably the output from 'neofetch') but  this  should
-include the hardware details as well as the Operating System,  Desktop, and
-Window Manager versions.
+- Architecture (and VM host if applicable);
 
-- GCC version used.
+- Operating System and version;
 
-- Commit ID.
+- Desktop Environment and version;
+
+- Window Manager and version;
+
+- GCC version used;
+
+- Commit ID;
 
 - A description of the problem.
+
+Thank you
