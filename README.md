@@ -138,6 +138,8 @@ should be commented out as shown.
 
 HP67 is unable to read or write to magnetic cards.
 
+HP67 display may .
+
 HP32 hangs after self test.
 
 ### Tested
@@ -169,3 +171,19 @@ The following packages are required to build and/or run the simulator.
 - Debian : gcc, make, libx11&#8209;dev, libc6&#8209;dev, xfonts&#8209;base
 
 - Ubuntu : gcc, make, libx11&#8209;dev, libc6&#8209;dev, xfonts&#8209;base
+
+
+### Problem Reports
+
+If you find problems or have suggestions relating to these simulators, then
+please create a new issue (https://github.com/mike632t/x11-calc/issues).
+
+Your problem report should contain:
+
+- System details (preferably the output from 'neofetch' but should include at least the host platform and OS version.
+
+- GCC version used.
+
+- Commit ID.
+
+- A description of the problem.
