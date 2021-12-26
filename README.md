@@ -180,7 +180,8 @@ please create a new issue (https://github.com/mike632t/x11-calc/issues).
 
 Your problem report should contain:
 
-- System details (preferably the output from 'neofetch' but should include at least the host platform and OS version.
+- System details (preferably the output from 'neofetch') but this should at
+least the host platform and the OS, desktop, and window manager details.
 
 - GCC version used.
 
