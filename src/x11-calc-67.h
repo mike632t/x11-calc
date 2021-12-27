@@ -18,10 +18,12 @@
  * You  should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * 00 Dec 21   0.1   - Initial version - MT
+ * 06 Dec 21   0.1   - Initial version - MT
  *                   - Simplified keyboard constants - MT
  *                   - Fixed number of digits and added new CLASSIC display
  *                     type definition - MT
+ * 24 Dec 21         - Standard key width now defined as KEY WIDTH - MT
+ *
  */
 
 #define MODEL           "67"
@@ -41,7 +43,7 @@
 #define KBD_ROW         43 * SCALE_HEIGHT
 
 #define KEY_HEIGHT      30 * SCALE_HEIGHT
-#define KEY_SMALL       33 * SCALE_WIDTH
+#define KEY_WIDTH       33 * SCALE_WIDTH
 #define KEY_NUMERIC     41 * SCALE_WIDTH
 #define KEY_GAP          3 * SCALE_WIDTH
 #define SWITCH_HEIGHT   10 * SCALE_HEIGHT
