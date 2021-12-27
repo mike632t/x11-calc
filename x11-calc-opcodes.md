@@ -1072,7 +1072,7 @@
     go to $FE              1773      1773
     go to $FF              1777      1777
 
-## Additional Instructions
+### Additional Opcodes
 
     Op Code               Classic   Woodstock
     crc 60                 N/A       0060
