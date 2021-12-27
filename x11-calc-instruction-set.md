@@ -1,4 +1,4 @@
-# introduction
+# Instruction Set
 
 Contains the type definitions and functions definitions used to emulate the
 ACT  processor  with seven 56-bit Registers.  Each register consists  of 14
