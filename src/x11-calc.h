@@ -47,7 +47,11 @@
  */
 #define COMMIT_ID "[Commit ID: $Format:%h$]"
 
+#if defined(HP67) || defined(HP45)
+#define SCALE_WIDTH     1.15
+#else
 #define SCALE_WIDTH     1
+#endif
 #define SCALE_HEIGHT    1
 
 /** #define __TIME__     "00:00:00" /* Release only */
@@ -123,6 +127,11 @@
 #define FILENAME     "x11-calc-38"
 #define TITLE        "RPN calc 38C"
 #include "x11-calc-38.h"
+
+#elif defined(HP45)
+#define FILENAME     "x11-calc-45"
+#define TITLE        "RPN calc 45"
+#include "x11-calc-45.h"
 #endif
 
 #endif
