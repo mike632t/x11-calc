@@ -1,15 +1,3 @@
-## Introduction
-
-Contains the type definitions and functions definitions used to emulate the
-ACT  processor  with seven 56-bit Registers.  Each register consists  of 14
-4-bit nibbles capable of storing a 10 digit mantissa and a 2 digit exponent
-with separate signs for both the mantissa and exponent.
-
-Each  16-bit processor instruction is retrieved from the currently selected
-ROM and can operate on one or more registers (or the selected part of  each
-register) allowing them to  be  cleared, copied,  exchanged,   incremented,
-decremented, shifted left or right and tested.
-
 ## Registers
 
 ### Arithmetic Registers
