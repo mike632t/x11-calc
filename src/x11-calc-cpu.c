@@ -228,6 +228,7 @@
  *                   - Modified 'clear data registers' to allow the HP67 to
  *                     behave as if it has continuous memory - MT
  * 22 Dec 21         - Uses model numbers for conditional compilation - MT
+ * 25 Dec 21         - A jump to ROM 0 always switches to bank 0 - MT
  *
  */
 
@@ -1392,8 +1393,6 @@ void v_processor_tick(oprocessor *h_processor) {
       if (h_processor->trace) debug(v_fprint_registers(stdout, h_processor)); /* Display CPU state before updating the CARRY flag */
       h_processor->opcode = i_opcode; /* Keep track of the previous opcode so you know when to increment 'P' */
       v_op_inc_pc(h_processor); /* Increment program counter (also updates CARRY flag) */
-#if defined(HP67)
-      if ((h_processor->pc < 02000) && (h_processor->bank > 0)) h_processor->bank = 0; /* Implicit bank switch !! */
-#endif
+      if ((h_processor->pc < 02000) && (h_processor->bank > 0)) h_processor->bank = 0; /* Implicit bank switch -  The first ROM chip at address 0 always has only one bank */
    }
 }
