@@ -103,7 +103,7 @@
  *                   - Tidied up comments - MT
  *  9 Sep 21         - Don't trace busy loops - MT
  * 12 Sep 21         - Fixed bug with single step and trace  - MT
- *                   - Added  option to allow breakpoint to be set from the
+ *                   - Added option to allow break-point to be set from the
  *                     command line - MT
  * 14 Sep 21         - Eliminated  the delay between ticks when the display
  *                     is blank - MT
@@ -178,6 +178,7 @@
  *                     time.h - MT
  * 20 Dec 21         - Changed all #ifdef to #if defined() - MT
  * 22 Dec 21         - Uses model numbers for conditional compilation - MT
+ * 26 Dec 21         - Checks the on/off switch state at startup - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Allow VMS users to set breakpoints?
@@ -568,7 +569,8 @@ int main(int argc, char *argv[]){
    b_abort = False;
    i_count = 0;
 
-   if (h_switch[1] != NULL) h_processor->select = h_switch[1]->state; else h_processor->select = False; /* Allow switches to be undefined if not used */
+   if (h_switch[0] != NULL) h_processor->enabled = h_switch[0]->state; /* Allow switches to be undefined if not used */
+   if (h_switch[1] != NULL) h_processor->select = h_switch[1]->state; else h_processor->select = False;
 
    while (!b_abort) {
       i_count--;
