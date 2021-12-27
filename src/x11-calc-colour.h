@@ -34,6 +34,8 @@
 
 #define BEIGE          0xffffff /* Beige numeric keys. */
 #define BLACK          0xffffff /* Black function keys. */
+#define DIM_GREY       0xffffff /* Gray function keys. */
+#define DIM_GRAY       0xffffff /* Gray function keys. */
 #define DARK_GREY      0xffffff /* Gray function keys. */
 #define DARK_GRAY      0xffffff /* Gray function keys. */
 #define MID_GREY       0xffffff /* Mid gray numeric keys. */
@@ -44,6 +46,7 @@
 #define YELLOW         0xffffff /* Yellow shift key. */
 #define BLUE           0x000000 /* Blue alternate text. */
 #define LIGHT_BLUE     0xffffff /* Light Blue shift key. */
+#define WHITE          0xffffff /* White text. */
 
 #define RED            0x000000 /* LED display colour. */
 #define DARK_RED       0xffffff /* LED display shading. */
@@ -57,6 +60,8 @@
 
 #define BEIGE          0xd9c8b6 /* Beige numeric keys. */
 #define BLACK          0x2e312e /* Black function keys. */
+#define DIM_GREY       0x4f4f4f /* Dark gray function keys. */
+#define DIM_GRAY       0x4f4f4f /* Dark gray function keys. */
 #define DARK_GREY      0x8f8f8f /* Gray function keys. */
 #define DARK_GRAY      0x8f8f8f /* Gray function keys. */
 #define MID_GREY       0xa9a9a9 /* Mid gray numeric keys. */
@@ -67,6 +72,7 @@
 #define YELLOW         0xf5a434 /* Yellow shift key. */
 #define BLUE           0x4aa0b0 /* Blue alternate text. */
 #define LIGHT_BLUE     0x4aa0b0 /* Blue shift key. */
+#define WHITE          0xffffff /* White text. */
 
 #define RED            0xb00000 /* LED display colour. */
 #define DARK_RED       0x400000 /* LED display shading. */
