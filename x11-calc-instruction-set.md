@@ -1,4 +1,4 @@
-# Introduction
+## Introduction
 
 Contains the type definitions and functions definitions used to emulate the
 ACT  processor  with seven 56-bit Registers.  Each register consists  of 14
@@ -75,7 +75,7 @@ Comprises of 16 status bits (S 0 - S 15)
     S 14       Set if EEX has been pressed?
     S 15 *     Set if any key is pressed.
 
-# Instruction set
+## Instruction set
 
 ## Special operations (n nnn nnn n00) - Woodstock
 
