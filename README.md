@@ -7,6 +7,8 @@ avoided in order to try to make the code as portable as possible.
 
 Should compile without modification on Linux, VAX/VMS, and Tru64 Unix.
 
+![HP67](./img/x11-calc-45.png)
+
 ![HP21](./img/x11-calc-21.png) ![HP22](./img/x11-calc-22.png) ![HP25](./img/x11-calc-25.png)
 
 ![HP27](./img/x11-calc-27.png) ![HP29](./img/x11-calc-29.png)
@@ -20,9 +22,13 @@ Should compile without modification on Linux, VAX/VMS, and Tru64 Unix.
 
 ### Latest News
 
+26/12 - Added HP45 (work in progress).
+
 20/12 - Completed HP67!!
 
 ### Status
+
+##### HP 45 - Work in progress
 
 ##### HP 21 - Working
 
