@@ -218,8 +218,6 @@ Card Reader Circuit instructions
 
     0nx64   n nn1 11 01 00    delayed select rom n
 
-    00745   0 111 10 01 01    memory full -> a        (Remove - type conflict ?)
-
 ## Type 2 - Arithmetic operations (n nnn nnn n10)
 
       9   8   7   6   5   4   3   2   1   0
