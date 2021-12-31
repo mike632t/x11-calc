@@ -27,6 +27,8 @@
  * 16 Nov 21         - Can now define the horizontal and vertical scales to
  *                     independently of each other - MT
  * 22 Nov 21         - Only saves the state of continuous registers - MT
+ * 30 Dec 21         - Does NOT have continuous memory - MT
+ *
  */
 
 #define MODEL           "25"
@@ -72,7 +74,6 @@
 #define MEMORY_SIZE     (8 + 1 + (49 / 7))
 #define ROM_SIZE        04000
 #define ROM_BANKS       1
-#define CONTINIOUS
 
 int i_rom [ROM_SIZE * ROM_BANKS];
 

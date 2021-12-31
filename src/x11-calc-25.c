@@ -30,6 +30,9 @@
  *                     the value of SCALE at compile time - MT
  * 23 Nov 21         - Added the alternate function text - MT
  * 06 Dec 21         - Label text colour now explicitly defined - MT
+ * 30 Dec 21         - Does NOT have continuous memory (HP model 25 appears
+ *                     to have a different ROM from the model 25C) - MT
+ *
  */
 
 #define VERSION        "0.1"
