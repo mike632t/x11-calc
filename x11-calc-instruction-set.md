@@ -139,7 +139,7 @@ least significant six bits of each opcode into three groups as shown below.
 
     0nn14   n nnn 00 11 00    0 -> s(n)
     0nn34   n nnn 01 11 00    if 0 = s(n)
-    0nn54   n nnn 10 11 00    if p # n
+    0nn54   n nnn 10 11 00    if p != n
     (where  nnnn = 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15
             p  =  14,  4,  7,  8, 11,  2, 10, 12,  1,  3, 13,  6,  0,  9,  5, 14)
     0nn74   n nnn 11 11 00    n -> p
@@ -196,8 +196,9 @@ Card Reader Circuit instructions
     0nn64   n nnn 11 01 00    delayed select rom n
 
     0nn30   n nnn 01 10 00    load constant n
+
     00050   0 000 10 10 00    display toggle
-    00250   0 010 10 10 00    c exch m
+    00250   0 010 10 10 00    m exch c
     00450   0 100 10 10 00    c -> stack
     00650   0 110 10 10 00    stack -> a
     00750   0 111 10 10 00    bcd -> c
@@ -209,9 +210,9 @@ Card Reader Circuit instructions
     01370   1 011 11 10 00    data -> c
 
     0nn14   n nnn 00 11 00    n -> p
-    01334   1 011 01 11 00    p - 1 -> p
-    0nn54   n nnn 10 11 00    if p # n
-    01374   1 011 11 11 00    p + 1 -> p
+    00034   0 000 01 11 00    p - 1 -> p
+    0nn54   n nnn 10 11 00    if p != n
+    00074   0 000 11 11 00    p + 1 -> p
 
     01064   1 000 11 01 00    delayed select group 0
     01264   1 010 11 01 00    delayed select group 1
@@ -271,8 +272,8 @@ The field modifier is used to select which part of the register to use.
             1 011 1 fff 10    if c[f] = 0
             1 100 0 fff 10    if a >= c[f]
             1 100 1 fff 10    if a >= b[f]
-            1 101 0 fff 10    if a[f] # 0
-            1 101 1 fff 10    if c[f] # 0
+            1 101 0 fff 10    if a[f] != 0
+            1 101 1 fff 10    if c[f] != 0
             1 110 0 fff 10    a - c -> a[f]
             1 110 1 fff 10    shift right a[f]
             1 111 0 fff 10    shift right b[f]
@@ -292,7 +293,7 @@ The field modifier is used to select which part of the register to use.
             0 000 0 fff 10    if b[f] = 0
             0 000 1 fff 10    0 -> b[f]
             0 001 0 fff 10    if a >= c[f]
-            0 001 1 fff 10    if c[f] # 0
+            0 001 1 fff 10    if c[f] != 0
             0 010 0 fff 10    b -> c[f]
             0 010 1 fff 10    0 - c -> c[f]
             0 011 0 fff 10    0 -> c[f]
@@ -308,7 +309,7 @@ The field modifier is used to select which part of the register to use.
             1 000 0 fff 10    if a >= b[f]
             1 000 1 fff 10    b exch c[f]
             1 001 0 fff 10    shift right c[f]
-            1 001 1 fff 10    if a[f] # 0
+            1 001 1 fff 10    if a[f] != 0
             1 010 0 fff 10    shift right b[f]
             1 010 1 fff 10    c + c -> c[f]
             1 011 0 fff 10    shift right a[f]

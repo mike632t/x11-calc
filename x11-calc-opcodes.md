@@ -139,83 +139,83 @@
     f exch a               N/A       1710
     hi i'm woodstock       N/A       1760
     i8 -> a                0350      N/A
-    if p # 0               0054      1354
+    if p != 0              0054      1354
     if p = 0               N/A       1344
-    if p # 1               0154      0554
+    if p != 1              0154      0554
     if p = 1               N/A       0544
-    if p # 2               0254      0354
+    if p != 2              0254      0354
     if p = 2               N/A       0344
-    if p # 3               0354      0754
+    if p != 3              0354      0754
     if p = 3               N/A       0744
-    if p # 4               0454      0054
+    if p != 4              0454      0054
     if p = 4               N/A       0044
-    if p # 5               0554      1254
+    if p != 5              0554      1254
     if p = 5               N/A       1244
-    if p # 6               0654      0654
+    if p != 6              0654      0654
     if p = 6               N/A       0644
-    if p # 7               0754      1654
+    if p != 7              0754      1654
     if p = 7               N/A       1644
-    if p # 8               1054      0154
+    if p != 8              1054      0154
     if p = 8               N/A       0144
-    if p # 9               1154      0454
+    if p != 9              1154      0454
     if p = 9               N/A       0444
-    if p # 10              1254      1554
+    if p != 10             1254      1554
     if p = 10              N/A       1544
-    if p # 11              1354      1454
+    if p != 11             1354      1454
     if p = 11              N/A       1444
-    if p # 12              1454      0254
+    if p != 12             1454      0254
     if p = 12              N/A       0244
-    if p # 13              1554      1154
+    if p != 13             1554      1154
     if p = 13              N/A       1144
-    if p # 14              1654      N/A
-    if p # 15              1754      N/A
+    if p != 14             1654      N/A
+    if p != 15             1754      N/A
     if s0 = 0              0024      0034
-    if s0 # 1              0024      0034
+    if s0 != 1             0024      0034
     if s0 = 1              N/A       0024
     if s1 = 1              N/A       0124
     if s1 = 0              0124      0134
-    if s1 # 1              0124      0134
+    if s1 != 1             0124      0134
     if s2 = 0              0224      0234
-    if s2 # 1              0224      0234
+    if s2 != 1             0224      0234
     if s2 = 1              N/A       0224
     if s3 = 0              0324      0334
-    if s3 # 1              0324      0334
+    if s3 != 1             0324      0334
     if s3 = 1              N/A       0324
     if s4 = 0              0424      0434
-    if s4 # 1              0424      0434
+    if s4 != 1             0424      0434
     if s4 = 1              N/A       0424
     if s5 = 0              0524      0534
-    if s5 # 1              0524      0534
+    if s5 != 1             0524      0534
     if s5 = 1              N/A       0524
     if s6 = 0              0624      0634
-    if s6 # 1              0624      0634
+    if s6 != 1             0624      0634
     if s6 = 1              N/A       0624
     if s7 = 0              0724      0734
-    if s7 # 1              0724      0734
+    if s7 != 1             0724      0734
     if s7 = 1              N/A       0724
     if s8 = 0              1024      1034
-    if s8 # 1              1024      1034
+    if s8 != 1             1024      1034
     if s8 = 1              N/A       1024
     if s9 = 0              1124      1134
-    if s9 # 1              1124      1134
+    if s9 != 1             1124      1134
     if s9 = 1              N/A       1124
     if s10 = 0             1224      1234
-    if s10 # 1             1224      1234
+    if s10 != 1            1224      1234
     if s10 = 1             N/A       1224
     if s11 = 0             1324      1334
-    if s11 # 1             1324      1334
+    if s11 != 1            1324      1334
     if s11 = 1             N/A       1324
     if s12 = 0             1424      1434
-    if s12 # 1             1424      1434
+    if s12 != 1            1424      1434
     if s12 = 1             N/A       1424
     if s13 = 0             1524      1534
-    if s13 # 1             1524      1534
+    if s13 != 1            1524      1534
     if s13 = 1             N/A       1524
     if s14 = 0             1624      1634
-    if s14 # 1             1624      1634
+    if s14 != 1            1624      1634
     if s14 = 1             N/A       1624
     if s15 = 0             1724      1734
-    if s15 # 1             1724      1734
+    if s15 != 1            1724      1734
     if s15 = 1             N/A       1724
     keys -> a              N/A       0120
     keys -> rom address    0320      0020
@@ -235,10 +235,10 @@
     load constant 13       N/A       1530
     load constant 14       N/A       1630
     load constant 15       N/A       1730
-    m1 -> c                N/A       0510
-    m1 exch c              N/A       0410
-    m2 -> c                N/A       0710
-    m2 exch c              N/A       0610
+    m -> c                 N/A       0510
+    m exch c               N/A       0410
+    n -> c                 N/A       0710
+    n exch c               N/A       0610
     mark and search        0400      N/A
     m -> c                 1250      N/A
     memory delete          0600      N/A
@@ -246,8 +246,8 @@
     memory initialize      1600      N/A
     memory insert          0200      N/A
     no operation           0000      0000
-    p - 1 -> p             1334      0620
-    p + 1 -> p             1374      0720
+    p - 1 -> p             0034      0620
+    p + 1 -> p             0074      0720
 
     pointer advance        1400      N/A
     return                 0060      1020
@@ -731,19 +731,19 @@
     if a >= c[xs]          0132      1412
     if a[m] # 0            1146      1526
     if a[m] >= 1           1146      1526
-    if a[ms] # 0           1166      1536
+    if a[ms] != 0          1166      1536
     if a[ms] >= 1          1166      1536
-    if a[p] # 0            1142      1502
+    if a[p] != 0           1142      1502
     if a[p] >= 1           1142      1502
-    if a[s] # 0            1176      1522
+    if a[s] != 0           1176      1522
     if a[s] >= 1           1176      1522
-    if a[w] # 0            1156      1532
+    if a[w] != 0           1156      1532
     if a[w] >= 1           1156      1532
-    if a[wp] # 0           1162      1506
+    if a[wp] != 0          1162      1506
     if a[wp] >= 1          1162      1506
-    if a[x] # 0            1152      1516
+    if a[x] != 0           1152      1516
     if a[x] >= 1           1152      1516
-    if a[xs] # 0           1172      1512
+    if a[xs] != 0          1172      1512
     if a[xs] >= 1          1172      1512
     if b[m] = 0            0006      1326
     if b[ms] = 0           0026      1336
@@ -753,28 +753,28 @@
     if b[wp] = 0           0022      1306
     if b[x] = 0            0012      1316
     if b[xs] = 0           0032      1312
-    if c[m] # 0            0146      1566
+    if c[m] != 0           0146      1566
     if c[m] = 0            0646      1366
     if c[m] >= 1           0146      1566
-    if c[ms] # 0           0166      1576
+    if c[ms] != 0          0166      1576
     if c[ms] = 0           0666      1376
     if c[ms] >= 1          0166      1576
-    if c[p] # 0            0142      1542
+    if c[p] != 0           0142      1542
     if c[p] = 0            0642      1342
     if c[p] >= 1           0142      1542
-    if c[s] # 0            0176      1562
+    if c[s] != 0           0176      1562
     if c[s] = 0            0676      1362
     if c[s] >= 1           0176      1562
-    if c[w] # 0            0156      1572
+    if c[w] != 0           0156      1572
     if c[w] = 0            0656      1372
     if c[w] >= 1           0156      1572
-    if c[wp] # 0           0162      1546
+    if c[wp] != 0          0162      1546
     if c[wp] = 0           0662      1346
     if c[wp] >= 1          0162      1546
-    if c[x] # 0            0152      1556
+    if c[x] != 0           0152      1556
     if c[x] = 0            0652      1356
     if c[x] >= 1           0152      1556
-    if c[xs] # 0           0172      1552
+    if c[xs] != 0          0172      1552
     if c[xs] = 0           0672      1352
     if c[xs] >= 1          0172      1552
     shift left a[m]        0406      0726
@@ -1113,7 +1113,7 @@
     0 -> p                 0014      1474
     select rom 0           0020      0040
     if s0 = 0              0024      0034
-    if s0 # 1              0024      0034
+    if s0 != 1             0024      0034
     load constant 0        0030      0030
     1 -> f0                0040      N/A
     0 -> s0                0044      0014
@@ -1124,33 +1124,33 @@
     1 -> s1                0104      0104
     1 -> p                 0114      1074
     if s1 = 0              0124      0134
-    if s1 # 1              0124      0134
+    if s1 != 1             0124      0134
     load constant 1        0130      0130
     0 -> f0                0140      N/A
     0 -> s1                0144      0114
-    if p # 1               0154      0554
+    if p != 1              0154      0554
     delayed select rom 0   0164      0064
     memory insert          0200      N/A
     1 -> s2                0204      0204
     2 -> p                 0214      0574
     select rom 1           0220      0140
     if s2 = 0              0224      0234
-    if s2 # 1              0224      0234
+    if s2 != 1             0224      0234
     load constant 2        0230      0230
     1 -> f1                0240      N/A
     0 -> s2                0244      0214
     c exch m               0250      N/A
-    if p # 2               0254      0354
+    if p != 2              0254      0354
     1 -> s3                0304      0304
     3 -> p                 0314      1174
     keys -> rom address    0320      0020
     if s3 = 0              0324      0334
-    if s3 # 1              0324      0334
+    if s3 != 1             0324      0334
     load constant 3        0330      0330
     0 -> f1                0340      N/A
     0 -> s3                0344      0314
     i8 -> a                0350      N/A
-    if p # 3               0354      0754
+    if p != 3              0354      0754
     delayed select rom 1   0364      0164
     mark and search        0400      N/A
     shift left a[p]        0402      0702
@@ -1162,7 +1162,7 @@
     select rom 2           0420      0240
     shift left a[wp]       0422      0706
     if s4 = 0              0424      0434
-    if s4 # 1              0424      0434
+    if s4 != 1             0424      0434
     shift left a[ms]       0426      0736
     load constant 4        0430      0430
     shift left a[xs]       0432      0712
@@ -1170,48 +1170,48 @@
     1 -> f2                0440      N/A
     0 -> s4                0444      0414
     c -> stack             0450      1310
-    if p # 4               0454      0054
+    if p != 4              0454      0054
     1 -> s5                0504      0504
     5 -> p                 0514      1674
     if s5 = 0              0524      0534
-    if s5 # 1              0524      0534
+    if s5 != 1             0524      0534
     load constant 5        0530      0530
     0 -> f2                0540      N/A
     0 -> s5                0544      0514
-    if p # 5               0554      1254
+    if p != 5              0554      1254
     delayed select rom 2   0564      0264
     memory delete          0600      N/A
     1 -> s6                0604      0604
     6 -> p                 0614      1374
     select rom 3           0620      0340
     if s6 = 0              0624      0634
-    if s6 # 1              0624      0634
+    if s6 != 1             0624      0634
     load constant 6        0630      0630
     1 -> f3                0640      N/A
     0 -> s6                0644      0614
     stack -> a             0650      1010
-    if p # 6               0654      0654
+    if p != 6              0654      0654
     1 -> s7                0704      0704
     7 -> p                 0714      0274
     if s7 = 0              0724      0734
-    if s7 # 1              0724      0734
+    if s7 != 1             0724      0734
     load constant 7        0730      0730
     0 -> f3                0740      N/A
     0 -> s7                0744      0714
     memory full -> a       0745      N/A
     bcd -> c               0750      N/A
-    if p # 7               0754      1654
+    if p != 7              0754      1654
     delayed select rom 3   0764      0364
     1 -> s8                1004      1004
     8 -> p                 1014      0374
     select rom 4           1020      0440
     if s8 = 0              1024      1034
-    if s8 # 1              1024      1034
+    if s8 != 1             1024      1034
     load constant 8        1030      1030
     1 -> f4                1040      N/A
     0 -> s8                1044      1014
     display off            1050      0310
-    if p # 8               1054      0154
+    if p != 8              1054      0154
     delayed select group 0 1064      N/A
     shift right c[p]       1102      1742
     1 -> s9                1104      1104
@@ -1221,14 +1221,14 @@
     shift right c[w]       1116      1772
     shift right c[wp]      1122      1746
     if s9 = 0              1124      1134
-    if s9 # 1              1124      1134
+    if s9 != 1             1124      1134
     shift right c[ms]      1126      1776
     load constant 9        1130      1130
     shift right c[xs]      1132      1752
     shift right c[s]       1136      1762
     0 -> f4                1140      N/A
     0 -> s9                1144      1114
-    if p # 9               1154      0454
+    if p != 9              1154      0454
     c -> data address      1160      1160
     delayed select rom 4   1164      0464
     search for label       1200      N/A
@@ -1241,7 +1241,7 @@
     select rom 5           1220      0540
     shift right b[wp]      1222      1706
     if s10 = 0             1224      1234
-    if s10 # 1             1224      1234
+    if s10 != 1            1224      1234
     shift right b[ms]      1226      1736
     load constant 10       1230      1230
     shift right b[xs]      1232      1712
@@ -1249,7 +1249,7 @@
     1 -> f5                1240      N/A
     0 -> s10               1244      1214
     m -> c                 1250      N/A
-    if p # 10              1254      1554
+    if p != 10             1254      1554
     delayed select group 1 1264      N/A
     shift right a[p]       1302      1642
     1 -> s11               1304      1304
@@ -1259,7 +1259,7 @@
     shift right a[w]       1316      1672
     shift right a[wp]      1322      1646
     if s11 = 0             1324      1334
-    if s11 # 1             1324      1334
+    if s11 != 1            1324      1334
     shift right a[ms]      1326      1676
     load constant 11       1330      1330
     shift right a[xs]      1332      1652
@@ -1267,7 +1267,7 @@
     shift right a[s]       1336      1662
     0 -> f5                1340      N/A
     0 -> s11               1344      1314
-    if p # 11              1354      1454
+    if p != 11             1354      1454
     c -> data              1360      1360
     delayed select rom 5   1364      0564
     data -> c              1370      N/A
@@ -1276,29 +1276,29 @@
     12 -> p                1414      0774
     select rom 6           1420      0640
     if s12 = 0             1424      1434
-    if s12 # 1             1424      1434
+    if s12 != 1            1424      1434
     1 -> f6                1440      N/A
     down rotate            1450      1110
-    if p # 12              1454      0254
+    if p != 12             1454      0254
     13 -> p                1514      1274
     if s13 = 0             1524      1534
-    if s13 # 1             1524      1534
+    if s13 != 1            1524      1534
     0 -> f6                1540      N/A
-    if p # 13              1554      1154
+    if p != 13             1554      1154
     delayed select rom 6   1564      0664
     memory initialize      1600      N/A
     14 -> p                1614      N/A
     select rom 7           1620      0740
     if s14 = 0             1624      1634
-    if s14 # 1             1624      1634
+    if s14 != 1            1624      1634
     1 -> f7                1640      N/A
     clear registers        1650      0010
-    if p # 14              1654      N/A
+    if p != 14             1654      N/A
     15 -> p                1714      N/A
     if s15 = 0             1724      1734
-    if s15 # 1             1724      1734
+    if s15 != 1            1724      1734
     0 -> f7                1740      N/A
-    if p # 15              1754      N/A
+    if p != 15             1754      N/A
     delayed select rom 7   1764      0764
     0 -> s12               N/A       1414
     0 -> s13               N/A       1514
@@ -1392,10 +1392,10 @@
     load constant 13       N/A       1530
     load constant 14       N/A       1630
     load constant 15       N/A       1730
-    m1 -> c                N/A       0510
-    m1 exch c              N/A       0410
-    m2 -> c                N/A       0710
-    m2 exch c              N/A       0610
+    m -> c                 N/A       0510
+    m exch c               N/A       0410
+    n -> c                 N/A       0710
+    n exch c               N/A       0610
     rom checksum           N/A       1460
     rotate a left          N/A       0520
     select rom 10          N/A       1240
