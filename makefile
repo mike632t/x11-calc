@@ -20,6 +20,7 @@
 #
 #	09 Oct 21   0.1   - Initial version - MT
 #  22 Nov 21   0.2   - Added data files to backups - MT
+#  04 Jan 21			- Added HP model 35 - MT
 #
 
 PROGRAM	=  x11-calc
@@ -30,7 +31,13 @@ FILES		+= ./img/x11-calc-*.png
 MAKE		=  make
 
 
-all: clean hp45 hp21 hp22 hp25 hp27 hp29 hp31 hp32 hp33 hp34 hp37 hp38 hp67
+all: clean hp35 hp45 hp21 hp22 hp25 hp27 hp29 hp31 hp32 hp33 hp34 hp37 hp38 hp67
+
+hp35:
+	@$(MAKE) --no-print-directory -C ./src MODEL=35
+
+hp80:
+	@$(MAKE) --no-print-directory -C ./src MODEL=80
 
 hp45:
 	@$(MAKE) --no-print-directory -C ./src MODEL=45
