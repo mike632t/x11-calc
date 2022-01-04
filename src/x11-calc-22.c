@@ -24,14 +24,15 @@
  *                     the value of SCALE at compile time - MT
  * 23 Nov 21         - Added the alternate function text - MT
  * 06 Dec 21         - Label text colour now explicitly defined - MT
+ * 03 Jan 21         - Changed debug() macro so that debug code is executed
+ *                     when DEBUG is defined (doesn't need to be true) - MT
+ *
  */
 
 #define VERSION        "0.1"
 #define BUILD          "0005"
 #define DATE           "06 Dec 21"
 #define AUTHOR         "MT"
-
-#define DEBUG 0        /* Enable/disable debug*/
 
 #include <stdarg.h>    /* strlen(), etc. */
 #include <stdio.h>     /* fprintf(), etc. */
