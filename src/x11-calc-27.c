@@ -30,14 +30,15 @@
  * 06 Dec 21         - Changed green to a slightly lighter colour to try to
  *                     improve the appearance of the black text - MT
  *                   - Label text colour now explicitly defined - MT
+ * 03 Jan 21         - Changed debug() macro so that debug code is executed
+ *                     when DEBUG is defined (doesn't need to be true) - MT
+ *
  */
 
 #define VERSION        "0.1"
 #define BUILD          "0008"
 #define DATE           "06 Dec 21"
 #define AUTHOR         "MT"
-
-#define DEBUG 0        /* Enable/disable debug*/
 
 #include <stdarg.h>    /* strlen(), etc. */
 #include <stdio.h>     /* fprintf(), etc. */
