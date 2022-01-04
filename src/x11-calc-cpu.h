@@ -129,5 +129,7 @@ void v_processor_save(oprocessor *h_processor);
 
 void v_fprint_registers(FILE *h_file, oprocessor *h_procesor);
 
+void v_fprint_memory(FILE *h_file, oprocessor *h_procesor);
+
 void v_processor_tick(oprocessor *h_procesor);
 #endif

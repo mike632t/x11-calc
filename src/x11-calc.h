@@ -48,7 +48,7 @@
  */
 #define COMMIT_ID "[Commit ID: $Format:%h$]"
 
-#if defined(HP67) || defined(HP45)
+#if defined (HP35) || defined (HP80) || defined (HP45) || defined (HP70) || defined(HP55) || defined(HP67)
 #define SCALE_WIDTH     1.15
 #else
 #define SCALE_WIDTH     1
@@ -69,7 +69,17 @@
 
 #define COLOUR_DEPTH 24
 
-#if defined(HP21)
+#if defined(HP35)
+#define FILENAME     "x11-calc-35"
+#define TITLE        "RPN calc 35"
+#include "x11-calc-35.h"
+
+#elif defined(HP45)
+#define FILENAME     "x11-calc-45"
+#define TITLE        "RPN calc 45"
+#include "x11-calc-45.h"
+
+#elif defined(HP21)
 #define FILENAME     "x11-calc-21"
 #define TITLE        "RPN calc 21"
 #include "x11-calc-21.h"
@@ -128,11 +138,6 @@
 #define FILENAME     "x11-calc-38"
 #define TITLE        "RPN calc 38C"
 #include "x11-calc-38.h"
-
-#elif defined(HP45)
-#define FILENAME     "x11-calc-45"
-#define TITLE        "RPN calc 45"
-#include "x11-calc-45.h"
 #endif
 
 #endif

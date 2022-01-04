@@ -56,14 +56,15 @@
  * 20 Dec 21         - Updated display for HP67 - MT
  * 21 Dec 21         - Only displays warning messages if DEBUG is true - MT
  * 22 Dec 21         - Uses model numbers for conditional compilation - MT
+ * 03 Jan 21         - Changed debug() macro so that debug code is executed
+ *                     when DEBUG is defined (doesn't need to be true) - MT
+ *
  */
 
 #define VERSION        "0.1"
 #define BUILD          "0019"
 #define DATE           "21 Dec 21"
 #define AUTHOR         "MT"
-
-#define DEBUG 0        /* Enable/disable debug*/
 
 #include <stdlib.h>    /* malloc(), etc. */
 #include <stdio.h>     /* fprintf(), etc. */
@@ -90,9 +91,7 @@
  *
  * Allocates storage for a seven segment display, sets the properties and
  * returns a pointer to the display, or exits the program if there isn't
- * enough memory available.  The height and width of the display are based on
- * the margins, size of the header and footer, number of digits, and the
- * width and height of the individual display segments.
+ * enough memory available.
  *
  */
 
@@ -109,18 +108,22 @@ odisplay *h_display_create(int i_index, int i_left, int i_top, int i_width,
    h_display->top = i_top;
    h_display->width = i_width;
    h_display->height = i_height;
-#if defined(CLASSIC)
-   for (i_count = 0; i_count < DIGITS; i_count++)
+#if defined(HP67) || defined (HP35) || defined (HP80) || defined (HP45) || defined (HP70) || defined(HP55)
+   for (i_count = 0; i_count < DIGITS; i_count++) {
       h_display->segment[i_count] = h_segment_create(0, 0,  ((4 + 13 * i_count) * SCALE_WIDTH), 21 * SCALE_HEIGHT, 11 * SCALE_WIDTH, 33 * SCALE_HEIGHT, i_foreground, i_background); /* 15 Digit display */
+   }
 #elif defined(HP31) || defined(HP32) || defined(HP33) || defined(HP34) || defined(HP37) || defined(HP38)
-   for (i_count = 0; i_count < DIGITS; i_count++)
+   for (i_count = 0; i_count < DIGITS; i_count++) {
       h_display->segment[i_count] = h_segment_create(0, 0,  ((3 + 18 * i_count) * SCALE_WIDTH) - 2, 18 * SCALE_HEIGHT, 16 * SCALE_WIDTH, 33 * SCALE_HEIGHT, i_foreground, i_background); /* 11 Digit display */
+   }
 #else
-   for (i_count = 0; i_count < DIGITS; i_count++)
+   for (i_count = 0; i_count < DIGITS; i_count++) {
       h_display->segment[i_count] = h_segment_create(0, 0,  ((5 + 16 * i_count) * SCALE_WIDTH), 21 * SCALE_HEIGHT, 14 * SCALE_WIDTH, 29 * SCALE_HEIGHT, i_foreground, i_background); /* 12 Digit display */
+   }
 #endif
-   for (i_count = 0; i_count < DIGITS; i_count++)
+   for (i_count = 0; i_count < DIGITS; i_count++) {
       h_display->segment[i_count]->mask = DISPLAY_SPACE;
+   }
    h_display->foreground = i_foreground;
    h_display->background = i_background;
    h_display->border = i_border;
@@ -156,10 +159,8 @@ int i_display_draw(Display* x_display, int x_application_window, int i_screen, o
  */
 
 int i_display_update(Display* x_display, int x_application_window, int i_screen, odisplay *h_display, oprocessor *h_processor){
-
+#if defined(HP67)
    int i_count;
-
-#if defined(CLASSIC)
    static int c_digits [] = { DISPLAY_ZERO,
                               DISPLAY_ONE,
                               DISPLAY_TWO,
@@ -223,7 +224,64 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
             h_display->segment[i_count]->mask = DISPLAY_SPACE;
       }
    }
-#else
+#elif defined (HP35) || defined (HP80) || defined (HP45) || defined (HP70) || defined(HP55)
+   int i_count, i_offset;
+   static int c_digits [] = { DISPLAY_ZERO,
+                              DISPLAY_ONE,
+                              DISPLAY_TWO,
+                              DISPLAY_THREE,
+                              DISPLAY_FOUR,
+                              DISPLAY_FIVE,
+                              DISPLAY_SIX,
+                              DISPLAY_SEVEN,
+                              DISPLAY_EIGHT,
+                              DISPLAY_NINE };
+
+   i_offset = REG_SIZE - 1;
+   for (i_count = 0; i_count < DIGITS; i_count++) {
+      if (h_display->segment[i_count] != NULL) {
+         if (h_processor->flags[DISPLAY_ENABLE] && h_processor->enabled)
+         {
+            switch (i_count) {
+            case 0:
+               if (h_processor->reg[A_REG]->nibble[REG_SIZE - i_count - 1] == 9)
+                  h_display->segment[i_count]->mask = DISPLAY_MINUS;
+               else
+                  h_display->segment[i_count]->mask = DISPLAY_SPACE;
+            break;
+            case 12:
+               i_offset = 2;
+               if ((h_processor->reg[A_REG]->nibble[REG_SIZE - i_count] == 9) &&
+                  (h_processor->reg[B_REG]->nibble[REG_SIZE - i_count] == 0))
+                  h_display->segment[i_count]->mask = DISPLAY_MINUS;
+               else
+                  h_display->segment[i_count]->mask = DISPLAY_SPACE;
+            break;
+            default:
+               switch (h_processor->reg[B_REG]->nibble[REG_SIZE - i_count] & 0x0F) {
+               case 2: /* Decimal point */
+                  h_display->segment[i_count]->mask = DISPLAY_DECIMAL;
+                  i_offset++;
+                  break;
+               case 9: /* Space */
+                  h_display->segment[i_count]->mask = DISPLAY_SPACE;
+                  break;
+               case 0: /* Number */
+                  if (i_offset >= 0) h_display->segment[i_count]->mask = c_digits[h_processor->reg[A_REG]->nibble[i_offset]];
+                  break;
+               default:
+                  debug(v_fprint_registers(stderr, h_processor);
+                  v_warning("Unexpected output format specified in %s line : %d\n", __FILE__, __LINE__));
+               }
+            }
+         }
+         else
+            h_display->segment[i_count]->mask = DISPLAY_SPACE;
+      }
+      i_offset--;
+   }
+#elif defined(HP31) || defined(HP32) || defined(HP33) || defined(HP34) || defined(HP37) || defined(HP38)
+   int i_count;
    static int c_digits [] = { DISPLAY_ZERO,
                               DISPLAY_ONE,
                               DISPLAY_TWO,
@@ -241,7 +299,6 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
                               DISPLAY_E,
                               DISPLAY_SPACE };
 
-#if defined(HP31) || defined(HP32) || defined(HP33) || defined(HP34) || defined(HP37) || defined(HP38)
    for (i_count = 0; i_count < DIGITS; i_count++) {
       if (h_display->segment[i_count] != NULL) {
          if (h_processor->flags[DISPLAY_ENABLE] && h_processor->enabled) {
@@ -280,6 +337,24 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
       }
    }
 #else
+   int i_count;
+   static int c_digits [] = { DISPLAY_ZERO,
+                              DISPLAY_ONE,
+                              DISPLAY_TWO,
+                              DISPLAY_THREE,
+                              DISPLAY_FOUR,
+                              DISPLAY_FIVE,
+                              DISPLAY_SIX,
+                              DISPLAY_SEVEN,
+                              DISPLAY_EIGHT,
+                              DISPLAY_NINE,
+                              DISPLAY_r,
+                              DISPLAY_c,
+                              DISPLAY_o,
+                              DISPLAY_P,
+                              DISPLAY_E,
+                              DISPLAY_SPACE };
+
    for (i_count = 0; i_count < DIGITS; i_count++) {
       if (h_display->segment[i_count] != NULL) {
          if (h_processor->flags[DISPLAY_ENABLE] && h_processor->enabled) {
@@ -299,7 +374,6 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
             h_display->segment[i_count]->mask = DISPLAY_SPACE;
       }
    }
-#endif
 #endif
    return (True);
 }

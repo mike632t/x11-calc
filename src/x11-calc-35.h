@@ -18,11 +18,11 @@
  * You  should have received a copy of the GNU General Public License  along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * 24 Dec 21         - Initial version with new button style - MT
+ * 04 Jan 22         - Initial version (50th anniversary) - MT
  *
  */
 
-#define MODEL           "45"
+#define MODEL           "35"
 #define HEIGHT          450 * SCALE_HEIGHT
 #define WIDTH           200 * SCALE_WIDTH
 #define BUTTONS         35
@@ -45,8 +45,8 @@
 #define KEY_GAP          3 * SCALE_WIDTH
 #define SWITCH_HEIGHT   10 * SCALE_HEIGHT
 
-#define ROM_SIZE        04000
-#define MEMORY_SIZE     10
+#define ROM_SIZE        01400
+#define MEMORY_SIZE     1
 #define ROM_BANKS       1
 
 int i_rom [ROM_SIZE * ROM_BANKS];
