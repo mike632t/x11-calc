@@ -27,6 +27,10 @@
  *                     independently of each other - MT
  * 22 Nov 21         - Only saves the state of continuous registers - MT
  * 21 Dev 21         - Fixed number of banks and ROM size - MT
+ * 31 Dec 21         - Having fixed 'clear data registers' keeping track of
+ *                     which registers are persistent is not a  requirement
+ *                     anymore - MT
+ *
  */
 
 #define MODEL           "29"
@@ -71,10 +75,6 @@
 #define ROM_SIZE        010000
 #define ROM_BANKS       1
 #define CONTINIOUS
-
-#define PERSISTENT { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, \
-   30, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47 \
-}
 
 int i_rom [ROM_SIZE * ROM_BANKS];
 
