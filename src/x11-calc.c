@@ -162,7 +162,8 @@
  *                     macros and moved them into this file to get the code
  *                     to compile using VAXC.  I would have preferred to be
  *                     able to define them in a separate language  specific
- *                     module but can't figure out how - MT
+ *                     module but I can't figure out how to make it work on
+ *                     the older C compilers - MT
  * 21 Nov 21         - Mapped backspace key to escape - MT
  * 28 Nov 21         - Made the trace flag a processor property - MT
  *             0.8   - HP34 simulator works (require testing).
@@ -179,6 +180,10 @@
  * 20 Dec 21         - Changed all #ifdef to #if defined() - MT
  * 22 Dec 21         - Uses model numbers for conditional compilation - MT
  * 26 Dec 21         - Checks the on/off switch state at startup - MT
+ * 03 jan 21         - Added ability to trap execution of an opcode - MT
+ * 03 Jan 21         - Changed debug() macro so that debug code is executed
+ *                     when DEBUG is defined (doesn't need to be true) - MT
+ * 04 Jan 21         - Updated help text - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Allow VMS users to set breakpoints?
@@ -193,8 +198,6 @@
 #define BUILD          "0083"
 #define DATE           "17 Dec 21"
 #define AUTHOR         "MT"
-
-#define DEBUG 0        /* Enable/disable debug*/
 
 #define INTERVAL 25    /* Number of ticks to execute before updating the display */
 #define DELAY 300      /* Number of intervals to wait before exiting (must be a multiple of 6) */
@@ -231,8 +234,9 @@
 const char * c_msg_usage = "Usage: %s [OPTION]... [FILE]\n\
 An RPN Calculator simulation for X11.\n\n\
   -b  ADDR                 set break-point (octal)\n\
-  -s, --step               start in single step\n\
-  -t, --trace              trace execution\n\
+  -i, OPCODE               break when specified instruction is executed\n\
+  -s,                      start in single step\n\
+  -t,                      trace execution\n\
       --cursor             display cursor (default)\n\
       --no-cursor          hide cursor\n\
       --help               display this help and exit\n\
@@ -240,7 +244,7 @@ An RPN Calculator simulation for X11.\n\n\
 const char * h_err_invalid_operand = "invalid operand(s)\n";
 const char * h_err_invalid_option = "invalid option -- '%c'\n";
 const char * h_err_unrecognised_option = "unrecognised option '%s'\n";
-const char * h_err_invalid_address = "not an octal address -- '%s' \n";
+const char * h_err_invalid_number = "not an octal number -- '%s' \n";
 const char * h_err_address_range = "out of range -- '%s' \n";
 const char * h_err_missing_argument = "option requires an argument -- '%s'\n";
 const char * h_err_invalid_argument = "expected argument not -- '%c' \n";
@@ -351,6 +355,7 @@ int main(int argc, char *argv[]){
 
    int i_offset, i_count, i_index;
    int i_breakpoint = -1; /* Break-point */
+   int i_trap = -1; /* Trap instruction */
    int i_ticks = -1;
 
 #if defined(vms) /* Parse DEC style command line options */
@@ -400,11 +405,39 @@ int main(int argc, char *argv[]){
                      i_breakpoint = 0;
                      for (i_offset = 0; i_offset < strlen(argv[i_count + 1]); i_offset++) { /* Parse octal number */
                         if ((argv[i_count + 1][i_offset] < '0') || (argv[i_count + 1][i_offset] > '7'))
-                           v_error(h_err_invalid_address, argv[i_count + 1]);
+                           v_error(h_err_invalid_number, argv[i_count + 1]);
                         else
                            i_breakpoint = i_breakpoint * 8 + argv[i_count + 1][i_offset] - '0';
                      }
                      if ((i_breakpoint < 0)  || (i_breakpoint > (unsigned)(sizeof(i_rom) / sizeof i_rom[0]))) { /* Check address range */
+                        v_error(h_err_address_range, argv[i_count + 1]);
+                     }
+                     else {
+                        if (i_count + 2 < argc) /* Remove the parameter from the arguments */
+                           for (i_offset = i_count + 1; i_offset < argc - 1; i_offset++)
+                              argv[i_offset] = argv[i_offset + 1];
+                        argc--;
+                     }
+                  }
+                  else {
+                     v_error(h_err_missing_argument, argv[i_count]);
+                  }
+               }
+               i_index = strlen(argv[i_count]) - 1;
+               break;
+            case 'i': /* Trap Instruction */
+               if (argv[i_count][i_index + 1] != 0)
+                  v_error(h_err_invalid_argument, argv[i_count][i_index + 1]);
+               else {
+                  if (i_count + 1 < argc) {
+                     i_trap = 0;
+                     for (i_offset = 0; i_offset < strlen(argv[i_count + 1]); i_offset++) { /* Parse octal number */
+                        if ((argv[i_count + 1][i_offset] < '0') || (argv[i_count + 1][i_offset] > '7'))
+                           v_error(h_err_invalid_number, argv[i_count + 1]);
+                        else
+                           i_trap = i_trap * 8 + argv[i_count + 1][i_offset] - '0';
+                     }
+                     if ((i_trap < 0)  || (i_trap > (unsigned)(sizeof(i_rom) / sizeof i_rom[0]))) { /* Check address range */
                         v_error(h_err_address_range, argv[i_count + 1]);
                      }
                      else {
@@ -471,29 +504,23 @@ int main(int argc, char *argv[]){
 #endif
    i_wait(200); /* Sleep for 200 milliseconds to 'debounce' keyboard! */
    v_version();
-   /* Open the display and create a new window */
-   if (!(x_display = XOpenDisplay(s_display_name))) v_error (h_err_display, s_display_name);
+   if (!(x_display = XOpenDisplay(s_display_name))) v_error (h_err_display, s_display_name); /* Open the display and create a new window */
 
-   /* Get the default screen for our X server */
-   i_screen = DefaultScreen(x_display);
+   i_screen = DefaultScreen(x_display); /* Get the default screen for our X server */
    i_screen_width = DisplayWidth(x_display, i_screen);
    i_screen_height = DisplayHeight(x_display, i_screen);
-
-   /* Set the background colour */
    i_background_colour = BACKGROUND;
 
-   /* Create the application window, as a child of the root window */
-   x_application_window = XCreateSimpleWindow(x_display,
+   x_application_window = XCreateSimpleWindow(x_display, /* Create the application window, as a child of the root window */
       RootWindow(x_display, i_screen),
       (i_screen_width - i_window_width) / 2 , (i_screen_height - i_window_height) / 2, /* Window position -ignored ? */
       i_window_width, /* Window width */
       i_window_height, /* Window height */
       i_window_border, /* Border width - ignored ? */
       BlackPixel(x_display, i_screen), /* Preferred method */
-      i_background_colour);
+      i_background_colour); /* Background colour */
 
-   /* Set application window size */
-   h_size_hint = XAllocSizeHints();
+   h_size_hint = XAllocSizeHints(); /* Set application window size */
    h_size_hint->flags = PMinSize | PMaxSize;
    h_size_hint->min_height = i_window_height;
    h_size_hint->min_width = i_window_width;
@@ -502,8 +529,7 @@ int main(int argc, char *argv[]){
    XSetWMNormalHints(x_display, x_application_window, h_size_hint);
    XStoreName(x_display, x_application_window, s_title); /* Set the window title */
 
-   /* Get window geometry */
-   if (XGetGeometry(x_display, x_application_window,
+   if (XGetGeometry(x_display, x_application_window,    /* Get window geometry */
          &RootWindow(x_display, i_screen),
          &i_window_left, &i_window_top,
          &i_window_width,
@@ -512,8 +538,7 @@ int main(int argc, char *argv[]){
          &i_colour_depth) == False)
       v_error(h_err_display_properties);
 
-   /* Check colour depth */
-   if (i_colour_depth != COLOUR_DEPTH) v_error(h_err_display_colour, COLOUR_DEPTH);
+   if (i_colour_depth != COLOUR_DEPTH) v_error(h_err_display_colour, COLOUR_DEPTH); /* Check colour depth */
 
    if (b_cursor)
       x_cursor = XCreateFontCursor(x_display, XC_arrow); /* Create a 'default' cursor */
@@ -522,7 +547,6 @@ int main(int argc, char *argv[]){
 
    XDefineCursor(x_display, x_application_window, x_cursor); /* Define the desired X cursor */
 
-   /* Load fonts */
    s_font = NORMAL_TEXT; /* Normal text font */
    if (!(h_normal_font = XLoadQueryFont(x_display, s_font))) v_error(h_err_font, s_font);
 
@@ -543,16 +567,14 @@ int main(int argc, char *argv[]){
    h_keyboard = h_keyboard_create(x_display); /* Only works with Linux */
 #endif
 
-   /* Select kind of events we are interested in */
-   XSelectInput(x_display, x_application_window, FocusChangeMask | ExposureMask |
+   XSelectInput(x_display, x_application_window, FocusChangeMask | ExposureMask | /* Select kind of events we are interested in */
       KeyPressMask | KeyReleaseMask | ButtonPressMask |
       ButtonReleaseMask | StructureNotifyMask | SubstructureNotifyMask);
 
    wm_delete = XInternAtom(x_display, "WM_DELETE_WINDOW", False); /* Create a windows delete message 'atom'. */
    XSetWMProtocols(x_display, x_application_window, &wm_delete, 1); /* Tell the display to pass wm_delete messages to the application window */
 
-   /* Show window on display */
-   XMapWindow(x_display, x_application_window);
+   XMapWindow(x_display, x_application_window);    /* Show window on display */
    XRaiseWindow(x_display, x_application_window); /* Raise window - ensures expose event is raised? */
 
    fprintf(stderr, "ROM Size : %4u words \n", (unsigned)(sizeof(i_rom) / sizeof i_rom[0]));
@@ -565,14 +587,13 @@ int main(int argc, char *argv[]){
    else
       v_processor_load(h_processor, s_pathname); /* Load user specified settings */
 
-   /* Main program event loop */
    b_abort = False;
    i_count = 0;
 
    if (h_switch[0] != NULL) h_processor->enabled = h_switch[0]->state; /* Allow switches to be undefined if not used */
    if (h_switch[1] != NULL) h_processor->select = h_switch[1]->state; else h_processor->select = False;
 
-   while (!b_abort) {
+   while (!b_abort) { /* Main program event loop */
       i_count--;
       if (i_count < 0) {
          i_display_update(x_display, x_application_window, i_screen, h_display, h_processor);
@@ -591,6 +612,7 @@ int main(int argc, char *argv[]){
          if (i_ticks == 0) b_abort = True;
       }
       if (h_processor->pc == i_breakpoint) h_processor->trace = h_processor->step = True; /* Breakpoint */
+      if ( h_processor->rom[h_processor->bank * ROM_SIZE + h_processor->pc] == i_trap) h_processor->trace = h_processor->step = True; /* Trap instruction */
       if (b_run) v_processor_tick(h_processor);
       if (h_processor->step) b_run = False;
 
@@ -616,8 +638,10 @@ int main(int argc, char *argv[]){
                h_processor->trace = h_processor->step = b_run = True;
             else if (h_keyboard->key == (XK_T & 0x1f)) /* Ctrl-T to toggle tracing */
                h_processor->trace = !h_processor->trace;
-            else if (h_keyboard->key == (XK_R & 0x1f)) /* Ctrl-R to display internal CPU registers */
+            else if (h_keyboard->key == (XK_R & 0x1f)) { /* Ctrl-R to display internal CPU registers */
                v_fprint_registers(stdout, h_processor);
+               v_fprint_memory(stdout, h_processor);
+            }
             else if (h_keyboard->key == (XK_C & 0x1f)) { /* Ctrl-C to reset */
                v_processor_reset(h_processor);
                if (s_pathname == NULL)
@@ -726,7 +750,6 @@ int main(int argc, char *argv[]){
          }
       }
    }
-
 
    v_processor_save(h_processor); /* Save state */
 
