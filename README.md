@@ -7,7 +7,7 @@ avoided in order to try to make the code as portable as possible.
 
 Should compile without modification on Linux, VAX/VMS, and Tru64 Unix.
 
-![HP67](./img/x11-calc-43.png) ![HP67](./img/x11-calc-45.png)
+![HP35](./img/x11-calc-35.png) ![HP45](./img/x11-calc-45.png)
 
 ![HP21](./img/x11-calc-21.png) ![HP22](./img/x11-calc-22.png) ![HP25](./img/x11-calc-25.png)
 
@@ -17,7 +17,7 @@ Should compile without modification on Linux, VAX/VMS, and Tru64 Unix.
 
 ![HP37](./img/x11-calc-37.png) ![HP38](./img/x11-calc-38.png)
 
-! [HP67](./img/x11-calc-67.png)
+![HP67](./img/x11-calc-67.png)
 
 ### Latest News
 
