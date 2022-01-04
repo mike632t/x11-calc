@@ -74,6 +74,7 @@
 #define MEMORY_SIZE     (8 + 1 + (49 / 7))
 #define ROM_SIZE        04000
 #define ROM_BANKS       1
+#define CONTINIOUS
 
 int i_rom [ROM_SIZE * ROM_BANKS];
 
