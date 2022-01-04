@@ -43,6 +43,8 @@
  *                     before filling in the foreground - MT
  * 15 Dec 18         - Changed debug macro and added an error macro - MT
  * 08 Aug 21         - Tidied up spelling errors in the comments - MT
+ * 03 Jan 21         - Changed debug() macro so that debug code is executed
+ *                     when DEBUG is defined (doesn't need to be true) - MT
  *
  * TO DO :           - Optimize drawing of display segment by drawing in
  ^                     all the darker background regions before the foreground.
@@ -53,8 +55,6 @@
 #define BUILD          "0006"
 #define DATE           "19 Jul 13"
 #define AUTHOR         "MT"
-
-#define DEBUG 0        /* Enable/disable debug*/
 
 #include <stdio.h>     /* fprintf(), etc */
 #include <stdlib.h>    /* malloc(), etc */
@@ -107,7 +107,7 @@ int i_segment_draw(Display *h_display, int x_application_window, int i_screen, o
 
    int i_left, i_right, i_upper, i_lower;
    int i_offset;
-#if defined(CLASSIC)
+#if defined(HP67) || defined (HP35) || defined (HP80) || defined (HP45) || defined (HP70) || defined(HP55)
    int i_middle;
 #endif
 
@@ -116,7 +116,7 @@ int i_segment_draw(Display *h_display, int x_application_window, int i_screen, o
    i_upper = h_segment->top + i_upper;
    i_offset = i_upper + (i_lower - i_upper) / 2;
    i_left = h_segment->left + 2;
-#if defined(CLASSIC)
+#if defined(HP67) || defined (HP35) || defined (HP80) || defined (HP45) || defined (HP70) || defined(HP55)
    i_right = h_segment->left + h_segment->width - 2;
    i_middle = i_left + ((i_right - i_left) / 2);
 #else
@@ -173,7 +173,7 @@ int i_segment_draw(Display *h_display, int x_application_window, int i_screen, o
       XFillRectangle(h_display, x_application_window, DefaultGC(h_display, i_screen), i_left + 1, i_offset - 1, i_right - i_left - 1, 3);
    }
 
-#if defined(CLASSIC)
+#if defined(HP67) || defined (HP35) || defined (HP80) || defined (HP45) || defined (HP70) || defined(HP55)
    if (h_segment->mask & SEG_DECIMAL) { /* Draw a decimal point separator */
       XFillRectangle(h_display, x_application_window, DefaultGC(h_display, i_screen), i_middle - 1 , (i_upper + 3 * (i_lower - i_upper) / 4) - 1, 3, 3);
    }
@@ -223,7 +223,7 @@ int i_segment_draw(Display *h_display, int x_application_window, int i_screen, o
       XDrawLine(h_display, x_application_window, DefaultGC(h_display, i_screen), i_left + 1, i_offset, i_right - 1, i_offset);
    }
 
-#if defined(CLASSIC)
+#if defined(HP67) || defined (HP35) || defined (HP80) || defined (HP45) || defined (HP70) || defined(HP55)
    if (h_segment->mask & SEG_DECIMAL) { /* Draw a decimal point separator */
       XDrawLine(h_display, x_application_window, DefaultGC(h_display, i_screen), i_middle, (i_upper + 3 * (i_lower - i_upper) / 4) - 1, i_middle, (i_upper + 3 * (i_lower - i_upper) / 4) + 1);
       XDrawLine(h_display, x_application_window, DefaultGC(h_display, i_screen), i_middle - 1, (i_upper + 3 * (i_lower - i_upper) / 4), i_middle + 1, (i_upper + 3 * (i_lower - i_upper) / 4));

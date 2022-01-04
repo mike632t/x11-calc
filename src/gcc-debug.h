@@ -23,16 +23,24 @@
  *                     setting  DEBUG true or false - MT
  * 22 Aug 21         - Prints Current filename and line number - MT
  *                   - Added verbose macro - MT
+ * 03 Jan 21         - Changed both macros to allow DEBUG and VERBOSE to be
+ *                     defined from the command line - MT
  *
  */
 
 /* Execute code if DEBUG is True */
 #ifndef debug /* Don't redefine macro if already defined. */
-#define debug(code) do {if(DEBUG){fprintf(stderr, "Debug\t: %s line : %d : ", \
-            __FILE__, __LINE__); code;}} while(0)
+#if defined(DEBUG)
+#define debug(code) do {fprintf(stderr, "Debug\t: %s line : %d : ", \
+            __FILE__, __LINE__); code;} while(0)
+#else
+#define debug(code)
+#endif
 #endif
 
-#ifndef verbose /* Don't redefine macro if already defined. */
-#define verbose(code) do {if(VERBOSE){fprintf(stderr, "Verbose\t: %s line : %d : ", \
-            __FILE__, __LINE__); code;}} while(0)
+#if defined(VERBOSE)
+#define verbose(code) do {fprintf(stderr, "Verbose\t: %s line : %d : ", \
+            __FILE__, __LINE__); code;} while(0)
+#else
+#define verbose(code)
 #endif

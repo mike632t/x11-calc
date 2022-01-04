@@ -19,7 +19,9 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * 29 Sep 20   0.1   - Initial version - MT
- * 
+ * 03 Jan 21         - Changed debug() macro so that debug code is executed
+ *                     when DEBUG is defined (doesn't need to be true) - MT
+ *
  * TO DO:            - Implement ability to align text in a label.
  *
  */
@@ -28,8 +30,6 @@
 #define BUILD          "0001"
 #define DATE           "29 Sep 21"
 #define AUTHOR         "MT"
-
-#define DEBUG 0        /* Enable/disable debug*/
 
 #include <string.h>    /* strlen(), etc. */
 #include <stdio.h>     /* fprintf(), etc. */
@@ -100,7 +100,7 @@ int i_label_draw(Display *h_display, int x_application_window, int i_screen, ola
 
    XSetForeground(h_display, DefaultGC(h_display, i_screen), h_label->background);
    XFillRectangle(h_display, x_application_window, DefaultGC(h_display, i_screen), h_label->left, h_label->top , h_label->width, h_label->height); /* Fill in label background  */
-   
+
    /* Find position of the label. */
    i_indent = h_label->left + (h_label->width - XTextWidth(h_label->text_font, h_label->text, strlen(h_label->text))) / 2; /* Center text */
    i_upper = h_label->top + (h_label->text_font->ascent) + (h_label->height - (h_label->text_font->ascent + h_label->text_font->descent)) / 2; /* Position text in middle of label. */

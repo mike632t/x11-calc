@@ -24,13 +24,14 @@
  * 02 Jul 13         - Initial version - MT
  * 15 Dec 18         - Changed debug macro and added an error macro - MT
  * 06 Dec 21         - Changed green to a slightly lighter shade - MT
+ * 03 Jan 21         - Changed debug() macro so that debug code is executed
+ *                     when DEBUG is defined (doesn't need to be true) - MT
+ *
  */
 
 #define VERSION        "0.1"
 #define BUILD          "0003"
 #define DATE           "06 Dec 21"
-
-#define DEBUG 0        /* Enable/disable debug*/
 
 #include "gcc-debug.h"
 

@@ -41,6 +41,8 @@
  *                     to be different from the main text colour- MT
  * 24 Dec 21         - Added the ability for selected models to use a flat
  *                     button style - MT
+ * 03 Jan 21         - Changed debug() macro so that debug code is executed
+ *                     when DEBUG is defined (doesn't need to be true) - MT
  *
  * To Do             - Make the button style a property?
  */
@@ -49,8 +51,6 @@
 #define BUILD          "0011"
 #define DATE           "06 Dec 21"
 #define AUTHOR         "MT"
-
-#define DEBUG 0        /* Enable/disable debug*/
 
 #include <string.h>    /* strlen(), etc. */
 #include <stdio.h>     /* fprintf(), etc. */
@@ -150,7 +150,7 @@ obutton *h_button_create(int i_index, char c_key,
 
 /* button_draw (display, window, screen, button) */
 
-#if defined(HP45)
+#if defined (HP35) || defined (HP80) || defined (HP45) || defined (HP70) || defined(HP55)
 int i_button_draw(Display *h_display, int x_application_window, int i_screen, obutton *h_button) {
 
    int i_indent, i_extent, i_upper, i_lower;
@@ -179,7 +179,6 @@ int i_button_draw(Display *h_display, int x_application_window, int i_screen, ob
       i_upper = i_upper + 2;
       XDrawLine(h_display, x_application_window, DefaultGC(h_display, i_screen), i_indent , i_upper, i_extent, i_upper); /* Top edge of button */
       i_indent--; i_extent++; i_upper++; i_lower--;
-      //XSetForeground(h_display, DefaultGC(h_display, i_screen), RED); /* Set the foreground colour. */
       XFillRectangle(h_display, x_application_window, DefaultGC(h_display, i_screen), i_indent, i_upper, h_button->width - 4, h_button->height - 7 ); /* Fill in button face */
       i_lower = i_lower + 2;
 

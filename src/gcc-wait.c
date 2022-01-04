@@ -24,14 +24,14 @@
  *                     gcc-cat.c) - MT
  * 30 Aug 21         - Changed  format statement to specify a long  integer
  *                     in the debug output (fixed warning) - MT
+ * 03 Jan 21         - Changed debug() macro so that debug code is executed
+ *                     when DEBUG is defined (doesn't need to be true) - MT
  *
  */
 
 #define VERSION        "0.1"
 #define BUILD          "0001"
 #define DATE           "16 Aug 20"
-
-#define DEBUG 0        /* Enable/disable debug */
 
 #include <stdio.h>
 #if defined(linux)
