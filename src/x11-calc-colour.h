@@ -25,6 +25,8 @@
  *                     as it doesn't support a colour display) - MT
  * 28 Sep 21         - Added mid grey - MT
  * 06 Dec 21         - Changed green to a slightly lighter colour - MT
+ * 04 Jan 21         - Added mid blue for alternate text - MT
+ *
  */
 
 #if defined(vms)
@@ -44,8 +46,8 @@
 #define LIGHT_GRAY     0xffffff /* Light gray numeric keys. */
 #define GREEN          0xffffff /* Green function keys. */
 #define YELLOW         0xffffff /* Yellow shift key. */
-#define BLUE           0x000000 /* Blue alternate text. */
-#define LIGHT_BLUE     0xffffff /* Light Blue shift key. */
+#define MID_BLUE       0x000000 /* MID_BLUE text and function keys. */
+#define LIGHT_BLUE     0xffffff /* MID_BLUE shift key. */
 #define WHITE          0xffffff /* White text. */
 
 #define RED            0x000000 /* LED display colour. */
@@ -70,8 +72,8 @@
 #define LIGHT_GRAY     0xcecfc6 /* Light gray numeric keys. */
 #define GREEN          0x948639 /* Green function keys. */
 #define YELLOW         0xf5a434 /* Yellow shift key. */
-#define BLUE           0x4aa0b0 /* Blue alternate text. */
-#define LIGHT_BLUE     0x4aa0b0 /* Blue shift key. */
+#define MID_BLUE       0x3784b0 /* MID_BLUE text and function keys. */
+#define LIGHT_BLUE     0x4aa0b0 /* MID_BLUE shift key. */
 #define WHITE          0xffffff /* White text. */
 
 #define RED            0xb00000 /* LED display colour. */
