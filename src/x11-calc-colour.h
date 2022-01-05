@@ -73,7 +73,7 @@
 #define LIGHT_GRAY     0xcecfc6 /* Light gray numeric keys. */
 #define GREEN          0x948639 /* Green function keys. */
 #define YELLOW         0xf5a434 /* Yellow shift key. */
-#define MID_BLUE       0x4096a5 /* MID_BLUE text and function keys (was 0x3784b0). */
+#define MID_BLUE       0x4096aa /* MID_BLUE text and function keys (was 0x3784b0). */
 #define LIGHT_BLUE     0x4aa0b0 /* MID_BLUE shift key. */
 #define WHITE          0xffffff /* White text. */
 
