@@ -7,8 +7,6 @@ avoided in order to try to make the code as portable as possible.
 
 Should compile without modification on Linux, VAX/VMS, and Tru64 Unix.
 
-![HP35](./img/x11-calc-35.png) ![HP45](./img/x11-calc-45.png)
-
 ![HP21](./img/x11-calc-21.png) ![HP22](./img/x11-calc-22.png) ![HP25](./img/x11-calc-25.png)
 
 ![HP27](./img/x11-calc-27.png) ![HP29](./img/x11-calc-29.png)
@@ -19,17 +17,22 @@ Should compile without modification on Linux, VAX/VMS, and Tru64 Unix.
 
 ![HP67](./img/x11-calc-67.png)
 
+![HP35](./img/x11-calc-35.png) ![HP80](./img/x11-calc-80.png) ![HP45](./img/x11-calc-45.png)
+
 ### Latest News
+
+05/01 - Added HP80.
 
 04/01 - Added HP35 (50 years after the launch of the original) !
 
 04/01 - HP45 working.
 
-20/12 - Completed HP67!!
-
 ### Status
 
 ##### HP 35 - Working
+
+##### HP 80 - Completed
+* Not fully tested.
 
 ##### HP 45 - Working
 
@@ -127,7 +130,7 @@ mode using '&#8209;s', and set a breakpoint using '&#8209;b &lt;octal address&gt
 
 'Ctrl&#8209;T'  also toggles trace mode when running, 'Ctrl&#8209;S' executes the  next
 instruction, 'Ctrl&#8209;Q' resumes execution, and 'Ctrl&#8209;R' displays the contents
-of the CPU registers .
+of the CPU registers.
 
 When in trace mode a jump to the same instruction produces no output.
 
@@ -147,9 +150,9 @@ should be commented out as shown.
 
 HP67 is unable to read or write to magnetic cards.
 
-HP67 display may .
-
 HP32 hangs after self test.
+
+HP35 and HP80 report an incorrect ROM size.
 
 ### Tested
 
