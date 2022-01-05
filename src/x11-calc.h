@@ -74,6 +74,11 @@
 #define TITLE        "RPN calc 35"
 #include "x11-calc-35.h"
 
+#elif defined(HP80)
+#define FILENAME     "x11-calc-80"
+#define TITLE        "RPN calc 80"
+#include "x11-calc-80.h"
+
 #elif defined(HP45)
 #define FILENAME     "x11-calc-45"
 #define TITLE        "RPN calc 45"
