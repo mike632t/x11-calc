@@ -26,6 +26,7 @@
  * 28 Sep 21         - Added mid grey - MT
  * 06 Dec 21         - Changed green to a slightly lighter colour - MT
  * 04 Jan 21         - Added mid blue for alternate text - MT
+ * 05 Jan 21         - Tweaked mid blue shade a bit - MT
  *
  */
 
@@ -72,7 +73,7 @@
 #define LIGHT_GRAY     0xcecfc6 /* Light gray numeric keys. */
 #define GREEN          0x948639 /* Green function keys. */
 #define YELLOW         0xf5a434 /* Yellow shift key. */
-#define MID_BLUE       0x3784b0 /* MID_BLUE text and function keys. */
+#define MID_BLUE       0x4096a5 /* MID_BLUE text and function keys (was 0x3784b0). */
 #define LIGHT_BLUE     0x4aa0b0 /* MID_BLUE shift key. */
 #define WHITE          0xffffff /* White text. */
 
