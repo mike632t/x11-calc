@@ -19,6 +19,7 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * 04 Jan 22         - Initial version (50th anniversary) - MT
+ * 05 Jan 22         - Changed the square root key legend to SQRT - MT
  *
  */
 
@@ -78,7 +79,8 @@ void v_init_keypad(obutton *h_button[], oswitch *h_switch[]) {
    /* Define second row of keys. */
    i_top += KBD_ROW;
    i_left = KBD_LEFT;
-   h_button[i_count++] = h_button_create(00056, 000, "/\xaf", "" , "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, BLACK, BACKGROUND, BACKGROUND, BACKGROUND);
+   /** h_button[i_count++] = h_button_create(00056, 000, "/\xaf", "" , "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, BLACK, BACKGROUND, BACKGROUND, BACKGROUND); /* Original */
+   h_button[i_count++] = h_button_create(00056, 000, "SQRT", "" , "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, BLACK, BACKGROUND, BACKGROUND, BACKGROUND); /* Modified */
    i_left += (KEY_WIDTH + KEY_GAP);
    h_button[i_count++] = h_button_create(00054, 000, "ARC", "", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, BLACK, BACKGROUND, BACKGROUND, BACKGROUND);
    i_left += (KEY_WIDTH + KEY_GAP);
@@ -95,7 +97,8 @@ void v_init_keypad(obutton *h_button[], oswitch *h_switch[]) {
    i_left += (KEY_WIDTH + KEY_GAP);
    h_button[i_count++] = h_button_create(00014, 000, "X-Y", "", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, BLACK, BACKGROUND, BACKGROUND, BACKGROUND);
    i_left += (KEY_WIDTH + KEY_GAP);
-   h_button[i_count++] = h_button_create(00013, 000, "Rv", "", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, BLACK, BACKGROUND, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00013, 000, "Rv", "", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, BLACK, BACKGROUND, BACKGROUND, BACKGROUND); /* Original */
+   /** h_button[i_count++] = h_button_create(00013, 000, "RDN", "", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, BLACK, BACKGROUND, BACKGROUND, BACKGROUND); /* Modified */
    i_left += (KEY_WIDTH + KEY_GAP);
    h_button[i_count++] = h_button_create(00012, 000, "STO", "", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, BLACK, BACKGROUND, BACKGROUND, BACKGROUND);
    i_left += (KEY_WIDTH + KEY_GAP);
