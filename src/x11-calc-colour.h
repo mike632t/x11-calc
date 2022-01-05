@@ -32,21 +32,22 @@
 
 #if defined(vms)
 
-#define DARK_TEXT      0x000000 /* Dark gray text. */
+#define DARK_TEXT      0x000000 /* Dark grey text. */
 #define LIGHT_TEXT     0x000000 /* Off white text. */
 
 #define BEIGE          0xffffff /* Beige numeric keys. */
 #define BLACK          0xffffff /* Black function keys. */
-#define DIM_GREY       0xffffff /* Gray function keys. */
-#define DIM_GRAY       0xffffff /* Gray function keys. */
-#define DARK_GREY      0xffffff /* Gray function keys. */
-#define DARK_GRAY      0xffffff /* Gray function keys. */
-#define MID_GREY       0xffffff /* Mid gray numeric keys. */
-#define MID_GRAY       0xffffff /* Mid gray numeric keys. */
-#define LIGHT_GREY     0xffffff /* Light gray numeric keys. */
-#define LIGHT_GRAY     0xffffff /* Light gray numeric keys. */
+#define DIM_GREY       0xffffff /* grey function keys. */
+#define DIM_GRAY       0xffffff /* grey function keys. */
+#define DARK_GREY      0xffffff /* grey function keys. */
+#define DARK_GRAY      0xffffff /* grey function keys. */
+#define MID_GREY       0xffffff /* Mid grey numeric keys. */
+#define MID_GRAY       0xffffff /* Mid grey numeric keys. */
+#define LIGHT_GREY     0xffffff /* Light grey numeric keys. */
+#define LIGHT_GRAY     0xffffff /* Light grey numeric keys. */
 #define GREEN          0xffffff /* Green function keys. */
 #define YELLOW         0xffffff /* Yellow shift key. */
+#define ORANGE         0xffffff /* Yellow shift key. */
 #define MID_BLUE       0x000000 /* MID_BLUE text and function keys. */
 #define LIGHT_BLUE     0xffffff /* MID_BLUE shift key. */
 #define WHITE          0xffffff /* White text. */
@@ -58,21 +59,22 @@
 
 #else
 
-#define DARK_TEXT      0x101010 /* Dark gray text. */
+#define DARK_TEXT      0x101010 /* Dark grey text. */
 #define LIGHT_TEXT     0xf0f0f0 /* Off white text. */
 
 #define BEIGE          0xd9c8b6 /* Beige numeric keys. */
 #define BLACK          0x2e312e /* Black function keys. */
-#define DIM_GREY       0x4f4f4f /* Dark gray function keys. */
-#define DIM_GRAY       0x4f4f4f /* Dark gray function keys. */
-#define DARK_GREY      0x8f8f8f /* Gray function keys. */
-#define DARK_GRAY      0x8f8f8f /* Gray function keys. */
-#define MID_GREY       0xa9a9a9 /* Mid gray numeric keys. */
-#define MID_GRAY       0xa9a9a9 /* Mid gray numeric keys. */
-#define LIGHT_GREY     0xcecfc6 /* Light gray numeric keys. */
-#define LIGHT_GRAY     0xcecfc6 /* Light gray numeric keys. */
+#define DIM_GREY       0x4f4f4f /* Dark grey function keys. */
+#define DIM_GRAY       0x4f4f4f /* Dark grey function keys. */
+#define DARK_GREY      0x8f8f8f /* grey function keys. */
+#define DARK_GRAY      0x8f8f8f /* grey function keys. */
+#define MID_GREY       0xa9a9a9 /* Mid grey numeric keys. */
+#define MID_GRAY       0xa9a9a9 /* Mid grey numeric keys. */
+#define LIGHT_GREY     0xcecfc6 /* Light grey numeric keys. */
+#define LIGHT_GRAY     0xcecfc6 /* Light grey numeric keys. */
 #define GREEN          0x948639 /* Green function keys. */
 #define YELLOW         0xf5a434 /* Yellow shift key. */
+#define ORANGE         0xe06900 /* Orange function keys. */
 #define MID_BLUE       0x4096aa /* MID_BLUE text and function keys (was 0x3784b0). */
 #define LIGHT_BLUE     0x4aa0b0 /* MID_BLUE shift key. */
 #define WHITE          0xffffff /* White text. */
