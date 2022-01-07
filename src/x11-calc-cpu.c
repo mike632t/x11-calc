@@ -251,8 +251,7 @@
  * 03 Jan 21         - Changed debug() macro so that debug code is executed
  *                     when DEBUG is defined (doesn't need to be true) - MT
  * 07 Jan 21         - Fixed bug in 'return' - MT
- *
- * To Do             - Fix 'select rom' and 'return'.
+ *                   - Fixed bug in 'delayed select rom' - MT
  *
  */
 
@@ -262,7 +261,7 @@
 #define DATE           "21 Dec 21"
 #define AUTHOR         "MT"
 
-#define HEXADECIMALS
+#define HEXADECIMAL
 
 #include <string.h>
 #include <stdlib.h>
@@ -816,7 +815,7 @@ void v_processor_tick(oprocessor *h_processor) {
             case 01: /* Op-Codes matching x xxx 010 000 */
                switch ((i_opcode >> 6) & 01){
                case 00: /* Op-Codes matching x xx0 010 000 */ /* select rom */
-                  if (h_processor->trace) fprintf(stdout, "select rom %02o", i_opcode >> 7);
+                  if (h_processor->trace) fprintf(stdout, "select rom %02o", i_opcode >> 7); /* Note - Not the same as the Woodstock CPU */
                   h_processor->pc = ((i_opcode >> 7) << 8) + ((h_processor->pc + 1) & 0xff); /* Program counter _must_ be incremented _before_ updating the address!! */
                   v_op_dec_pc(h_processor); /* Program counter will be auto incremented before next fetch */
                   break;
@@ -903,9 +902,9 @@ void v_processor_tick(oprocessor *h_processor) {
                case 01264: /*delayed select group 0 */
                   v_error(h_err_unexpected_opcode, i_opcode, h_processor->bank, h_processor->pc, __FILE__, __LINE__);
                   break;
-               default:
-                  if (h_processor->trace) fprintf(stdout, "delayed select rom %02o", i_opcode >> 7);
-                  h_processor->rom_number = i_opcode >> 6;
+               default: /* delayed select rom n */
+                  if (h_processor->trace) fprintf(stdout, "delayed select rom %02o", i_opcode >> 7); /* Note - Not the same as the Woodstock CPU */
+                  h_processor->rom_number = i_opcode >> 7;
                   h_processor->flags[DELAYED_ROM] = True;
                }
                break;
