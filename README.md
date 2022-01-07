@@ -21,17 +21,17 @@ Should compile without modification on Linux, VAX/VMS, and Tru64 Unix.
 
 ### Latest News
 
+07/01 - HP35 and HP80 now report an correct ROM size.
+
 05/01 - Added HP80.
 
 04/01 - Added HP35 (50 years after the launch of the original) !
-
-04/01 - HP45 working.
 
 ### Status
 
 ##### HP 35 - Working
 
-##### HP 80 - Completed
+##### HP 80 - Working
 * Not fully tested.
 
 ##### HP 45 - Working
@@ -152,8 +152,6 @@ HP67 is unable to read or write to magnetic cards.
 
 HP32 hangs after self test.
 
-HP35 and HP80 report an incorrect ROM size.
-
 ### Tested
 
 - Fedora 34, GCC 11.2.1, x64
@@ -183,7 +181,6 @@ The following packages are required to build and/or run the simulator.
 - Debian : gcc, make, libx11&#8209;dev, libc6&#8209;dev, xfonts&#8209;base
 
 - Ubuntu : gcc, make, libx11&#8209;dev, libc6&#8209;dev, xfonts&#8209;base
-
 
 ### Problem Reports
 
