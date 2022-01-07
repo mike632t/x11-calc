@@ -63,7 +63,7 @@
 
 #define ROM_SIZE        010000
 #define ROM_BANKS       2
-#define MEMORY_SIZE     78
+#define MEMORY_SIZE     78       /** Should be 64 ? */
 #define CONTINIOUS
 
 int i_rom [ROM_SIZE * ROM_BANKS];
