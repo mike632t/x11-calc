@@ -45,7 +45,7 @@
 #define KEY_GAP          3 * SCALE_WIDTH
 #define SWITCH_HEIGHT   10 * SCALE_HEIGHT
 
-#define ROM_SIZE        04000
+#define ROM_SIZE        03400
 #define MEMORY_SIZE     1
 #define ROM_BANKS       1
 

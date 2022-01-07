@@ -250,8 +250,9 @@
  *                     Octal or Hexadecimal (selected at compile time) - MT
  * 03 Jan 21         - Changed debug() macro so that debug code is executed
  *                     when DEBUG is defined (doesn't need to be true) - MT
+ * 07 Jan 21         - Fixed bug in 'return' - MT
  *
- * To Do             - Fix 'select rom' ?
+ * To Do             - Fix 'select rom' and 'return'.
  *
  */
 
@@ -844,8 +845,7 @@ void v_processor_tick(oprocessor *h_processor) {
                case 00060: /* return */
                   if (h_processor->trace) fprintf(stdout, "return");
                   h_processor->sp = (h_processor->sp - 1) & (STACK_SIZE - 1); /* Update stack pointer */
-                  h_processor->pc = h_processor->stack[h_processor->sp] & (ROM_SIZE - 1); /* Pop program counter from the stack */
-                  h_processor->bank = h_processor->stack[h_processor->sp] / ROM_SIZE; /* Get new bank number */
+                  h_processor->pc = (h_processor->pc & (~0xff)) + (h_processor->stack[h_processor->sp] & 0xff); /* Pop program counter from the stack */
                   break;
                case 01160: /* c -> data address */
                   {
