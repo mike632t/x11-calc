@@ -47,6 +47,7 @@
  * 04 Jan 22         - Added HP 5 and HP 80 - MT
  * 05 Jan 22         - Added HP 70 - MT
  * 07 Jan 22         - Changed HP25 window title back to HP25C - MT
+ *                   - Added HP70 - MT
  *
  * TO DO :           -
  */
@@ -87,6 +88,11 @@
 #define FILENAME     "x11-calc-45"
 #define TITLE        "RPN calc 45"
 #include "x11-calc-45.h"
+
+#elif defined(HP70)
+#define FILENAME     "x11-calc-70"
+#define TITLE        "RPN calc 70"
+#include "x11-calc-70.h"
 
 #elif defined(HP21)
 #define FILENAME     "x11-calc-21"
