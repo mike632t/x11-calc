@@ -230,7 +230,7 @@ Where fff is the field modifier.
 
      13   12  11  10  9   8   7   6   5   4   3   2   1   0
     +---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-    | s | m | m | m | m | m | m | m | m | m | m | s | e | e |
+    | s | m | m | m | m | m | m | m | m | m | m | s | x | x |
     +---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
 The field modifier is used to select which part of the register to use.
