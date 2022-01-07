@@ -21,7 +21,7 @@ Should compile without modification on Linux, VAX/VMS, and Tru64 Unix.
 
 ### Latest News
 
-07/01 - HP35 and HP80 now report an correct ROM size.
+07/01 - HP35 and HP80 now report the correct ROM size.
 
 05/01 - Added HP80.
 
