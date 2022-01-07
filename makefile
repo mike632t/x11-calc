@@ -20,19 +20,20 @@
 #
 #	09 Oct 21   0.1   - Initial version - MT
 #  22 Nov 21   0.2   - Added data files to backups - MT
-#  04 Jan 21			- Added HP model 35 - MT
-#  07 Jan 21			- Added HP model 80 - MT
+#  04 Jan 22			- Added HP model 35 - MT
+#  07 Jan 22			- Added HP model 80 - MT
+#  07 Jan 22			- Added HP model 70 - MT
 #
 
 PROGRAM	=  x11-calc
 FILES		=  ./src/*.c ./src/*.h ./prg/*.dat ./src/makefile
-FILES		+= ./rom/*.dis ./rom/*.dmp
+FILES		+= ./rom/*.dis ./rom/*.obj ./bin/x11-calc-*
 FILES		+= *.md LICENSE makefile .gitignore .gitattributes
 FILES		+= ./img/x11-calc-*.png
 MAKE		=  make
 
 
-all: clean hp35 hp80 hp45 hp21 hp22 hp25 hp27 hp29 hp31 hp32 hp33 hp34 hp37 hp38 hp67
+all: clean hp35 hp80 hp45 hp70 hp21 hp22 hp25 hp27 hp29 hp31 hp32 hp33 hp34 hp37 hp38 hp67
 
 hp35:
 	@$(MAKE) --no-print-directory -C ./src MODEL=35
@@ -42,6 +43,9 @@ hp80:
 
 hp45:
 	@$(MAKE) --no-print-directory -C ./src MODEL=45
+
+hp70:
+	@$(MAKE) --no-print-directory -C ./src MODEL=70
 
 hp21:
 	@$(MAKE) --no-print-directory -C ./src MODEL=21
