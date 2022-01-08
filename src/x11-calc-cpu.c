@@ -1359,7 +1359,7 @@ void v_processor_tick(oprocessor *h_processor) {
                   break;
                case 01020: /* return */
                   if (h_processor->trace) fprintf(stdout, "return");
-#if defined(HP67) || defined(HP34)
+#if defined(HP67) || defined(HP34) || defined(HP38)
                   h_processor->sp = (h_processor->sp - 1) & (STACK_SIZE - 1); /* Update stack pointer */
                   h_processor->pc = h_processor->stack[h_processor->sp] & (ROM_SIZE - 1); /* Pop program counter from the stack */
                   h_processor->bank = h_processor->stack[h_processor->sp] / ROM_SIZE; /* Get new bank number */
