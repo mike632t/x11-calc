@@ -60,7 +60,6 @@ Should compile without modification on Linux, VAX/VMS, and Tru64 Unix.
 ##### HP 34 - Working
 * Self test crashes. (Last known working commit 1ccdc5a).
 
-
 ##### HP 37 - Completed
 * Not fully tested.
 
@@ -140,8 +139,9 @@ When in trace mode a jump to the same instruction produces no output.
 
 ### Known Issues
 
-On  UNIX/Linux a 24&#8209;bit colour display is required, while on VMS  the
-simulator requires a black and white display.
+On UNIX/Linux a 24 bit colour display is required.
+
+VMS only supports a black and white display.
 
 Keyboard shortcuts only work on Linux.
 
@@ -155,6 +155,10 @@ should be commented out as shown.
 HP67 is unable to read or write to magnetic cards.
 
 HP32 hangs after self test.
+
+HP34 crashes during self test.
+
+HP38 crashes during self test.
 
 ### Tested
 
