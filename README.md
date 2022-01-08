@@ -58,11 +58,13 @@ Should compile without modification on Linux, VAX/VMS, and Tru64 Unix.
 ##### HP 33 - Working
 
 ##### HP 34 - Working
+* Crashes on self test
 
 ##### HP 37 - Completed
 * Not fully tested.
 
 ##### HP 38 - Completed
+* Crashes on self test
 * Not fully tested.
 
 ##### HP 67 - Mostly working
