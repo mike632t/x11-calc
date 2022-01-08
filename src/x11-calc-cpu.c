@@ -261,7 +261,7 @@
 #define DATE           "21 Dec 21"
 #define AUTHOR         "MT"
 
-#define HEXADECIMAL
+#define OCTAL
 
 #include <string.h>
 #include <stdlib.h>
@@ -502,7 +502,8 @@ static void v_op_inc_pc(oprocessor *h_processor) {
 #if defined (HP35) || defined (HP80) || defined (HP45) || defined (HP70) || defined(HP55)
    h_processor->pc = ((h_processor->pc >> 8) << 8) | ((h_processor->pc + 1) & 0xff);
 #else
-   if (h_processor->pc++ >= (ROM_SIZE - 1)) h_processor->pc = 0;
+   if (h_processor->pc++ >= ((ROM_SIZE * ROM_BANKS) - 1)) h_processor->pc = 0;
+   //if (h_processor->pc++ >= (ROM_SIZE - 1)) h_processor->pc = 0;
 #endif
    h_processor->flags[PREV_CARRY] = h_processor->flags[CARRY];
    h_processor->flags[CARRY] = False;
@@ -1358,9 +1359,14 @@ void v_processor_tick(oprocessor *h_processor) {
                   break;
                case 01020: /* return */
                   if (h_processor->trace) fprintf(stdout, "return");
+#if defined(HP67) || defined(HP34)
                   h_processor->sp = (h_processor->sp - 1) & (STACK_SIZE - 1); /* Update stack pointer */
                   h_processor->pc = h_processor->stack[h_processor->sp] & (ROM_SIZE - 1); /* Pop program counter from the stack */
                   h_processor->bank = h_processor->stack[h_processor->sp] / ROM_SIZE; /* Get new bank number */
+#else
+                  h_processor->sp = (h_processor->sp - 1) & (STACK_SIZE - 1); /* Update stack pointer */
+                  h_processor->pc = h_processor->stack[h_processor->sp]; /* Pop program counter from the stack */
+#endif
                   break;
                default:
                   v_error(h_err_unexpected_opcode, i_opcode, h_processor->bank, h_processor->pc, __FILE__, __LINE__);
