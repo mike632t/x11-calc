@@ -36,6 +36,9 @@ Should compile without modification on Linux, VAX/VMS, and Tru64 Unix.
 
 ##### HP 45 - Working
 
+##### HP 70 - Not Working
+* Under investigation.
+
 ##### HP 21 - Working
 
 ##### HP 22 - Working
@@ -147,6 +150,8 @@ should be commented out as shown.
 
     #dtoverlay=vc4-fkms-v3d
     #dtoverlay=vc4-kms-v3d
+
+HP70 Basic functions appear to work but financial functions do not.
 
 HP67 is unable to read or write to magnetic cards.
 
