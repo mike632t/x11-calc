@@ -59,13 +59,15 @@ Should compile without modification on Linux, VAX/VMS, and Tru64 Unix.
 
 ##### HP 34 - Working
 * Crashes on self test
+* Last known working commit 1ccdc5a5729604d861ea70672246098cf57e0e15
 
 ##### HP 37 - Completed
 * Not fully tested.
 
 ##### HP 38 - Completed
-* Crashes on self test
-* Not fully tested.
+* Finance functions don't return correct values
+* Self test crashes.
+* Last known working commit 1ccdc5a5729604d861ea70672246098cf57e0e15
 
 ##### HP 67 - Mostly working
 * Cannot read or write to magnetic cards.
