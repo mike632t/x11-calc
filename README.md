@@ -137,10 +137,6 @@ should be commented out as shown.
 
 HP32 hangs after self test.
 
-HP34 crashes during self test.
-
-HP38 crashes during self test.
-
 ### Tested
 
 - Fedora 34, GCC 11.2.1, x64
