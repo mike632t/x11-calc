@@ -46,10 +46,9 @@ Currently compiles without modification on Linux, VAX/VMS, and  Tru64 Unix.
 ##### HP 34 - Working
 
 ##### HP 37 - Completed
-* Not fully tested
+* Fails self test
 
-##### HP 38 - Completed
-* Not fully tested
+##### HP 38 - Working
 
 ##### HP 67 - Work in progress
 
@@ -82,7 +81,9 @@ The following keyboard shortcuts should work on Linux:
 'Esc' or 'Backspace' is 'Clx', 'c' is CHS, 'e' is 'EEX' and on programmable
 models 'Space' corresponds to 'SST'.
 
-'f' and where applicable 'g' and 'h' correspond to the function keys.
+'A' - 'E' correspond to the function keys where they exist.
+
+'f' and where applicable 'g' and 'h' correspond to the shift keys.
 
 'Ctrl-Z'  Quits,  and  'Ctrl-C' does a reset.  For models  with  continuous
 memory 'Ctrl-Z' saves the current register contents, and 'Ctrl-C'  restores
@@ -115,18 +116,17 @@ mode using '&#8209;s', and set a breakpoint using '&#8209;b &lt;octal address&gt
 
 'Ctrl&#8209;T'  also toggles trace mode when running, 'Ctrl&#8209;S' executes the  next
 instruction, 'Ctrl&#8209;Q' resumes execution, and 'Ctrl&#8209;R' displays the contents
-of the CPU registers .
+of the CPU registers.
 
 When in trace mode a jump to the same instruction produces no output.
 
 ### Known Issues
 
-HP32 hangs after self test.
+On UNIX/Linux a 24 bit colour display is required.
+
+VMS only supports a black and white display.
 
 Keyboard shortcuts only work on Linux.
-
-On  UNIX/Linux a 24&#8209;bit colour display is required, while on VMS  the
-simulator requires a black and white display.
 
 On a Raspberry Pi the display is not updated properly if either FKMS or KMS
 graphics overlays are enabled.  The following entries in '/boot/config.txt'
@@ -135,7 +135,19 @@ should be commented out as shown.
     #dtoverlay=vc4-fkms-v3d
     #dtoverlay=vc4-kms-v3d
 
+HP32 hangs after self test.
+
+HP34 crashes during self test.
+
+HP38 crashes during self test.
+
 ### Tested
+
+- Fedora 34, GCC 11.2.1, x64
+
+- Gentoo, GCC 11.2.0, x64
+
+- Ubuntu 20.04, GCC 9.3.0, x64
 
 - Debian 10 (Buster), GCC 8.3.0, x64
 
@@ -145,20 +157,39 @@ should be commented out as shown.
 
 - Debian 5 (Lenny), GCC 4.2.4, alpha
 
-- Fedora 34, GCC 11.2.1, x64
-
-- Ubuntu 20.04, GCC 9.3.0, x64
-
 - VAX/VMS 5.4-3, VAXC 3.2, VAX (simh)
 
 ### Prerequisites
 
 The following packages are required to build and/or run the simulator.
 
+- Fedora : gcc, make, libx11&#8209;dev, libc6&#8209;dev, xorg&#8209;x11&#8209;xfonts&#8209;base
+
+- Gentoo : gcc, make, libx11&#8209;dev, libc6&#8209;dev, font&#8209;misc&#8209;misc
+
 - Debian : gcc, make, libx11&#8209;dev, libc6&#8209;dev, xfonts&#8209;base
 
 - Ubuntu : gcc, make, libx11&#8209;dev, libc6&#8209;dev, xfonts&#8209;base
 
-- Fedora : gcc, make, libx11&#8209;dev, libc6&#8209;dev, xorg&#8209;x11&#8209;xfonts&#8209;base
+### Problem Reports
 
-- Gentoo : gcc, make, libx11&#8209;dev, libc6&#8209;dev, font&#8209;misc&#8209;misc
+If you find problems or have suggestions relating to these simulators, then
+please create a new issue (https://github.com/mike632t/x11-calc/issues).
+
+Your problem report should contain:
+
+- Architecture (and VM host if applicable);
+
+- Operating System and version;
+
+- Desktop Environment and version;
+
+- Window Manager and version;
+
+- GCC version used;
+
+- Commit ID;
+
+- A description of the problem.
+
+Thank you.
