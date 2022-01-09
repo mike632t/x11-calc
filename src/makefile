@@ -53,7 +53,7 @@ LIBS		= -lX11 -lm
 FLAGS		= -fcommon -Wall -pedantic -ansi -std=gnu99
 FLAGS		+= -Wno-comment -Wno-deprecated-declarations -Wno-builtin-macro-redefined
 FLAGS		+= -no-pie
-#FLAGS		+= -g # For debugging
+FLAGS		+= -g # For debugging
 CC			= gcc
 
 
