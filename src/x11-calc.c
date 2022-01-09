@@ -612,7 +612,7 @@ int main(int argc, char *argv[]){
          if (i_ticks == 0) b_abort = True;
       }
       if (h_processor->pc == i_breakpoint) h_processor->trace = h_processor->step = True; /* Breakpoint */
-      if ( h_processor->rom[h_processor->bank * ROM_SIZE + h_processor->pc] == i_trap) h_processor->trace = h_processor->step = True; /* Trap instruction */
+      if ( h_processor->rom[h_processor->pc] == i_trap) h_processor->trace = h_processor->step = True; /* Trap instruction */
       if (b_run) v_processor_tick(h_processor);
       if (h_processor->step) b_run = False;
 

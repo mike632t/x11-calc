@@ -707,10 +707,10 @@ static void v_op_dec_p(oprocessor *h_processor) {
 }
 
 /* Jump to subroutine */
-void op_jsb(oprocessor *h_processor, int i_count){
+void op_jsb(oprocessor *h_processor, int i_address){
    h_processor->stack[h_processor->sp] = h_processor->bank * ROM_SIZE + h_processor->pc; /* Push current address on the stack */
    h_processor->sp = (h_processor->sp + 1) & (STACK_SIZE - 1); /* Update stack pointer */
-   h_processor->pc = ((h_processor->pc & 0xff00) | i_count); /* Note - Uses an eight bit address */
+   h_processor->pc = ((h_processor->pc & 0xff00) | i_address); /* Note - Uses an eight bit address */
    v_delayed_rom(h_processor);
    v_op_dec_pc(h_processor); /* Program counter will be auto incremented before next fetch */
 }
@@ -1374,8 +1374,12 @@ void v_processor_tick(oprocessor *h_processor) {
                break;
             case 02: /* Op-Codes matching x xxx 100 000 */ /* select rom */
                if (h_processor->trace) fprintf(stdout, "select rom %02o", i_opcode >> 6);
+#if defined(HP67)
                h_processor->pc = ((i_opcode >> 6) << 8) + ((h_processor->pc + 1)& 0xff); /* Program counter _must_ be incremented _before_ updating the address!! */
                v_op_dec_pc(h_processor); /* Program counter will be auto incremented before next fetch */
+#else
+               h_processor->pc = (i_opcode >> 6) * 256 + (h_processor->pc % 256);
+#endif
                break;
             case 03: /* Op-Codes matching x xxx 110 000 */
                switch (i_opcode) {
