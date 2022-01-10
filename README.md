@@ -19,7 +19,13 @@ Should compile without modification on Linux, VAX/VMS, and Tru64 Unix.
 
 ![HP35](./img/x11-calc-35.png) ![HP80](./img/x11-calc-80.png) ![HP45](./img/x11-calc-45.png)
 
+Adding new simulators can introduce regression bugs in the existing code so
+the code has been split into two branches stable and unstable, changes will
+only be merged into the stable branch when every thing has been retested.
+
 ### Latest News
+
+10/01 - Split code into two branches, stable and unstable.
 
 07/01 - HP35 and HP80 now report the correct ROM size.
 
