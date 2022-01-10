@@ -85,9 +85,9 @@ new folder run 'make all' to build all the available simulators.
 
 e.g:
 
-    $ wget https://github.com/mike632t/x11-calc/archive/refs/heads/master.zip
-    $ unzip master.zip
-    $ cd x11-calc-master
+    $ wget https://github.com/mike632t/x11-calc/archive/refs/heads/stable.zip
+    $ unzip stable.zip
+    $ cd x11-calc-stable
     $ make all
 
     $ ./bin/x11-calc-29
