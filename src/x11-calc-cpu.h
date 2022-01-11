@@ -101,7 +101,6 @@ typedef struct {
    unsigned char status[STATUS_BITS];  /* Status (S0 - S15) */
    unsigned int stack[STACK_SIZE];     /* Call stack */
    unsigned int opcode;                /* Last opcode */
-   unsigned int bank;                  /* Bank number */
    unsigned int pc;                    /* Program counter */
    unsigned int sp;                    /* Stack pointer */
    unsigned int f;                     /* F register */
