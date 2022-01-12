@@ -25,13 +25,13 @@ only be merged into the stable branch when every thing has been retested.
 
 ### Latest News
 
-11/01 - Work in progress - more testing needed on unstable branch
+12/01 - Work in progress - more testing needed on unstable branch.
 
 10/01 - Split code into two branches, stable and unstable.
 
-04/01 - Added HP35 (50 years after the launch of the original) !
+04/01 - Added HP35 (50 years after the launch of the original)!
 
-### Status (Unstable)
+### Status
 
 ##### HP 35 - Working
 
@@ -48,19 +48,20 @@ only be merged into the stable branch when every thing has been retested.
 
 ##### HP 25 - Working
 
-##### HP 27 - Completed
+##### HP 27 - Working
 
 ##### HP 29 - Working
 
 ##### HP 31 - Working
 
-##### HP 32 - Not working
+##### HP 32 - Working
 
 ##### HP 33 - Working
 
 ##### HP 34 - Working
 
 ##### HP 37 - Completed
+* Fails self test.
 
 ##### HP 38 - Completed
 
