@@ -184,7 +184,7 @@
  * 03 Jan 22         - Changed debug() macro so that debug code is executed
  *                     when DEBUG is defined (doesn't need to be true) - MT
  * 04 Jan 22         - Updated help text - MT
- * 12 Jan 22         -
+ * 12 Jan 22         - Only sets mode switch state at start up - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Allow VMS users to set breakpoints?
