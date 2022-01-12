@@ -65,7 +65,7 @@ only be merged into the stable branch when every thing has been retested.
 
 ##### HP 38 - Completed
 
-##### HP 67 - Mostly working
+##### HP 67 - Not working
 * Cannot read or write to magnetic cards.
 * Has continuous memory.
 
