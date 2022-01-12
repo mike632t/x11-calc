@@ -264,6 +264,11 @@
  *                   - Removed the processor bank property and any explicit
  *                     references to the ROM bank. Note that bank switching
  *                     assumes there are only two ROM banks - MT
+ * 12 Jan 22         - Modified code sets the processor status bit based on
+ *                     the select property - MT
+ *                   - Added a timer property to the processor to allow the
+ *                     processor  status bit to be set appropriately if the
+ *                     timer is enabled - MT
  *
  *
  */
@@ -673,6 +678,7 @@ oprocessor *h_processor_create(int *h_rom){
       h_processor->mem[i_count] = h_register_create(i_count); /* Allocate storage for the RAM */
    h_processor->rom = h_rom ; /* Address of ROM */
    h_processor->select = False;
+   h_processor->timer = False;
    h_processor->trace = False;
    h_processor->step = False;
    v_processor_reset(h_processor);
@@ -770,7 +776,12 @@ void v_processor_tick(oprocessor *h_processor) {
 
    if (h_processor->enabled) {
 #if defined (HP35) || defined (HP80) || defined (HP45) || defined (HP70) || defined(HP55)
+      /* TIMER : status[11] = 1, status[3] = 0
+       * PRGM  : status[11] = 0, status[3] = 1
+       * RUN   : status[11] = 0, status[3] = 0 */
       if (h_processor->keypressed) h_processor->status[0] = True; /* Set status bit 0 if key pressed */
+      if (h_processor->select) h_processor->status[3] = True; /* Set status bits based on switch position */
+      if (h_processor->timer) h_processor->status[11] = True;
 #endif
 #if defined(HP67) /* Seems to use a flag rather then the status word for the switch position */
       if (h_processor->keypressed) h_processor->status[15] = True; /* Set status bit 15 if key pressed */
@@ -778,12 +789,12 @@ void v_processor_tick(oprocessor *h_processor) {
 #endif
 #if defined (HP21) || defined (HP22) || defined(HP25) || defined(HP27) || defined(HP29)
       if (h_processor->keypressed) h_processor->status[15] = True; /* Set status bit if key pressed */
-      h_processor->status[3] = h_processor->select; /* Set status bit based on switch position */
+      if (h_processor->select) h_processor->status[3] = True; /* Set status bits based on switch position */
       h_processor->status[5] = True; /* Low Power */
 #endif
 #if defined(HP31) || defined(HP32) || defined(HP33) || defined(HP34) || defined(HP37) || defined(HP38)  /* Setting S(5) breaks the self test */
       if (h_processor->keypressed) h_processor->status[15] = True; /* Set status bit if key pressed */
-      h_processor->status[3] = h_processor->select; /* Set status bit based on switch position */
+      if (h_processor->select) h_processor->status[3] = True; /* Set status bits based on switch position */
       h_processor->status[5] = False; /* Self Test */
 #endif
       i_opcode = h_processor->rom[h_processor->pc]; /* Get next instruction */
