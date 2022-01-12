@@ -26,12 +26,13 @@
  * 22 Dec 21         - Added keyboard shortcuts for shift keys - MT
  * 03 Jan 21         - Changed debug() macro so that debug code is executed
  *                     when DEBUG is defined (doesn't need to be true) - MT
+ * 11 Jan 22         - Removed ROM_BANKS - MT
  *
  */
 
 #define VERSION        "0.1"
-#define BUILD          "0003"
-#define DATE           "06 Dec 21"
+#define BUILD          "0006"
+#define DATE           "11 Jan 22"
 #define AUTHOR         "MT"
 
 #include <stdarg.h>    /* strlen(), etc. */
@@ -174,7 +175,7 @@ void v_init_keypad(obutton *h_button[], oswitch *h_switch[]) {
    h_button[i_count++] = h_button_create(00160, 000, "R/S", "-x-", "STK", "SPACE", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, LIGHT_GRAY, YELLOW, MID_BLUE, BLACK);
 }
 
-int i_rom[ROM_SIZE * ROM_BANKS] = {
+int i_rom[ROM_SIZE] = {
 00000, 01743, 00264, 00217, 01074, 00330, 01160, 01570,
 01020, 00256, 01160, 00070, 00232, 00520, 00520, 01152,
 00067, 01020, 00564, 01303, 01550, 01020, 00610, 00464,

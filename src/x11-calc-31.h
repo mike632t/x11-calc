@@ -28,6 +28,7 @@
  * 16 Nov 21         - Can now define the horizontal and vertical scales to
  *                     independently of each other - MT
  * 22 Dec 21         - Removed SPICE symbol - MT
+ * 11 Jan 22         - Removed ROM_BANKS - MT
  *
  */
 
@@ -71,8 +72,7 @@
 
 #define ROM_SIZE        04000
 #define MEMORY_SIZE     4
-#define ROM_BANKS       1
 
-int i_rom [ROM_SIZE * ROM_BANKS];
+int i_rom [ROM_SIZE];
 
 void v_init_keypad(obutton *h_button[], oswitch *h_switch[]);

@@ -19,6 +19,7 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * 24 Dec 21         - Initial version with new button style - MT
+ * 11 Jan 22         - Removed ROM_BANKS - MT
  *
  */
 
@@ -47,8 +48,7 @@
 
 #define ROM_SIZE        04000
 #define MEMORY_SIZE     10
-#define ROM_BANKS       1
 
-int i_rom [ROM_SIZE * ROM_BANKS];
+int i_rom [ROM_SIZE];
 
 void v_init_keypad(obutton *h_button[], oswitch *h_switch[]);

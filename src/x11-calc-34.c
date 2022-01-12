@@ -24,12 +24,13 @@
  * 06 Dec 21         - Label text colour now explicitly defined - MT
  * 03 Jan 21         - Changed debug() macro so that debug code is executed
  *                     when DEBUG is defined (doesn't need to be true) - MT
+ * 11 Jan 22         - Removed ROM_BANKS - MT
  *
  */
 
 #define VERSION        "0.1"
-#define BUILD          "0004"
-#define DATE           "06 Dec 21"
+#define BUILD          "0005"
+#define DATE           "11 Jan 22"
 #define AUTHOR         "MT"
 
 #include <stdarg.h>    /* strlen(), etc. */

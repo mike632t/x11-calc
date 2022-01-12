@@ -25,6 +25,8 @@
  *                     the value of SCALE at compile time - MT
  * 16 Nov 21         - Can now define the horizontal and vertical scales to
  *                     independently of each other - MT
+ * 11 Jan 22         - Removed ROM_BANKS - MT
+ *
  */
 
 #define MODEL           "22"
@@ -69,8 +71,7 @@
  * six financial registers.  */
 #define MEMORY_SIZE     (10 + 6) /* 0 - 15 */
 #define ROM_SIZE        04000
-#define ROM_BANKS       1
 
-int i_rom [ROM_SIZE * ROM_BANKS];
+int i_rom [ROM_SIZE];
 
 void v_init_keypad(obutton *h_button[], oswitch *h_switch[]);

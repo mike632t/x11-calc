@@ -20,12 +20,13 @@
  *
  * 04 Jan 22         - Initial version (50th anniversary) - MT
  * 05 Jan 22         - Changed the square root key legend to SQRT - MT
+ * 11 Jan 22         - Removed ROM_BANKS - MT
  *
  */
 
 #define VERSION        "0.1"
-#define BUILD          "0001"
-#define DATE           "04 Jan 22"
+#define BUILD          "0002"
+#define DATE           "11 Jan 22"
 #define AUTHOR         "MT"
 
 #include <stdarg.h>    /* strlen(), etc. */
@@ -169,7 +170,7 @@ void v_init_keypad(obutton *h_button[], oswitch *h_switch[]) {
    i_left += (KEY_NUMERIC + 3 * KEY_GAP);
    h_button[i_count++] = h_button_create(00042, 000, "\x1c", "", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, LIGHT_GRAY, BACKGROUND, BACKGROUND, BACKGROUND);
 }
-int i_rom[ROM_SIZE * ROM_BANKS] = {
+int i_rom[ROM_SIZE] = {
    00335, 01377, 01044, 00027, 00504, 01104, 00204, 00420,
    01321, 01773, 00137, 00303, 00650, 01547, 01356, 01742,
    00056, 00220, 01752, 01752, 01752, 00153, 01151, 00250,

@@ -21,12 +21,13 @@
  * 24 Dec 21         - Initial version with new button style - MT
  * 03 Jan 21         - Changed debug() macro so that debug code is executed
  *                     when DEBUG is defined (doesn't need to be true) - MT
+ * 11 Jan 22         - Removed ROM_BANKS - MT
  *
  */
 
 #define VERSION        "0.1"
 #define BUILD          "0002"
-#define DATE           "06 Dec 21"
+#define DATE           "11 Jan 22"
 #define AUTHOR         "MT"
 
 #include <stdarg.h>    /* strlen(), etc. */
@@ -168,7 +169,7 @@ void v_init_keypad(obutton *h_button[], oswitch *h_switch[]) {
    i_left += (KEY_NUMERIC + 3 * KEY_GAP);
    h_button[i_count++] = h_button_create(00042, 000, "E+", "E-", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, LIGHT_GRAY, YELLOW, BACKGROUND, BACKGROUND);
 }
-int i_rom[ROM_SIZE * ROM_BANKS] = {
+int i_rom[ROM_SIZE] = {
    00255, 01420, 00451, 01456, 01746, 00472, 01572, 01616,
    01352, 01611, 01611, 01352, 01445, 00623, 01024, 00507,
    01035, 01656, 00616, 00013, 01220, 01035, 01656, 01020,

@@ -23,6 +23,7 @@
  *                   - Fixed number of digits and added new CLASSIC display
  *                     type definition - MT
  * 24 Dec 21         - Standard key width now defined as KEY WIDTH - MT
+ * 11 Jan 22         - Removed ROM_BANKS - MT
  *
  */
 
@@ -48,12 +49,10 @@
 #define KEY_GAP          3 * SCALE_WIDTH
 #define SWITCH_HEIGHT   10 * SCALE_HEIGHT
 
-#define ROM_SIZE        010000
+#define ROM_SIZE        020000
 #define MEMORY_SIZE     72
-#define ROM_BANKS       2
 #define CONTINIOUS
-#define CLASSIC
 
-int i_rom [ROM_SIZE * ROM_BANKS];
+int i_rom [ROM_SIZE];
 
 void v_init_keypad(obutton *h_button[], oswitch *h_switch[]);

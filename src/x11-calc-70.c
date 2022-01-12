@@ -18,13 +18,14 @@
  * You  should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * 05 Jan 22         - Initial version (50th anniversary) - MT
+ * 04 Jan 22         - Initial version (50th anniversary) - MT
+ * 11 Jan 22         - Removed ROM_BANKS - MT
  *
  */
 
 #define VERSION        "0.1"
 #define BUILD          "0001"
-#define DATE           "04 Jan 22"
+#define DATE           "11 Jan 22"
 #define AUTHOR         "MT"
 
 #include <stdarg.h>    /* strlen(), etc. */
@@ -167,7 +168,7 @@ void v_init_keypad(obutton *h_button[], oswitch *h_switch[]) {
    h_button[i_count++] = h_button_create(00042, 000, "CLX", "", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, LIGHT_GRAY, BACKGROUND, BACKGROUND, BACKGROUND);
 }
 
-int i_rom[ROM_SIZE * ROM_BANKS] = {
+int i_rom[ROM_SIZE] = {
    01431, 00420, 00420, 00420, 00564, 00007, 00764, 00043,
    00620, 01641, 01751, 01671, 00015, 00041, 00146, 00107,
    00267, 00376, 01656, 00316, 01731, 01656, 01360, 00316,

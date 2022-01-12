@@ -20,6 +20,7 @@
  *
  * 05 Jan 22         - Initial version - MT
  * 07 Jan 22         - Fixed number of registers - MT
+ * 11 Jan 22         - Removed ROM_BANKS - MT
  *
  */
 
@@ -48,8 +49,7 @@
 
 #define ROM_SIZE        04000
 #define MEMORY_SIZE     10
-#define ROM_BANKS       1
 
-int i_rom [ROM_SIZE * ROM_BANKS];
+int i_rom [ROM_SIZE];
 
 void v_init_keypad(obutton *h_button[], oswitch *h_switch[]);

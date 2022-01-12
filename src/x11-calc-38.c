@@ -22,12 +22,13 @@
  * 06 Dec 21         - Label text colour now explicitly defined - MT
  * 03 Jan 21         - Changed debug() macro so that debug code is executed
  *                     when DEBUG is defined (doesn't need to be true) - MT
+ * 11 Jan 22         - Removed ROM_BANKS - MT
  *
  */
 
 #define VERSION        "0.1"
-#define BUILD          "0002"
-#define DATE           "06 Dec 21"
+#define BUILD          "0003"
+#define DATE           "11 Jan 22"
 #define AUTHOR         "MT"
 
 #include <stdarg.h>    /* strlen(), etc. */
@@ -54,6 +55,7 @@ void v_init_keypad(obutton *h_button[], oswitch *h_switch[]) {
 
    /* Define the switches. */
    h_switch[0] = h_switch_create(00000, "OFF", "ON ", h_alternate_font, KEYBOARD_COL_A, KEYBOARD_ROW_0, ENTER_KEY_WIDTH, SWITCH_HEIGHT, True, MID_GREY, DARK_GREY);
+   h_switch[0]->state = True;
    h_switch[1] = h_switch_create(00000, "BEGIN", "END", h_alternate_font, KEYBOARD_COL_D, KEYBOARD_ROW_0, ENTER_KEY_WIDTH, SWITCH_HEIGHT, True, MID_GREY, DARK_GREY);
 
    /* Define top row of keys. */
@@ -101,7 +103,7 @@ void v_init_keypad(obutton *h_button[], oswitch *h_switch[]) {
    h_button[29] = h_button_create(00100, 000, "R/S", "E+", "", "E-", h_normal_font, h_small_font, h_alternate_font, KEYBOARD_COL_4, KEYBOARD_ROW_7, NUM_KEY_WIDTH, KEY_HEIGHT, False, LIGHT_GRAY, YELLOW, MID_BLUE, BLACK);
 }
 
-int i_rom[ROM_SIZE * ROM_BANKS] = {
+int i_rom[ROM_SIZE] = {
 00440, 00063, 00073, 00107, 00747, 00757, 00773, 01113,
 01123, 01137, 01713, 01367, 00072, 00126, 00410, 00510,
 00416, 00062, 00422, 00410, 01074, 00620, 00652, 00752,

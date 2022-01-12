@@ -30,6 +30,7 @@
  * 31 Dec 21         - Having fixed 'clear data registers' keeping track of
  *                     which registers are persistent is not a  requirement
  *                     anymore - MT
+ * 11 Jan 22         - Removed ROM_BANKS - MT
  *
  */
 
@@ -73,9 +74,8 @@
 
 #define MEMORY_SIZE     48
 #define ROM_SIZE        010000
-#define ROM_BANKS       1
 #define CONTINIOUS
 
-int i_rom [ROM_SIZE * ROM_BANKS];
+int i_rom [ROM_SIZE];
 
 void v_init_keypad(obutton *h_button[], oswitch *h_switch[]);

@@ -30,16 +30,15 @@
  *                     the value of SCALE at compile time - MT
  * 23 Nov 21         - Added the alternate function text - MT
  * 06 Dec 21         - Label text colour now explicitly defined - MT
- * 30 Dec 21         - Does NOT have continuous memory (HP model 25 appears
- *                     to have a different ROM from the model 25C) - MT
- * 03 Jan 21         - Changed debug() macro so that debug code is executed
+ * 03 Jan 22         - Changed debug() macro so that debug code is executed
  *                     when DEBUG is defined (doesn't need to be true) - MT
+ * 11 Jan 22         - Removed ROM_BANKS - MT
  *
  */
 
 #define VERSION        "0.1"
-#define BUILD          "0010"
-#define DATE           "06 Dec 21"
+#define BUILD          "0011"
+#define DATE           "11 Jan 22"
 #define AUTHOR         "MT"
 
 #include <stdarg.h>    /* strlen(), etc. */
@@ -113,7 +112,7 @@ void v_init_keypad(obutton *h_button[], oswitch *h_switch[]) {
    h_button[29] = h_button_create(00220, 000, "R/S", "PAUSE", "", "NOP", h_normal_font, h_small_font, h_alternate_font, KEYBOARD_COL_4, KEYBOARD_ROW_7, NUM_KEY_WIDTH, KEY_HEIGHT, False, BEIGE, YELLOW, MID_BLUE, BLACK);
 }
 
-int i_rom[ROM_SIZE * ROM_BANKS] = {
+int i_rom[ROM_SIZE] = {
    01173, 00202, 01242, 00202, 00427, 01053, 00555, 00313,
    00643, 01671, 00710, 01566, 00030, 00704, 00006, 01526,
    00110, 01731, 00774, 00432, 00742, 00342, 00302, 00610,

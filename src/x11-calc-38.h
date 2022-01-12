@@ -20,6 +20,7 @@
  *
  * 04 Dec 21   0.1   - Initial version - MT
  * 22 Dec 21         - Removed SPICE symbol - MT
+ * 11 Jan 22         - Removed ROM_BANKS - MT
  *
  */
 
@@ -61,11 +62,10 @@
 #define KEY_HEIGHT      30 * SCALE_HEIGHT
 #define SWITCH_HEIGHT   10 * SCALE_HEIGHT
 
-#define ROM_SIZE        010000
+#define ROM_SIZE        020000
 #define MEMORY_SIZE     51
-#define ROM_BANKS       2
 #define CONTINIOUS
 
-int i_rom [ROM_SIZE * ROM_BANKS];
+int i_rom [ROM_SIZE];
 
 void v_init_keypad(obutton *h_button[], oswitch *h_switch[]);

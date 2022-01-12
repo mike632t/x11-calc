@@ -27,7 +27,7 @@
  * 16 Nov 21         - Can now define the horizontal and vertical scales to
  *                     independently of each other - MT
  * 22 Nov 21         - Only saves the state of continuous registers - MT
- * 30 Dec 21         - Does NOT have continuous memory - MT
+ * 11 Jan 22         - Removed ROM_BANKS - MT
  *
  */
 
@@ -73,9 +73,8 @@
  * and forty nine program steps */
 #define MEMORY_SIZE     (8 + 1 + (49 / 7))
 #define ROM_SIZE        04000
-#define ROM_BANKS       1
 #define CONTINIOUS
 
-int i_rom [ROM_SIZE * ROM_BANKS];
+int i_rom [ROM_SIZE];
 
 void v_init_keypad(obutton *h_button[], oswitch *h_switch[]);

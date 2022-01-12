@@ -34,14 +34,15 @@
  *                     the value of SCALE at compile time - MT
  * 23 Nov 21         - Added the alternate function text - MT
  * 06 Dec 21         - Label text colour now explicitly defined - MT
- * 03 Jan 21         - Changed debug() macro so that debug code is executed
+ * 03 Jan 22         - Changed debug() macro so that debug code is executed
  *                     when DEBUG is defined (doesn't need to be true) - MT
+ * 11 Jan 22         - Removed ROM_BANKS - MT
  *
  */
 
 #define VERSION        "0.1"
-#define BUILD          "0011"
-#define DATE           "06 Dec 21"
+#define BUILD          "0012"
+#define DATE           "11 jan 22"
 #define AUTHOR         "MT"
 
 #include <stdarg.h>    /* strlen(), etc. */
@@ -115,7 +116,7 @@ void v_init_keypad(obutton *h_button[], oswitch *h_switch[]) {
    h_button[29] = h_button_create(00221, 000, "DSP", "", "", "", h_large_font, h_small_font, h_alternate_font, KEYBOARD_COL_4, KEYBOARD_ROW_7, NUM_KEY_WIDTH, KEY_HEIGHT, False, BEIGE, BACKGROUND, MID_BLUE, BLACK);
 }
 
-int i_rom[ROM_SIZE * ROM_BANKS] = {
+int i_rom[ROM_SIZE] = {
    00672, 00672, 01710, 00410, 00432, 00214, 00110, 00310,
    01635, 01566, 00014, 00432, 00072, 00445, 01610, 00134,
    00120, 01015, 01112, 01512, 00264, 00272, 01363, 00006,

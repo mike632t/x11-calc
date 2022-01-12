@@ -19,12 +19,13 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * 04 Jan 22         - Initial version - MT
+ * 11 Jan 22         - Removed ROM_BANKS - MT
  *
  */
 
 #define VERSION        "0.1"
 #define BUILD          "0001"
-#define DATE           "04 Jan 22"
+#define DATE           "11 Jan 22"
 #define AUTHOR         "MT"
 
 #include <stdarg.h>    /* strlen(), etc. */
@@ -166,7 +167,7 @@ void v_init_keypad(obutton *h_button[], oswitch *h_switch[]) {
    i_left += (KEY_NUMERIC + 3 * KEY_GAP);
    h_button[i_count++] = h_button_create(00042, 000, "E+", "E-", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, LIGHT_GRAY, BACKGROUND, BACKGROUND, BACKGROUND);
 }
-int i_rom[ROM_SIZE * ROM_BANKS] = {
+int i_rom[ROM_SIZE] = {
 01311, 00563, 01752, 01752, 01752, 00223, 00650, 00220,
 01450, 01203, 00220, 01767, 01450, 00477, 00650, 00207,
 00000, 00000, 01752, 01752, 01752, 00013, 00650, 00220,

@@ -25,12 +25,13 @@
  * 06 Dec 21         - Label text colour now explicitly defined - MT
  * 03 Jan 21         - Changed debug() macro so that debug code is executed
  *                     when DEBUG is defined (doesn't need to be true) - MT
+ * 11 Jan 22         - Removed ROM_BANKS - MT
  *
  */
 
 #define VERSION        "0.1"
-#define BUILD          "0004"
-#define DATE           "06 Dec 21"
+#define BUILD          "0005"
+#define DATE           "11 Jan 22"
 #define AUTHOR         "MT"
 
 #include <stdarg.h>    /* strlen(), etc. */
@@ -104,7 +105,7 @@ void v_init_keypad(obutton *h_button[], oswitch *h_switch[]) {
    h_button[29] = h_button_create(00100, '%', "%", "-kg", "", "", h_normal_font, h_small_font, h_alternate_font, KEYBOARD_COL_4, KEYBOARD_ROW_7, NUM_KEY_WIDTH, KEY_HEIGHT, False, LIGHT_GRAY, YELLOW, LIGHT_GRAY, LIGHT_GRAY);
 }
 
-int i_rom[ROM_SIZE * ROM_BANKS] = {
+int i_rom[ROM_SIZE] = {
    00664, 00013, 01460, 00031, 01360, 01020, 01566, 00011,
    00432, 01410, 00774, 01352, 00022, 01156, 00752, 01152,
    00117, 00756, 01020, 00552, 00137, 00432, 00157, 00406,
