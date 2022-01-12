@@ -25,20 +25,17 @@ only be merged into the stable branch when every thing has been retested.
 
 ### Latest News
 
+11/01 - Work in progress - more testing needed on unstable branch
+
 10/01 - Split code into two branches, stable and unstable.
-
-07/01 - HP35 and HP80 now report the correct ROM size.
-
-05/01 - Added HP80.
 
 04/01 - Added HP35 (50 years after the launch of the original) !
 
-### Status
+### Status (Unstable)
 
 ##### HP 35 - Working
 
 ##### HP 80 - Working
-* Not fully tested.
 
 ##### HP 45 - Working
 
@@ -52,25 +49,20 @@ only be merged into the stable branch when every thing has been retested.
 ##### HP 25 - Working
 
 ##### HP 27 - Completed
-* Not fully tested.
 
 ##### HP 29 - Working
 
 ##### HP 31 - Working
 
-##### HP 32 - Completed
-* Working but hangs after self test completes.
+##### HP 32 - Not working
 
 ##### HP 33 - Working
 
 ##### HP 34 - Working
-* Self test crashes. (Last known working commit 1ccdc5a).
 
 ##### HP 37 - Completed
-* Not fully tested.
 
 ##### HP 38 - Completed
-* Self test crashes. (Last known working commit 1ccdc5a).
 
 ##### HP 67 - Mostly working
 * Cannot read or write to magnetic cards.
@@ -160,11 +152,6 @@ should be commented out as shown.
 
 HP67 is unable to read or write to magnetic cards.
 
-HP32 hangs after self test.
-
-HP34 crashes during self test.
-
-HP38 crashes during self test.
 
 ### Tested
 
