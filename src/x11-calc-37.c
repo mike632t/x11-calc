@@ -23,12 +23,13 @@
  * 03 Jan 21         - Changed debug() macro so that debug code is executed
  *                     when DEBUG is defined (doesn't need to be true) - MT
  * 11 Jan 22         - Removed ROM_BANKS - MT
+ * 12 Jan 22         - Added mode switch - MT
  *
  */
 
 #define VERSION        "0.1"
-#define BUILD          "0003"
-#define DATE           "11 Jan 22"
+#define BUILD          "0004"
+#define DATE           "12 Jan 22"
 #define AUTHOR         "MT"
 
 #include <stdarg.h>    /* strlen(), etc. */
@@ -57,7 +58,8 @@ void v_init_keypad(obutton *h_button[], oswitch *h_switch[]) {
 
    /* Define the switches. */
    h_switch[0] = h_switch_create(00000, "OFF", "ON ", h_alternate_font, KEYBOARD_COL_A, KEYBOARD_ROW_0, ENTER_KEY_WIDTH, SWITCH_HEIGHT, True, MID_GREY, DARK_GREY);
-   h_switch[1] = NULL;
+   h_switch[1] = h_switch_create(00000, "BEGIN", "END", h_alternate_font, KEYBOARD_COL_D, KEYBOARD_ROW_0, ENTER_KEY_WIDTH, SWITCH_HEIGHT, True, MID_GREY, DARK_GREY);
+
    /* Define top row of keys. */
    h_button[0] = h_button_create(00064, 000, "n", "12\xd7", "", "", h_normal_font, h_small_font, h_alternate_font, KEYBOARD_COL_A, KEYBOARD_ROW_1, SMALL_KEY_WIDTH, KEY_HEIGHT, False, BLACK, YELLOW, MID_BLUE, BLACK);
    h_button[1] = h_button_create(00063, 000, "i", "12\xf7", "", "", h_normal_font, h_small_font, h_alternate_font, KEYBOARD_COL_B, KEYBOARD_ROW_1, SMALL_KEY_WIDTH, KEY_HEIGHT, False, BLACK, YELLOW, MID_BLUE, BLACK);
