@@ -180,10 +180,11 @@
  * 20 Dec 21         - Changed all #ifdef to #if defined() - MT
  * 22 Dec 21         - Uses model numbers for conditional compilation - MT
  * 26 Dec 21         - Checks the on/off switch state at startup - MT
- * 03 jan 21         - Added ability to trap execution of an opcode - MT
- * 03 Jan 21         - Changed debug() macro so that debug code is executed
+ * 03 jan 22         - Added ability to trap execution of an opcode - MT
+ * 03 Jan 22         - Changed debug() macro so that debug code is executed
  *                     when DEBUG is defined (doesn't need to be true) - MT
- * 04 Jan 21         - Updated help text - MT
+ * 04 Jan 22         - Updated help text - MT
+ * 12 Jan 22         -
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Allow VMS users to set breakpoints?
@@ -195,8 +196,8 @@
 
 #define NAME           "x11-calc"
 #define VERSION        "0.8"
-#define BUILD          "0083"
-#define DATE           "17 Dec 21"
+#define BUILD          "0089"
+#define DATE           "12 Jan 22"
 #define AUTHOR         "MT"
 
 #define INTERVAL 25    /* Number of ticks to execute before updating the display */
@@ -591,7 +592,7 @@ int main(int argc, char *argv[]){
    i_count = 0;
 
    if (h_switch[0] != NULL) h_processor->enabled = h_switch[0]->state; /* Allow switches to be undefined if not used */
-   if (h_switch[1] != NULL) h_processor->select = h_switch[1]->state; else h_processor->select = False;
+   if (h_switch[1] != NULL) h_processor->select = h_switch[1]->state;
 
    while (!b_abort) { /* Main program event loop */
       i_count--;
