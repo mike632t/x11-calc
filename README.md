@@ -25,7 +25,7 @@ only be merged into the stable branch when every thing has been retested.
 
 ### Latest News
 
-12/01 - Work in progress - more testing needed on unstable branch.
+12/01 - Most bugs are now fixed.
 
 10/01 - Split code into two branches, stable and unstable.
 
