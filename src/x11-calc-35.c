@@ -75,9 +75,9 @@ void v_init_keypad(obutton *h_button[], oswitch *h_switch[]) {
 #if defined(RED_DOT)
    h_button[i_count++] = h_button_create(00006, 000, "", "xY", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, BLACK, LIGHT_GREY, BACKGROUND, BACKGROUND);
    i_left += (KEY_WIDTH + KEY_GAP);
-   h_button[i_count++] = h_button_create(00004, 000, "", "LOG", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, BLACK, LIGHT_GREY, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00004, 000, "", "log", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, BLACK, LIGHT_GREY, BACKGROUND, BACKGROUND);
    i_left += (KEY_WIDTH + KEY_GAP);
-   h_button[i_count++] = h_button_create(00003, 000, "", "LN", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, BLACK, LIGHT_GREY, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00003, 000, "", "ln", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, BLACK, LIGHT_GREY, BACKGROUND, BACKGROUND);
    i_left += (KEY_WIDTH + KEY_GAP);
    h_button[i_count++] = h_button_create(00002, 000, "", "eX", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, BLACK, LIGHT_GREY, BACKGROUND, BACKGROUND);
    i_left += (KEY_WIDTH + KEY_GAP);
@@ -87,15 +87,15 @@ void v_init_keypad(obutton *h_button[], oswitch *h_switch[]) {
    i_top += KBD_ROW;
    i_left = KBD_LEFT;
    /** h_button[i_count++] = h_button_create(00056, 000, "", "/\xaf", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, BLACK, BACKGROUND, BACKGROUND, BACKGROUND); /* Original */
-   h_button[i_count++] = h_button_create(00056, 000, "", "SQRT", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, BLACK, LIGHT_GREY, BACKGROUND, BACKGROUND); /* Modified */
+   h_button[i_count++] = h_button_create(00056, 000, "", "sqrt", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, BLACK, LIGHT_GREY, BACKGROUND, BACKGROUND); /* Modified */
    i_left += (KEY_WIDTH + KEY_GAP);
-   h_button[i_count++] = h_button_create(00054, 000, "", "ARC", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, BLACK, LIGHT_GREY, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00054, 000, "", "arc", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, BLACK, LIGHT_GREY, BACKGROUND, BACKGROUND);
    i_left += (KEY_WIDTH + KEY_GAP);
-   h_button[i_count++] = h_button_create(00053, 000, "", "SIN", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, BLACK, LIGHT_GREY, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00053, 000, "", "sin", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, BLACK, LIGHT_GREY, BACKGROUND, BACKGROUND);
    i_left += (KEY_WIDTH + KEY_GAP);
-   h_button[i_count++] = h_button_create(00052, 000, "", "COS", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, BLACK, LIGHT_GREY, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00052, 000, "", "cos", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, BLACK, LIGHT_GREY, BACKGROUND, BACKGROUND);
    i_left += (KEY_WIDTH + KEY_GAP);
-   h_button[i_count++] = h_button_create(00050, 000, "", "TAN", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, BLACK, LIGHT_GREY, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00050, 000, "", "tan", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, BLACK, LIGHT_GREY, BACKGROUND, BACKGROUND);
 
    /* Define third row of keys. */
    i_top += KBD_ROW;
