@@ -185,6 +185,8 @@
  *                     when DEBUG is defined (doesn't need to be true) - MT
  * 04 Jan 22         - Updated help text - MT
  * 12 Jan 22         - Only sets mode switch state at start up - MT
+ *                   - Checks  for breakpoints and instruction traps at the
+ *                     same time - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Allow VMS users to set breakpoints?
@@ -196,7 +198,7 @@
 
 #define NAME           "x11-calc"
 #define VERSION        "0.8"
-#define BUILD          "0089"
+#define BUILD          "0090"
 #define DATE           "12 Jan 22"
 #define AUTHOR         "MT"
 
@@ -309,14 +311,13 @@ void v_set_blank_cursor(Display *x_display, Window x_application_window, Cursor 
    Pixmap x_blank;
    XColor x_Color;
    char c_pixmap_data[1] = {0}; /* An empty pixmap */
-
    x_blank = XCreateBitmapFromData (x_display, x_application_window, c_pixmap_data, 1, 1); /* Create an empty bitmap */
    (*x_cursor) = XCreatePixmapCursor(x_display, x_blank, x_blank, &x_Color, &x_Color, 0, 0); /* Use the empty pixmap to create a blank cursor */
    XFreePixmap (x_display, x_blank); /* Free up pixmap */
 }
 
-int main(int argc, char *argv[]){
-
+int main(int argc, char *argv[])
+{
    Display *x_display; /* Pointer to X display structure */
    Window x_application_window; /* Application window structure */
    Cursor x_cursor; /* Application cursor */
@@ -325,7 +326,6 @@ int main(int argc, char *argv[]){
    Atom wm_delete;
 
    oswitch *h_switch[2];
-   /* oswitch *h_selected = NULL; */
    obutton *h_button[BUTTONS]; /* Array to hold pointers to buttons */
    obutton *h_pressed = NULL;
    odisplay *h_display; /* Pointer to display structure */
@@ -360,8 +360,10 @@ int main(int argc, char *argv[]){
    int i_ticks = -1;
 
 #if defined(vms) /* Parse DEC style command line options */
-   for (i_count = 1; i_count < argc; i_count++) {
-      if (argv[i_count][0] == '/') {
+   for (i_count = 1; i_count < argc; i_count++)
+   {
+      if (argv[i_count][0] == '/')
+      {
          for (i_index = 0; argv[i_count][i_index]; i_index++) /* Convert option to uppercase */
             if (argv[i_count][i_index] >= 'a' && argv[i_count][i_index] <= 'z')
                argv[i_count][i_index] = argv[i_count][i_index] - 32; /* TO DO - Assumes 8-bit ASCII encoding */
@@ -373,44 +375,56 @@ int main(int argc, char *argv[]){
             b_trace = False; /* Enable tracing */
          else if (!strncmp(argv[i_count], "/TRACE", i_index))
             b_trace = True; /* Enable tracing */
-         else if (!strncmp(argv[i_count], "/VERSION", i_index)) {
+         else if (!strncmp(argv[i_count], "/VERSION", i_index))
+         {
             v_version; /* Display version information */
             fprintf(stdout, h_msg_licence, __DATE__ +7, AUTHOR);
             exit(0);
          }
-         else if ((!strncmp(argv[i_count], "/HELP", i_index)) | (!strncmp(argv[i_count], "/?", i_index))) {
+         else if ((!strncmp(argv[i_count], "/HELP", i_index)) | (!strncmp(argv[i_count], "/?", i_index)))
+         {
             fprintf(stdout, c_msg_usage, FILENAME);
             exit(0);
          }
-         else { /* If we get here then the we have an invalid option */
+         else /* If we get here then the we have an invalid option */
             v_error(h_err_invalid_option, argv[i_count]);
-         }
-         if (argv[i_count][1] != 0) {
-            for (i_index = i_count; i_index < argc - 1; i_index++) argv[i_index] = argv[i_index + 1];
+         if (argv[i_count][1] != 0)
+         {
+            for (i_index = i_count; i_index < argc - 1; i_index++)
+               argv[i_index] = argv[i_index + 1];
             argc--; i_count--;
          }
       }
    }
 #else /* Parse UNIX style command line options */
    b_abort = False; /* Stop processing command line */
-   for (i_count = 1; i_count < argc && (b_abort != True); i_count++) {
-      if (argv[i_count][0] == '-') {
+   for (i_count = 1; i_count < argc && (b_abort != True); i_count++)
+   {
+      if (argv[i_count][0] == '-')
+      {
          i_index = 1;
-         while (argv[i_count][i_index] != 0) {
-            switch (argv[i_count][i_index]) {
+         while (argv[i_count][i_index] != 0)
+         {
+            switch (argv[i_count][i_index])
+            {
             case 'b': /* Breakpoint */
                if (argv[i_count][i_index + 1] != 0)
                   v_error(h_err_invalid_argument, argv[i_count][i_index + 1]);
-               else {
-                  if (i_count + 1 < argc) {
+               else
+                  if (i_count + 1 < argc)
+                  {
                      i_breakpoint = 0;
-                     for (i_offset = 0; i_offset < strlen(argv[i_count + 1]); i_offset++) { /* Parse octal number */
+                     for (i_offset = 0; i_offset < strlen(argv[i_count + 1]); i_offset++) /* Parse octal number */
+                     {
                         if ((argv[i_count + 1][i_offset] < '0') || (argv[i_count + 1][i_offset] > '7'))
                            v_error(h_err_invalid_number, argv[i_count + 1]);
                         else
                            i_breakpoint = i_breakpoint * 8 + argv[i_count + 1][i_offset] - '0';
                      }
-                     if ((i_breakpoint < 0)  || (i_breakpoint > (unsigned)(sizeof(i_rom) / sizeof i_rom[0]))) { /* Check address range */
+                     if ((i_breakpoint < 0)  ||
+                        (i_breakpoint > (unsigned)(sizeof(i_rom) / sizeof i_rom[0])) ||
+                        (i_breakpoint > 07777)) /* Check address range - must be in bank 0*/
+                     {
                         v_error(h_err_address_range, argv[i_count + 1]);
                      }
                      else {
@@ -420,38 +434,36 @@ int main(int argc, char *argv[]){
                         argc--;
                      }
                   }
-                  else {
+                  else
                      v_error(h_err_missing_argument, argv[i_count]);
-                  }
-               }
                i_index = strlen(argv[i_count]) - 1;
                break;
             case 'i': /* Trap Instruction */
                if (argv[i_count][i_index + 1] != 0)
                   v_error(h_err_invalid_argument, argv[i_count][i_index + 1]);
-               else {
-                  if (i_count + 1 < argc) {
+               else
+                  if (i_count + 1 < argc)
+                  {
                      i_trap = 0;
-                     for (i_offset = 0; i_offset < strlen(argv[i_count + 1]); i_offset++) { /* Parse octal number */
+                     for (i_offset = 0; i_offset < strlen(argv[i_count + 1]); i_offset++) /* Parse octal number */
+                     {
                         if ((argv[i_count + 1][i_offset] < '0') || (argv[i_count + 1][i_offset] > '7'))
                            v_error(h_err_invalid_number, argv[i_count + 1]);
                         else
                            i_trap = i_trap * 8 + argv[i_count + 1][i_offset] - '0';
                      }
-                     if ((i_trap < 0)  || (i_trap > (unsigned)(sizeof(i_rom) / sizeof i_rom[0]))) { /* Check address range */
+                     if ((i_trap < 0) || (i_trap > 01777)) /* Check range */
                         v_error(h_err_address_range, argv[i_count + 1]);
-                     }
-                     else {
+                     else
+                     {
                         if (i_count + 2 < argc) /* Remove the parameter from the arguments */
                            for (i_offset = i_count + 1; i_offset < argc - 1; i_offset++)
                               argv[i_offset] = argv[i_offset + 1];
                         argc--;
                      }
                   }
-                  else {
+                  else
                      v_error(h_err_missing_argument, argv[i_count]);
-                  }
-               }
                i_index = strlen(argv[i_count]) - 1;
                break;
             case 's': /* Start in single step mode */
@@ -465,18 +477,18 @@ int main(int argc, char *argv[]){
                if (i_index == 2)
                  b_abort = True; /* '--' terminates command line processing */
                else
-                  if (!strncmp(argv[i_count], "--no-cursor", i_index)) {
+                  if (!strncmp(argv[i_count], "--no-cursor", i_index))
                      b_cursor = False; /* Don't draw a cursor - unless drawn by the window manager */
-                  }
-                  else if (!strncmp(argv[i_count], "--cursor", i_index)) {
+                  else if (!strncmp(argv[i_count], "--cursor", i_index))
                      b_cursor = True; /* Draw cursor */
-                  }
-                  else if (!strncmp(argv[i_count], "--version", i_index)) {
+                  else if (!strncmp(argv[i_count], "--version", i_index))
+                  {
                      v_version(); /* Display version information */
                      fprintf(stdout, h_msg_licence, __DATE__ +7, AUTHOR);
                      exit(0);
                   }
-                  else if (!strncmp(argv[i_count], "--help", i_index)) {
+                  else if (!strncmp(argv[i_count], "--help", i_index))
+                  {
                      fprintf(stdout, c_msg_usage, FILENAME);
                      exit(0);
                   }
@@ -489,7 +501,8 @@ int main(int argc, char *argv[]){
             }
             i_index++; /* Parse next letter in option */
          }
-         if (argv[i_count][1] != 0) {
+         if (argv[i_count][1] != 0)
+         {
             for (i_offset = i_count; i_offset < argc - 1; i_offset++)
                argv[i_offset] = argv[i_offset + 1];
             argc--; i_count--;
@@ -497,11 +510,12 @@ int main(int argc, char *argv[]){
       }
    }
 #endif
+
 #if defined(CONTINIOUS)
    if (argc > 2) v_error(h_err_invalid_operand); /* There should never be more than one command lime parameter */
    if (argc > 1) s_pathname = argv[1]; /* Set path name if a parameter was passed and continuous memory is enabled */
 #else
-   if (argc > 1) v_error(h_err_invalid_operand); /* There shouldn't any command lime parameters */
+   if (argc > 1) v_error(h_err_invalid_operand); /* There shouldn't any command line parameters */
 #endif
    i_wait(200); /* Sleep for 200 milliseconds to 'debounce' keyboard! */
    v_version();
@@ -594,9 +608,11 @@ int main(int argc, char *argv[]){
    if (h_switch[0] != NULL) h_processor->enabled = h_switch[0]->state; /* Allow switches to be undefined if not used */
    if (h_switch[1] != NULL) h_processor->select = h_switch[1]->state;
 
-   while (!b_abort) { /* Main program event loop */
+   while (!b_abort) /* Main program event loop */
+   {
       i_count--;
-      if (i_count < 0) {
+      if (i_count < 0)
+      {
          i_display_update(x_display, x_application_window, i_screen, h_display, h_processor);
          i_display_draw(x_display, x_application_window, i_screen, h_display); /* Redraw display */
          i_count = INTERVAL;
@@ -612,16 +628,22 @@ int main(int argc, char *argv[]){
 #endif
          if (i_ticks == 0) b_abort = True;
       }
-      if (h_processor->pc == i_breakpoint) h_processor->trace = h_processor->step = True; /* Breakpoint */
-      if ( h_processor->rom[h_processor->pc] == i_trap) h_processor->trace = h_processor->step = True; /* Trap instruction */
+      if (((h_processor->pc & 0xfff) == i_breakpoint) || (h_processor->rom[h_processor->pc] == i_trap)) /* Check for Breakpoint or Instruction Trap */
+      {
+         if (!h_processor->trace || !h_processor->step) fprintf(stderr, "** break **\n");
+         h_processor->trace = h_processor->step = True;
+      }
       if (b_run) v_processor_tick(h_processor);
       if (h_processor->step) b_run = False;
 
-      while (XPending(x_display)) {
+      while (XPending(x_display))
+      {
          XNextEvent(x_display, &x_event);
-         switch (x_event.type) {
+         switch (x_event.type)
+         {
          case FocusOut:
-            if (!(h_pressed == NULL)) {
+            if (!(h_pressed == NULL))
+            {
                h_pressed->state = False;
                i_button_draw(x_display, x_application_window, i_screen, h_pressed);
                h_processor->keypressed = False; /* Don't clear the status bit here!! */
@@ -639,11 +661,10 @@ int main(int argc, char *argv[]){
                h_processor->trace = h_processor->step = b_run = True;
             else if (h_keyboard->key == (XK_T & 0x1f)) /* Ctrl-T to toggle tracing */
                h_processor->trace = !h_processor->trace;
-            else if (h_keyboard->key == (XK_R & 0x1f)) { /* Ctrl-R to display internal CPU registers */
+            else if (h_keyboard->key == (XK_R & 0x1f)) /* Ctrl-R to display internal CPU registers */
                v_fprint_registers(stdout, h_processor);
-               v_fprint_memory(stdout, h_processor);
-            }
-            else if (h_keyboard->key == (XK_C & 0x1f)) { /* Ctrl-C to reset */
+            else if (h_keyboard->key == (XK_C & 0x1f)) /* Ctrl-C to reset */
+            {
                v_processor_reset(h_processor);
                if (s_pathname == NULL)
                   v_processor_restore(h_processor); /* Load current saved settings */
@@ -653,12 +674,13 @@ int main(int argc, char *argv[]){
             }
             else { /* Check for matching button */
                int i_count;
-               for (i_count = 0; i_count < BUTTONS; i_count++){
+               for (i_count = 0; i_count < BUTTONS; i_count++)
+               {
                   h_pressed = h_button_key_pressed(h_button[i_count], h_keyboard->key);
-                  if (h_pressed != NULL) {
+                  if (h_pressed != NULL)
+                  {
                      h_pressed->state = True;
                      i_button_draw(x_display, x_application_window, i_screen, h_pressed);
-
                      h_processor->code = h_pressed->index;
                      h_processor->keypressed = True;
                      break;
@@ -669,8 +691,10 @@ int main(int argc, char *argv[]){
          case KeyRelease :
             h_key_released(h_keyboard, x_display, x_event.xkey.keycode, x_event.xkey.state);
             if (h_keyboard->key == (XK_BackSpace & 0x1f)) h_keyboard->key = XK_Escape & 0x1f; /* Map backspace to escape */
-            if (h_pressed != NULL) {
-               if (h_keyboard->key == h_pressed->key) {
+            if (h_pressed != NULL)
+            {
+               if (h_keyboard->key == h_pressed->key)
+               {
                   h_pressed->state = False;
                   i_button_draw(x_display, x_application_window, i_screen, h_pressed);
                   h_processor->keypressed = False; /* Don't clear the status bit here!! */
@@ -679,11 +703,14 @@ int main(int argc, char *argv[]){
             break;
 #endif
          case ButtonPress :
-            if (x_event.xbutton.button == 1) {
+            if (x_event.xbutton.button == 1)
+            {
                int i_count;
-               for (i_count = 0; i_count < sizeof(h_button) / sizeof(*h_button); i_count++) {
+               for (i_count = 0; i_count < sizeof(h_button) / sizeof(*h_button); i_count++)
+               {
                   h_pressed = h_button_pressed(h_button[i_count], x_event.xbutton.x, x_event.xbutton.y);
-                  if (!(h_pressed == NULL)) {
+                  if (!(h_pressed == NULL))
+                  {
                      h_pressed->state = True;
                      i_button_draw(x_display, x_application_window, i_screen, h_pressed);
                      h_processor->code = h_pressed->index;
@@ -693,21 +720,25 @@ int main(int argc, char *argv[]){
                   }
                }
                if (h_pressed == NULL) { /* It wasn't a button that was pressed check the switches */
-                  if (!(h_switch_pressed(h_switch[0], x_event.xbutton.x, x_event.xbutton.y) == NULL)) {
+                  if (!(h_switch_pressed(h_switch[0], x_event.xbutton.x, x_event.xbutton.y) == NULL))
+                  {
                      h_switch[0]->state = !(h_switch[0]->state); /* Toggle switch */
                      i_switch_draw(x_display, x_application_window, i_screen, h_switch[0]);
-                     if (h_switch[0]->state) {
+                     if (h_switch[0]->state)
+                     {
                         v_processor_reset(h_processor); /* Reset the processor */
                         v_processor_restore(h_processor); /* Restore saved settings */
                      }
-                     else {
+                     else
+                     {
                         v_processor_save(h_processor); /* Save current settings */
                         h_processor->enabled = False; /* Disable the processor */
                         i_ticks = DELAY; /* Set count down */
                      }
                      debug(fprintf(stderr, "Switch pressed (%s).\n", h_switch[0]->state ? "On" : "Off"));
                   }
-                  if (!(h_switch_pressed(h_switch[1], x_event.xbutton.x, x_event.xbutton.y) == NULL)) {
+                  if (!(h_switch_pressed(h_switch[1], x_event.xbutton.x, x_event.xbutton.y) == NULL))
+                  {
                      h_switch[1]->state = !(h_switch[1]->state); /* Toggle switch */
                      i_switch_draw(x_display, x_application_window, i_screen, h_switch[1]);
                      h_processor->select = h_switch[1]->state;
@@ -717,21 +748,24 @@ int main(int argc, char *argv[]){
             }
             break;
          case ButtonRelease :
-            if (x_event.xbutton.button == 1) {
-               if (!(h_pressed == NULL)) {
+            if (x_event.xbutton.button == 1)
+            {
+               if (!(h_pressed == NULL))
+               {
                   h_pressed->state = False;
                   i_button_draw(x_display, x_application_window, i_screen, h_pressed);
                   h_processor->keypressed = False; /* Don't clear the status bit here!! */
                   debug(fprintf(stderr, "Button released - keycode(%.2X).\n", h_pressed->index));
                }
-               if (h_pressed == NULL) { /* It wasn't a button that was released check the switches */
-                  if (!(h_switch_pressed(h_switch[0], x_event.xbutton.x, x_event.xbutton.y) == NULL)) {
+               if (h_pressed == NULL)
+               { /* It wasn't a button that was released check the switches */
+                  if (!(h_switch_pressed(h_switch[0], x_event.xbutton.x, x_event.xbutton.y) == NULL))
+                  {
                      i_ticks = -1;
                      debug(fprintf(stderr, "Switch released (%s).\n", h_switch[0]->state ? "On" : "Off"));
                   }
-                  if (!(h_switch_pressed(h_switch[1], x_event.xbutton.x, x_event.xbutton.y) == NULL)) {
+                  if (!(h_switch_pressed(h_switch[1], x_event.xbutton.x, x_event.xbutton.y) == NULL))
                      debug(fprintf(stderr, "Switch released (%s).\n", h_switch[1]->state ? "On" : "Off"));
-                  }
                }
             }
             break;
