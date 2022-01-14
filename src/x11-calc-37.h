@@ -19,6 +19,9 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * 02 Dec 21   0.1   - Initial version - MT
+ * 22 Dec 21         - Removed SPICE symbol - MT
+ * 11 Jan 22         - Removed ROM_BANKS - MT
+ *
  */
 
 #define MODEL           "37"
@@ -61,10 +64,7 @@
 
 #define ROM_SIZE        05000
 #define MEMORY_SIZE     9
-#define ROM_BANKS       1
-#define SPICE           True
-#define CONTINIOUS      False
 
-int i_rom [ROM_SIZE * ROM_BANKS];
+int i_rom [ROM_SIZE];
 
 void v_init_keypad(obutton *h_button[], oswitch *h_switch[]);

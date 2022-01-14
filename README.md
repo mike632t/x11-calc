@@ -1,5 +1,12 @@
 ## x11-calc - Another RPN (Reverse Polish) calculator.
 
+Written in C using just X11.
+
+Use  of any language extensions or non standard language features has  been
+avoided in order to try to make the code as portable as possible.
+
+Should compile without modification on Linux, VAX/VMS, and Tru64 Unix.
+
 ![HP21](./img/x11-calc-21.png) ![HP22](./img/x11-calc-22.png) ![HP25](./img/x11-calc-25.png)
 
 ![HP27](./img/x11-calc-27.png) ![HP29](./img/x11-calc-29.png)
@@ -8,22 +15,31 @@
 
 ![HP37](./img/x11-calc-37.png) ![HP38](./img/x11-calc-38.png)
 
-Written in C using just X11.
+![HP67](./img/x11-calc-67.png)
 
-Use  of any language extensions or non standard language features has  been
-avoided in order to try to make the code as portable as possible.
+![HP35](./img/x11-calc-35.png) ![HP80](./img/x11-calc-80.png) ![HP45](./img/x11-calc-45.png)
 
-Currently compiles without modification on Linux, VAX/VMS, and  Tru64 Unix.
+Adding new simulators can introduce regression bugs in the existing code so
+the code has been split into two branches stable and unstable, changes will
+only be merged into the stable branch when every thing has been retested.
 
 ### Latest News
 
-04/12 - HP38C working but not tested.
+12/01 - Most bugs are now fixed.
 
-02/12 - HP37E working but not tested.
+10/01 - Split code into two branches, stable and unstable.
 
-28/11 - HP34C now working!!
+04/01 - Added HP35 (50 years after the launch of the original)!
 
 ### Status
+
+##### HP 35 - Working
+
+##### HP 80 - Working
+
+##### HP 45 - Working
+
+##### HP 70 - Working
 
 ##### HP 21 - Working
 
@@ -32,26 +48,34 @@ Currently compiles without modification on Linux, VAX/VMS, and  Tru64 Unix.
 
 ##### HP 25 - Working
 
-##### HP 27 - Completed
+##### HP 27 - Working
 
 ##### HP 29 - Working
 
 ##### HP 31 - Working
 
-##### HP 32 - Completed
-* Working but hangs after self test completes
+##### HP 32 - Working
 
 ##### HP 33 - Working
 
 ##### HP 34 - Working
 
 ##### HP 37 - Completed
+<<<<<<< HEAD
 * Fails self test
 
 ##### HP 38 - Working
 
 ##### HP 67 - Work in progress
+=======
+* Fails self test.
 
+##### HP 38 - Completed
+>>>>>>> unstable
+
+##### HP 67 - Not working
+* Cannot read or write to magnetic cards.
+* Has continuous memory.
 
 ### Compiling
 
@@ -62,9 +86,9 @@ new folder run 'make all' to build all the available simulators.
 
 e.g:
 
-    $ wget https://github.com/mike632t/x11-calc/archive/refs/heads/master.zip
-    $ unzip master.zip
-    $ cd x11-calc-master
+    $ wget https://github.com/mike632t/x11-calc/archive/refs/heads/stable.zip
+    $ unzip stable.zip
+    $ cd x11-calc-stable
     $ make all
 
     $ ./bin/x11-calc-29
@@ -135,7 +159,12 @@ should be commented out as shown.
     #dtoverlay=vc4-fkms-v3d
     #dtoverlay=vc4-kms-v3d
 
+<<<<<<< HEAD
 HP32 hangs after self test.
+=======
+HP67 is unable to read or write to magnetic cards.
+
+>>>>>>> unstable
 
 ### Tested
 

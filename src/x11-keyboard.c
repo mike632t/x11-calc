@@ -20,6 +20,8 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * 19 Sep 21         - Initial version (Cheese House)- MT
+ * 03 Jan 21         - Changed debug() macro so that debug code is executed
+ *                     when DEBUG is defined (doesn't need to be true) - MT
  *
  */
 
@@ -27,8 +29,6 @@
 #define BUILD          "0001"
 #define DATE           "19 Sep 21"
 #define AUTHOR         "MT"
-
-#define DEBUG 0        /* Enable/disable debug*/
 
 #include <ctype.h>     /* is alpha(), etc. */
 #include <string.h>    /* strlen(), etc. */

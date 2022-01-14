@@ -28,6 +28,7 @@
  * 30 Aug 20         - Base  the number of display segments on the  maximum
  *                     number of digits in the display - MT
  * 08 Aug 21         - Tidied up spelling errors in the comments - MT
+ * 20 Dec 21         - Updated display for HP67 - MT
  *
  */
 
@@ -50,7 +51,9 @@
 #define DISPLAY_COLON      0x0200
 #define DISPLAY_r          0x0044
 #define DISPLAY_c          0x004c
+#define DISPLAY_C          0x000f
 #define DISPLAY_o          0x005c
+#define DISPLAY_d          0x007c
 #define DISPLAY_P          0x0067
 #define DISPLAY_E          0x004f
 #define DISPLAY_TEST       0x01ff
