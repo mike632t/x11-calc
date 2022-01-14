@@ -23,6 +23,7 @@
  * 03 Jan 21         - Changed debug() macro so that debug code is executed
  *                     when DEBUG is defined (doesn't need to be true) - MT
  * 11 Jan 22         - Removed ROM_BANKS - MT
+ * 14 Jan 22         - Added keyboard shortcuts for 'n' and 'i' - MT
  *
  */
 
@@ -59,8 +60,8 @@ void v_init_keypad(obutton *h_button[], oswitch *h_switch[]) {
    h_switch[1] = h_switch_create(00000, "BEGIN", "END", h_alternate_font, KEYBOARD_COL_D, KEYBOARD_ROW_0, ENTER_KEY_WIDTH, SWITCH_HEIGHT, True, MID_GREY, DARK_GREY);
 
    /* Define top row of keys. */
-   h_button[0] = h_button_create(00064, 000, "n", "AMORT", "", "12\xd7", h_normal_font, h_small_font, h_alternate_font, KEYBOARD_COL_A, KEYBOARD_ROW_1, SMALL_KEY_WIDTH, KEY_HEIGHT, False, BLACK, YELLOW, MID_BLUE, BLACK);
-   h_button[1] = h_button_create(00063, 000, "i", "INT", "", "12\xf7", h_normal_font, h_small_font, h_alternate_font, KEYBOARD_COL_B, KEYBOARD_ROW_1, SMALL_KEY_WIDTH, KEY_HEIGHT, False, BLACK, YELLOW, MID_BLUE, BLACK);
+   h_button[0] = h_button_create(00064, 'n', "n", "AMORT", "", "12\xd7", h_normal_font, h_small_font, h_alternate_font, KEYBOARD_COL_A, KEYBOARD_ROW_1, SMALL_KEY_WIDTH, KEY_HEIGHT, False, BLACK, YELLOW, MID_BLUE, BLACK);
+   h_button[1] = h_button_create(00063, 'i', "i", "INT", "", "12\xf7", h_normal_font, h_small_font, h_alternate_font, KEYBOARD_COL_B, KEYBOARD_ROW_1, SMALL_KEY_WIDTH, KEY_HEIGHT, False, BLACK, YELLOW, MID_BLUE, BLACK);
    h_button[2] = h_button_create(00062, 000, "PV", "NPV", "", "CF\xb0", h_normal_font, h_small_font, h_alternate_font, KEYBOARD_COL_C, KEYBOARD_ROW_1, SMALL_KEY_WIDTH, KEY_HEIGHT, False, BLACK, YELLOW, MID_BLUE, BLACK);
    h_button[3] = h_button_create(00061, 000, "PMT", "RND", "", "CF\xb9", h_normal_font, h_small_font, h_alternate_font, KEYBOARD_COL_D, KEYBOARD_ROW_1, SMALL_KEY_WIDTH, KEY_HEIGHT, False, BLACK, YELLOW, MID_BLUE, BLACK);
    h_button[4] = h_button_create(00060, 000, "FV", "IRR", "", "N\xb9", h_normal_font, h_small_font, h_alternate_font, KEYBOARD_COL_E, KEYBOARD_ROW_1, SMALL_KEY_WIDTH, KEY_HEIGHT, False, BLACK, YELLOW, MID_BLUE, BLACK);

@@ -44,7 +44,6 @@ only be merged into the stable branch when every thing has been retested.
 ##### HP 21 - Working
 
 ##### HP 22 - Working
-* The examples on pages 65, 66 and 76 only work if END is selected.
 
 ##### HP 25 - Working
 
@@ -100,6 +99,8 @@ models 'Space' corresponds to 'SST'.
 'A' - 'E' correspond to the function keys where they exist.
 
 'f' and where applicable 'g' and 'h' correspond to the shift keys.
+
+On financial models 'n' and 'i' correspond to the matching functions.
 
 'Ctrl-Z'  Quits,  and  'Ctrl-C' does a reset.  For models  with  continuous
 memory 'Ctrl-Z' saves the current register contents, and 'Ctrl-C'  restores

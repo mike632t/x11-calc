@@ -27,6 +27,7 @@
  * 03 Jan 22         - Changed debug() macro so that debug code is executed
  *                     when DEBUG is defined (doesn't need to be true) - MT
  * 11 Jan 22         - Removed ROM_BANKS - MT
+ * 14 Jan 22         - Added keyboard shortcuts for 'n' and 'i' - MT
  *
  */
 
@@ -62,8 +63,8 @@ void v_init_keypad(obutton *h_button[], oswitch *h_switch[]) {
    h_switch[1] = h_switch_create(00000, "BEGIN", "END", h_alternate_font, KEYBOARD_COL_D, KEYBOARD_ROW_0, ENTER_KEY_WIDTH, SWITCH_HEIGHT, True, MID_GREY, DARK_GREY);
 
    /* Define top row of keys. */
-   h_button[0] = h_button_create(00263, 000, "n", "12\xd7", "", "", h_normal_font, h_small_font, h_alternate_font, KEYBOARD_COL_A, KEYBOARD_ROW_1, SMALL_KEY_WIDTH, KEY_HEIGHT, False, BLACK, YELLOW, BLACK, BLACK);
-   h_button[1] = h_button_create(00262, 000, "i", "12\xf7", "", "", h_normal_font, h_small_font, h_alternate_font, KEYBOARD_COL_B, KEYBOARD_ROW_1, SMALL_KEY_WIDTH, KEY_HEIGHT, False, BLACK, YELLOW, BLACK, BLACK);
+   h_button[0] = h_button_create(00263, 'n', "n", "12\xd7", "", "", h_normal_font, h_small_font, h_alternate_font, KEYBOARD_COL_A, KEYBOARD_ROW_1, SMALL_KEY_WIDTH, KEY_HEIGHT, False, BLACK, YELLOW, BLACK, BLACK);
+   h_button[1] = h_button_create(00262, 'i', "i", "12\xf7", "", "", h_normal_font, h_small_font, h_alternate_font, KEYBOARD_COL_B, KEYBOARD_ROW_1, SMALL_KEY_WIDTH, KEY_HEIGHT, False, BLACK, YELLOW, BLACK, BLACK);
    h_button[2] = h_button_create(00261, 000, "PMT", "ACC", "", "", h_normal_font, h_small_font, h_alternate_font, KEYBOARD_COL_C, KEYBOARD_ROW_1, SMALL_KEY_WIDTH, KEY_HEIGHT, False, BLACK, YELLOW, BLACK, BLACK);
    h_button[3] = h_button_create(00260, 000, "PV", "INT", "", "", h_normal_font, h_small_font, h_alternate_font, KEYBOARD_COL_D, KEYBOARD_ROW_1, SMALL_KEY_WIDTH, KEY_HEIGHT, False, BLACK, YELLOW, BLACK, BLACK);
    h_button[4] = h_button_create(00264, 000, "FV", "BAL", "", "", h_normal_font, h_small_font, h_alternate_font, KEYBOARD_COL_E, KEYBOARD_ROW_1, SMALL_KEY_WIDTH, KEY_HEIGHT, False, BLACK, YELLOW, BLACK, BLACK);
