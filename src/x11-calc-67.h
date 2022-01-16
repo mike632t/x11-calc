@@ -24,6 +24,7 @@
  *                     type definition - MT
  * 24 Dec 21         - Standard key width now defined as KEY WIDTH - MT
  * 11 Jan 22         - Removed ROM_BANKS - MT
+ * 15 jan 22         - Corrected MEMORY_SIZE - MT
  *
  */
 
@@ -50,7 +51,7 @@
 #define SWITCH_HEIGHT   10 * SCALE_HEIGHT
 
 #define ROM_SIZE        020000
-#define MEMORY_SIZE     72
+#define MEMORY_SIZE     64
 #define CONTINIOUS
 
 int i_rom [ROM_SIZE];
