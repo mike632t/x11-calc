@@ -19,13 +19,9 @@ Should compile without modification on Linux, VAX/VMS, and Tru64 Unix.
 
 ![HP35](./img/x11-calc-35.png) ![HP80](./img/x11-calc-80.png) ![HP45](./img/x11-calc-45.png)
 
-Adding new simulators can introduce regression bugs in the existing code so
-the code has been split into two branches stable and unstable, changes will
-only be merged into the stable branch when every thing has been retested.
-
 ### Latest News
 
-12/01 - Most bugs are now fixed.
+16/01 - Updated stable branch.
 
 10/01 - Split code into two branches, stable and unstable.
 
@@ -60,17 +56,9 @@ only be merged into the stable branch when every thing has been retested.
 ##### HP 34 - Working
 
 ##### HP 37 - Completed
-<<<<<<< HEAD
-* Fails self test
-
-##### HP 38 - Working
-
-##### HP 67 - Work in progress
-=======
 * Fails self test.
 
 ##### HP 38 - Completed
->>>>>>> unstable
 
 ##### HP 67 - Not working
 * Cannot read or write to magnetic cards.
@@ -160,12 +148,8 @@ should be commented out as shown.
     #dtoverlay=vc4-fkms-v3d
     #dtoverlay=vc4-kms-v3d
 
-<<<<<<< HEAD
-HP32 hangs after self test.
-=======
 HP67 is unable to read or write to magnetic cards.
 
->>>>>>> unstable
 
 ### Tested
 
