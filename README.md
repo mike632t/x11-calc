@@ -60,9 +60,17 @@ only be merged into the stable branch when every thing has been retested.
 ##### HP 34 - Working
 
 ##### HP 37 - Completed
+<<<<<<< HEAD
+* Fails self test
+
+##### HP 38 - Working
+
+##### HP 67 - Work in progress
+=======
 * Fails self test.
 
 ##### HP 38 - Completed
+>>>>>>> unstable
 
 ##### HP 67 - Not working
 * Cannot read or write to magnetic cards.
@@ -152,8 +160,12 @@ should be commented out as shown.
     #dtoverlay=vc4-fkms-v3d
     #dtoverlay=vc4-kms-v3d
 
+<<<<<<< HEAD
+HP32 hangs after self test.
+=======
 HP67 is unable to read or write to magnetic cards.
 
+>>>>>>> unstable
 
 ### Tested
 
