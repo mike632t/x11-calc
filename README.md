@@ -60,7 +60,7 @@ Should compile without modification on Linux, VAX/VMS, and Tru64 Unix.
 
 ##### HP 38 - Completed
 
-##### HP 67 - Not working
+##### HP 67 - Working
 * Cannot read or write to magnetic cards.
 * Has continuous memory.
 
