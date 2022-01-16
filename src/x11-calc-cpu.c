@@ -695,7 +695,7 @@ oprocessor *h_processor_create(int *h_rom) /* Create a new processor 'object' */
 
 static void v_op_inc_p(oprocessor *h_processor) /* Increment p register */
 {
-#if defined(HP31) || defined(HP32) || defined(HP33) || defined(HP34) || defined(HP37) || defined(HP38) | defined(HP67)
+#if defined(HP31) || defined(HP32) || defined(HP33) || defined(HP34) || defined(HP37) || defined(HP38) || defined(HP67)
    if (h_processor->p == REG_SIZE - 1)
       h_processor->p = 0;
    else
