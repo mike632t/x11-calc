@@ -274,6 +274,9 @@
  *                   - Program counter wraps around to the start of the ROM
  *                     in the Classic series, but wraps around to the start
  *                     of the current bank in later models - MT
+ * 16 Jan 21         - The behaviour of 'p + 1 -> p' on the HP67 is not the
+ *                     same as the woodstock series and it actually appears
+ *                     to match the later spice series - MT
  *
  */
 
@@ -692,7 +695,7 @@ oprocessor *h_processor_create(int *h_rom) /* Create a new processor 'object' */
 
 static void v_op_inc_p(oprocessor *h_processor) /* Increment p register */
 {
-#if defined(HP31) || defined(HP32) || defined(HP33) || defined(HP34) || defined(HP37) || defined(HP38)
+#if defined(HP31) || defined(HP32) || defined(HP33) || defined(HP34) || defined(HP37) || defined(HP38) | defined(HP67)
    if (h_processor->p == REG_SIZE - 1)
       h_processor->p = 0;
    else
@@ -902,7 +905,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                      if (i_addr < MEMORY_SIZE)
                         h_processor->addr = i_addr;
                      else {
-                        h_processor->addr = MEMORY_SIZE - 1; /** Print warning ??? */
+                        h_processor->addr = MEMORY_SIZE - 1;
                      }
                   }
                   break;
@@ -1469,7 +1472,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                         h_processor->addr = i_addr;
                      else
                      {
-                        h_processor->addr = MEMORY_SIZE - 1; /** Print warning ? */
+                        h_processor->addr = MEMORY_SIZE - 1;
                      }
                   }
                   break;
