@@ -27,6 +27,7 @@
  * 03 Jan 21         - Changed debug() macro so that debug code is executed
  *                     when DEBUG is defined (doesn't need to be true) - MT
  * 11 Jan 22         - Removed ROM_BANKS - MT
+ * 15 Jan 22         - Changed 'PSE' to 'PAUSE' - MT
  *
  */
 
@@ -155,7 +156,7 @@ void v_init_keypad(obutton *h_button[], oswitch *h_switch[]) {
    h_button[i_count++] = h_button_create(00143, '*', "\xd7", "X<0", "X\x1a\x59", "F?", h_large_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, GREEN, YELLOW, MID_BLUE, BLACK);
    i_left += (KEY_WIDTH + 2 * KEY_GAP + 1);
    i_width = KEY_NUMERIC;
-   h_button[i_count++] = h_button_create(00142, '1', "1", "-R", "-P", "PSE", h_large_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, LIGHT_GRAY, YELLOW, MID_BLUE, BLACK);
+   h_button[i_count++] = h_button_create(00142, '1', "1", "-R", "-P", "PAUSE", h_large_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, LIGHT_GRAY, YELLOW, MID_BLUE, BLACK);
    i_left += (KEY_NUMERIC + 2 * KEY_GAP + 1);
    h_button[i_count++] = h_button_create(00141, '2', "2", "-D", "-R", "\x1c", h_large_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, LIGHT_GRAY, YELLOW, MID_BLUE, BLACK);
    i_left += (KEY_NUMERIC + 2 * KEY_GAP + 1);
