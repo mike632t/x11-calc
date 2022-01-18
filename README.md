@@ -1,6 +1,8 @@
 ## x11-calc - Another RPN (Reverse Polish) calculator.
 
-Written in C using just X11.
+Simulators for the HP 35, HP 80, HP 45, HP 70, HP 21, HP 22, HP 25C, HP 27,
+HP 29C, HP 31E, HP 32E, HP 33C, HP 34C, HP 37E, HP 38C and HP 67 written in
+C using only X11.
 
 Use  of any language extensions or non standard language features has  been
 avoided in order to try to make the code as portable as possible.
@@ -89,14 +91,13 @@ The following keyboard shortcuts should work on Linux:
 '0' - '9', '+'. '-'. '*'. '/' and 'Enter' should do what you expect them to
 (when using numeric key pad you need to use numlock as usual).
 
-'Esc' or 'Backspace' is 'Clx', 'c' is CHS, 'e' is 'EEX' and on programmable
-models 'Space' corresponds to 'SST'.
-
-'A' - 'E' correspond to the function keys where they exist.
-
 'f' and where applicable 'g' and 'h' correspond to the shift keys.
 
-On financial models 'n' and 'i' correspond to the matching functions.
+'Esc' or 'Backspace' corresponds to 'Clx', 'c' to CHS, 'e' to 'EEX', and on
+financial models 'n' and 'i' correspond to 'n' and 'i' if not shifted.
+
+On programmable models 'A' - 'E' correspond to the function keys where they
+exist and 'Space' to 'SST' if not shifted
 
 'Ctrl-Z'  Quits,  and  'Ctrl-C' does a reset.  For models  with  continuous
 memory 'Ctrl-Z' saves the current register contents, and 'Ctrl-C'  restores
@@ -148,7 +149,9 @@ should be commented out as shown.
     #dtoverlay=vc4-fkms-v3d
     #dtoverlay=vc4-kms-v3d
 
-HP67 is unable to read or write to magnetic cards.
+HP 67 is unable to read or write to magnetic cards.
+
+HP 37E fails self test.
 
 
 ### Tested
