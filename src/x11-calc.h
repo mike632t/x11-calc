@@ -55,10 +55,11 @@
 
 #if defined (HP35) || defined (HP80) || defined (HP45) || defined (HP70) || defined(HP55) || defined(HP67)
 #define SCALE_WIDTH     1.15
+#define SCALE_HEIGHT    1
 #else
 #define SCALE_WIDTH     1
-#endif
 #define SCALE_HEIGHT    1
+#endif
 
 /** #define __TIME__     "00:00:00" /* Release only */
 
