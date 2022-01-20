@@ -71,8 +71,7 @@ Should compile without modification on Linux, VAX/VMS, and Tru64 Unix.
 To  build the simulator on Linux check that you have all the  prerequisites
 installed  then  download the source code from github and unzip it  (a  new
 folder  will  be created to automatically).  Then change directory  to  the
-new  folder run 'make all' on linux or '@make all' on VMS to build all  the
-simulators.
+new  folder run 'make all' build all the simulators.
 
 e.g:
 
