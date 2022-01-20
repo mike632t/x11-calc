@@ -153,7 +153,7 @@ HP 37E fails self test.
 
 #### VMS Specific Issues
 
-Colour palette assumes a black and whit display.
+Colour palette assumes a black and white display.
 
 Not all text is visible due to the limited colour palette and the DEC fonts
 are missing some characters (for example the Pi symbol).
