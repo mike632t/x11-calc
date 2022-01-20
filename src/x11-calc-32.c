@@ -64,8 +64,6 @@
 
 oregister o_mem[MEMORY_SIZE];
 
-int i_rom[ROM_SIZE];
-
 void v_init_keypad(obutton *h_button[], oswitch *h_switch[]) {
 
    /* Define the switches. */
