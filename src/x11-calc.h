@@ -48,6 +48,7 @@
  * 05 Jan 22         - Added HP 70 - MT
  * 07 Jan 22         - Changed HP25 window title back to HP25C - MT
  *                   - Added HP70 - MT
+ * 20 Jan 22         - Model number now defined in make script for VMS - MT
  *
  * TO DO :           -
  */
@@ -64,16 +65,10 @@
 /** #define __TIME__     "00:00:00" /* Release only */
 
 #if defined(vms)
-
-#define FILENAME     "x11-calc-33"
-#define TITLE        "RPN calc 33C"
-#include "x11-calc-33.h"
-
 #define COLOUR_DEPTH 1
-
 #else
-
 #define COLOUR_DEPTH 24
+#endif
 
 #if defined(HP35)
 #define FILENAME     "x11-calc-35"
@@ -154,8 +149,6 @@
 #define FILENAME     "x11-calc-38"
 #define TITLE        "RPN calc 38C"
 #include "x11-calc-38.h"
-#endif
-
 #endif
 
 void v_version(); /* Display version information */
