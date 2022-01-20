@@ -23,7 +23,7 @@ Should compile without modification on Linux, VAX/VMS, and Tru64 Unix.
 
 ### Latest News
 
-16/01 - Updated stable branch.
+20/01 - Now compiles cleanly on VAX/VMS.
 
 10/01 - Split code into two branches, stable and unstable.
 
@@ -71,7 +71,8 @@ Should compile without modification on Linux, VAX/VMS, and Tru64 Unix.
 To  build the simulator on Linux check that you have all the  prerequisites
 installed  then  download the source code from github and unzip it  (a  new
 folder  will  be created to automatically).  Then change directory  to  the
-new folder run 'make all' to build all the available simulators.
+new  folder run 'make all' on linux or '@make all' on VMS to build all  the
+simulators.
 
 e.g:
 
@@ -138,8 +139,6 @@ When in trace mode a jump to the same instruction produces no output.
 
 On UNIX/Linux a 24 bit colour display is required.
 
-VMS only supports a black and white display.
-
 Keyboard shortcuts only work on Linux.
 
 On a Raspberry Pi the display is not updated properly if either FKMS or KMS
@@ -153,6 +152,12 @@ HP 67 is unable to read or write to magnetic cards.
 
 HP 37E fails self test.
 
+#### VMS Specific Issues
+
+Colour palette assumes a black and whit display.
+
+Not all text is visible due to the limited colour palette and the DEC fonts
+are missing some characters (for example the Pi symbol).
 
 ### Tested
 
