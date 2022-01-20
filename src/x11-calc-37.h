@@ -21,6 +21,8 @@
  * 02 Dec 21   0.1   - Initial version - MT
  * 22 Dec 21         - Removed SPICE symbol - MT
  * 11 Jan 22         - Removed ROM_BANKS - MT
+ * 20 Jan 22         - Fixed compilation warnings on VAXC by defining i_rom
+ *                     as external - MT
  *
  */
 
@@ -65,6 +67,6 @@
 #define ROM_SIZE        05000
 #define MEMORY_SIZE     9
 
-int i_rom [ROM_SIZE];
+extern int i_rom [ROM_SIZE];
 
 void v_init_keypad(obutton *h_button[], oswitch *h_switch[]);

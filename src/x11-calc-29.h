@@ -31,6 +31,8 @@
  *                     which registers are persistent is not a  requirement
  *                     anymore - MT
  * 11 Jan 22         - Removed ROM_BANKS - MT
+ * 20 Jan 22         - Fixed compilation warnings on VAXC by defining i_rom
+ *                     as external - MT
  *
  */
 
@@ -76,6 +78,6 @@
 #define ROM_SIZE        010000
 #define CONTINIOUS
 
-int i_rom [ROM_SIZE];
+extern int i_rom [ROM_SIZE];
 
 void v_init_keypad(obutton *h_button[], oswitch *h_switch[]);

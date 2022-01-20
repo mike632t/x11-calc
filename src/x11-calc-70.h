@@ -21,6 +21,8 @@
  * 05 Jan 22         - Initial version - MT
  * 07 Jan 22         - Fixed number of registers - MT
  * 11 Jan 22         - Removed ROM_BANKS - MT
+ * 20 Jan 22         - Fixed compilation warnings on VAXC by defining i_rom
+ *                     as external - MT
  *
  */
 
@@ -50,6 +52,6 @@
 #define ROM_SIZE        04000
 #define MEMORY_SIZE     10
 
-int i_rom [ROM_SIZE];
+extern int i_rom [ROM_SIZE];
 
 void v_init_keypad(obutton *h_button[], oswitch *h_switch[]);
