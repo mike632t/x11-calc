@@ -7,7 +7,6 @@ C using only X11.
 ### Screenshots
 
 
-![HP35](./x11-calc-35.png) ![HP80](./x11-calc-80.png) ![HP45](./x11-calc-45.png)
 
 ![HP21](./x11-calc-21.png) ![HP22](./x11-calc-22.png) ![HP25](./x11-calc-25.png)
 
@@ -15,7 +14,7 @@ C using only X11.
 
 ![HP31](./x11-calc-31.png) ![HP32](./x11-calc-32.png) ![HP33](./x11-calc-33.png) ![HP34](./x11-calc-34.png)
 
-![HP37](./x11-calc-37.png) ![HP38](./x11-calc-38.png)
+![HP37](./x11-calc-37.png) ![HP38](./x11-calc-38.png) ![HP67](./x11-calc-67.png)
 
-![HP67](./x11-calc-67.png)
+![HP35](./x11-calc-35.png) ![HP80](./x11-calc-80.png) ![HP45](./x11-calc-45.png)  ![HP70](./x11-calc-70.png)
 
