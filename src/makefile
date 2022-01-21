@@ -38,6 +38,7 @@
 #   3 Oct 21	0.10	- Fixed issue with backup file name - MT
 #   9 Oct 21	0.11	- Moved source code and executable files into separate
 #							  folders - MT
+#  21 Jan 22         - Moved text messages to a separate file  - MT
 #
 
 MODEL		= 21
