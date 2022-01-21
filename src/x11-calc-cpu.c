@@ -277,16 +277,15 @@
  * 16 Jan 21         - The behaviour of 'p + 1 -> p' on the HP67 is not the
  *                     same as the woodstock series and it actually appears
  *                     to match the later spice series - MT
+ * 21 Jan 22         - Moved text messages to a separate file  - MT
  *
  */
 
 #define NAME           "x11-calc"
 #define VERSION        "0.9"
-#define BUILD          "0139"
+#define BUILD          "0145"
 #define DATE           "12 Jan 22"
 #define AUTHOR         "MT"
-
-#define OCTAL
 
 #include <string.h>
 #include <stdlib.h>
@@ -303,30 +302,10 @@
 
 #include "x11-calc-cpu.h"
 
+#include "x11-calc-messages.h"
+
 #include "gcc-debug.h" /* print() */
 #include "gcc-wait.h"  /* i_wait() */
-
-const char * h_msg_loading = "Loading '%s'.\n";
-const char * h_msg_saving = "Saving '%s'.\n";
-
-const char * h_err_register_alloc = "Run-time error\t: %s line : %d : Memory allocation failed!\n";
-const char * h_err_opening_file = "Unable to open '%s'.\n";
-
-#if defined(HEXADECIMAL)
-const char * h_err_unexpected_opcode = "Unexpected opcode (%03x) at %1o-%04x in %s line : %d\n";
-const char * h_err_unexpected_error = "Unexpected error at %1o-%04x in %s line : %d\n";
-const char * h_err_invalid_address = "Address (%02o) out of range at %1o-%04x in %s line : %d\n";
-const char * h_err_invalid_register = "Invalid register (REG[%d]) at %1o-%04x in %s line : %d\n";
-const char * h_msg_opcode = "%1o-%04x %04x  ";
-const char * h_msg_address = "%04x";
-# else
-const char * h_err_unexpected_opcode = "Unexpected opcode (%04o) at %1o-%04o in %s line : %d\n";
-const char * h_err_unexpected_error = "Unexpected error at %1o-%04o in %s line : %d\n";
-const char * h_err_invalid_address = "Address (%02o) out of range at %1o-%04o in %s line : %d\n";
-const char * h_err_invalid_register = "Invalid register (REG[%d]) at %1o-%04o in %s line : %d\n";
-const char * h_msg_opcode = "%1o-%04o %04o  ";
-const char * h_msg_address = "%04o";
-#endif
 
 static void v_fprint_register(FILE *h_file, oregister *h_register) /* Print the contents of a register */
 {
