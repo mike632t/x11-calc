@@ -14,7 +14,5 @@ C using only X11.
 
 ![HP34](./x11-calc-34.png) ![HP37](./x11-calc-37.png) ![HP38](./x11-calc-38.png)
 
-![HP67](./x11-calc-67.png)
-
-![HP35](./x11-calc-35.png) ![HP80](./x11-calc-80.png) ![HP45](./x11-calc-45.png)  ![HP70](./x11-calc-70.png)
+![HP67](./x11-calc-67.png) ![HP35](./x11-calc-35.png) ![HP80](./x11-calc-80.png) ![HP45](./x11-calc-45.png)  ![HP70](./x11-calc-70.png)
 
