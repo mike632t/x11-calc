@@ -79,6 +79,6 @@
 #define MEMORY_SIZE     21
 #define CONTINIOUS
 
-extern extern int i_rom [ROM_SIZE];
+extern int i_rom [ROM_SIZE];
 
 void v_init_keypad(obutton *h_button[], oswitch *h_switch[]);
