@@ -37,6 +37,7 @@
  * 03 Jan 22         - Changed debug() macro so that debug code is executed
  *                     when DEBUG is defined (doesn't need to be true) - MT
  * 11 Jan 22         - Removed ROM_BANKS - MT
+ * 23 Jan 22         - Changed the colour of the numeric keys - MT
  *
  */
 
@@ -92,28 +93,28 @@ void v_init_keypad(obutton *h_button[], oswitch *h_switch[]) {
    h_button[13] = h_button_create(00320, 033, "CLX", "", "", "CLR", h_normal_font, h_small_font, h_alternate_font, KEYBOARD_COL_E, KEYBOARD_ROW_3, SMALL_KEY_WIDTH, KEY_HEIGHT, False, BLACK, BACKGROUND, MID_BLUE, BLACK);
 
    /* Define fourth row of keys. */
-   h_button[14] = h_button_create(00144, '-', "-", "", "", "M-", h_large_font, h_small_font, h_alternate_font, KEYBOARD_COL_1, KEYBOARD_ROW_4, SMALL_KEY_WIDTH, KEY_HEIGHT, False, BEIGE, BACKGROUND, MID_BLUE, BLACK);
-   h_button[15] = h_button_create(00143, '7', "7", "", "", "", h_large_font, h_small_font, h_alternate_font, KEYBOARD_COL_2, KEYBOARD_ROW_4, NUM_KEY_WIDTH, KEY_HEIGHT, False, BEIGE, BACKGROUND, MID_BLUE, BLACK);
-   h_button[16] = h_button_create(00142, '8', "8", "", "", "", h_large_font, h_small_font, h_alternate_font, KEYBOARD_COL_3, KEYBOARD_ROW_4, NUM_KEY_WIDTH, KEY_HEIGHT, False, BEIGE, BACKGROUND, MID_BLUE, BLACK);
-   h_button[17] = h_button_create(00141, '9', "9", "", "", "", h_large_font, h_small_font, h_alternate_font, KEYBOARD_COL_4, KEYBOARD_ROW_4, NUM_KEY_WIDTH, KEY_HEIGHT, False, BEIGE, BACKGROUND, MID_BLUE, BLACK);
+   h_button[14] = h_button_create(00144, '-', "-", "", "", "M-", h_large_font, h_small_font, h_alternate_font, KEYBOARD_COL_1, KEYBOARD_ROW_4, SMALL_KEY_WIDTH, KEY_HEIGHT, False, LIGHT_GRAY, BACKGROUND, MID_BLUE, BLACK);
+   h_button[15] = h_button_create(00143, '7', "7", "", "", "", h_large_font, h_small_font, h_alternate_font, KEYBOARD_COL_2, KEYBOARD_ROW_4, NUM_KEY_WIDTH, KEY_HEIGHT, False, LIGHT_GRAY, BACKGROUND, MID_BLUE, BLACK);
+   h_button[16] = h_button_create(00142, '8', "8", "", "", "", h_large_font, h_small_font, h_alternate_font, KEYBOARD_COL_3, KEYBOARD_ROW_4, NUM_KEY_WIDTH, KEY_HEIGHT, False, LIGHT_GRAY, BACKGROUND, MID_BLUE, BLACK);
+   h_button[17] = h_button_create(00141, '9', "9", "", "", "", h_large_font, h_small_font, h_alternate_font, KEYBOARD_COL_4, KEYBOARD_ROW_4, NUM_KEY_WIDTH, KEY_HEIGHT, False, LIGHT_GRAY, BACKGROUND, MID_BLUE, BLACK);
 
    /* Define fifth row of keys. */
-   h_button[18] = h_button_create(00244, '+', "+", "", "", "M+", h_large_font, h_small_font, h_alternate_font, KEYBOARD_COL_1, KEYBOARD_ROW_5, SMALL_KEY_WIDTH, KEY_HEIGHT, False, BEIGE, BACKGROUND, MID_BLUE, BLACK);
-   h_button[19] = h_button_create(00243, '4', "4", "", "", "", h_large_font, h_small_font, h_alternate_font, KEYBOARD_COL_2, KEYBOARD_ROW_5, NUM_KEY_WIDTH, KEY_HEIGHT, False, BEIGE, BACKGROUND, MID_BLUE, BLACK);
-   h_button[20] = h_button_create(00242, '5', "5", "", "", "", h_large_font, h_small_font, h_alternate_font, KEYBOARD_COL_3, KEYBOARD_ROW_5, NUM_KEY_WIDTH, KEY_HEIGHT, False, BEIGE, BACKGROUND, MID_BLUE, BLACK);
-   h_button[21] = h_button_create(00241, '6', "6", "", "", "", h_large_font, h_small_font, h_alternate_font, KEYBOARD_COL_4, KEYBOARD_ROW_5, NUM_KEY_WIDTH, KEY_HEIGHT, False, BEIGE, BACKGROUND, MID_BLUE, BLACK);
+   h_button[18] = h_button_create(00244, '+', "+", "", "", "M+", h_large_font, h_small_font, h_alternate_font, KEYBOARD_COL_1, KEYBOARD_ROW_5, SMALL_KEY_WIDTH, KEY_HEIGHT, False, LIGHT_GRAY, BACKGROUND, MID_BLUE, BLACK);
+   h_button[19] = h_button_create(00243, '4', "4", "", "", "", h_large_font, h_small_font, h_alternate_font, KEYBOARD_COL_2, KEYBOARD_ROW_5, NUM_KEY_WIDTH, KEY_HEIGHT, False, LIGHT_GRAY, BACKGROUND, MID_BLUE, BLACK);
+   h_button[20] = h_button_create(00242, '5', "5", "", "", "", h_large_font, h_small_font, h_alternate_font, KEYBOARD_COL_3, KEYBOARD_ROW_5, NUM_KEY_WIDTH, KEY_HEIGHT, False, LIGHT_GRAY, BACKGROUND, MID_BLUE, BLACK);
+   h_button[21] = h_button_create(00241, '6', "6", "", "", "", h_large_font, h_small_font, h_alternate_font, KEYBOARD_COL_4, KEYBOARD_ROW_5, NUM_KEY_WIDTH, KEY_HEIGHT, False, LIGHT_GRAY, BACKGROUND, MID_BLUE, BLACK);
 
    /* Define sixth row of keys. */
-   h_button[22] = h_button_create(00164, '*', "\xd7", "", "", "M\xd7", h_large_font, h_small_font, h_alternate_font, KEYBOARD_COL_1, KEYBOARD_ROW_6, SMALL_KEY_WIDTH, KEY_HEIGHT, False, BEIGE, BACKGROUND, MID_BLUE, BLACK);
-   h_button[23] = h_button_create(00163, '1', "1", "",  "","", h_large_font, h_small_font, h_alternate_font, KEYBOARD_COL_2, KEYBOARD_ROW_6, NUM_KEY_WIDTH, KEY_HEIGHT, False, BEIGE, BACKGROUND, MID_BLUE, BLACK);
-   h_button[24] = h_button_create(00162, '2', "2", "", "", "", h_large_font, h_small_font, h_alternate_font, KEYBOARD_COL_3, KEYBOARD_ROW_6, NUM_KEY_WIDTH, KEY_HEIGHT, False, BEIGE, BACKGROUND, MID_BLUE, BLACK);
-   h_button[25] = h_button_create(00161, '3', "3", "", "", "", h_large_font, h_small_font, h_alternate_font, KEYBOARD_COL_4, KEYBOARD_ROW_6, NUM_KEY_WIDTH, KEY_HEIGHT, False, BEIGE, BACKGROUND, MID_BLUE, BLACK);
+   h_button[22] = h_button_create(00164, '*', "\xd7", "", "", "M\xd7", h_large_font, h_small_font, h_alternate_font, KEYBOARD_COL_1, KEYBOARD_ROW_6, SMALL_KEY_WIDTH, KEY_HEIGHT, False, LIGHT_GRAY, BACKGROUND, MID_BLUE, BLACK);
+   h_button[23] = h_button_create(00163, '1', "1", "",  "","", h_large_font, h_small_font, h_alternate_font, KEYBOARD_COL_2, KEYBOARD_ROW_6, NUM_KEY_WIDTH, KEY_HEIGHT, False, LIGHT_GRAY, BACKGROUND, MID_BLUE, BLACK);
+   h_button[24] = h_button_create(00162, '2', "2", "", "", "", h_large_font, h_small_font, h_alternate_font, KEYBOARD_COL_3, KEYBOARD_ROW_6, NUM_KEY_WIDTH, KEY_HEIGHT, False, LIGHT_GRAY, BACKGROUND, MID_BLUE, BLACK);
+   h_button[25] = h_button_create(00161, '3', "3", "", "", "", h_large_font, h_small_font, h_alternate_font, KEYBOARD_COL_4, KEYBOARD_ROW_6, NUM_KEY_WIDTH, KEY_HEIGHT, False, LIGHT_GRAY, BACKGROUND, MID_BLUE, BLACK);
 
    /* Define bottom row of keys. */
-   h_button[26] = h_button_create(00224, '/', "\xf7", "", "", "M\xf7", h_large_font, h_small_font, h_alternate_font, KEYBOARD_COL_1, KEYBOARD_ROW_7, SMALL_KEY_WIDTH, KEY_HEIGHT, False, BEIGE, BACKGROUND, MID_BLUE, BLACK);
-   h_button[27] = h_button_create(00223, '0', "0", "", "", "", h_large_font, h_small_font, h_alternate_font, KEYBOARD_COL_2, KEYBOARD_ROW_7, NUM_KEY_WIDTH, KEY_HEIGHT, False, BEIGE, YELLOW, MID_BLUE, BLACK);
-   h_button[28] = h_button_create(00222, '.', ".", "", "", "", h_large_font, h_small_font, h_alternate_font, KEYBOARD_COL_3, KEYBOARD_ROW_7, NUM_KEY_WIDTH, KEY_HEIGHT, False, BEIGE, BACKGROUND, MID_BLUE, BLACK);
-   h_button[29] = h_button_create(00221, 000, "DSP", "", "", "", h_large_font, h_small_font, h_alternate_font, KEYBOARD_COL_4, KEYBOARD_ROW_7, NUM_KEY_WIDTH, KEY_HEIGHT, False, BEIGE, BACKGROUND, MID_BLUE, BLACK);
+   h_button[26] = h_button_create(00224, '/', "\xf7", "", "", "M\xf7", h_large_font, h_small_font, h_alternate_font, KEYBOARD_COL_1, KEYBOARD_ROW_7, SMALL_KEY_WIDTH, KEY_HEIGHT, False, LIGHT_GRAY, BACKGROUND, MID_BLUE, BLACK);
+   h_button[27] = h_button_create(00223, '0', "0", "", "", "", h_large_font, h_small_font, h_alternate_font, KEYBOARD_COL_2, KEYBOARD_ROW_7, NUM_KEY_WIDTH, KEY_HEIGHT, False, LIGHT_GRAY, YELLOW, MID_BLUE, BLACK);
+   h_button[28] = h_button_create(00222, '.', ".", "", "", "", h_large_font, h_small_font, h_alternate_font, KEYBOARD_COL_3, KEYBOARD_ROW_7, NUM_KEY_WIDTH, KEY_HEIGHT, False, LIGHT_GRAY, BACKGROUND, MID_BLUE, BLACK);
+   h_button[29] = h_button_create(00221, 000, "DSP", "", "", "", h_large_font, h_small_font, h_alternate_font, KEYBOARD_COL_4, KEYBOARD_ROW_7, NUM_KEY_WIDTH, KEY_HEIGHT, False, LIGHT_GRAY, BACKGROUND, MID_BLUE, BLACK);
 }
 
 int i_rom[ROM_SIZE] = {
