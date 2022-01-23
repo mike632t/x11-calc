@@ -188,6 +188,7 @@
  *                   - Checks  for breakpoints and instruction traps at the
  *                     same time - MT
  * 21 Jan 22   0.1   - Moved text messages to a separate file  - MT
+ * 23 Jan 22         - Removed unwanted debug code - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Allow VMS users to set breakpoints?
@@ -672,7 +673,6 @@ int main(int argc, char *argv[])
                      i_button_draw(x_display, x_application_window, i_screen, h_pressed);
                      h_processor->code = h_pressed->index;
                      h_processor->keypressed = True;
-                     debug(fprintf(stderr, "Button pressed - keycode(%.2X).\n", h_pressed->index));
                      break;
                   }
                }
@@ -692,14 +692,12 @@ int main(int argc, char *argv[])
                         h_processor->enabled = False; /* Disable the processor */
                         i_ticks = DELAY; /* Set count down */
                      }
-                     debug(fprintf(stderr, "Switch pressed (%s).\n", h_switch[0]->state ? "On" : "Off"));
                   }
                   if (!(h_switch_pressed(h_switch[1], x_event.xbutton.x, x_event.xbutton.y) == NULL))
                   {
                      h_switch[1]->state = !(h_switch[1]->state); /* Toggle switch */
                      i_switch_draw(x_display, x_application_window, i_screen, h_switch[1]);
                      h_processor->select = h_switch[1]->state;
-                     debug(fprintf(stderr, "Switch pressed (%s).\n", h_switch[1]->state ? "On" : "Off"));
                   }
                }
             }
@@ -712,18 +710,10 @@ int main(int argc, char *argv[])
                   h_pressed->state = False;
                   i_button_draw(x_display, x_application_window, i_screen, h_pressed);
                   h_processor->keypressed = False; /* Don't clear the status bit here!! */
-                  debug(fprintf(stderr, "Button released - keycode(%.2X).\n", h_pressed->index));
                }
-               if (h_pressed == NULL)
-               { /* It wasn't a button that was released check the switches */
+               if (h_pressed == NULL) /* It wasn't a button that was released so check the switches */
                   if (!(h_switch_pressed(h_switch[0], x_event.xbutton.x, x_event.xbutton.y) == NULL))
-                  {
                      i_ticks = -1;
-                     debug(fprintf(stderr, "Switch released (%s).\n", h_switch[0]->state ? "On" : "Off"));
-                  }
-                  if (!(h_switch_pressed(h_switch[1], x_event.xbutton.x, x_event.xbutton.y) == NULL))
-                     debug(fprintf(stderr, "Switch released (%s).\n", h_switch[1]->state ? "On" : "Off"));
-               }
             }
             break;
          case Expose : /* Draw or redraw the window */

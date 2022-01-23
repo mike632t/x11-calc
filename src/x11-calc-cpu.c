@@ -278,6 +278,7 @@
  *                     same as the woodstock series and it actually appears
  *                     to match the later spice series - MT
  * 21 Jan 22         - Moved text messages to a separate file  - MT
+ * 23 Jan 22         - Removed unwanted debug code - MT
  *
  */
 
@@ -560,8 +561,8 @@ void v_processor_save(oprocessor *h_processor) /* Save processor state */
    char *s_pathname;
    int i_count, i_counter;
 
-   if (h_processor != NULL)
-   { /* Check processor defined and continuous memory enabled */
+   if (h_processor != NULL) /* Check processor defined */
+   {
       if (s_dir == NULL) s_dir = ""; /* Use current folder if HOME not defined */
 #if defined(unix)
       s_pathname = malloc((strlen(s_dir) + strlen(s_filename) +
@@ -1063,7 +1064,6 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             s_field = "p";
             if (h_processor->p >= REG_SIZE)
             {
-               debug(v_fprint_registers(stderr, h_processor));
                v_error(h_err_unexpected_error, (h_processor->pc >> 12), (h_processor->pc & 0xfff), __FILE__, __LINE__);
                h_processor->last = 0;
             }
