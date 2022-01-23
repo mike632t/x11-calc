@@ -279,10 +279,11 @@
  *                     to match the later spice series - MT
  * 21 Jan 22         - Moved text messages to a separate file  - MT
  * 23 Jan 22         - Removed unwanted debug code - MT
+ *                   - Updated 'select rom' - MT
  *
  */
 
-#define NAME           "x11-calc"
+#define NAME           "x11-calc-cpu"
 #define VERSION        "0.9"
 #define BUILD          "0145"
 #define DATE           "12 Jan 22"
@@ -1395,7 +1396,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                break;
             case 02: /* Op-Codes matching x xxx 100 000 */ /* select rom */
                if (h_processor->trace) fprintf(stdout, "select rom %02o", i_opcode >> 6);
-               h_processor->pc = (i_opcode >> 6) * 256 + (h_processor->pc % 256);
+               h_processor->pc = ((i_opcode >> 6) << 8) + ((h_processor->pc) & 0xff);
                break;
             case 03: /* Op-Codes matching x xxx 110 000 */
                switch (i_opcode)
