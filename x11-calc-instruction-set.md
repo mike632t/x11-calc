@@ -1,8 +1,47 @@
 # Registers
 
+## Program Counter
+
+### Classic
+
+Logically  a  13-bit counter comprised of a bank number, a group  number, a
+3-bit ROM number and an 8-bit address.
+
+     12  11  10   9   8   7   6   5   4   3   2   1   0
+    +---+---+---+---+---+---+---+---+---+---+---+---+---+
+    | b | g | r | r | r | n | n | n | n | n | n | n | n |
+    +---+---+---+---+---+---+---+---+---+---+---+---+---+
+
+The program counter is incremented after the current instruction is fetched
+from memory but before it is executed.
+
+Incrementing the program counter only changes the 8-bit address field which
+is reset to zero if it overflows.
+
+Selecting ROM number 0 resets the bank number to zero.
+
+### Woodstock and later
+
+Logically a 13-bit counter comprised of a bank number, a 4-bit ROM  number,
+and an 8-bit address.
+
+     12  11  10   9   8   7   6   5   4   3   2   1   0
+    +---+---+---+---+---+---+---+---+---+---+---+---+---+
+    | b | r | r | r | r | a | a | a | a | a | a | a | a |
+    +---+---+---+---+---+---+---+---+---+---+---+---+---+
+
+The program counter is incremented after the current instruction is fetched
+from memory but before it is executed.
+
+Incrementing  the  program counter adds one to the combined ROM number  and
+address fields and is reset to zero if it overflows or the end or memory is
+reached.
+
+Selecting ROM number 0 resets the bank number to zero.
+
 ## Arithmetic Registers
 
-     13   12  11  10  9   8   7   6   5   4   3   2   1   0
+     13  12  11  10   9   8   7   6   5   4   3   2   1   0
     +---+---+---+---+---+---+---+---+---+---+---+---+---+---+
     | s | m | m | m | m | m | m | m | m | m | m | s | e | e |
     +---+---+---+---+---+---+---+---+---+---+---+---+---+---+
