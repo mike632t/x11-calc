@@ -185,7 +185,7 @@ The following packages are required to build and/or run the simulator.
 ### Problem Reports
 
 If you find problems or have suggestions relating to these simulators, then
-please create a new issue (https://github.com/mike632t/x11-calc/issues).
+please create a new [issue](https://github.com/mike632t/x11-calc/issues).
 
 Your problem report should contain:
 
