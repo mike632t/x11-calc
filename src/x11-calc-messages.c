@@ -24,6 +24,7 @@
  *                     into german and spanish - MT
  *                   - Reduced the number of digits used to show 12-bit hex
  *                     values to 3 - MT
+ *                   - Removed special characters - MT
  *
  * To Do             - Fix errors in translation!
  *
@@ -44,15 +45,16 @@ const char * h_msg_opcode = "%1o-%04o %04o  ";
 const char * h_msg_address = "%04o";
 #endif
 
+
 #if defined(LANG_es)
 const char * h_msg_loading = "Cargando de '%s'.\n";
 const char * h_msg_saving = "Guardando de '%s'.\n";
 
-const char * h_err_register_alloc = "Error en tiempo de ejecucion\t: %s linea: %d: Fallo la asignación de memoria!\n";
+const char * h_err_register_alloc = "Error en tiempo de ejecucion\t: %s linea: %d: Fallo la asignacion de memoria!\n";
 const char * h_err_opening_file = "No se puede abrir '%s'.\n";
 
 const char * h_err_display = "No se puede conectar al servidor X '%s'.\n";
-const char * h_err_display_properties = "No se pueden obtener las propiedades de visualización.\n";
+const char * h_err_display_properties = "No se pueden obtener las propiedades de visualizacion.\n";
 const char * h_err_display_colour = "Requiere una pantalla a color de %d-bits.\n";
 const char * h_err_font = "No se puede cargar la fuente '%s'.\n";
 
@@ -72,7 +74,7 @@ const char * h_err_invalid_register = "Registro inválido (REG[%d]) en %1o-%04o 
 const char * c_msg_usage = "Uso: %s [OPCION]... [ARCHIVO]\n\
 Una simulación de calculadora RPN para X11.\n\n\
   -b  ADDR                 establecer punto de ruptura (octal)\n\
-  -i, OPCODE               establecer trampa de instrucción (octal)\n\
+  -i, OPCODE               establecer trampa de instruccion (octal)\n\
   -s,                      single step\n\
   -t,                      trace execution\n\
       --cursor             mostrar cursor (predeterminado)\n\
