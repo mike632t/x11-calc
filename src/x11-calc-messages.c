@@ -3,7 +3,7 @@
  *
  * Copyright(C) 2019 - MT
  *
- * Text messages.
+ * With thanks to Alejandro GARZA for providing the spanish translation.
  *
  * This  program is free software: you can redistribute it and/or modify it
  * under  the terms of the GNU General Public License as published  by  the
@@ -25,12 +25,13 @@
  *                   - Reduced the number of digits used to show 12-bit hex
  *                     values to 3 - MT
  *                   - Removed special characters - MT
+ * 29 Jan 22         - Updated spanish translation - MT
  *
  * To Do             - Fix errors in translation!
  *
  */
 
-#define HEXADECIMAL
+#define OCTAL
 
 const char * h_msg_licence = "Copyright(C) %s %s\n\
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\n\
@@ -47,22 +48,22 @@ const char * h_msg_address = "%04o";
 
 
 #if defined(LANG_es)
-const char * h_msg_loading = "Cargando de '%s'.\n";
-const char * h_msg_saving = "Guardando de '%s'.\n";
+const char * h_msg_loading = "Cargando '%s'.\n";
+const char * h_msg_saving = "Guardando '%s'.\n";
 
-const char * h_err_register_alloc = "Error en tiempo de ejecucion\t: %s linea: %d: Fallo la asignacion de memoria!\n";
+const char * h_err_register_alloc = "Error de ejecucion\t: %s linea: %d: iFallo la asignacion de memoria!\n";
 const char * h_err_opening_file = "No se puede abrir '%s'.\n";
 
-const char * h_err_display = "No se puede conectar al servidor X '%s'.\n";
-const char * h_err_display_properties = "No se pueden obtener las propiedades de visualizacion.\n";
-const char * h_err_display_colour = "Requiere una pantalla a color de %d-bits.\n";
-const char * h_err_font = "No se puede cargar la fuente '%s'.\n";
+const char * h_err_display = "No se pudo conectar al servidor X '%s'.\n";
+const char * h_err_display_properties = "No se pudo obtener las propiedades del monitor.\n";
+const char * h_err_display_colour = "Requiere un monitor de %d bits de color.\n";
+const char * h_err_font = "No se pudo cargar la fuente '%s'.\n";
 
 #if defined(HEXADECIMAL)
 const char * h_err_unexpected_opcode = "Codigo de operación inesperado (%03x) en %1x-%03x en %s en la línea : %d\n";
 const char * h_err_unexpected_error = "Error inesperado en %1x-%03x en %s: en la línea: %d\n";
 const char * h_err_invalid_address = "Direccion (%02o) fuera de rango en %1x-%03x en %s en la línea : %d\n";
-const char * h_err_invalid_register = "Registro inválido (REG[%d]) en %1x-%03x en %s en la línea : %d\n";
+const char * h_err_invalid_register = "Registro invalido (REG[%d]) en %1x-%03x en %s en la línea : %d\n";
 # else
 const char * h_err_unexpected_opcode = "Codigo de operación inesperado (%04o) en %1o-%04o en %s en la línea : %d\n";
 const char * h_err_unexpected_error = "Error inesperado en %1o-%04o en %s: en la línea: %d\n";
@@ -72,30 +73,30 @@ const char * h_err_invalid_register = "Registro inválido (REG[%d]) en %1o-%04o 
 
 #if defined(unix)
 const char * c_msg_usage = "Uso: %s [OPCION]... [ARCHIVO]\n\
-Una simulación de calculadora RPN para X11.\n\n\
-  -b  ADDR                 establecer punto de ruptura (octal)\n\
-  -i, OPCODE               establecer trampa de instruccion (octal)\n\
-  -s,                      single step\n\
-  -t,                      trace execution\n\
-      --cursor             mostrar cursor (predeterminado)\n\
-      --no-cursor          cursor oculto\n\
+Simularor de calculadora RPN para X11.\n\n\
+  -b  ADDR                 punto de interrupcion (octal)\n\
+  -i, OPCODE               instruccion de trampa (octal)\n\
+  -s,                      un paso\n\
+  -t,                      seguimiento de la ejecucion\n\
+      --cursor             mostrar cursor (default)\n\
+      --no-cursor          ocultar cursor\n\
       --help               mostrar esta ayuda y salir\n\
-      --version            mostrar información de la versión y salir\n\n";
-const char * h_err_invalid_operand = "operando(s) inválido(s)\n";
+      --version            mostrar version y salir\n\n";
+const char * h_err_invalid_operand = "operando(s) inválido\n";
 const char * h_err_invalid_option = "opcion invalida -- '%c'\n";
 const char * h_err_unrecognised_option = "opcion no reconocida '%s'\n";
 const char * h_err_invalid_number = "no es un numero octal -- '%s' \n";
 const char * h_err_address_range = "fuera del rango  -- '%s' \n";
 const char * h_err_missing_argument = "opcion requiere un argumento -- '%s'\n";
-const char * h_err_invalid_argument = "argumento esperado no opcion -- '%c' \n";
+const char * h_err_invalid_argument = "argumento esperado no es -- '%c' \n";
 #else
 const char * c_msg_usage = "Uso: %s [OPCION]... [ARCHIVO]\n\
 Una simulación de calculadora RPN para X11.\n\n\
-  /cursor                  mostrar cursor (predeterminado)\n\
-  /nocursor                cursor oculto\n\
-  /step                    single step\n\
-  /trace                   trace execution\n\
-  /version                 mostrar información de la versión y salir\n\
+  /cursor                  mostrar cursor (default)\n\
+  /nocursor                ocultar cursor\n\
+  /step                    un paso\n\
+  /trace                   seguimiento de la ejecucion\n\
+  /version                 mostrar version y salir\n\
   /?, /help                mostrar esta ayuda y salir\n";
 
 const char * h_err_invalid_operand = "parametro(s) invalido(s)\n";
