@@ -31,7 +31,7 @@
 #define DATE           "11 Jan 22"
 #define AUTHOR         "MT"
 
-#define RED_DOT
+/** #define RED_DOT */
 
 #include <stdarg.h>    /* strlen(), etc. */
 #include <stdio.h>     /* fprintf(), etc. */

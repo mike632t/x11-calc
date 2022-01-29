@@ -33,6 +33,7 @@
  * 11 Jan 22         - Removed ROM_BANKS - MT
  * 20 Jan 22         - Fixed compilation warnings on VAXC by defining i_rom
  *                     as external - MT
+ * 29 Jan 22         - Added an optional bezel to the display - MT
  *
  */
 
@@ -43,8 +44,18 @@
 
 #define DIGITS          12
 
-#define DISPLAY_LEFT    0
-#define DISPLAY_TOP     4 * SCALE_HEIGHT
+#define DIGIT_COLOUR       RED
+#define DIGIT_BACKGROUND   DARK_RED
+#define DISPLAY_BACKGROUND RED_BACKGROUND
+#define BEZEL_COLOUR       LIGHT_GREY
+
+#define BEZEL_LEFT      0 * SCALE_WIDTH
+#define BEZEL_TOP       4 * SCALE_HEIGHT
+#define BEZEL_WIDTH     200 * SCALE_WIDTH
+#define BEZEL_HEIGHT    61 * SCALE_HEIGHT
+
+#define DISPLAY_LEFT    0 * SCALE_WIDTH
+#define DISPLAY_TOP     0 * SCALE_HEIGHT
 #define DISPLAY_WIDTH   200 * SCALE_WIDTH
 #define DISPLAY_HEIGHT  61 * SCALE_HEIGHT
 

@@ -29,6 +29,7 @@
  *                     number of digits in the display - MT
  * 08 Aug 21         - Tidied up spelling errors in the comments - MT
  * 20 Dec 21         - Updated display for HP67 - MT
+ * 29 Jan 22         - Added an optional bezel to the display - MT
  *
  */
 
@@ -65,14 +66,20 @@ typedef struct { /* Calculator display structure. */
    int top;
    int width;
    int height;
+   int display_left;
+   int display_top;
+   int display_width;
+   int display_height;
    unsigned int foreground;
    unsigned int background;
+   unsigned int fill;
    unsigned int border;
 } odisplay;
 
 odisplay *h_display_create(int i_index,
    int i_left, int i_top, int i_width, int i_height,
-   unsigned int i_foreground, unsigned int i_background, unsigned int i_border);
+   int i_display_left, int i_display_top, int i_display_width, int i_display_height,
+   unsigned int i_foreground, unsigned int i_background, unsigned int i_fill, unsigned int i_border);
 
 int i_display_draw(Display* x_display, int x_application_window, int i_screen, odisplay *h_display);
 

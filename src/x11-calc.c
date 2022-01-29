@@ -189,6 +189,8 @@
  *                     same time - MT
  * 21 Jan 22   0.1   - Moved text messages to a separate file  - MT
  * 23 Jan 22         - Removed unwanted debug code - MT
+ * 29 Jan 22         - Added an optional bezel to the display, not that you
+ *                     will see it yet - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Allow VMS users to set breakpoints?
@@ -200,8 +202,8 @@
 
 #define NAME           "x11-calc"
 #define VERSION        "0.8"
-#define BUILD          "0091"
-#define DATE           "21 Jan 22"
+#define BUILD          "0092"
+#define DATE           "29 Jan 22"
 #define AUTHOR         "MT"
 
 #define INTERVAL 25    /* Number of ticks to execute before updating the display */
@@ -534,7 +536,9 @@ int main(int argc, char *argv[])
 
    v_init_keypad(h_button, h_switch); /* Create buttons */
 
-   h_display = h_display_create(0, DISPLAY_LEFT, DISPLAY_TOP, DISPLAY_WIDTH, DISPLAY_HEIGHT, RED, DARK_RED, RED_BACKGROUND); /* Create display */
+   h_display = h_display_create(0, BEZEL_LEFT, BEZEL_TOP, BEZEL_WIDTH, BEZEL_HEIGHT,
+      DISPLAY_LEFT, DISPLAY_TOP, DISPLAY_WIDTH, DISPLAY_HEIGHT, DIGIT_COLOUR, DIGIT_BACKGROUND,
+      DISPLAY_BACKGROUND, BEZEL_COLOUR); /* Create display */
 
 #if defined(linux)
    h_keyboard = h_keyboard_create(x_display); /* Only works with Linux */

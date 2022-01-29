@@ -58,12 +58,13 @@
  * 22 Dec 21         - Uses model numbers for conditional compilation - MT
  * 03 Jan 21         - Changed debug() macro so that debug code is executed
  *                     when DEBUG is defined (doesn't need to be true) - MT
+ * 29 Jan 22         - Added an optional bezel to the display - MT
  *
  */
 
 #define VERSION        "0.1"
-#define BUILD          "0019"
-#define DATE           "21 Dec 21"
+#define BUILD          "0020"
+#define DATE           "29 Jan 22"
 #define AUTHOR         "MT"
 
 #include <stdlib.h>    /* malloc(), etc. */
@@ -95,8 +96,9 @@
  *
  */
 
-odisplay *h_display_create(int i_index, int i_left, int i_top, int i_width,
-   int i_height, unsigned int i_foreground, unsigned int i_background, unsigned int i_border){
+odisplay *h_display_create(int i_index, int i_left, int i_top, int i_width, int i_height,
+   int i_display_left, int i_display_top, int i_display_width, int i_display_height,
+   unsigned int i_foreground, unsigned int i_background, unsigned int i_fill, unsigned int i_border){
 
    odisplay *h_display; /* Pointer to display. */
    int i_count;
@@ -108,17 +110,24 @@ odisplay *h_display_create(int i_index, int i_left, int i_top, int i_width,
    h_display->top = i_top;
    h_display->width = i_width;
    h_display->height = i_height;
+   h_display->display_left = i_display_left;
+   h_display->display_top = i_display_top;
+   h_display->display_width = i_display_width;
+   h_display->display_height = i_display_height;
+
 #if defined(HP67) || defined (HP35) || defined (HP80) || defined (HP45) || defined (HP70) || defined(HP55)
    for (i_count = 0; i_count < DIGITS; i_count++) {
-      h_display->segment[i_count] = h_segment_create(0, 0,  ((4 + 13 * i_count) * SCALE_WIDTH), 21 * SCALE_HEIGHT, 11 * SCALE_WIDTH, 33 * SCALE_HEIGHT, i_foreground, i_background); /* 15 Digit display */
+      //h_display->segment[i_count] = h_segment_create(0, 0, i_display_left + ((4 + 13 * i_count) * SCALE_WIDTH), i_display_top + (21 * SCALE_HEIGHT), 11 * SCALE_WIDTH, 33 * SCALE_HEIGHT, i_foreground, i_background); /* 15 Digit display */
+      h_display->segment[i_count] = h_segment_create(0, 0, i_left + i_display_left + ((4 + 13 * i_count) * SCALE_WIDTH), i_top + i_display_top + (i_display_height - 33 * SCALE_HEIGHT) / 2, 11 * SCALE_WIDTH, 33 * SCALE_HEIGHT, i_foreground, i_background); /* 15 Digit display */
    }
 #elif defined(HP31) || defined(HP32) || defined(HP33) || defined(HP34) || defined(HP37) || defined(HP38)
    for (i_count = 0; i_count < DIGITS; i_count++) {
-      h_display->segment[i_count] = h_segment_create(0, 0,  ((3 + 18 * i_count) * SCALE_WIDTH) - 2, 18 * SCALE_HEIGHT, 16 * SCALE_WIDTH, 33 * SCALE_HEIGHT, i_foreground, i_background); /* 11 Digit display */
+      //h_display->segment[i_count] = h_segment_create(0, 0, i_display_left + ((3 + 18 * i_count) * SCALE_WIDTH) - 2, i_display_top + (18 * SCALE_HEIGHT), 16 * SCALE_WIDTH, 33 * SCALE_HEIGHT, i_foreground, i_background); /* 11 Digit display */
+      h_display->segment[i_count] = h_segment_create(0, 0, i_left + i_display_left + ((3 + 18 * i_count) * SCALE_WIDTH) - 2, i_top + i_display_top + (i_display_height - 33 * SCALE_HEIGHT) / 2, 16 * SCALE_WIDTH, 33 * SCALE_HEIGHT, i_foreground, i_background); /* 11 Digit display */
    }
 #else
    for (i_count = 0; i_count < DIGITS; i_count++) {
-      h_display->segment[i_count] = h_segment_create(0, 0,  ((5 + 16 * i_count) * SCALE_WIDTH), 21 * SCALE_HEIGHT, 14 * SCALE_WIDTH, 29 * SCALE_HEIGHT, i_foreground, i_background); /* 12 Digit display */
+      h_display->segment[i_count] = h_segment_create(0, 0, i_left + i_display_left + ((5 + 16 * i_count) * SCALE_WIDTH), i_top + i_display_top + (i_display_height - 29 * SCALE_HEIGHT) /2, 14 * SCALE_WIDTH, 29 * SCALE_HEIGHT, i_foreground, i_background); /* 12 Digit display */
    }
 #endif
    for (i_count = 0; i_count < DIGITS; i_count++) {
@@ -126,6 +135,7 @@ odisplay *h_display_create(int i_index, int i_left, int i_top, int i_width,
    }
    h_display->foreground = i_foreground;
    h_display->background = i_background;
+   h_display->fill = i_fill;
    h_display->border = i_border;
    return (h_display);
 }
@@ -141,9 +151,14 @@ int i_display_draw(Display* x_display, int x_application_window, int i_screen, o
 
    int i_count;
 
-   /* Set the foreground colour. */
-   XSetForeground(x_display, DefaultGC(x_display, i_screen), h_display->border);
-   XFillRectangle(x_display, x_application_window, DefaultGC(x_display, i_screen), h_display->left, h_display->top, h_display->width, h_display->height);
+   if (h_display->display_top != 0 || h_display->display_left != 0 || h_display->display_width != h_display->width || h_display->height != h_display->display_height)
+   {
+      XSetForeground(x_display, DefaultGC(x_display, i_screen), h_display->border); /* Set the border colour. */
+      XFillRectangle(x_display, x_application_window, DefaultGC(x_display, i_screen), h_display->left, h_display->top, h_display->width, h_display->height); /* Fill in the border. */
+   }
+
+   XSetForeground(x_display, DefaultGC(x_display, i_screen), h_display->fill); /* Set the background colour. */
+   XFillRectangle(x_display, x_application_window, DefaultGC(x_display, i_screen), h_display->left + h_display->display_left, h_display->top + h_display->display_top, h_display->display_width, h_display->display_height); /* Fill in the background. */
 
    /* Draw display segments. */
    for (i_count = 0; i_count < DIGITS; i_count++)

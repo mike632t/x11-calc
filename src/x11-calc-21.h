@@ -32,29 +32,40 @@
  * 11 Jan 22         - Removed ROM_BANKS - MT
  * 20 Jan 22         - Fixed compilation warnings on VAXC by defining i_rom
  *                     as external - MT
+ * 29 Jan 22         - Added an optional bezel to the display - MT
  *
  */
 
-#define MODEL           "21"
-#define HEIGHT          385 * SCALE_HEIGHT
-#define WIDTH           200 * SCALE_WIDTH
-#define BUTTONS         30
+#define MODEL              "21"
+#define HEIGHT             385 * SCALE_HEIGHT
+#define WIDTH              200 * SCALE_WIDTH
+#define BUTTONS            30
 
-#define DIGITS          12
+#define DIGITS             12
 
-#define DISPLAY_LEFT    0
-#define DISPLAY_TOP     4 * SCALE_HEIGHT
+#define DIGIT_COLOUR       RED
+#define DIGIT_BACKGROUND   DARK_RED
+#define DISPLAY_BACKGROUND RED_BACKGROUND
+#define BEZEL_COLOUR       LIGHT_GREY
+
+#define BEZEL_LEFT      0 * SCALE_WIDTH
+#define BEZEL_TOP       4 * SCALE_HEIGHT
+#define BEZEL_WIDTH     200 * SCALE_WIDTH
+#define BEZEL_HEIGHT    61 * SCALE_HEIGHT
+
+#define DISPLAY_LEFT    0 * SCALE_WIDTH
+#define DISPLAY_TOP     0 * SCALE_HEIGHT
 #define DISPLAY_WIDTH   200 * SCALE_WIDTH
 #define DISPLAY_HEIGHT  61 * SCALE_HEIGHT
 
-#define KEYBOARD_ROW_0  67 * SCALE_HEIGHT
-#define KEYBOARD_ROW_1  89 * SCALE_HEIGHT
-#define KEYBOARD_ROW_2  132 * SCALE_HEIGHT
-#define KEYBOARD_ROW_3  175 * SCALE_HEIGHT
-#define KEYBOARD_ROW_4  218 * SCALE_HEIGHT
-#define KEYBOARD_ROW_5  261 * SCALE_HEIGHT
-#define KEYBOARD_ROW_6  304 * SCALE_HEIGHT
-#define KEYBOARD_ROW_7  347 * SCALE_HEIGHT
+#define KEYBOARD_ROW_0     67 * SCALE_HEIGHT
+#define KEYBOARD_ROW_1     89 * SCALE_HEIGHT
+#define KEYBOARD_ROW_2     132 * SCALE_HEIGHT
+#define KEYBOARD_ROW_3     175 * SCALE_HEIGHT
+#define KEYBOARD_ROW_4     218 * SCALE_HEIGHT
+#define KEYBOARD_ROW_5     261 * SCALE_HEIGHT
+#define KEYBOARD_ROW_6     304 * SCALE_HEIGHT
+#define KEYBOARD_ROW_7     347 * SCALE_HEIGHT
 
 #define KEYBOARD_COL_A  12 * SCALE_WIDTH
 #define KEYBOARD_COL_B  48 * SCALE_WIDTH
@@ -79,3 +90,5 @@
 extern int i_rom [ROM_SIZE];
 
 void v_init_keypad(obutton *h_button[], oswitch *h_switch[]);
+
+//void v_init_display(odisplay *h_display);
