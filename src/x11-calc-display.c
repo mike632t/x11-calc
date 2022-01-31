@@ -59,6 +59,8 @@
  * 03 Jan 21         - Changed debug() macro so that debug code is executed
  *                     when DEBUG is defined (doesn't need to be true) - MT
  * 29 Jan 22         - Added an optional bezel to the display - MT
+ * 31 Jan 22         - Added support for the HP10C, HP11C, HP12C, HP15C and
+ *                     HP16C - MT
  *
  */
 
@@ -120,7 +122,7 @@ odisplay *h_display_create(int i_index, int i_left, int i_top, int i_width, int 
       //h_display->segment[i_count] = h_segment_create(0, 0, i_display_left + ((4 + 13 * i_count) * SCALE_WIDTH), i_display_top + (21 * SCALE_HEIGHT), 11 * SCALE_WIDTH, 33 * SCALE_HEIGHT, i_foreground, i_background); /* 15 Digit display */
       h_display->segment[i_count] = h_segment_create(0, 0, i_left + i_display_left + ((4 + 13 * i_count) * SCALE_WIDTH), i_top + i_display_top + (i_display_height - 33 * SCALE_HEIGHT) / 2, 11 * SCALE_WIDTH, 33 * SCALE_HEIGHT, i_foreground, i_background); /* 15 Digit display */
    }
-#elif defined(HP31) || defined(HP32) || defined(HP33) || defined(HP34) || defined(HP37) || defined(HP38)
+#elif defined(HP31) || defined(HP32) || defined(HP33) || defined(HP34) || defined(HP37) || defined(HP38) ||  defined(HP10) ||  defined(HP11) ||  defined(HP12) ||  defined(HP15) ||  defined(HP16)
    for (i_count = 0; i_count < DIGITS; i_count++) {
       //h_display->segment[i_count] = h_segment_create(0, 0, i_display_left + ((3 + 18 * i_count) * SCALE_WIDTH) - 2, i_display_top + (18 * SCALE_HEIGHT), 16 * SCALE_WIDTH, 33 * SCALE_HEIGHT, i_foreground, i_background); /* 11 Digit display */
       h_display->segment[i_count] = h_segment_create(0, 0, i_left + i_display_left + ((3 + 18 * i_count) * SCALE_WIDTH) - 2, i_top + i_display_top + (i_display_height - 33 * SCALE_HEIGHT) / 2, 16 * SCALE_WIDTH, 33 * SCALE_HEIGHT, i_foreground, i_background); /* 11 Digit display */
@@ -295,7 +297,7 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
       }
       i_offset--;
    }
-#elif defined(HP31) || defined(HP32) || defined(HP33) || defined(HP34) || defined(HP37) || defined(HP38)
+#elif defined(HP31) || defined(HP32) || defined(HP33) || defined(HP34) || defined(HP37) || defined(HP38) || defined(HP10) ||  defined(HP11) ||  defined(HP12) ||  defined(HP15) ||  defined(HP16)
    int i_count;
    static int c_digits [] = { DISPLAY_ZERO,
                               DISPLAY_ONE,
