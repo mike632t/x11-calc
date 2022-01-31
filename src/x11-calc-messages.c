@@ -1,9 +1,10 @@
 /*
  * x11-calc-text.c - RPN (Reverse Polish) calculator simulator.
  *
- * Copyright(C) 2019 - MT
+ * Copyright(C) 2022 - MT
  *
- * With thanks to Alejandro GARZA for providing the spanish translation.
+ * With thanks to Alejandro GARZA for providing the Spanish translation and
+ * Martin HEPPERLE for translating the text into German.
  *
  * This  program is free software: you can redistribute it and/or modify it
  * under  the terms of the GNU General Public License as published  by  the
@@ -19,19 +20,20 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * 21 Jan 22   0.1   - Initial version - MT
- * 23 Jan 22         - Added a french language translation - MT
+ * 23 Jan 22         - Added a French language translation - MT
  * 24 Jan 22         - Added my first attempt at translating text  messages
- *                     into german and spanish - MT
+ *                     into German and Spanish - MT
  *                   - Reduced the number of digits used to show 12-bit hex
  *                     values to 3 - MT
  *                   - Removed special characters - MT
- * 29 Jan 22         - Updated spanish translation - MT
- *
- * To Do             - Fix errors in translation!
+ * 29 Jan 22         - Updated Spanish translation - MT
+ * 31 Jan 22         - Updated German translation - MT
  *
  */
 
-#define OCTAL
+#if defined (HP10) || defined (HP11) || defined (HP12) || defined (HP15) || defined (HP16) || defined(HP41)
+#define HEXADECIMAL
+#endif
 
 const char * h_msg_licence = "Copyright(C) %s %s\n\
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\n\
@@ -105,56 +107,56 @@ const char * h_err_invalid_option = "opcion invalida %s\n";
 
 
 #elif defined(LANG_de)
-const char * h_msg_loading = "Wird geladen '%s'.\n";
+const char * h_msg_loading = "Lade '%s'.\n";
 const char * h_msg_saving = "Speichern '%s'.\n";
 
 const char * h_err_register_alloc = "Laufzeitfehler\t: %s Zeile : %d : Speicherzuweisung fehlgeschlagen!\n";
 const char * h_err_opening_file = "Kann '%s' nicht öffnen.\n";
 
-const char * h_err_display = "Es kann keine Verbindung zum X-server '%s' hergestellt werden.\n";
-const char * h_err_display_properties = "Anzeigeeigenschaften konnen nicht abgerufen werden.\n";
-const char * h_err_display_colour = "Erfordert ein %d-bit-farbdisplay.\n";
-const char * h_err_font = "Schriftart '%s' kann nicht geladen werden..\n";
+const char * h_err_display = "Kann keine verbindung zum X-Server '%s' herstellen.\n";
+const char * h_err_display_properties = "Kann eigenschaften des displays nicht abfragen.\n";
+const char * h_err_display_colour = "Ein %d-bit farbdisplay wird benotigt.\n";
+const char * h_err_font = "Kann schrift '%s' nicht laden.\n";
 
 #if defined(HEXADECIMAL)
-const char * h_err_unexpected_opcode = "Unerwarteter opcode (%03x) bei %1x-%03x in %s zeile: %d\n";
-const char * h_err_unexpected_error = "Unerwarteter fehler bei %1x-%03x in %s zeile: %d\n";
-const char * h_err_invalid_address = "Adresse (%02o) auberhalb des bereichs bei %1x-%03x in %s zeile : %d\n";
-const char * h_err_invalid_register = "Invalid register (REG[%d]) at %1x-%03x in %s line : %d\n";
+const char * h_err_unexpected_opcode = "Unerwarteter opcode (%03x) an %1x-%03x in %s zeile: %d\n";
+const char * h_err_unexpected_error = "Nicht abgefangener fehler an %1x-%03x in %s zeile: %d\n";
+const char * h_err_invalid_address = "Ungültige adresse (%02o) an %1x-%03x in %s zeile : %d\n";
+const char * h_err_invalid_register = "Ungultiges register (REG[%d]) an %1x-%03x in %s zeile : %d\n";
 # else
 const char * h_err_unexpected_opcode = "Unerwarteter opcode (%04o) bei %1o-%04o in %s zeile : %d\n";
-const char * h_err_unexpected_error = "Unerwarteter fehler bei %1o-%04o in %s zeile : %d\n";
-const char * h_err_invalid_address = "Adresse (%02o) auberhalb des bereichs bei %1o-%04o in %s zeile : %d\n";
-const char * h_err_invalid_register = "Ungultiges register (REG[%d]) bei %1o-%04o in %s zeile : %d\n";
+const char * h_err_unexpected_error = "Nicht abgefangener fehler an %1o-%04o in %s zeile : %d\n";
+const char * h_err_invalid_address = "Ungültige adresse (%02o) an %1o-%04o in %s zeile : %d\n";
+const char * h_err_invalid_register = "Ungultiges register (REG[%d]) an %1o-%04o in %s zeile : %d\n";
 #endif /* Hexadecimal */
 
 #if defined(unix)
 const char * c_msg_usage = "Verwendung: %s [OPTION]... [DATEI]\n\
-Eine RPN-rechner-simulation fur X11.\n\n\
-  -b  ADDR                 haltepunkt setzen (oktal)\n\
-  -i, OPCODE               anweisung trap setzen (oktal)\n\
-  -s,                      single step\n\
-  -t,                      trace execution\n\
-      --cursor             anzeigecursor (standard)\n\
+Eine RPN rechner simulation fur X11.\n\n\
+  -b  ADDR                 haltepunkt an adresse setzen (oktal)\n\
+  -i, OPCODE               haltepunkt anf opcode setzen (oktal)\n\
+  -s,                      einzelschritt\n\
+  -t,                      ausfuhrung protokollieren\n\
+      --cursor             cursor anzeigen (default)\n\
       --no-cursor          cursor verstecken\n\
-      --help               diese hilfe anzeigen und beenden\n\
-      --version            versionsinformationen ausgeben und beenden\n\n";
+      --help               diese hilfe anzeigen und dann beenden\n\
+      --version            versionsinformationen ausgeben und dann beenden\n\n";
 const char * h_err_invalid_operand = "ungultige(r) operand(en)\n";
 const char * h_err_invalid_option = "ungultige option -- '%c'\n";
-const char * h_err_unrecognised_option = "nicht erkannte option '%s'\n";
-const char * h_err_invalid_number = "keine oktalzahl -- '%s' \n";
-const char * h_err_address_range = "adresse auberhalb des zulassigen bereichs -- '%s' \n";
-const char * h_err_missing_argument = "option erfordert ein argument -- '%s'\n";
-const char * h_err_invalid_argument = "erwartetes argument nicht -- '%c' \n";
+const char * h_err_unrecognised_option = "unbekannte option '%s'\n";
+const char * h_err_invalid_number = "keine gultige oktalzahl -- '%s' \n";
+const char * h_err_address_range = "auberhalb des adressbereichs -- '%s' \n";
+const char * h_err_missing_argument = "option benotigt ein argument -- '%s'\n";
+const char * h_err_invalid_argument = "erwartetes argument, nicht -- '%c' \n";
 #else
 const char * c_msg_usage = "Verwendung: %s [OPTION...] [DATEI]\n\
-Eine RPN-rechner-simulation fur X11.\n\n\
-  /cursor                  anzeigecursor (standard)\n\
+Eine RPN rechner simulation fur X11.\n\n\
+  /cursor                  cursor anzeigen (default)\n\
   /nocursor                cursor verstecken\n\
-  /step                    single step\n\
-  /trace                   trace execution\n\
-  /version                 versionsinformationen ausgeben und beenden\n\
-  /?, /help                diese hilfe anzeigen und beenden\n";
+  /step                    einzelschritt\n\
+  /trace                   ausfuhrung protokollieren\n\
+  /version                 versionsinformationen ausgeben und dann beenden\n\
+  /?, /help                diese hilfe anzeigen und dann beenden\n";
 
 const char * h_err_invalid_operand = "ungultige(r) parameter\n";
 const char * h_err_invalid_option = "ungultige option %s\n";
