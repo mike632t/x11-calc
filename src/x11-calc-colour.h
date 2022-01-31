@@ -27,6 +27,7 @@
  * 06 Dec 21         - Changed green to a slightly lighter colour - MT
  * 04 Jan 21         - Added mid blue for alternate text - MT
  * 05 Jan 21         - Tweaked mid blue shade a bit - MT
+ * 31 Jan 22         - Added gold - MT
  *
  */
 
@@ -48,9 +49,10 @@
 #define GREEN          0xffffff /* Green function keys. */
 #define YELLOW         0xffffff /* Yellow shift key. */
 #define ORANGE         0xffffff /* Yellow shift key. */
-#define MID_BLUE       0x000000 /* MID_BLUE text and function keys. */
-#define LIGHT_BLUE     0xffffff /* MID_BLUE shift key. */
-#define WHITE          0xffffff /* White text. */
+#define MID_BLUE       0x000000 /* Blue text and function keys. */
+#define LIGHT_BLUE     0xffffff /* Blue shift key. */
+#define WHITE          0xffffff /* White. */
+#define GOLD           0xffffff /* Gold. */
 
 #define RED            0x000000 /* LED display colour. */
 #define DARK_RED       0xffffff /* LED display shading. */
@@ -75,9 +77,10 @@
 #define GREEN          0x948639 /* Green function keys. */
 #define YELLOW         0xf5a434 /* Yellow shift key. */
 #define ORANGE         0xe06900 /* Orange function keys. */
-#define MID_BLUE       0x4096aa /* MID_BLUE text and function keys (was 0x3784b0). */
-#define LIGHT_BLUE     0x4aa0b0 /* MID_BLUE shift key. */
-#define WHITE          0xffffff /* White text. */
+#define MID_BLUE       0x4096aa /* Blue text and function keys (was 0x3784b0). */
+#define LIGHT_BLUE     0x4aa0b0 /* Blue shift key. */
+#define WHITE          0xffffff /* White. */
+#define GOLD           0xe8d8b8 /* Gold. (0xeae08f)*/
 
 #define RED            0xb00000 /* LED display colour. */
 #define DARK_RED       0x400000 /* LED display shading. */
