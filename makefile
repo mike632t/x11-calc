@@ -23,6 +23,8 @@
 #  04 Jan 22			- Added HP model 35 - MT
 #  07 Jan 22			- Added HP model 80 - MT
 #  07 Jan 22			- Added HP model 70 - MT
+#  31 jan 22			- Added support for the HP10C, HP11C, HP12C, HP15C and
+#                      HP16C (all are currently work in progress) - MT
 #
 
 PROGRAM	=  x11-calc
@@ -32,8 +34,15 @@ FILES		+= *.md LICENSE makefile .gitignore .gitattributes
 FILES		+= ./img/x11-calc-*.png
 MAKE		=  make
 
-
 all: clean hp35 hp80 hp45 hp70 hp21 hp22 hp25 hp27 hp29 hp31 hp32 hp33 hp34 hp37 hp38 hp67
+
+classic: clean hp35 hp80 hp45 hp70
+
+woodstock: clean hp21 hp22 hp25 hp27 hp29
+
+spice: clean hp31 hp32 hp33 hp34 hp37 hp38
+
+voyager: clean hp10 hp11 hp12 hp15 hp16
 
 hp35:
 	@$(MAKE) --no-print-directory -C ./src MODEL=35
@@ -82,6 +91,21 @@ hp38:
 
 hp67:
 	@$(MAKE) --no-print-directory -C ./src MODEL=67
+
+hp10:
+	@$(MAKE) --no-print-directory -C ./src MODEL=10
+
+hp11:
+	@$(MAKE) --no-print-directory -C ./src MODEL=11
+
+hp12:
+	@$(MAKE) --no-print-directory -C ./src MODEL=12
+
+hp15:
+	@$(MAKE) --no-print-directory -C ./src MODEL=15
+
+hp16:
+	@$(MAKE) --no-print-directory -C ./src MODEL=16
 
 clean:
 	@rm  -f ./src/*.o
