@@ -44,11 +44,13 @@
  * 20 Dec 21         - Changed all #ifdef to #if defined() - MT
  * 24 Dec 21         - Added HP model 45 - MT
  * 30 Dec 21         - Changed HP25C window title to HP25 - MT
- * 04 Jan 22         - Added HP 5 and HP 80 - MT
+ * 04 Jan 22         - Added HP 45 and HP 80 - MT
  * 05 Jan 22         - Added HP 70 - MT
  * 07 Jan 22         - Changed HP25 window title back to HP25C - MT
  *                   - Added HP70 - MT
  * 20 Jan 22         - Model number now defined in make script for VMS - MT
+ * 31 Jan 22         - Added support for the HP10C, HP11C, HP12C, HP15C and
+ *                     HP16C - MT
  *
  * TO DO :           -
  */
@@ -149,6 +151,32 @@
 #define FILENAME     "x11-calc-38"
 #define TITLE        "RPN calc 38C"
 #include "x11-calc-38.h"
+
+#elif defined(HP10)
+#define FILENAME     "x11-calc-10"
+#define TITLE        "RPN calc 10C"
+#include "x11-calc-10.h"
+
+#elif defined(HP11)
+#define FILENAME     "x11-calc-11"
+#define TITLE        "RPN calc 11C"
+#include "x11-calc-11.h"
+
+#elif defined(HP12)
+#define FILENAME     "x11-calc-12"
+#define TITLE        "RPN calc 12C"
+#include "x11-calc-12.h"
+
+#elif defined(HP15)
+#define FILENAME     "x11-calc-15"
+#define TITLE        "RPN calc 15C"
+#include "x11-calc-15.h"
+
+#elif defined(HP16)
+#define FILENAME     "x11-calc-16"
+#define TITLE        "RPN calc 16C"
+#include "x11-calc-16.h"
+
 #endif
 
 void v_version(); /* Display version information */
