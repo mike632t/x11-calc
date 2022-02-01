@@ -41,6 +41,7 @@
  * 12 Jan 22         - Added a timer property to the processor to allow the
  *                     processor  status bit to be set appropriately if the
  *                     timer is enabled - MT
+ * 29 Jan 22         - Added a second pointer register 'q' - MT
  *
  */
 
@@ -97,9 +98,6 @@ typedef struct {
    int *rom;
    int first;
    int last;
-#if defined(HP67)
-   unsigned char crc[STATES];          /* Card reader states */
-#endif
    unsigned char flags[FLAGS];         /* Processor flags*/
    unsigned char status[STATUS_BITS];  /* Status (S0 - S15) */
    unsigned int stack[STACK_SIZE];     /* Call stack */
@@ -118,6 +116,13 @@ typedef struct {
    unsigned char enabled;              /* Enabled */
    unsigned char trace;                /* Trace flag */
    unsigned char step;                 /* Step flag */
+#if defined(HP67)
+   unsigned char crc[STATES];          /* Card reader states */
+#endif
+#if defined (HP10) || defined (HP11) || defined (HP12) || defined (HP15) || defined (HP16) || defined(HP41)
+   unsigned int q;                     /* Q register */
+   unsigned char pointer;              /* Selects P or Q registers */
+#endif
 } oprocessor;
 
 oprocessor *h_processor_create(int *h_rom);
