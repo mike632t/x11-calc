@@ -28,45 +28,59 @@
  * 20 Jan 22         - Fixed compilation warnings on VAXC by defining i_rom
  *                     as external - MT
  * 29 Jan 22         - Added an optional bezel to the display - MT
+ * 12 Feb 22         - Updated layout and separated the initialisation code
+ *                     for buttons and switches into two functions - MT
  *
  */
 
-#define MODEL           "67"
-#define HEIGHT          450 * SCALE_HEIGHT
-#define WIDTH           200 * SCALE_WIDTH
-#define BUTTONS         35
-
-#define DIGITS          15
+#define MODEL              "67"
+#define HEIGHT             450 * SCALE_HEIGHT
+#define WIDTH              200 * SCALE_WIDTH
+#define BUTTONS            35
+#define SWITCHES           2
+#define DIGITS             15
 
 #define DIGIT_COLOUR       RED
 #define DIGIT_BACKGROUND   DARK_RED
 #define DISPLAY_BACKGROUND RED_BACKGROUND
 #define BEZEL_COLOUR       LIGHT_GREY
 
-#define BEZEL_LEFT      0 * SCALE_WIDTH
-#define BEZEL_TOP       4 * SCALE_HEIGHT
-#define BEZEL_WIDTH     200 * SCALE_WIDTH
-#define BEZEL_HEIGHT    61 * SCALE_HEIGHT
+#define KBD_LEFT           12 * SCALE_WIDTH
+#define KBD_TOP            67 * SCALE_HEIGHT
+#define KBD_ROW            43 * SCALE_HEIGHT /** Was 43 / 49 */
 
-#define DISPLAY_LEFT    0 * SCALE_WIDTH
-#define DISPLAY_TOP     0 * SCALE_HEIGHT
-#define DISPLAY_WIDTH   200 * SCALE_WIDTH
-#define DISPLAY_HEIGHT  61 * SCALE_HEIGHT
+#define BEZEL_LEFT         0 * SCALE_WIDTH
+#define BEZEL_TOP          4 * SCALE_HEIGHT
+#define BEZEL_WIDTH        200 * SCALE_WIDTH
+#define BEZEL_HEIGHT       61 * SCALE_HEIGHT
 
-#define KBD_LEFT        12 * SCALE_WIDTH
-#define KBD_TOP         67 * SCALE_HEIGHT
-#define KBD_ROW         43 * SCALE_HEIGHT
+#define DISPLAY_LEFT       0 * SCALE_WIDTH
+#define DISPLAY_TOP        0 * SCALE_HEIGHT
+#define DISPLAY_WIDTH      200 * SCALE_WIDTH
+#define DISPLAY_HEIGHT     61 * SCALE_HEIGHT
 
-#define KEY_HEIGHT      30 * SCALE_HEIGHT
-#define KEY_WIDTH       33 * SCALE_WIDTH
-#define KEY_NUMERIC     41 * SCALE_WIDTH
-#define KEY_GAP          3 * SCALE_WIDTH
-#define SWITCH_HEIGHT   10 * SCALE_HEIGHT
+#define KBD_LEFT           12 * SCALE_WIDTH
+#define KBD_TOP            67 * SCALE_HEIGHT
+#define KBD_ROW            43 * SCALE_HEIGHT
 
-#define ROM_SIZE        020000
-#define MEMORY_SIZE     64
+#define KEY_HEIGHT         30 * SCALE_HEIGHT
+#define KEY_WIDTH          33 * SCALE_WIDTH
+#define KEY_NUMERIC        42 * SCALE_WIDTH
+/**
+   #define KEY_WIDTH       39 * SCALE_WIDTH
+   #define KEY_NUMERIC     50 * SCALE_WIDTH
+ */
+#define KEY_GAP            3 * SCALE_WIDTH
+#define SWITCH_HEIGHT      10 * SCALE_HEIGHT
+
+#define ROM_SIZE           020000
+#define MEMORY_SIZE        64
 #define CONTINIOUS
 
 extern int i_rom [ROM_SIZE];
 
-void v_init_keypad(obutton *h_button[], oswitch *h_switch[]);
+void v_init_labels(olabel *h_label[]);
+
+void v_init_switches(oswitch *h_label[]);
+
+void v_init_buttons(obutton *h_button[]);

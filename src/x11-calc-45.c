@@ -22,12 +22,14 @@
  * 03 Jan 21         - Changed debug() macro so that debug code is executed
  *                     when DEBUG is defined (doesn't need to be true) - MT
  * 11 Jan 22         - Removed ROM_BANKS - MT
+ * 12 Feb 22         - Updated layout and separated the initialisation code
+ *                     for buttons and switches into two functions - MT
  *
  */
 
 #define VERSION        "0.1"
-#define BUILD          "0002"
-#define DATE           "11 Jan 22"
+#define BUILD          "0004"
+#define DATE           "12 Feb 22"
 #define AUTHOR         "MT"
 
 #include <stdarg.h>    /* strlen(), etc. */
@@ -40,6 +42,7 @@
 #include "x11-calc-font.h"
 #include "x11-calc-button.h"
 #include "x11-calc-switch.h"
+#include "x11-calc-label.h"
 #include "x11-calc-colour.h"
 
 #include "x11-calc-cpu.h"
@@ -50,124 +53,108 @@
 
 oregister o_mem[MEMORY_SIZE];
 
-void v_init_keypad(obutton *h_button[], oswitch *h_switch[]) {
-   int i_left, i_top, i_height, i_width, i_count;
-
-   /* Define the switches. */
-   i_top = KBD_TOP;
-   i_left = KBD_LEFT;
-   i_height = SWITCH_HEIGHT;
-   i_width = (2 * KEY_WIDTH + KEY_GAP);
-   h_switch[0] = h_switch_create(00000, "OFF", "ON ", h_alternate_font, i_left, i_top, i_width, i_height, True, MID_GREY, DARK_GREY);
-   h_switch[0]->state = True;
+void v_init_switches(oswitch *h_switch[]) /* Define the switches. */
+{
+   h_switch[0] = h_switch_create(00000, "OFF", "ON ", h_alternate_font, KBD_LEFT, KBD_TOP, 2 * KEY_WIDTH + KEY_GAP, SWITCH_HEIGHT, True, MID_GREY, DARK_GREY);
    h_switch[1] = NULL;
+}
+
+void v_init_buttons(obutton *h_button[]) {
+   int i_left, i_top, i_count = 0;
 
    /* Define top row of keys. */
-   i_top += KEY_HEIGHT;
+   i_top = KBD_TOP + 2* (SWITCH_HEIGHT + 1); /* Assumes the function label and switch text use the same font */
    i_left = KBD_LEFT;
-   i_height = KEY_HEIGHT;
-   i_width = KEY_WIDTH;
-   i_count = 0;
-   h_button[i_count++] = h_button_create(00006, 000, "1/x", "yX", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, DIM_GREY, YELLOW, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00006, 000, "1/x", "yX", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, False, DIM_GREY, YELLOW, BACKGROUND, BACKGROUND);
    i_left += (KEY_WIDTH + KEY_GAP);
-   h_button[i_count++] = h_button_create(00004, 000, "ln", "log", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, DIM_GREY, YELLOW, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00004, 000, "ln", "log", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, False, DIM_GREY, YELLOW, BACKGROUND, BACKGROUND);
    i_left += (KEY_WIDTH + KEY_GAP);
-   h_button[i_count++] = h_button_create(00003, 000, "eX", "10x", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, DIM_GREY, YELLOW, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00003, 000, "eX", "10x", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, False, DIM_GREY, YELLOW, BACKGROUND, BACKGROUND);
    i_left += (KEY_WIDTH + KEY_GAP);
-   h_button[i_count++] = h_button_create(00002, 000, "FIX", "SCI", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, DIM_GREY, YELLOW, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00002, 000, "FIX", "SCI", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, False, DIM_GREY, YELLOW, BACKGROUND, BACKGROUND);
    i_left += (KEY_WIDTH + KEY_GAP);
-   h_button[i_count++] = h_button_create(00000, 'f', "", "", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, YELLOW, BACKGROUND, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00000, 'f', "", "", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, False, YELLOW, BACKGROUND, BACKGROUND, BACKGROUND);
 
    /* Define second row of keys. */
    i_top += KBD_ROW;
    i_left = KBD_LEFT;
-   h_button[i_count++] = h_button_create(00056, 000, "x\xb2", "/\xaf", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, DIM_GREY, YELLOW, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00056, 000, "x\xb2", "/\xaf", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, False, DIM_GREY, YELLOW, BACKGROUND, BACKGROUND);
    i_left += (KEY_WIDTH + KEY_GAP);
-   h_button[i_count++] = h_button_create(00054, 000, "-P", "-R", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, BLACK, YELLOW, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00054, 000, "-P", "-R", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, False, BLACK, YELLOW, BACKGROUND, BACKGROUND);
    i_left += (KEY_WIDTH + KEY_GAP);
-   h_button[i_count++] = h_button_create(00053, 000, "SIN", "SIN-\xb9", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, BLACK, YELLOW, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00053, 000, "SIN", "SIN-\xb9", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, False, BLACK, YELLOW, BACKGROUND, BACKGROUND);
    i_left += (KEY_WIDTH + KEY_GAP);
-   h_button[i_count++] = h_button_create(00052, 000, "COS", "COS-\xb9", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, BLACK, YELLOW, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00052, 000, "COS", "COS-\xb9", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, False, BLACK, YELLOW, BACKGROUND, BACKGROUND);
    i_left += (KEY_WIDTH + KEY_GAP);
-   h_button[i_count++] = h_button_create(00050, 000, "TAN", "TAN-\xb9", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, BLACK, YELLOW, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00050, 000, "TAN", "TAN-\xb9", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, False, BLACK, YELLOW, BACKGROUND, BACKGROUND);
 
    /* Define third row of keys. */
    i_top += KBD_ROW;
    i_left = KBD_LEFT;
-   h_button[i_count++] = h_button_create(00016, 000, "X-Y", "n!", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, MID_GREY, YELLOW, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00016, 000, "X-Y", "n!", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, False, MID_GREY, YELLOW, BACKGROUND, BACKGROUND);
    i_left += (KEY_WIDTH + KEY_GAP);
-   h_button[i_count++] = h_button_create(00014, 000, "Rv", "x,s", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, MID_GREY, YELLOW, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00014, 000, "Rv", "x,s", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, False, MID_GREY, YELLOW, BACKGROUND, BACKGROUND);
    i_left += (KEY_WIDTH + KEY_GAP);
-   h_button[i_count++] = h_button_create(00013, 000, "STO", "-D.MS", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, MID_GREY, YELLOW, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00013, 000, "STO", "-D.MS", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, False, MID_GREY, YELLOW, BACKGROUND, BACKGROUND);
    i_left += (KEY_WIDTH + KEY_GAP);
-   h_button[i_count++] = h_button_create(00012, 000, "RCL", "D.MS-", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, MID_GREY, YELLOW, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00012, 000, "RCL", "D.MS-", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, False, MID_GREY, YELLOW, BACKGROUND, BACKGROUND);
    i_left += (KEY_WIDTH + KEY_GAP);
-   h_button[i_count++] = h_button_create(00010, 000, "%", "d%", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, DIM_GREY, YELLOW, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00010, 000, "%", "d%", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, False, DIM_GREY, YELLOW, BACKGROUND, BACKGROUND);
 
    /* Define fourth row of keys. */
    i_top += KBD_ROW;
    i_left = KBD_LEFT;
-   i_width = 2* KEY_WIDTH + KEY_GAP;
-   h_button[i_count++] = h_button_create(00074, 015, "ENTER", "      ", "DEG", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, MID_GREY, BACKGROUND, YELLOW, BACKGROUND);
+   h_button[i_count++] = h_button_create(00074, 015, "ENTER", "      ", "DEG", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, 2* KEY_WIDTH + KEY_GAP, KEY_HEIGHT, False, False, MID_GREY, BACKGROUND, YELLOW, BACKGROUND);
    i_left += (2 * (KEY_WIDTH + KEY_GAP));
-   i_width = KEY_WIDTH;
-   h_button[i_count++] = h_button_create(00073, 'c', "CHS", "RAD", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, MID_GREY, YELLOW, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00073, 'c', "CHS", "RAD", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, False, MID_GREY, YELLOW, BACKGROUND, BACKGROUND);
    i_left += (KEY_WIDTH + KEY_GAP);
-   h_button[i_count++] = h_button_create(00072, 'e', "EEX", "GRD", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, MID_GREY, YELLOW, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00072, 'e', "EEX", "GRD", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, False, MID_GREY, YELLOW, BACKGROUND, BACKGROUND);
    i_left += (KEY_WIDTH + KEY_GAP);
-   h_button[i_count++] = h_button_create(00070, 033, "CLX", "CLEAR", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, MID_GREY, YELLOW, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00070, 033, "CLX", "CLEAR", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, False, MID_GREY, YELLOW, BACKGROUND, BACKGROUND);
 
    /* Define fifth row of keys. */
    i_top += KBD_ROW;
    i_left = KBD_LEFT;
-   i_width = KEY_SMALL;
-   h_button[i_count++] = h_button_create(00066, '-', "-", "", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, MID_GREY, YELLOW, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00066, '-', "-", "", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_SMALL, KEY_HEIGHT, False, False, MID_GREY, YELLOW, BACKGROUND, BACKGROUND);
    i_left += (KEY_SMALL + 3 * KEY_GAP);
-   i_width = KEY_NUMERIC;
-   h_button[i_count++] = h_button_create(00064, '7', "7", "cm/in", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, LIGHT_GREY, YELLOW, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00064, '7', "7", "cm/in", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_NUMERIC, KEY_HEIGHT, False, False, LIGHT_GREY, YELLOW, BACKGROUND, BACKGROUND);
    i_left += (KEY_NUMERIC + 3 * KEY_GAP);
-   h_button[i_count++] = h_button_create(00063, '8', "8", "kg/lb", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, LIGHT_GREY, YELLOW, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00063, '8', "8", "kg/lb", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_NUMERIC, KEY_HEIGHT, False, False, LIGHT_GREY, YELLOW, BACKGROUND, BACKGROUND);
    i_left += (KEY_NUMERIC + 3 * KEY_GAP);
-   h_button[i_count++] = h_button_create(00062, '9', "9", "ltr/gal", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, LIGHT_GREY, YELLOW, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00062, '9', "9", "ltr/gal", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_NUMERIC, KEY_HEIGHT, False, False, LIGHT_GREY, YELLOW, BACKGROUND, BACKGROUND);
 
    /* Define sixth row of keys. */
    i_top += KBD_ROW;
    i_left = KBD_LEFT;
-   i_width = KEY_SMALL;
-   h_button[i_count++] = h_button_create(00026, '+', "+", "", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, MID_GREY, YELLOW, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00026, '+', "+", "", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_SMALL, KEY_HEIGHT, False, False, MID_GREY, YELLOW, BACKGROUND, BACKGROUND);
    i_left += (KEY_SMALL + 3 * KEY_GAP);
-   i_width = KEY_NUMERIC;
-   h_button[i_count++] = h_button_create(00024, '4', "4", "", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, LIGHT_GREY, YELLOW, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00024, '4', "4", "", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_NUMERIC, KEY_HEIGHT, False, False, LIGHT_GREY, YELLOW, BACKGROUND, BACKGROUND);
    i_left += (KEY_NUMERIC + 3 * KEY_GAP);
-   h_button[i_count++] = h_button_create(00023, '5', "5", "", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, LIGHT_GREY, YELLOW, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00023, '5', "5", "", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_NUMERIC, KEY_HEIGHT, False, False, LIGHT_GREY, YELLOW, BACKGROUND, BACKGROUND);
    i_left += (KEY_NUMERIC + 3 * KEY_GAP);
-   h_button[i_count++] = h_button_create(00022, '6', "6", "", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, LIGHT_GREY, YELLOW, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00022, '6', "6", "", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_NUMERIC, KEY_HEIGHT, False, False, LIGHT_GREY, YELLOW, BACKGROUND, BACKGROUND);
 
    /* Define seventh row of keys. */
    i_top += KBD_ROW;
    i_left = KBD_LEFT;
-   i_width = KEY_SMALL;
-   h_button[i_count++] = h_button_create(00036, '*', "\xd7", "", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, MID_GREY, YELLOW, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00036, '*', "\xd7", "", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_SMALL, KEY_HEIGHT, False, False, MID_GREY, YELLOW, BACKGROUND, BACKGROUND);
    i_left += (KEY_SMALL + 3 * KEY_GAP);
-   i_width = KEY_NUMERIC;
-   h_button[i_count++] = h_button_create(00034, '1', "1", "", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, LIGHT_GREY, YELLOW, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00034, '1', "1", "", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_NUMERIC, KEY_HEIGHT, False, False, LIGHT_GREY, YELLOW, BACKGROUND, BACKGROUND);
    i_left += (KEY_NUMERIC + 3 * KEY_GAP);
-   h_button[i_count++] = h_button_create(00033, '2', "2", "", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, LIGHT_GREY, YELLOW, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00033, '2', "2", "", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_NUMERIC, KEY_HEIGHT, False, False, LIGHT_GREY, YELLOW, BACKGROUND, BACKGROUND);
    i_left += (KEY_NUMERIC + 3 * KEY_GAP);
-   h_button[i_count++] = h_button_create(00032, '3', "3", "", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, LIGHT_GREY, YELLOW, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00032, '3', "3", "", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_NUMERIC, KEY_HEIGHT, False, False, LIGHT_GREY, YELLOW, BACKGROUND, BACKGROUND);
 
    /* Define bottom row of keys. */
    i_top += KBD_ROW;
    i_left = KBD_LEFT;
-   i_width = KEY_SMALL;
-   h_button[i_count++] = h_button_create(00046, '/', "\xf7", "", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, MID_GREY, YELLOW, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00046, '/', "\xf7", "", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_SMALL, KEY_HEIGHT, False, False, MID_GREY, YELLOW, BACKGROUND, BACKGROUND);
    i_left += (KEY_SMALL + 3 * KEY_GAP);
-   i_width = KEY_NUMERIC;
-   h_button[i_count++] = h_button_create(00044, '0', "0", "LAST x", "", "", h_large_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, LIGHT_GRAY, YELLOW, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00044, '0', "0", "LAST x", "", "", h_large_font, h_small_font, h_alternate_font, i_left, i_top, KEY_NUMERIC, KEY_HEIGHT, False, False, LIGHT_GRAY, YELLOW, BACKGROUND, BACKGROUND);
    i_left += (KEY_NUMERIC + 3 * KEY_GAP);
-   h_button[i_count++] = h_button_create(00043, '.', ".", "\x1c", "", "", h_large_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, LIGHT_GRAY, YELLOW, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00043, '.', ".", "\x1c", "", "", h_large_font, h_small_font, h_alternate_font, i_left, i_top, KEY_NUMERIC, KEY_HEIGHT, False, False, LIGHT_GRAY, YELLOW, BACKGROUND, BACKGROUND);
    i_left += (KEY_NUMERIC + 3 * KEY_GAP);
-   h_button[i_count++] = h_button_create(00042, 000, "E+", "E-", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, i_width, i_height, False, LIGHT_GRAY, YELLOW, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00042, 000, "E+", "E-", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_NUMERIC, KEY_HEIGHT, False, False, LIGHT_GRAY, YELLOW, BACKGROUND, BACKGROUND);
 }
 int i_rom[ROM_SIZE] = {
    00255, 01420, 00451, 01456, 01746, 00472, 01572, 01616,
