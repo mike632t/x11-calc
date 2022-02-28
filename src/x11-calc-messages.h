@@ -19,6 +19,7 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * 13 Jun 13   0.1   - Initial version - MT
+ * 02 Feb 22         - Added formatting strings for relative jumps - MT
  *
  */
 
@@ -34,6 +35,8 @@ extern char * h_err_invalid_address;
 extern char * h_err_invalid_register;
 extern char * h_msg_opcode;
 extern char * h_msg_address;
+const char * h_msg_negative_offset;
+const char * h_msg_positive_offset;
 
 extern char * c_msg_usage;
 extern char * h_err_invalid_operand;

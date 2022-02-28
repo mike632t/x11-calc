@@ -28,12 +28,15 @@
  *                   - Removed special characters - MT
  * 29 Jan 22         - Updated Spanish translation - MT
  * 31 Jan 22         - Updated German translation - MT
+ * 02 Feb 22         - Added formatting strings for relative jumps - MT
  *
  */
 
 #if defined (HP10) || defined (HP11) || defined (HP12) || defined (HP15) || defined (HP16) || defined(HP41)
-#define HEXADECIMAL
 #endif
+#define HEXADECIMAL
+
+/* Remember to define prototype in include file for any new strings */
 
 const char * h_msg_licence = "Copyright(C) %s %s\n\
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\n\
@@ -43,9 +46,13 @@ There is NO WARRANTY, to the extent permitted by law.\n";
 #if defined(HEXADECIMAL)
 const char * h_msg_opcode = "%1x-%03x  %03x   ";
 const char * h_msg_address = "%03x";
+const char * h_msg_negative_offset = "-0x%x";
+const char * h_msg_positive_offset = "+0x%x";
 #else
 const char * h_msg_opcode = "%1o-%04o %04o  ";
 const char * h_msg_address = "%04o";
+const char * h_msg_negative_offset = "-0%o";
+const char * h_msg_positive_offset = "+0%o";
 #endif
 
 
