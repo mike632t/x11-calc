@@ -51,7 +51,7 @@
  * 20 Jan 22         - Model number now defined in make script for VMS - MT
  * 31 Jan 22         - Added support for the HP10C, HP11C, HP12C, HP15C and
  *                     HP16C - MT
- * 26 Feb 22         - Added place holder for possible HP41 support - MT
+ * 26 Feb 22         - Added place holder for possible HP41C support - MT
  *
  * TO DO :           -
  */
