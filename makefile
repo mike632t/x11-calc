@@ -21,10 +21,11 @@
 #	09 Oct 21   0.1   - Initial version - MT
 #  22 Nov 21   0.2   - Added data files to backups - MT
 #  04 Jan 22			- Added HP model 35 - MT
-#  07 Jan 22			- Added HP model 80 - MT
-#  07 Jan 22			- Added HP model 70 - MT
-#  31 jan 22			- Added support for the HP10C, HP11C, HP12C, HP15C and
+#  07 Jan 22         - Added HP model 80 - MT
+#  07 Jan 22         - Added HP model 70 - MT
+#  31 jan 22         - Added support for the HP10C, HP11C, HP12C, HP15C and
 #                      HP16C (all are currently work in progress) - MT
+#  22 Feb 22         - Added place holder for HP41 - MT
 #
 
 PROGRAM	=  x11-calc
@@ -71,6 +72,9 @@ hp27:
 hp29:
 	@$(MAKE) --no-print-directory -C ./src MODEL=29
 
+hp67:
+	@$(MAKE) --no-print-directory -C ./src MODEL=67
+
 hp31:
 	@$(MAKE) --no-print-directory -C ./src MODEL=31
 
@@ -89,8 +93,8 @@ hp37:
 hp38:
 	@$(MAKE) --no-print-directory -C ./src MODEL=38
 
-hp67:
-	@$(MAKE) --no-print-directory -C ./src MODEL=67
+#hp41:
+#	@$(MAKE) --no-print-directory -C ./src MODEL=41
 
 hp10:
 	@$(MAKE) --no-print-directory -C ./src MODEL=10
