@@ -28,6 +28,7 @@
  * 04 Jan 21         - Added mid blue for alternate text - MT
  * 05 Jan 21         - Tweaked mid blue shade a bit - MT
  * 31 Jan 22         - Added gold - MT
+ * 24 Feb 22         - Added an alternate LCD background colour - MT
  *
  */
 
@@ -82,6 +83,8 @@
 #define WHITE          0xffffff /* White. */
 #define GOLD           0xe8d8b8 /* Gold. (0xeae08f)*/
 
+#define GREEN_GREY     0xa5aFa0 /* LCD background */
+#define GREEN_GRAY     0xa5aFa0 /* LCD background */
 #define RED            0xb00000 /* LED display colour. */
 #define DARK_RED       0x400000 /* LED display shading. */
 #define RED_BACKGROUND 0x180000 /* LED display background */
