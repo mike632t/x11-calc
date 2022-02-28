@@ -1,19 +1,25 @@
 ## x11-calc - Another RPN (Reverse Polish) calculator.
 
 Simulators for the HP 35, HP 80, HP 45, HP 70, HP 21, HP 22, HP 25C, HP 27,
-HP 29C, HP 31E, HP 32E, HP 33C, HP 34C, HP 37E, HP 38C and HP 67 written in
-C using only X11.
+HP 29C,  HP 31E,  HP 32E,  HP 33C, HP 34C, HP 37E, HP 38C,  HP 67,  HP 10C,
+HP 11C, HP 12C, HP 15C, and HP 16C  written in C using only X11.
 
 Use  of any language extensions or non standard language features has  been
 avoided in order to try to make the code as portable as possible.
 
 Should compile without modification on Linux, VAX/VMS, and Tru64 Unix.
 
-![HP25](./img/x11-calc-25.png) ![HP29](./img/x11-calc-29.png) ![HP33](./img/x11-calc-33.png) ![HP34](./img/x11-calc-34.png)
+Unlike all the other simulators the ROM images for the HP10C, HP11C, HP12C,
+HP15C, HP16C are not defined in the the source code and must be loaded from
+a separate ROM file.
+
+![HP10](./img/x11-calc-10.png) ![HP11](./img/x11-calc-11.png) ![HP12](./img/x11-calc-12.png)
 
 More [screenshots](./img/)
 
 ### Latest News
+
+28/02 - Added HP10C, HP11C, HP12C, HP15C, and HP16C.
 
 20/01 - Now compiles cleanly on VAX/VMS.
 
@@ -35,28 +41,38 @@ More [screenshots](./img/)
 
 ##### HP 22 - Working
 
-##### HP 25 - Working
+##### HP 25C - Working
 
 ##### HP 27 - Working
 
-##### HP 29 - Working
+##### HP 29C - Working
 
-##### HP 31 - Working
+##### HP 31E - Working
 
-##### HP 32 - Working
+##### HP 32E - Working
 
-##### HP 33 - Working
+##### HP 33C - Working
 
-##### HP 34 - Working
+##### HP 34C - Working
 
-##### HP 37 - Completed
+##### HP 37E - Completed
 * Fails self test.
 
-##### HP 38 - Completed
+##### HP 38C - Completed
 
 ##### HP 67 - Working
 * Cannot read or write to magnetic cards.
 * Has continuous memory.
+
+##### HP 10C - Work in progress.
+
+##### HP 11C - Work in progress.
+
+##### HP 12C - Work in progress.
+
+##### HP 15C - Work in progress.
+
+##### HP 16C - Work in progress.
 
 ### Compiling
 
@@ -126,6 +142,23 @@ of the CPU registers.
 
 When in trace mode a jump to the same instruction produces no output.
 
+### ROM Images
+
+No ROM images are included for the HP10C, HP11C, HP12C, HP15C, HP16C.
+
+The '-r <filename>' command line option provides the ability to use the ROM
+contents held in an separate file as hexadecimal address:opcode pairs.
+
+    0000:107
+    0001:04e
+    0002:270
+    0003:238
+    0004:2ee
+    0005:13f
+
+This allows you to use your own ROM images with any of the simulators. Even
+if they already have a ROM image included in the code.
+
 ### Known Issues
 
 On UNIX/Linux a 24 bit colour display is required.
@@ -162,6 +195,8 @@ are missing some characters (for example the Pi symbol).
 
 - Debian 10 (Buster), GCC 8.3.0, x64
 
+- Debian 10 (Buster), clang 7.0.1, x64
+
 - Debian 10 (Buster), GCC 8.3.0, arm
 
 - Debian 9 (Stretch), GCC 6.3.0, arm
@@ -178,7 +213,7 @@ The following packages are required to build and/or run the simulator.
 
 - Gentoo : gcc, make, libx11&#8209;dev, libc6&#8209;dev, font&#8209;misc&#8209;misc
 
-- Debian : gcc, make, libx11&#8209;dev, libc6&#8209;dev, xfonts&#8209;base
+- Debian : gcc (or clang), make, libx11&#8209;dev, libc6&#8209;dev, xfonts&#8209;base
 
 - Ubuntu : gcc, make, libx11&#8209;dev, libc6&#8209;dev, xfonts&#8209;base
 
