@@ -13,7 +13,7 @@ Unlike all the other simulators the ROM images for the HP10C, HP11C, HP12C,
 HP15C, HP16C are not defined in the the source code and must be loaded from
 a separate ROM file.
 
-![HP10](./img/x11-calc-10.png) ![HP11](./img/x11-calc-11.png) ![HP12](./img/x11-calc-12.png)
+![HP10](./img/x11-calc-10.png) ![HP11](./img/x11-calc-11.png)
 
 More [screenshots](./img/)
 
