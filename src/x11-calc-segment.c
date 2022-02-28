@@ -45,6 +45,7 @@
  * 08 Aug 21         - Tidied up spelling errors in the comments - MT
  * 03 Jan 21         - Changed debug() macro so that debug code is executed
  *                     when DEBUG is defined (doesn't need to be true) - MT
+ * 08 Feb 22         - Include header for labels - MT
  *
  * TO DO :           - Optimize drawing of display segment by drawing in
  ^                     all the darker background regions before the foreground.
@@ -64,6 +65,7 @@
 
 #include "x11-calc-switch.h"
 #include "x11-calc-button.h"
+#include "x11-calc-label.h"
 
 #include "x11-calc.h"
 
