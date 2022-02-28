@@ -21,10 +21,10 @@
 #	Note seperator (tab) at the beginning of the line CANNOT be a space..!
 #
 #	01 May 13   0.1	- Initial version - MT
-#  02 Jul 13         - Seperated code and headers for button and colour
+#  02 Jul 13         - Separated  code  and headers for button  and  colour
 #                      manipulation into separate files - MT
-#  09 Mar 14   0.2   - Seperated  code for different calculator models into
-#                      a  seperate files (instead of using a single  source
+#  09 Mar 14   0.2   - Separated  code for different calculator models into
+#                      a  separate files (instead of using a single  source
 #                      file with conditional compilation - MT
 #  27 Sep 20   0.3   - Added make clean option - MT
 #  08 Aug 21   0.4   - Removed x11-calc-format - MT
@@ -39,10 +39,11 @@
 #   9 Oct 21	0.11	- Moved source code and executable files into separate
 #							  folders - MT
 #  21 Jan 22         - Moved text messages to a separate file  - MT
-#  22 jan 22			- Define a symbol for the current language - MT
+#  22 jan 22			- Added a symbol for the current language - MT
+#	24 Feb 22			- Clean now deletes ALL object files - MT
 #
 
-MODEL		= 21
+MODEL		= 10
 PROGRAM	= x11-calc
 SOURCES 	= x11-calc.c x11-calc-cpu.c x11-calc-display.c x11-calc-segment.c
 SOURCES 	+= x11-calc-button.c x11-calc-switch.c x11-calc-label.c x11-calc-colour.c
@@ -56,7 +57,7 @@ LIBS		= -lX11 -lm
 FLAGS		= -fcommon -Wall -pedantic -ansi -std=gnu99
 FLAGS		+= -Wno-comment -Wno-deprecated-declarations -Wno-builtin-macro-redefined
 FLAGS		+= -no-pie
-#FLAGS		+= -g # For debugging
+FLAGS		+= -g # For debugging
 CC			= gcc
 
 
@@ -72,4 +73,5 @@ $(OBJECTS) : $(SOURCES)
 	@$(CC) $(FLAGS) -c $(SOURCES)
 
 clean:
-	@rm -f $(PROGRAM)-$(MODEL).o
+#	@rm -f $(PROGRAM)-$(MODEL).o
+	@rm -f ../bin/$(OBJECTS) # -v
