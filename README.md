@@ -29,6 +29,16 @@ More [screenshots](./img/)
 
 ### Status
 
+##### HP 10C - Work in progress.
+
+##### HP 11C - Work in progress.
+
+##### HP 12C - Work in progress.
+
+##### HP 15C - Work in progress.
+
+##### HP 16C - Work in progress.
+
 ##### HP 35 - Working
 
 ##### HP 80 - Working
@@ -63,16 +73,6 @@ More [screenshots](./img/)
 ##### HP 67 - Working
 * Cannot read or write to magnetic cards.
 * Has continuous memory.
-
-##### HP 10C - Work in progress.
-
-##### HP 11C - Work in progress.
-
-##### HP 12C - Work in progress.
-
-##### HP 15C - Work in progress.
-
-##### HP 16C - Work in progress.
 
 ### Compiling
 
