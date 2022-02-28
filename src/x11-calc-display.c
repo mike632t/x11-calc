@@ -59,8 +59,7 @@
  * 03 Jan 21         - Changed debug() macro so that debug code is executed
  *                     when DEBUG is defined (doesn't need to be true) - MT
  * 29 Jan 22         - Added an optional bezel to the display - MT
- * 31 Jan 22         - Added support for the HP10C, HP11C, HP12C, HP15C and
- *                     HP16C - MT
+ * 20 Feb 22         - Now supports the 10C, 11C, 12C, 15C and 16C - MT
  *
  */
 
@@ -77,6 +76,7 @@
 
 #include "x11-calc-button.h"
 #include "x11-calc-switch.h"
+#include "x11-calc-label.h"
 
 #include "x11-calc.h"
 
@@ -178,22 +178,11 @@ int i_display_draw(Display* x_display, int x_application_window, int i_screen, o
 int i_display_update(Display* x_display, int x_application_window, int i_screen, odisplay *h_display, oprocessor *h_processor){
 #if defined(HP67)
    int i_count;
-   static int c_digits [] = { DISPLAY_ZERO,
-                              DISPLAY_ONE,
-                              DISPLAY_TWO,
-                              DISPLAY_THREE,
-                              DISPLAY_FOUR,
-                              DISPLAY_FIVE,
-                              DISPLAY_SIX,
-                              DISPLAY_SEVEN,
-                              DISPLAY_EIGHT,
-                              DISPLAY_NINE,
-                              DISPLAY_r,
-                              DISPLAY_C,
-                              DISPLAY_o,
-                              DISPLAY_d,
-                              DISPLAY_E,
-                              DISPLAY_SPACE };
+   static int c_digits [] =
+   {
+      DISPLAY_ZERO, DISPLAY_ONE, DISPLAY_TWO, DISPLAY_THREE, DISPLAY_FOUR, DISPLAY_FIVE, DISPLAY_SIX, DISPLAY_SEVEN,
+      DISPLAY_EIGHT, DISPLAY_NINE, DISPLAY_r, DISPLAY_C, DISPLAY_o, DISPLAY_d, DISPLAY_E, DISPLAY_SPACE
+   };
 
    for (i_count = 0; i_count < DIGITS; i_count++) {
       if (h_display->segment[i_count] != NULL) {
@@ -243,16 +232,11 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
    }
 #elif defined (HP35) || defined (HP80) || defined (HP45) || defined (HP70) || defined(HP55)
    int i_count, i_offset;
-   static int c_digits [] = { DISPLAY_ZERO,
-                              DISPLAY_ONE,
-                              DISPLAY_TWO,
-                              DISPLAY_THREE,
-                              DISPLAY_FOUR,
-                              DISPLAY_FIVE,
-                              DISPLAY_SIX,
-                              DISPLAY_SEVEN,
-                              DISPLAY_EIGHT,
-                              DISPLAY_NINE };
+   static int c_digits [] =
+   {
+      DISPLAY_ZERO, DISPLAY_ONE, DISPLAY_TWO, DISPLAY_THREE, DISPLAY_FOUR, DISPLAY_FIVE,
+      DISPLAY_SIX, DISPLAY_SEVEN, DISPLAY_EIGHT, DISPLAY_NINE
+   };
 
    i_offset = REG_SIZE - 1;
    for (i_count = 0; i_count < DIGITS; i_count++) {
@@ -297,34 +281,28 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
       }
       i_offset--;
    }
-#elif defined(HP31) || defined(HP32) || defined(HP33) || defined(HP34) || defined(HP37) || defined(HP38) || defined(HP10) ||  defined(HP11) ||  defined(HP12) ||  defined(HP15) ||  defined(HP16)
+#elif defined(HP31) || defined(HP32) || defined(HP33) || defined(HP34) || defined(HP37) || defined(HP38)
    int i_count;
-   static int c_digits [] = { DISPLAY_ZERO,
-                              DISPLAY_ONE,
-                              DISPLAY_TWO,
-                              DISPLAY_THREE,
-                              DISPLAY_FOUR,
-                              DISPLAY_FIVE,
-                              DISPLAY_SIX,
-                              DISPLAY_SEVEN,
-                              DISPLAY_EIGHT,
-                              DISPLAY_NINE,
-                              DISPLAY_r,
-                              DISPLAY_c,
-                              DISPLAY_o,
-                              DISPLAY_P,
-                              DISPLAY_E,
-                              DISPLAY_SPACE };
+   static int c_digits [] =
+   {
+      DISPLAY_ZERO, DISPLAY_ONE, DISPLAY_TWO, DISPLAY_THREE, DISPLAY_FOUR, DISPLAY_FIVE, DISPLAY_SIX, DISPLAY_SEVEN,
+      DISPLAY_EIGHT, DISPLAY_NINE, DISPLAY_r, DISPLAY_c, DISPLAY_o, DISPLAY_P, DISPLAY_E, DISPLAY_SPACE
+   };
 
-   for (i_count = 0; i_count < DIGITS; i_count++) {
-      if (h_display->segment[i_count] != NULL) {
-         if (h_processor->flags[DISPLAY_ENABLE] && h_processor->enabled) {
+   for (i_count = 0; i_count < DIGITS; i_count++)
+   {
+      if (h_display->segment[i_count] != NULL)
+      {
+         if (h_processor->flags[DISPLAY_ENABLE] && h_processor->enabled)
+         {
             if (i_count == 0)
                h_display->segment[i_count]->mask = DISPLAY_SPACE;
             else
                h_display->segment[i_count]->mask = c_digits[h_processor->reg[A_REG]->nibble[REG_SIZE - 1 - i_count]];
-            if ((h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x04) != 0) {
-               if (i_count > 1) {
+            if ((h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x04) != 0)
+            {
+               if (i_count > 1)
+               {
                   if (h_processor->reg[A_REG]->nibble[REG_SIZE - 1 - i_count]== 0x9)
                      h_display->segment[i_count]->mask = DISPLAY_MINUS;
                   else
@@ -333,7 +311,8 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
                else
                   if (i_count == 1) h_display->segment[0]->mask = DISPLAY_MINUS; /* Negative value */
             }
-            if ((h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x02) != 0) {
+            if ((h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x02) != 0)
+            {
                if ((h_display->segment[i_count]->mask != DISPLAY_COMMA)
                   && (h_display->segment[i_count]->mask != DISPLAY_SPACE)
                   && (h_display->segment[i_count]->mask != DISPLAY_MINUS))
@@ -342,7 +321,8 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
                   h_display->segment[0]->mask = DISPLAY_MINUS; /* Self test */
 
             }
-            if ((h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x01) != 0) {
+            if ((h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x01) != 0)
+            {
                if (i_count == 0)
                   h_display->segment[i_count]->mask = DISPLAY_SPACE;
                else
@@ -353,24 +333,74 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
             h_display->segment[i_count]->mask = DISPLAY_SPACE;
       }
    }
+#elif defined(HP10) ||  defined(HP11) ||  defined(HP12) ||  defined(HP15) ||  defined(HP16)
+   /*
+    * Unlike the earlier models which display the contents of the processor
+    * registers  directly, the voyager series use two memory registers ([9]
+    * and [10]) to hold that state of every segment (and annunciator).
+    *
+    * When updating the display it is necessary to look up the state of all
+    * the segments individually, using the table below to map the values in
+    * the two memory registers to each segment in each digit...
+    *
+    */
+   int i_count, i_counter;
+#if defined(HP10) /* Uses a different display to the earlier models so the look up table is different */
+   static int i_map [DIGITS][9][3] =
+   { /*      A             B             C             D             E             F             G             H             I                    */
+     /*  r   n   b     r   n   b     r   n   b     r   n   b     r   n   b     r   n   b     r   n   b     r   n   b     r   n   b                */
+      {{ 0,  0,  0}, { 0,  0,  0}, { 0,  0,  0}, { 0,  0,  0}, { 0,  0,  0}, { 0,  0,  0}, {10, 11,  4}, { 0,  0,  0}, { 0,  0,  0}}, /* Digit 0  */
+      {{10, 10,  8}, {10, 10,  4}, {10, 11,  1}, {10, 11,  8}, {10, 11,  2}, {10, 10,  2}, {10, 10,  1}, {10, 12,  2}, {10, 12,  1}}, /* Digit 1  */
+      {{10,  3,  8}, {10,  3,  4}, {10,  4,  1}, {10, 12,  8}, {10,  4,  2}, {10,  3,  2}, {10,  3,  1}, {10, 13,  2}, {10, 13,  1}}, /* Digit 2  */
+      {{10,  2,  2}, {10,  2,  1}, {10,  2,  4}, {10, 13,  8}, {10,  2,  8}, {10,  1,  8}, {10,  1,  4}, {10,  6,  2}, {10,  6,  1}}, /* Digit 3  */
+      {{10,  7,  2}, {10,  7,  1}, {10,  7,  4}, {10,  4,  8}, {10,  7,  8}, {10,  6,  8}, {10,  6,  4}, {10,  8,  2}, {10,  8,  1}}, /* Digit 4  */
+      {{10,  9,  2}, {10,  9,  1}, {10,  9,  4}, {10,  5,  2}, {10,  9,  8}, {10,  8,  8}, {10,  8,  4}, {10,  5,  8}, {10,  5,  4}}, /* Digit 5  */
+      {{ 9, 13,  2}, { 9, 13,  1}, { 9, 13,  4}, { 9,  1,  8}, { 9, 13,  8}, { 9, 12,  8}, { 9, 12,  4}, { 9, 12,  2}, { 9, 12,  1}}, /* Digit 6  */
+      {{ 9, 11,  2}, { 9, 11,  1}, { 9, 11,  4}, { 9,  2,  2}, { 9, 11,  8}, { 9, 10,  8}, { 9, 10,  4}, { 9, 10,  2}, { 9, 10,  1}}, /* Digit 7  */
+      {{ 9,  9,  2}, { 9,  9,  1}, { 9,  9,  4}, { 9,  2,  8}, { 9,  9,  8}, { 9,  8,  8}, { 9,  8,  4}, { 9,  4,  2}, { 9,  4,  1}}, /* Digit 8  */
+      {{ 9,  7,  8}, { 9,  7,  4}, { 9,  8,  1}, { 9,  3,  8}, { 9,  8,  2}, { 9,  7,  2}, { 9,  7,  1}, { 9,  3,  2}, { 9,  3,  1}}, /* Digit 9  */
+      {{ 9,  6,  2}, { 9,  6,  1}, { 9,  6,  4}, { 9,  4,  8}, { 9,  6,  8}, { 9,  5,  8}, { 9,  5,  4}, { 9,  5,  2}, { 9,  5,  1}}  /* Digit 10 */
+   };
+#else
+   static int i_map [DIGITS][9][3] =
+   { /*      A             B             C             D             E             F             G             H             I                    */
+     /*  r   n   b     r   n   b     r   n   b     r   n   b     r   n   b     r   n   b     r   n   b     r   n   b     r   n   b                */
+      {{ 0,  0,  0}, { 0,  0,  0}, { 0,  0,  0}, { 0,  0,  0}, { 0,  0,  0}, { 0,  0,  0}, { 9, 11,  4}, { 0,  0,  0}, { 0,  0,  0}}, /* Digit 0  */
+      {{ 9,  5,  2}, { 9,  5,  1}, { 9,  4,  4}, { 9, 11,  8}, { 9,  4,  8}, { 9,  5,  8}, { 9,  5,  4}, { 9,  9,  8}, { 9,  9,  4}}, /* Digit 1  */
+      {{ 9,  6,  8}, { 9,  6,  4}, { 9,  6,  1}, { 9,  4,  2}, { 9,  6,  2}, { 9,  7,  2}, { 9,  7,  1}, { 9,  3,  8}, { 9,  3,  4}}, /* Digit 2  */
+      {{ 9, 12,  8}, { 9, 12,  4}, { 9, 12,  1}, { 9,  3,  2}, { 9, 12,  2}, { 9, 13,  2}, { 9, 13,  1}, { 9, 13,  8}, { 9, 12,  4}}, /* Digit 3  */
+      {{ 9,  8,  2}, { 9,  8,  1}, { 9,  8,  8}, { 9,  2,  2}, { 9,  7,  4}, { 9,  7,  8}, { 9,  8,  4}, { 9,  9,  2}, { 9,  9,  1}}, /* Digit 4  */
+      {{ 9, 10,  8}, { 9, 10,  4}, { 9, 10,  1}, { 9,  1,  8}, { 9, 10,  2}, { 9, 11,  2}, { 9, 11,  1}, { 9,  2,  8}, { 9,  2,  4}}, /* Digit 5  */
+      {{10,  2,  8}, {10,  2,  4}, {10,  2,  1}, {10,  3,  8}, {10,  2,  2}, {10,  3,  2}, {10,  3,  1}, {10,  4,  2}, {10,  4,  1}}, /* Digit 6  */
+      {{10,  5,  2}, {10,  5,  1}, {10,  4,  4}, {10,  1,  8}, {10,  4,  8}, {10,  5,  8}, {10,  5,  4}, {10,  6,  2}, {10,  6,  1}}, /* Digit 7  */
+      {{10,  7,  2}, {10,  7,  1}, {10,  6,  4}, {10,  9,  8}, {10,  6,  8}, {10,  7,  8}, {10,  7,  4}, {10,  9,  2}, {10,  9,  1}}, /* Digit 8  */
+      {{10, 11,  8}, {10, 11,  4}, {10, 11,  1}, {10,  8,  2}, {10, 11,  2}, {10, 12,  2}, {10, 12,  1}, {10,  8,  8}, {10,  8,  4}}, /* Digit 9  */
+      {{10, 13,  2}, {10, 13,  1}, {10, 13,  1}, {10, 10,  2}, {10, 12,  8}, {10, 13,  8}, {10, 13,  4}, {10, 10,  8}, {10, 10,  4}}  /* Digit 10 */
+   };
+#endif
+   for (i_count = 0; i_count < DIGITS; i_count++)
+   {
+      if (h_display->segment[i_count] != NULL)
+      {
+         h_display->segment[i_count]->mask = DISPLAY_SPACE;
+         if (h_processor->flags[DISPLAY_ENABLE] && h_processor->enabled)
+         {
+            for (i_counter = 0; i_counter < 9; i_counter++)
+            {
+               if (i_map[i_count][i_counter][0] > 0)
+                  if ((h_processor->mem[i_map[i_count][i_counter][0]]->nibble[i_map[i_count][i_counter][1]] & i_map[i_count][i_counter][2]))
+                     h_display->segment[i_count]->mask |= (1 << i_counter); /* Mask determines which segments are on */
+            }
+         }
+      }
+   }
 #else
    int i_count;
-   static int c_digits [] = { DISPLAY_ZERO,
-                              DISPLAY_ONE,
-                              DISPLAY_TWO,
-                              DISPLAY_THREE,
-                              DISPLAY_FOUR,
-                              DISPLAY_FIVE,
-                              DISPLAY_SIX,
-                              DISPLAY_SEVEN,
-                              DISPLAY_EIGHT,
-                              DISPLAY_NINE,
-                              DISPLAY_r,
-                              DISPLAY_c,
-                              DISPLAY_o,
-                              DISPLAY_P,
-                              DISPLAY_E,
-                              DISPLAY_SPACE };
+   static int c_digits [] =
+   {
+      DISPLAY_ZERO, DISPLAY_ONE, DISPLAY_TWO, DISPLAY_THREE, DISPLAY_FOUR, DISPLAY_FIVE, DISPLAY_SIX, DISPLAY_SEVEN,
+      DISPLAY_EIGHT, DISPLAY_NINE, DISPLAY_r, DISPLAY_c, DISPLAY_o, DISPLAY_P, DISPLAY_E, DISPLAY_SPACE
+   };
 
    for (i_count = 0; i_count < DIGITS; i_count++) {
       if (h_display->segment[i_count] != NULL) {
