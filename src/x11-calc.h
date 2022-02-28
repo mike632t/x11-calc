@@ -51,6 +51,7 @@
  * 20 Jan 22         - Model number now defined in make script for VMS - MT
  * 31 Jan 22         - Added support for the HP10C, HP11C, HP12C, HP15C and
  *                     HP16C - MT
+ * 26 Feb 22         - Added place holder for possible HP41 support - MT
  *
  * TO DO :           -
  */
@@ -151,6 +152,11 @@
 #define FILENAME     "x11-calc-38"
 #define TITLE        "RPN calc 38C"
 #include "x11-calc-38.h"
+
+#elif defined(HP41)
+#define FILENAME     "x11-calc-41"
+#define TITLE        "RPN calc 41C"
+#include "x11-calc-41.h"
 
 #elif defined(HP10)
 #define FILENAME     "x11-calc-10"
