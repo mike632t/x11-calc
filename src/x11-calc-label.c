@@ -21,8 +21,11 @@
  * 29 Sep 20   0.1   - Initial version - MT
  * 03 Jan 21         - Changed debug() macro so that debug code is executed
  *                     when DEBUG is defined (doesn't need to be true) - MT
+ * 10 Feb 22         - Added background shading and horizontal line - MT
  *
- * TO DO:            - Implement ability to align text in a label.
+ * TO DO:            - Implement ability to align text in a label using the
+ *                     style property to modify the position and appearance
+ *                     of the text.
  *
  */
 
@@ -68,8 +71,8 @@ olabel *h_label_pressed(olabel *h_label, int i_xpos, int i_ypos){
 
 /* label_create (index, text, font, left, top, width, height, colour) */
 
-olabel *h_label_create(int i_index, char* s_text, XFontStruct *h_normal_font,
-   int i_left, int i_top, int i_width, int i_height, int i_alignment,
+olabel *h_label_create(int i_index, char* s_text, XFontStruct *h_font,
+   int i_left, int i_top, int i_width, int i_height,
    unsigned int i_colour, unsigned int i_background) {
 
    olabel *h_label; /* Ponter to label. */
@@ -79,14 +82,13 @@ olabel *h_label_create(int i_index, char* s_text, XFontStruct *h_normal_font,
 
    h_label->index = i_index;
    h_label->text = s_text;
-   h_label->text_font = h_normal_font;
+   h_label->text_font = h_font;
 
    h_label->left = i_left;
    h_label->top = i_top;
    h_label->width = i_width;
    h_label->height = i_height;
 
-   h_label->alignment = i_alignment; /* Left, centre, right */
    h_label->colour = i_colour;
    h_label->background = i_background;
    return(h_label);
@@ -96,26 +98,23 @@ olabel *h_label_create(int i_index, char* s_text, XFontStruct *h_normal_font,
 
 int i_label_draw(Display *h_display, int x_application_window, int i_screen, olabel *h_label){
 
-   int i_indent, i_upper;
-
-   XSetForeground(h_display, DefaultGC(h_display, i_screen), h_label->background);
-   XFillRectangle(h_display, x_application_window, DefaultGC(h_display, i_screen), h_label->left, h_label->top , h_label->width, h_label->height); /* Fill in label background  */
-
-   /* Find position of the label. */
-   i_indent = h_label->left + (h_label->width - XTextWidth(h_label->text_font, h_label->text, strlen(h_label->text))) / 2; /* Center text */
+   int i_indent, i_upper, i_offset;
+   i_offset = h_label->top + h_label->height / 2;
+   XSetFont(h_display, DefaultGC(h_display, i_screen), h_label->text_font->fid); /* Set the text font. */
+   i_indent = 1 + h_label->left + (h_label->width - XTextWidth(h_label->text_font, h_label->text, strlen(h_label->text))) / 2; /* Find position of the text. */
    i_upper = h_label->top + (h_label->text_font->ascent) + (h_label->height - (h_label->text_font->ascent + h_label->text_font->descent)) / 2; /* Position text in middle of label. */
 
-   /* Draw the label. */
-   XSetForeground(h_display, DefaultGC(h_display, i_screen), h_label->colour);
+   XSetForeground(h_display, DefaultGC(h_display, i_screen), h_label->background);
+   XFillRectangle(h_display, x_application_window, DefaultGC(h_display, i_screen), h_label->left, h_label->top , h_label->width, h_label->height); /* Fill in label background. */
 
-   /* Set the text font. */
-   XSetFont(h_display, DefaultGC(h_display, i_screen), h_label->text_font->fid);
+   XSetForeground(h_display, DefaultGC(h_display, i_screen), h_label->colour); /* Set the text colour. */
+   XDrawLine(h_display, x_application_window, DefaultGC(h_display, i_screen),h_label->left , i_offset, h_label->left + h_label->width - 2, i_offset); /* Draw line through middle of label. */
 
-   /* Find position of the text. */
-   i_indent = 1 + h_label->left + (h_label->width - XTextWidth(h_label->text_font, h_label->text, strlen(h_label->text))) / 2;
+   XSetForeground(h_display, DefaultGC(h_display, i_screen), h_label->background);
+   XFillRectangle(h_display, x_application_window, DefaultGC(h_display, i_screen), (i_indent - 3), h_label->top , XTextWidth(h_label->text_font, h_label->text, strlen(h_label->text)) + 5, h_label->height); /* Fill in label background. */
 
-   /* Draw the main text. */
-   XDrawString(h_display, x_application_window, DefaultGC(h_display, i_screen), i_indent, i_upper, h_label->text, strlen(h_label->text));
+   XSetForeground(h_display, DefaultGC(h_display, i_screen), h_label->colour); /* Set the background colour. */
+   XDrawString(h_display, x_application_window, DefaultGC(h_display, i_screen), i_indent, i_upper, h_label->text, strlen(h_label->text)); /* Draw the text. */
    return(True);
 }
 
