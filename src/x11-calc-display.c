@@ -60,6 +60,7 @@
  *                     when DEBUG is defined (doesn't need to be true) - MT
  * 29 Jan 22         - Added an optional bezel to the display - MT
  * 20 Feb 22         - Now supports the 10C, 11C, 12C, 15C and 16C - MT
+ * 01 Mar 22         - Fixed 11C, 12C, 15C and 16C display (digit 3) - MT
  *
  */
 
@@ -333,7 +334,7 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
             h_display->segment[i_count]->mask = DISPLAY_SPACE;
       }
    }
-#elif defined(HP10) ||  defined(HP11) ||  defined(HP12) ||  defined(HP15) ||  defined(HP16)
+#elif defined(HP10) || defined(HP11) || defined(HP12) || defined(HP15) || defined(HP16)
    /*
     * Unlike the earlier models which display the contents of the processor
     * registers  directly, the voyager series use two memory registers ([9]
@@ -368,7 +369,7 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
       {{ 0,  0,  0}, { 0,  0,  0}, { 0,  0,  0}, { 0,  0,  0}, { 0,  0,  0}, { 0,  0,  0}, { 9, 11,  4}, { 0,  0,  0}, { 0,  0,  0}}, /* Digit 0  */
       {{ 9,  5,  2}, { 9,  5,  1}, { 9,  4,  4}, { 9, 11,  8}, { 9,  4,  8}, { 9,  5,  8}, { 9,  5,  4}, { 9,  9,  8}, { 9,  9,  4}}, /* Digit 1  */
       {{ 9,  6,  8}, { 9,  6,  4}, { 9,  6,  1}, { 9,  4,  2}, { 9,  6,  2}, { 9,  7,  2}, { 9,  7,  1}, { 9,  3,  8}, { 9,  3,  4}}, /* Digit 2  */
-      {{ 9, 12,  8}, { 9, 12,  4}, { 9, 12,  1}, { 9,  3,  2}, { 9, 12,  2}, { 9, 13,  2}, { 9, 13,  1}, { 9, 13,  8}, { 9, 12,  4}}, /* Digit 3  */
+      {{ 9, 12,  8}, { 9, 12,  4}, { 9, 12,  1}, { 9,  3,  2}, { 9, 12,  2}, { 9, 13,  2}, { 9, 13,  1}, { 9, 13,  8}, { 9, 13,  4}}, /* Digit 3  */
       {{ 9,  8,  2}, { 9,  8,  1}, { 9,  8,  8}, { 9,  2,  2}, { 9,  7,  4}, { 9,  7,  8}, { 9,  8,  4}, { 9,  9,  2}, { 9,  9,  1}}, /* Digit 4  */
       {{ 9, 10,  8}, { 9, 10,  4}, { 9, 10,  1}, { 9,  1,  8}, { 9, 10,  2}, { 9, 11,  2}, { 9, 11,  1}, { 9,  2,  8}, { 9,  2,  4}}, /* Digit 5  */
       {{10,  2,  8}, {10,  2,  4}, {10,  2,  1}, {10,  3,  8}, {10,  2,  2}, {10,  3,  2}, {10,  3,  1}, {10,  4,  2}, {10,  4,  1}}, /* Digit 6  */
