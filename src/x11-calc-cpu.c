@@ -295,6 +295,8 @@
  * 22 Feb 22         - Displays the contents of any changed registers (10C,
  *                     11C, 12C, 15C and 16C only) - MT
  * 28 Feb 22         - Can now read ROM contents from a file - MT
+ * 01 Mar 22         - Branch to subroutine now calls op_jsb(), and 'rstkb'
+ *                     now clears the carry flag - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -833,12 +835,14 @@ static void v_op_dec_p(oprocessor *h_processor) /* Decrement p register */
 #endif
 
 #if defined (HP10) || defined (HP11) || defined (HP12) || defined (HP15) || defined (HP16) || defined(HP41)
-void op_jsb(oprocessor *h_processor, int i_address) /* Jump to subroutine */
+
+void op_jsb(oprocessor *h_processor, int i_address) /* Call to subroutine */
 {
    h_processor->stack[h_processor->sp] = h_processor->pc; /* Push current address on the stack */
    h_processor->sp = (h_processor->sp + 1) & (STACK_SIZE - 1); /* Update stack pointer */
-   h_processor->pc = ((h_processor->pc & 0xff00) | i_address); /* Note - Uses an eight bit address */
+   h_processor->pc = i_address; /* Long address */
 }
+
 #else
 
 static void v_delayed_rom(oprocessor *h_processor) /* Delayed ROM select */
@@ -1692,7 +1696,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             else
             {
                if (h_processor->trace) fprintf(stdout, "rstkb");
-               if (!h_processor->keypressed) h_processor->kyf = False; /* Clear keyboard flag if no key pressed **/
+               if (!h_processor->keypressed) h_processor->flags[CARRY] = h_processor->kyf = False; /* Clear keyboard flag if no key pressed **/
             }
             break;
          case 0x03: /* Test status bit [dddd] if 0 <= dddd <= 14 (dd dd00 1100) or test keyboard (11 1100 1100) **/
@@ -2078,27 +2082,17 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             v_op_inc_pc(h_processor); /* Increment program counter */
             switch (i_next & 0x3)
             {
-            case 0x0:
-               if (!h_processor->flags[PREV_CARRY])
-               {
-                  h_processor->stack[h_processor->sp] = h_processor->pc; /* Push current address on the stack */
-                  h_processor->sp = (h_processor->sp + 1) & (STACK_SIZE - 1); /* Update stack pointer */
-                  h_processor->pc = i_address;
-               }
+            case 0x0: /* if no carry then stack[2] -> stack[3], stack[1] -> stack[2], stack[0] -> stack[1], pc -> stack[0], a -> pc - Branch to subroutine on no carry (aa aaaa aa00, aa aaaa aa00) **/
+               if (!h_processor->flags[PREV_CARRY]) op_jsb(h_processor, i_address);
                break;
-            case 0x1:
-               if (h_processor->flags[PREV_CARRY])
-               {
-                  h_processor->stack[h_processor->sp] = h_processor->pc; /* Push current address on the stack */
-                  h_processor->sp = (h_processor->sp + 1) & (STACK_SIZE - 1); /* Update stack pointer */
-                  h_processor->pc = i_address;
-               }
+            case 0x1: /* if carry then stack[2] -> stack[3], stack[1] -> stack[2], stack[0] -> stack[1], pc -> stack[0], a -> pc - Branch to subroutine on no carry (aa aaaa aa00, aa aaaa aa01) **/
+               if (h_processor->flags[PREV_CARRY]) op_jsb(h_processor, i_address);
                break;
-            case 0x2:
+            case 0x2:  /* if no carry then a -> pc - Branch on no carry (aa aaaa aa00, aa aaaa aa10) **/
                if (!h_processor->flags[PREV_CARRY])
                   h_processor->pc = i_address;
                break;
-            case 0x3:
+            case 0x3: /* if carry then a -> pc - Branch on carry (aa aaaa aa00, aa aaaa aa11) **/
                if (h_processor->flags[PREV_CARRY])
                   h_processor->pc = i_address;
                break;
