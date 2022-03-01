@@ -30,10 +30,15 @@
  * 08 Aug 21         - Tidied up spelling errors in the comments - MT
  * 20 Dec 21         - Updated display for HP67 - MT
  * 29 Jan 22         - Added an optional bezel to the display - MT
+ * 01 Mar 22         - Only define constants that are required - MT
  *
  */
 
 #include "x11-calc-cpu.h"
+
+#define DISPLAY_SPACE      0x0000
+
+#if !(defined(HP10) || defined(HP11) || defined(HP12) || defined(HP15) || defined(HP16))
 
 #define DISPLAY_ONE        0x0030
 #define DISPLAY_TWO        0x006d
@@ -45,7 +50,6 @@
 #define DISPLAY_EIGHT      0x007f
 #define DISPLAY_NINE       0x0073
 #define DISPLAY_ZERO       0x003f
-#define DISPLAY_SPACE      0x0000
 #define DISPLAY_MINUS      0x0040
 #define DISPLAY_DECIMAL    0x0080
 #define DISPLAY_COMMA      0x0100
@@ -58,6 +62,8 @@
 #define DISPLAY_P          0x0067
 #define DISPLAY_E          0x004f
 #define DISPLAY_TEST       0x01ff
+
+#endif
 
 typedef struct { /* Calculator display structure. */
    int index;
