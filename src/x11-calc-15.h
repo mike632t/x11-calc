@@ -19,6 +19,7 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * 30 Jan 22   0.1   - Initial version (derived from x11-calc-10.c) - MT
+ * 02 Mar 22         - Fixed ROM size - MT
  *
  */
 
@@ -55,7 +56,7 @@
 #define KEY_GAP            3 * SCALE_WIDTH
 
 #define MEMORY_SIZE        1024
-#define ROM_SIZE           014000
+#define ROM_SIZE           034000
 
 extern int i_rom [ROM_SIZE];
 
