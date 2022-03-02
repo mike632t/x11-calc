@@ -20,7 +20,7 @@
  *
  * 10 Oct 21   0.1   - Initial version - MT
  * 12 Oct 21         - Removed Title and replaced with model number - MT
- *                   - Added macro definition for continuous memory - MT
+ * 02 Mar 22         - Modified memory size (still too big) - MT
  *
  */
 
@@ -56,7 +56,7 @@
 #define DISPLAY_WIDTH      200 * SCALE_WIDTH
 #define DISPLAY_HEIGHT     48 * SCALE_HEIGHT
 
-#define MEMORY_SIZE        4096
+#define MEMORY_SIZE        1024
 #define ROM_SIZE           010000
 
 extern int i_rom [ROM_SIZE];
