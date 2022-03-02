@@ -299,6 +299,8 @@
  *                     now clears the carry flag - MT
  * 02 Mar 22         - Fixed 'm = c', 'c = m', and 'cmex' (forgot about the
  *                     field size) - MT
+ *                   - Changed the 'g' register from an integer to an array
+ *                     to make it simpler to reference each nibble - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -1743,32 +1745,34 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                break;
             case 0x01: /* c[pt + 1:pt] -> g - Load g from c (00 0101 1000) */
                if (h_processor->trace) fprintf(stdout, "g = c\t");
-               h_processor->g  = h_processor->reg[C_REG]->nibble[*h_active_pointer(h_processor)] & 0x0f; /* c[pt] -> g[0] */
+               h_processor->g[0]  = h_processor->reg[C_REG]->nibble[*h_active_pointer(h_processor)] & 0x0f; /* c[pt] -> g[0] */
                if (*h_active_pointer(h_processor) < (REG_SIZE - 1))  /* Check that pt + 1 is valid */
-                  h_processor->g = h_processor->g | (h_processor->reg[C_REG]->nibble[*h_active_pointer(h_processor) + 1] & 0x0f) << 4; /* c[pt + 1] -> g[1] */
-               if (h_processor->trace) fprintf(stdout, "\tg = 0x%02x", h_processor->g);
+                  h_processor->g[1] = h_processor->reg[C_REG]->nibble[*h_active_pointer(h_processor) + 1] & 0x0f; /* c[pt + 1] -> g[1] */
+               if (h_processor->trace) fprintf(stdout, "\tg = 0x%02x", h_processor->g[0] | (h_processor->g[1] << 4));
                break;
             case 0x02: /* g -> c[pt + 1:pt] - Load c from g (00 0101 1000) */
                if (h_processor->trace) fprintf(stdout, "c = g\t");
-               h_processor->reg[C_REG]->nibble[*h_active_pointer(h_processor)] = (h_processor->g & 0x0f); /* g[0] -> c[pt] */
+               h_processor->reg[C_REG]->nibble[*h_active_pointer(h_processor)] = h_processor->g[0]; /* g[0] -> c[pt] */
                if (*h_active_pointer(h_processor) < (REG_SIZE - 1))  /* Check that pt + 1 is valid */
-                  h_processor->reg[C_REG]->nibble[*h_active_pointer(h_processor) + 1] = (h_processor->g & 0xf0) >> 4; /* g[1] -> c[pt + 1] */
+                  h_processor->reg[C_REG]->nibble[*h_active_pointer(h_processor) + 1] = h_processor->g[1]; /* g[1] -> c[pt + 1] */
                if (h_processor->trace) v_fprint_register(stdout, h_processor->reg[C_REG]);
                break;
             case 0x03: /* g -> c[pt + 1:pt], c[pt + 1:pt] -> g - Exchange c and g (00 1101 1000 */
                if (h_processor->trace) fprintf(stdout, "cgex\t");
                {
-                  int i_temp = h_processor->g;
-                  h_processor->g = (h_processor->reg[C_REG]->nibble[*h_active_pointer(h_processor)] & 0x0f); /* c[pt] -> g[0] (0 -> g[1]) */
-                  h_processor->reg[C_REG]->nibble[*h_active_pointer(h_processor)] = i_temp & 0x0f; /* g[0] -> c[pt] */
+                  int i_temp[2];
+                  i_temp[0] = h_processor->g[0]; i_temp[1] = h_processor->g[1];
+                  h_processor->g[0] = h_processor->reg[C_REG]->nibble[*h_active_pointer(h_processor)] & 0x0f; /* c[pt] -> g[0] */
+                  h_processor->g[1] = 0; /* (0 -> g[1]) */
+                  h_processor->reg[C_REG]->nibble[*h_active_pointer(h_processor)] = i_temp[0]; /* g[0] -> c[pt] */
                   if (*h_active_pointer(h_processor) < (REG_SIZE - 1))  /* Check that pt + 1 is valid */
                   {
-                     h_processor->g = (h_processor->g & 0x0f) | ((h_processor->reg[C_REG]->nibble[*h_active_pointer(h_processor) + 1] & 0x0f) << 4); /* c[pt + 1] -> g[1] */
-                     h_processor->reg[C_REG]->nibble[*h_active_pointer(h_processor) + 1] = i_temp >> 4; /* g[1] -> c[pt + 1] */
+                     h_processor->g[1] = h_processor->reg[C_REG]->nibble[*h_active_pointer(h_processor) + 1] & 0x0f; /* c[pt + 1] -> g[1] */
+                     h_processor->reg[C_REG]->nibble[*h_active_pointer(h_processor) + 1] = i_temp[1]; /* g[1] -> c[pt + 1] */
                   }
                }
                if (h_processor->trace) v_fprint_register(stdout, h_processor->reg[C_REG]);
-               if (h_processor->trace) fprintf(stdout, "\tg = 0x%02x", h_processor->g);
+               if (h_processor->trace) fprintf(stdout, "\tg = 0x%02x", h_processor->g[0] | (h_processor->g[1] << 4));
                break;
             case 0x05: /* c -> m - Copy C register to M register (01 0101 1000) */
                if (h_processor->trace) fprintf(stdout, "m = c\t");

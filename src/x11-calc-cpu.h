@@ -42,6 +42,8 @@
  *                     processor  status bit to be set appropriately if the
  *                     timer is enabled - MT
  * 29 Jan 22         - Added a second pointer register 'q' - MT
+ *                   - Changed the 'g' register from an integer to an array
+ *                     to make it simpler to reference each nibble - MT
  *
  */
 
@@ -127,7 +129,7 @@ typedef struct {
    unsigned char enabled;              /* Enabled */
 #if defined (HP10) || defined (HP11) || defined (HP12) || defined (HP15) || defined (HP16) || defined(HP41)
    unsigned char kyf;                  /* Keyboard flag */
-   unsigned int g;                     /* G register */
+   unsigned int g[2];                  /* G register */
    unsigned int q;                     /* Q register */
    unsigned char ptr;                  /* Selects P or Q registers (Q = True) */
 #endif
