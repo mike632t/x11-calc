@@ -445,7 +445,7 @@ int main(int argc, char *argv[])
                else
                   if (i_count + 1 < argc)
                   {
-                     v_rom_load(h_processor, argv[i_count + 1]); /* Load user specified settings */
+                     v_read_rom(h_processor, argv[i_count + 1]); /* Load user specified settings */
                      if (i_count + 2 < argc) /* Remove the parameter from the arguments */
                         for (i_offset = i_count + 1; i_offset < argc - 1; i_offset++)
                            argv[i_offset] = argv[i_offset + 1];
@@ -593,9 +593,9 @@ int main(int argc, char *argv[])
    h_processor->step = b_step;
 
    if (s_pathname == NULL)
-      v_processor_restore(h_processor);
+      v_restore_state(h_processor);
    else
-      v_processor_load(h_processor, s_pathname); /* Load user specified settings */
+      v_read_state(h_processor, s_pathname); /* Load user specified settings */
 
    b_abort = False;
    i_count = 0;
@@ -664,9 +664,9 @@ int main(int argc, char *argv[])
             {
                v_processor_reset(h_processor);
                if (s_pathname == NULL)
-                  v_processor_restore(h_processor); /* Load current saved settings */
+                  v_restore_state(h_processor); /* Load current saved settings */
                else
-                  v_processor_load(h_processor, s_pathname); /* Load user specified settings */
+                  v_read_state(h_processor, s_pathname); /* Load user specified settings */
                b_run = True;
             }
             else { /* Check for matching button */
@@ -732,11 +732,11 @@ int main(int argc, char *argv[])
                      if (h_switch[0]->state)
                      {
                         v_processor_reset(h_processor); /* Reset the processor */
-                        v_processor_restore(h_processor); /* Restore saved settings */
+                        v_restore_state(h_processor); /* Restore saved settings */
                      }
                      else
                      {
-                        v_processor_save(h_processor); /* Save current settings */
+                        v_save_state(h_processor); /* Save current settings */
                         h_processor->enabled = False; /* Disable the processor */
                         i_ticks = DELAY; /* Set count down */
                      }
@@ -790,7 +790,7 @@ int main(int argc, char *argv[])
       }
    }
 
-   v_processor_save(h_processor); /* Save state */
+   v_save_state(h_processor); /* Save state */
 
    /** XFreeCursor (x_display, x_cursor); /* Free cursor */
    XDestroyWindow(x_display, x_application_window); /* Close connection to server */
