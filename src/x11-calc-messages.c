@@ -34,8 +34,8 @@
  */
 
 #if defined (HP10) || defined (HP11) || defined (HP12) || defined (HP15) || defined (HP16) || defined(HP41)
-#endif
 #define HEXADECIMAL
+#endif
 
 /* Remember to define prototype in include file for any new strings */
 
@@ -49,13 +49,14 @@ const char * h_msg_opcode = "%1x-%03x  %03x   ";
 const char * h_msg_address = "%03x";
 const char * h_msg_negative_offset = "-0x%x";
 const char * h_msg_positive_offset = "+0x%x";
+const char * h_msg_rom = "%x:%x";
 #else
 const char * h_msg_opcode = "%1o-%04o %04o  ";
 const char * h_msg_address = "%04o";
 const char * h_msg_negative_offset = "-0%o";
 const char * h_msg_positive_offset = "+0%o";
+const char * h_msg_rom = "%o:%o";
 #endif
-
 
 #if defined(LANG_es)
 const char * h_msg_loading = "Cargando '%s'.\n";

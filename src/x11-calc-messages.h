@@ -37,6 +37,7 @@ extern char * h_msg_opcode;
 extern char * h_msg_address;
 const char * h_msg_negative_offset;
 const char * h_msg_positive_offset;
+const char * h_msg_rom;
 
 extern char * c_msg_usage;
 extern char * h_err_invalid_operand;

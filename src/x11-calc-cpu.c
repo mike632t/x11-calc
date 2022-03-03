@@ -580,11 +580,7 @@ void v_read_rom(oprocessor *h_processor, char *s_pathname) /* Load rom from 'obj
       i_count = 0;
       while ((!feof(h_datafile)) && (i_count < ROM_SIZE))
       {
-#if defined(HEXADECIMAL)
-         i_counter = fscanf(h_datafile, "%x:%x", &i_addr, &i_opcode);
-#else
-         i_counter = fscanf(h_datafile, "%o:%o", &i_addr, &i_opcode);
-#endif
+         i_counter = fscanf(h_datafile, h_msg_rom, &i_addr, &i_opcode);
          if (i_counter < 2)
             while (((c_char = fgetc(h_datafile)) != '\n') && (!feof(h_datafile)));
          else
