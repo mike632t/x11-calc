@@ -29,6 +29,7 @@
  * 29 Jan 22         - Updated Spanish translation - MT
  * 31 Jan 22         - Updated German translation - MT
  * 02 Feb 22         - Added formatting strings for relative jumps - MT
+ * 03 Mar 22         - Updated help text - MT
  *
  */
 
@@ -84,7 +85,8 @@ const char * h_err_invalid_register = "Registro inválido (REG[%d]) en %1o-%04o 
 const char * c_msg_usage = "Uso: %s [OPCION]... [ARCHIVO]\n\
 Simularor de calculadora RPN para X11.\n\n\
   -b  ADDR                 punto de interrupcion (octal)\n\
-  -i, OPCODE               instruccion de trampa (octal)\n\
+  -i  OPCODE               instruccion de trampa (octal)\n\
+  -r  FILE                 leer el contenido de la ROM de FILE\n\
   -s,                      un paso\n\
   -t,                      seguimiento de la ejecucion\n\
       --cursor             mostrar cursor (default)\n\
@@ -142,6 +144,7 @@ const char * c_msg_usage = "Verwendung: %s [OPTION]... [DATEI]\n\
 Eine RPN rechner simulation fur X11.\n\n\
   -b  ADDR                 haltepunkt an adresse setzen (oktal)\n\
   -i, OPCODE               haltepunkt anf opcode setzen (oktal)\n\
+  -r  FILE                 lesen sie den ROM inhalt von FILE\n\
   -s,                      einzelschritt\n\
   -t,                      ausfuhrung protokollieren\n\
       --cursor             cursor anzeigen (default)\n\
@@ -199,6 +202,7 @@ const char * c_msg_usage = "Utilisation : %s [OPTION]... [FICHIER]\n\
 Une simulation RPN Calculator pour X11.\n\n\
   -b  ADDR                 définir un point d'arrêt (octal)\n\
   -i, OPCODE               définir un piège d'instruction (octal)\n\
+  -r  FILE                 lire le contenu de la ROM de FILE\n\
   -s,                      single step\n\
   -t,                      trace execution\n\
       --cursor             curseur d'affichage (par défaut)\n\
@@ -257,6 +261,7 @@ const char * c_msg_usage = "Usage: %s [OPTION]... [FILE]\n\
 An RPN Calculator simulation for X11.\n\n\
   -b  ADDR                 set break-point (octal)\n\
   -i, OPCODE               set instruction trap (octal)\n\
+  -r  FILE                 read ROM contents from FILE\n\
   -s,                      single step\n\
   -t,                      trace execution\n\
       --cursor             display cursor (default)\n\
