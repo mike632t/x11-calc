@@ -301,6 +301,8 @@
  *                     field size) - MT
  *                   - Changed the 'g' register from an integer to an array
  *                     to make it simpler to reference each nibble - MT
+ * 03 Mar 22         - Read ROM file using octal if hexadecimal is not used
+ *                     to display opcodes - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -565,7 +567,7 @@ static void v_op_inc_pc(oprocessor *h_processor) /* Increment program counter */
    h_processor->flags[CARRY] = False;
 }
 
-void v_rom_load(oprocessor *h_processor, char *s_pathname) /* Load rom from 'object' file */
+void v_read_rom(oprocessor *h_processor, char *s_pathname) /* Load rom from 'object' file */
 {
    FILE *h_datafile;
    unsigned int i_addr, i_opcode;
@@ -578,7 +580,11 @@ void v_rom_load(oprocessor *h_processor, char *s_pathname) /* Load rom from 'obj
       i_count = 0;
       while ((!feof(h_datafile)) && (i_count < ROM_SIZE))
       {
+#if defined(HEXADECIMAL)
          i_counter = fscanf(h_datafile, "%x:%x", &i_addr, &i_opcode);
+#else
+         i_counter = fscanf(h_datafile, "%o:%o", &i_addr, &i_opcode);
+#endif
          if (i_counter < 2)
             while (((c_char = fgetc(h_datafile)) != '\n') && (!feof(h_datafile)));
          else
@@ -595,7 +601,7 @@ void v_rom_load(oprocessor *h_processor, char *s_pathname) /* Load rom from 'obj
       v_error(h_err_opening_file, s_pathname); /* Can't open data file */
 }
 
-void v_processor_load(oprocessor *h_processor, char *s_pathname) /* Load saved processor state */
+void v_read_state(oprocessor *h_processor, char *s_pathname) /* Load saved processor state */
 {
 #if defined(CONTINIOUS)
    FILE *h_datafile;
@@ -618,7 +624,7 @@ void v_processor_load(oprocessor *h_processor, char *s_pathname) /* Load saved p
 #endif
 }
 
-void v_processor_save(oprocessor *h_processor) /* Save processor state */
+void v_save_state(oprocessor *h_processor) /* Save processor state */
 {
 #if defined(CONTINIOUS)
    FILE *h_datafile;
@@ -660,7 +666,7 @@ void v_processor_save(oprocessor *h_processor) /* Save processor state */
 #endif
 }
 
-void v_processor_restore(oprocessor *h_processor) /* Restore saved processor state */
+void v_restore_state(oprocessor *h_processor) /* Restore saved processor state */
 {
 #if defined(CONTINIOUS)
    char *s_dir = getenv("HOME");
@@ -681,7 +687,7 @@ void v_processor_restore(oprocessor *h_processor) /* Restore saved processor sta
 #endif
       strcat(s_pathname, s_filename);
       strcat(s_pathname, s_filetype);
-      v_processor_load(h_processor, s_pathname); /* Load settings */
+      v_read_state(h_processor, s_pathname); /* Load settings */
    }
 #endif
 }
