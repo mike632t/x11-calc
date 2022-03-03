@@ -29,7 +29,7 @@ More [screenshots](./img/)
 
 ### Status
 
-##### HP 10C - Work in progress.
+##### HP 10C - Partly working? (No continuous memory)
 
 ##### HP 11C - Work in progress.
 
@@ -39,21 +39,21 @@ More [screenshots](./img/)
 
 ##### HP 16C - Work in progress.
 
-##### HP 35 - Working
+##### HP 35  - Working
 
-##### HP 80 - Working
+##### HP 80  - Working
 
-##### HP 45 - Working
+##### HP 45  - Working
 
-##### HP 70 - Working
+##### HP 70  - Working
 
-##### HP 21 - Working
+##### HP 21  - Working
 
-##### HP 22 - Working
+##### HP 22  - Working
 
 ##### HP 25C - Working
 
-##### HP 27 - Working
+##### HP 27  - Working
 
 ##### HP 29C - Working
 
@@ -70,7 +70,7 @@ More [screenshots](./img/)
 
 ##### HP 38C - Completed
 
-##### HP 67 - Working
+##### HP 67  - Working
 * Cannot read or write to magnetic cards.
 * Has continuous memory.
 
