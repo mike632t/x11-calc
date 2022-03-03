@@ -303,9 +303,13 @@
  *                     to make it simpler to reference each nibble - MT
  * 03 Mar 22         - Read ROM file using octal if hexadecimal is not used
  *                     to display opcodes - MT
+ *                   - Added a minimal implementation of 'display blink' to
+ *                     simply  enable the display (actually getting  it  to
+ *                     blink is done in hardware) - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
+ *                   - Figure out how to get the display to blink..?
  *
  */
 
@@ -315,7 +319,7 @@
 #define DATE           "07 Feb 22"
 #define AUTHOR         "MT"
 
-#define NO_DEBUG
+#define DEBUG
 
 #include <string.h>
 #include <stdlib.h>
@@ -1935,6 +1939,12 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
          case 0x0c:
             switch ((i_opcode >> 6) & 0xf)
             {
+#if defined (HP10) || defined (HP11) || defined (HP12) || defined (HP15) || defined (HP16)
+            case 0x00: /* display blink- Display blink (00 0011 0000) */
+               if (h_processor->trace) fprintf(stdout, "blink\t");
+               h_processor->flags[DISPLAY_ENABLE] = True;
+               break;
+#endif
             case 0x01: /* c -> n - Load n from c (00 0111 0000) */
                if (h_processor->trace) fprintf(stdout, "n = c\t");
                h_processor->first = 0;
