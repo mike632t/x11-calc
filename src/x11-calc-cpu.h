@@ -139,13 +139,13 @@ oprocessor *h_processor_create(int *h_rom);
 
 void v_processor_reset(oprocessor *h_processor);
 
-void v_rom_load(oprocessor *h_processor, char *s_pathname);
+void v_read_rom(oprocessor *h_processor, char *s_pathname);
 
-void v_processor_load(oprocessor *h_processor, char *s_pathname);
+void v_read_state(oprocessor *h_processor, char *s_pathname);
 
-void v_processor_restore(oprocessor *h_processor);
+void v_restore_state(oprocessor *h_processor);
 
-void v_processor_save(oprocessor *h_processor);
+void v_save_state(oprocessor *h_processor);
 
 void v_fprint_registers(FILE *h_file, oprocessor *h_procesor);
 
