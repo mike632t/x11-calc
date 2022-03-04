@@ -44,6 +44,8 @@
  * 29 Jan 22         - Added a second pointer register 'q' - MT
  *                   - Changed the 'g' register from an integer to an array
  *                     to make it simpler to reference each nibble - MT
+ * 04 Mar 22         - Changed flags and status bits data type to  unsigned
+ *                     integers so they can be loaded/saved as hex - MT
  *
  */
 
@@ -105,8 +107,8 @@ typedef struct {
    int *rom;
    int first;
    int last;
-   unsigned char flags[FLAGS];         /* Processor flags*/
-   unsigned char status[STATUS_BITS];  /* Status (S0 - S15) */
+   unsigned int flags[FLAGS];          /* Processor flags*/
+   unsigned int status[STATUS_BITS];   /* Status (S0 - S15) */
    unsigned int stack[STACK_SIZE];     /* Call stack */
 #if defined(HP67)
    unsigned char crc[STATES];          /* Card reader states */
@@ -119,7 +121,6 @@ typedef struct {
    unsigned int addr;                  /* Address register */
    unsigned int base;                  /* Current arithmetic base */
    unsigned int code;                  /* Key code */
-   unsigned int rom_number;            /* Delayed ROM number */
    unsigned char keypressed;           /* Key pressed */
    unsigned char select;               /* Save run/prgm switch state */
    unsigned char timer;                /* Save timer switch state */
@@ -132,6 +133,8 @@ typedef struct {
    unsigned int g[2];                  /* G register */
    unsigned int q;                     /* Q register */
    unsigned char ptr;                  /* Selects P or Q registers (Q = True) */
+#else
+   unsigned int rom_number;            /* Delayed ROM number */
 #endif
 } oprocessor;
 
