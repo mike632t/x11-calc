@@ -21,6 +21,7 @@
  * 10 Oct 21   0.1   - Initial version - MT
  * 12 Oct 21         - Removed Title and replaced with model number - MT
  * 02 Mar 22         - Modified memory size (still too big) - MT
+ * 04 Mar 22         - Enabled continuous memory - MT
  *
  */
 
@@ -58,6 +59,7 @@
 
 #define MEMORY_SIZE        1024
 #define ROM_SIZE           010000
+#define CONTINIOUS
 
 extern int i_rom [ROM_SIZE];
 
