@@ -20,6 +20,6 @@ C using only X11.
 
 ![HP10](./x11-calc-10.png) ![HP11](./x11-calc-11.png)
 
-![HP12](./x11-calc-12.png) ![HP15](./x15-calc-15.png)
+![HP12](./x11-calc-12.png) ![HP15](./x11-calc-15.png)
 
-![HP16](./x15-calc-16.png)
+![HP16](./x11-calc-16.png)
