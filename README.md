@@ -19,6 +19,8 @@ More [screenshots](./img/)
 
 ### Latest News
 
+04/03 - HP10C working.
+
 28/02 - Added HP10C, HP11C, HP12C, HP15C, and HP16C.
 
 20/01 - Now compiles cleanly on VAX/VMS.
@@ -29,15 +31,15 @@ More [screenshots](./img/)
 
 ### Status
 
-##### HP 10C - Partly working? (No continuous memory)
+##### HP 10C - Working
 
-##### HP 11C - Work in progress.
+##### HP 11C - Not finished
 
-##### HP 12C - Work in progress.
+##### HP 12C - Not finished
 
-##### HP 15C - Work in progress.
+##### HP 15C - Not finished
 
-##### HP 16C - Work in progress.
+##### HP 16C - Not finished
 
 ##### HP 35  - Working
 

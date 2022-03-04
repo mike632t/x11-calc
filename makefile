@@ -30,7 +30,8 @@
 
 PROGRAM	=  x11-calc
 FILES		=  ./src/*.c ./src/*.h ./prg/*.dat ./src/makefile
-FILES		+= ./rom/*.dis ./rom/*.obj ./bin/x11-calc-*
+FILES		+= ./rom/*.dis ./rom/*.obj ./src/*.rom
+FILES		+= ./bin/x11-calc-*
 FILES		+= *.md LICENSE makefile .gitignore .gitattributes
 FILES		+= ./img/x11-calc-*.png
 MAKE		=  make
