@@ -18,8 +18,8 @@ C using only X11.
 
 ![HP34](./x11-calc-34.png) ![HP37](./x11-calc-37.png) ![HP38](./x11-calc-38.png)
 
-![HP10](./img/x11-calc-10.png) ![HP11](./img/x11-calc-11.png)
+![HP10](./x11-calc-10.png) ![HP11](./x11-calc-11.png)
 
-![HP12](./img/x11-calc-12.png) ![HP15](./img/x15-calc-15.png)
+![HP12](./x11-calc-12.png) ![HP15](./x15-calc-15.png)
 
-![HP16](./img/x15-calc-16.png)
+![HP16](./x15-calc-16.png)
