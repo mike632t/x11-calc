@@ -33,11 +33,11 @@ More [screenshots](./img/)
 
 ##### HP 10C - Working
 
-##### HP 11C - Working
+##### HP 11C - Working (More testing needed)
 
-##### HP 12C - Not finished
+##### HP 12C - Working (More testing needed)
 
-##### HP 15C - Not finished
+##### HP 15C - Working (More testing needed)
 
 ##### HP 16C - Not finished
 
