@@ -315,6 +315,7 @@
  *                     and status bits to unsigned char (reading each value
  *                     into a temporary unsigned int first allows fscanf to
  *                     be used to read the saved values) - MT
+ * 06 Mar 22         - Fixed the issue with the relative jump offset - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -2896,7 +2897,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             {
                int i_offset;
                i_offset = i_opcode >> 3;
-               if (i_offset > 0x40) i_offset = i_offset - 128;
+               if (i_offset >= 0x40) i_offset = i_offset - 128; /* Fixed relative jump offset */
                if (i_opcode & 00004)
                {
                   if (h_processor->trace) fprintf(stdout, "jc ");
