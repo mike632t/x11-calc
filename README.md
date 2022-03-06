@@ -19,7 +19,7 @@ More [screenshots](./img/)
 
 ### Latest News
 
-04/03 - HP10C working.
+06/03 - HP11C working.
 
 28/02 - Added HP10C, HP11C, HP12C, HP15C, and HP16C.
 
@@ -33,7 +33,7 @@ More [screenshots](./img/)
 
 ##### HP 10C - Working
 
-##### HP 11C - Not finished
+##### HP 11C - Working
 
 ##### HP 12C - Not finished
 
