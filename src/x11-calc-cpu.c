@@ -316,6 +316,7 @@
  *                     into a temporary unsigned int first allows fscanf to
  *                     be used to read the saved values) - MT
  * 06 Mar 22         - Fixed the issue with the relative jump offset - MT
+ *                   - Added 'cstex' instruction (exchange c and st)- MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -565,20 +566,6 @@ static void v_reg_shl(oprocessor *h_processor, oregister *h_register) /* Logical
          h_register->nibble[i_count] = h_register->nibble[i_count - 1];
    }
    h_processor->flags[PREV_CARRY] = h_processor->flags[CARRY] = False;
-}
-
-static void v_op_inc_pc(oprocessor *h_processor) /* Increment program counter */
-{
-#if defined (HP35) || defined (HP80) || defined (HP45) || defined (HP70) || defined(HP55)
-   h_processor->pc = ((h_processor->pc >> 8) << 8) | ((h_processor->pc + 1) & 0xff); /* Address wraps round at end of ROM */
-#else
-   if (h_processor->pc >= (ROM_SIZE - 1))
-      h_processor->pc = 0; /* Address wraps round at end of memory */
-   else
-      h_processor->pc = (h_processor->pc & 0xf000) | ((h_processor->pc + 1) & 0xfff); /* Address wraps round at end of bank */
-#endif
-   h_processor->flags[PREV_CARRY] = h_processor->flags[CARRY];
-   h_processor->flags[CARRY] = False;
 }
 
 void v_read_rom(oprocessor *h_processor, char *s_pathname) /* Load rom from 'object' file */
@@ -921,6 +908,20 @@ static void v_op_dec_p(oprocessor *h_processor) /* Decrement p register */
 #endif
 }
 #endif
+
+static void v_op_inc_pc(oprocessor *h_processor) /* Increment program counter */
+{
+#if defined (HP35) || defined (HP80) || defined (HP45) || defined (HP70) || defined(HP55)
+   h_processor->pc = ((h_processor->pc >> 8) << 8) | ((h_processor->pc + 1) & 0xff); /* Address wraps round at end of ROM */
+#else
+   if (h_processor->pc >= (ROM_SIZE - 1))
+      h_processor->pc = 0; /* Address wraps round at end of memory */
+   else
+      h_processor->pc = (h_processor->pc & 0xf000) | ((h_processor->pc + 1) & 0xfff); /* Address wraps round at end of bank */
+#endif
+   h_processor->flags[PREV_CARRY] = h_processor->flags[CARRY];
+   h_processor->flags[CARRY] = False;
+}
 
 #if defined (HP10) || defined (HP11) || defined (HP12) || defined (HP15) || defined (HP16) || defined(HP41)
 
@@ -1876,6 +1877,31 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                v_reg_exch(h_processor, h_processor->reg[M_REG], h_processor->reg[C_REG]);
                if (h_processor->trace) v_fprint_register(stdout, h_processor->reg[C_REG]);
                if (h_processor->trace) v_fprint_register(stdout, h_processor->reg[M_REG]);
+               break;
+            case 0x0f: /* c[0:1] -> st[0:7], st[0:7] -> c[0:1] - Exchange C register and the status word (11 1101 1000) */
+               if (h_processor->trace) fprintf(stdout, "cstex\t");
+               {
+                  int i_temp, i_status, i_count;
+                  i_status = 0;
+                  for (i_count = 7; i_count >= 0 ; i_count--)
+                  {
+                     i_status <<= 1;
+                     if (h_processor->status[i_count]) i_status |= 0x1;
+                  }
+                  i_temp = h_processor->reg[C_REG]->nibble[0] | h_processor->reg[C_REG]->nibble[1] << 4;
+                  for (i_count = 0; i_count < (sizeof(h_processor->status) / sizeof(*h_processor->status)); i_count++)
+                  {
+                     if (i_temp & 0x1)
+                        h_processor->status[i_count] = True;
+                     else
+                        h_processor->status[i_count] = False;
+                     i_temp >>= 1;
+                  }
+                  h_processor->reg[C_REG]->nibble[0] = i_status & 0xf;
+                  h_processor->reg[C_REG]->nibble[1] = i_status >> 4;
+               }
+               if (h_processor->trace) v_fprint_register(stdout, h_processor->reg[C_REG]);
+               if (h_processor->trace) v_fprint_status(stdout, h_processor);
                break;
             default:
                debug(fprintf(stderr,"%02x\n", (i_opcode >> 6) & 0xf));
