@@ -36,7 +36,7 @@ FILES		+= *.md LICENSE makefile .gitignore .gitattributes
 FILES		+= ./img/x11-calc-*.png
 MAKE		=  make
 
-all: clean hp35 hp80 hp45 hp70 hp21 hp22 hp25 hp27 hp29 hp31 hp32 hp33 hp34 hp37 hp38 hp67
+all: clean hp35 hp80 hp45 hp70 hp21 hp22 hp25 hp27 hp29 hp31 hp32 hp33 hp34 hp37 hp38 hp67 hp10 hp11 hp12 hp15 hp16
 
 classic: clean hp35 hp80 hp45 hp70
 
