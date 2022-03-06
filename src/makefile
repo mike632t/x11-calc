@@ -43,7 +43,7 @@
 #	24 Feb 22			- Clean now deletes ALL object files - MT
 #
 
-MODEL		= 10
+MODEL		= 35
 PROGRAM	= x11-calc
 SOURCES 	= x11-calc.c x11-calc-cpu.c x11-calc-display.c x11-calc-segment.c
 SOURCES 	+= x11-calc-button.c x11-calc-switch.c x11-calc-label.c x11-calc-colour.c
