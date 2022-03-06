@@ -146,17 +146,32 @@ When in trace mode a jump to the same instruction produces no output.
 
 ### ROM Images
 
-No ROM images are included for the HP10C, HP11C, HP12C, HP15C, HP16C.
+No ROM images are included for the HP10C, HP11C, HP12C, HP15C, and HP16C.
 
 The '-r <filename>' command line option provides the ability to use the ROM
-contents held in an separate file as hexadecimal address:opcode pairs.
+contents held in an separate file.
 
+For the HP10C, HP11C, HP12C, HP15C, and HP16C the ROM comprised of pairs of
+hexadecimal values as address:opcode.
+
+eg.
     0000:107
     0001:04e
     0002:270
     0003:238
     0004:2ee
     0005:13f
+
+Other models include the ROM as part of the program, but you can specify an
+alternate ROM comprising of pairs of octal values.
+
+eg.
+    00000:0255
+    00001:1420
+    00002:0451
+    00003:1456
+    00004:1746
+    00005:0472
 
 This allows you to use your own ROM images with any of the simulators. Even
 if they already have a ROM image included in the code.
