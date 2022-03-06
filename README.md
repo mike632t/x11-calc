@@ -154,7 +154,6 @@ contents held in an separate file.
 For the HP10C, HP11C, HP12C, HP15C, and HP16C the ROM comprised of pairs of
 hexadecimal values as address:opcode.
 
-eg.
     0000:107
     0001:04e
     0002:270
@@ -165,7 +164,6 @@ eg.
 Other models include the ROM as part of the program, but you can specify an
 alternate ROM comprising of pairs of octal values.
 
-eg.
     00000:0255
     00001:1420
     00002:0451
