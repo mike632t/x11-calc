@@ -317,6 +317,8 @@
  *                     be used to read the saved values) - MT
  * 06 Mar 22         - Fixed the issue with the relative jump offset - MT
  *                   - Added 'cstex' instruction (exchange c and st)- MT
+ *             0.10  - Added 'c =st', 'c = stk', 'c = c and a', and fixed a
+ *                     bug in 'cstex' - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -325,7 +327,7 @@
  */
 
 #define NAME           "x11-calc-cpu"
-#define VERSION        "0.9"
+#define VERSION        "0.10"
 #define BUILD          "0153"
 #define DATE           "07 Feb 22"
 #define AUTHOR         "MT"
@@ -472,6 +474,15 @@ static void v_reg_or(oprocessor *h_processor, oregister *h_destination, oregiste
    for (i_count = h_processor->first; i_count <= h_processor->last; i_count++){
       if (h_argument != NULL) i_temp = h_argument->nibble[i_count]; else i_temp = 0;
       h_destination->nibble[i_count] = h_source->nibble[i_count] | i_temp;
+   }
+}
+
+static void v_reg_and(oprocessor *h_processor, oregister *h_destination, oregister *h_source, oregister *h_argument) /* And the contents of two registers */
+{
+   int i_count, i_temp;
+   for (i_count = h_processor->first; i_count <= h_processor->last; i_count++){
+      if (h_argument != NULL) i_temp = h_argument->nibble[i_count]; else i_temp = 0;
+      h_destination->nibble[i_count] = h_source->nibble[i_count] & i_temp;
    }
 }
 #endif
@@ -1878,18 +1889,33 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                if (h_processor->trace) v_fprint_register(stdout, h_processor->reg[C_REG]);
                if (h_processor->trace) v_fprint_register(stdout, h_processor->reg[M_REG]);
                break;
-            case 0x0f: /* c[0:1] -> st[0:7], st[0:7] -> c[0:1] - Exchange C register and the status word (11 1101 1000) */
-               if (h_processor->trace) fprintf(stdout, "cstex\t");
+            case 0x0e: /* st[0:7] -> c[0:1] - Load c register from the status word (11 1101 1000) */
+               if (h_processor->trace) fprintf(stdout, "c = st\t");
                {
-                  int i_temp, i_status, i_count;
+                  int i_status, i_count;
                   i_status = 0;
                   for (i_count = 7; i_count >= 0 ; i_count--)
                   {
                      i_status <<= 1;
                      if (h_processor->status[i_count]) i_status |= 0x1;
                   }
+                  h_processor->reg[C_REG]->nibble[0] = i_status & 0xf;
+                  h_processor->reg[C_REG]->nibble[1] = i_status >> 4;
+               }
+               if (h_processor->trace) v_fprint_register(stdout, h_processor->reg[C_REG]);
+               break;
+            case 0x0f: /* c[0:1] -> st[0:7], st[0:7] -> c[0:1] - Exchange c register and the status word (11 1101 1000) */
+               if (h_processor->trace) fprintf(stdout, "cstex\t");
+               {
+                  int i_temp, i_status, i_count;
+                  i_status = 0; /* Save st[0:7] */
+                  for (i_count = 7; i_count >= 0 ; i_count--)
+                  {
+                     i_status <<= 1;
+                     if (h_processor->status[i_count]) i_status |= 0x1;
+                  }
                   i_temp = h_processor->reg[C_REG]->nibble[0] | h_processor->reg[C_REG]->nibble[1] << 4;
-                  for (i_count = 0; i_count < (sizeof(h_processor->status) / sizeof(*h_processor->status)); i_count++)
+                  for (i_count = 0; i_count <=7; i_count++)
                   {
                      if (i_temp & 0x1)
                         h_processor->status[i_count] = True;
@@ -2098,6 +2124,14 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                h_processor->stack[h_processor->sp] = (h_processor->reg[C_REG]->nibble[6] << 12) | (h_processor->reg[C_REG]->nibble[5] << 8) | (h_processor->reg[C_REG]->nibble[4] << 4) | (h_processor->reg[C_REG]->nibble[3]);
                h_processor->sp = (h_processor->sp + 1) & (STACK_SIZE - 1); /* Update stack pointer */
                break;
+            case 0x06: /* stack[2] -> stack[3], stack[1] -> stack[2], stack[0] -> stack[1], c -> stack[0] - Pop c[6:3] from the stack (01 0111 0000) */
+               if (h_processor->trace) fprintf(stdout, "c = stk\t");
+               h_processor->sp = (h_processor->sp - 1) & (STACK_SIZE - 1); /* Update stack pointer */
+               h_processor->reg[C_REG]->nibble[3] = h_processor->stack[h_processor->sp] & 0xf;
+               h_processor->reg[C_REG]->nibble[4] = (h_processor->stack[h_processor->sp] >> 4) & 0xf;
+               h_processor->reg[C_REG]->nibble[5] = (h_processor->stack[h_processor->sp] >> 8) & 0xf;
+               h_processor->reg[C_REG]->nibble[6] = (h_processor->stack[h_processor->sp] >> 12) & 0xf;
+               break;
             case 0x09: /* {addr[11:4], nnnn} -> addr, c -> reg[addr] - Load register address from c (10 0111 1000) */
                   if (h_processor->trace) fprintf(stdout, "dadd = c\t");
                   h_processor->addr = ((h_processor->reg[C_REG]->nibble[2] << 8) |
@@ -2126,11 +2160,18 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                }
                if (h_processor->trace) v_fprint_register(stdout, h_processor->reg[C_REG]);
                break;
-            case 0x0d: /* c | a -> c - Load c with c or c (11 0111 0000) */
-               if (h_processor->trace) fprintf(stdout, "c = cora\t");
+            case 0x0d: /* c | a -> c - Load c with c or a (11 0111 0000) */
+               if (h_processor->trace) fprintf(stdout, "c = c or a\t");
                h_processor->first = 0;
                h_processor->last = REG_SIZE - 1;
                v_reg_or(h_processor, h_processor->reg[C_REG], h_processor->reg[C_REG], h_processor->reg[A_REG]);
+               if (h_processor->trace) v_fprint_register(stdout, h_processor->reg[C_REG]);
+               break;
+            case 0x0e: /* c | a -> c - Load c with c and a (11 0111 0000) */
+               if (h_processor->trace) fprintf(stdout, "c = c and a");
+               h_processor->first = 0;
+               h_processor->last = REG_SIZE - 1;
+               v_reg_and(h_processor, h_processor->reg[C_REG], h_processor->reg[C_REG], h_processor->reg[A_REG]);
                if (h_processor->trace) v_fprint_register(stdout, h_processor->reg[C_REG]);
                break;
             default:
