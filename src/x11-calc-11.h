@@ -56,6 +56,7 @@
 
 #define MEMORY_SIZE        1024
 #define ROM_SIZE           014000
+#define CONTINIOUS
 
 extern int i_rom [ROM_SIZE];
 
