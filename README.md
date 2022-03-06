@@ -164,12 +164,12 @@ hexadecimal values as address:opcode.
 Other models include the ROM as part of the program, but you can specify an
 alternate ROM comprising of pairs of octal values.
 
-    00000:0255
-    00001:1420
-    00002:0451
-    00003:1456
-    00004:1746
-    00005:0472
+    00000:00255
+    00001:01420
+    00002:00451
+    00003:01456
+    00004:01746
+    00005:00472
 
 This allows you to use your own ROM images with any of the simulators. Even
 if they already have a ROM image included in the code.
