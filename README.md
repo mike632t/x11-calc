@@ -19,9 +19,7 @@ More [screenshots](./img/)
 
 ### Latest News
 
-06/03 - HP10C, HP11C, HP12C and HP15C now all appear to be working!!
-
-28/02 - Added HP10C, HP11C, HP12C, HP15C, and HP16C.
+06/03 - HP10C, HP11C, HP12C, HP15C and HP16C are now working!!
 
 20/01 - Now compiles cleanly on VAX/VMS.
 
@@ -39,7 +37,7 @@ More [screenshots](./img/)
 
 ##### HP 15C - Working (More testing needed)
 
-##### HP 16C - Not finished
+##### HP 16C - Working (More testing needed)
 
 ##### HP 35  - Working
 
@@ -171,8 +169,7 @@ alternate ROM comprising of pairs of octal values.
     00004:01746
     00005:00472
 
-This allows you to use your own ROM images with any of the simulators. Even
-if they already have a ROM image included in the code.
+This allows you to use your own ROM images with any of the simulators.
 
 ### Known Issues
 
