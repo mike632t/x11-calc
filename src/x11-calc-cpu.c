@@ -311,6 +311,10 @@
  * 04 Mar 22         - The HP10C, HP11C, HP12C, HP15C and HP16C include the
  *                     state  of the processor when saving or restoring the
  *                     contents of memory - MT
+ * 05 Mar 22         - Changed the data type of the register nibbles, flags
+ *                     and status bits to unsigned char (reading each value
+ *                     into a temporary unsigned int first allows fscanf to
+ *                     be used to read the saved values) - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -615,6 +619,7 @@ void v_read_state(oprocessor *h_processor, char *s_pathname) /* Read processor s
 {
 #if defined(CONTINIOUS)
    FILE *h_datafile;
+   unsigned int i_temp;
    int i_count, i_counter;
 
    if ((h_processor != NULL) && (s_pathname != NULL)) { /* Check processor and pathname are defined */
@@ -624,28 +629,37 @@ void v_read_state(oprocessor *h_processor, char *s_pathname) /* Read processor s
 #if defined (HP10) || defined (HP11) || defined (HP12) || defined (HP15) || defined (HP16) || defined(HP41)
          for (i_count = 0; i_count < FLAGS; i_count++)
          {
-            fscanf(h_datafile, "%x,", &h_processor->flags[i_count]);
+            fscanf(h_datafile, "%x,", &i_temp);
+            h_processor->flags[i_count] = i_temp;
          }
          for (i_count = 0; i_count < STATUS_BITS; i_count++)
          {
-            fscanf(h_datafile, "%x,", &h_processor->status[i_count]);
+            fscanf(h_datafile, "%x,", &i_temp);
+            h_processor->status[i_count] = i_temp;
          }
-         for (i_count = 0; i_count < REGISTERS; i_count++) {
-            for (i_counter = REG_SIZE - 1; i_counter >= 0 ; i_counter--) {
-               fscanf(h_datafile, "%x,", &h_processor->reg[i_count]->nibble[i_counter]);
+         for (i_count = 0; i_count < REGISTERS; i_count++)
+            for (i_counter = REG_SIZE - 1; i_counter >= 0 ; i_counter--)
+            {
+               fscanf(h_datafile, "%x,", &i_temp);
+               h_processor->reg[i_count]->nibble[i_counter] = i_temp;
             }
-         }
-         fscanf(h_datafile, "%x,", &h_processor->p);
-         fscanf(h_datafile, "%x,", &h_processor->q);
-         fscanf(h_datafile, "%x,", &h_processor->f);
-         fscanf(h_datafile, "%x,", &h_processor->g[0]);
-         fscanf(h_datafile, "%x,", &h_processor->g[1]);
+         fscanf(h_datafile, "%x,", &i_temp);
+         h_processor->p = i_temp;
+         fscanf(h_datafile, "%x,", &i_temp);
+         h_processor->q = i_temp;
+         fscanf(h_datafile, "%x,", &i_temp);
+         h_processor->f = i_temp;
+         fscanf(h_datafile, "%x,", &i_temp);
+         h_processor->g[0] = i_temp;
+         fscanf(h_datafile, "%x,", &i_temp);
+         h_processor->g[1] = i_temp;
 #endif
-         for (i_count = 0; i_count < MEMORY_SIZE; i_count++) {
-            for (i_counter = REG_SIZE - 1; i_counter >= 0 ; i_counter--) {
-               fscanf(h_datafile, "%x,", &h_processor->mem[i_count]->nibble[i_counter]);
+         for (i_count = 0; i_count < MEMORY_SIZE; i_count++)
+            for (i_counter = REG_SIZE - 1; i_counter >= 0 ; i_counter--)
+            {
+               fscanf(h_datafile, "%x,", &i_temp);
+               h_processor->mem[i_count]->nibble[i_counter] = i_temp;
             }
-         }
          fclose(h_datafile);
       }
       else
@@ -816,7 +830,7 @@ oprocessor *h_processor_create(int *h_rom) /* Create a new processor 'object' */
 }
 
 #if defined (HP10) || defined (HP11) || defined (HP12) || defined (HP15) || defined (HP16) || defined(HP41)
-static unsigned int *h_active_pointer (oprocessor *h_processor) /* Return address of active pointer */
+static unsigned char *h_active_pointer (oprocessor *h_processor) /* Return address of active pointer */
 {
    if (h_processor->ptr)
       return &h_processor->q;

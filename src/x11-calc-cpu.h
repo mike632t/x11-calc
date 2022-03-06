@@ -46,6 +46,8 @@
  *                     to make it simpler to reference each nibble - MT
  * 04 Mar 22         - Changed flags and status bits data type to  unsigned
  *                     integers so they can be loaded/saved as hex - MT
+ * 05 Mar 22         - Changed the data type of the register nibbles, flags
+ *                     and status bits back to unsigned char - MT
  *
  */
 
@@ -98,7 +100,7 @@
 
 typedef struct {
    int id;
-   unsigned int nibble[REG_SIZE];
+   unsigned char nibble[REG_SIZE];
 } oregister;
 
 typedef struct {
@@ -107,20 +109,20 @@ typedef struct {
    int *rom;
    int first;
    int last;
-   unsigned int flags[FLAGS];          /* Processor flags*/
-   unsigned int status[STATUS_BITS];   /* Status (S0 - S15) */
    unsigned int stack[STACK_SIZE];     /* Call stack */
+   unsigned char flags[FLAGS];         /* Processor flags*/
+   unsigned char status[STATUS_BITS];  /* Status (S0 - S15) */
 #if defined(HP67)
    unsigned char crc[STATES];          /* Card reader states */
 #endif
    unsigned int opcode;                /* Last opcode */
    unsigned int pc;                    /* Program counter */
    unsigned int sp;                    /* Stack pointer */
-   unsigned int f;                     /* F register */
-   unsigned int p;                     /* P register */
    unsigned int addr;                  /* Address register */
    unsigned int base;                  /* Current arithmetic base */
    unsigned int code;                  /* Key code */
+   unsigned char f;                    /* F register */
+   unsigned char p;                    /* P register */
    unsigned char keypressed;           /* Key pressed */
    unsigned char select;               /* Save run/prgm switch state */
    unsigned char timer;                /* Save timer switch state */
@@ -130,8 +132,8 @@ typedef struct {
    unsigned char enabled;              /* Enabled */
 #if defined (HP10) || defined (HP11) || defined (HP12) || defined (HP15) || defined (HP16) || defined(HP41)
    unsigned char kyf;                  /* Keyboard flag */
-   unsigned int g[2];                  /* G register */
-   unsigned int q;                     /* Q register */
+   unsigned char g[2];                  /* G register */
+   unsigned char q;                     /* Q register */
    unsigned char ptr;                  /* Selects P or Q registers (Q = True) */
 #else
    unsigned int rom_number;            /* Delayed ROM number */
