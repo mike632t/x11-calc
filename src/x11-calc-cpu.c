@@ -319,6 +319,7 @@
  *                   - Added 'cstex' instruction (exchange c and st)- MT
  *             0.10  - Added 'c =st', 'c = stk', 'c = c and a', and fixed a
  *                     bug in 'cstex' - MT
+ * 07 Mar 22         - Removed unused debug code - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -329,10 +330,10 @@
 #define NAME           "x11-calc-cpu"
 #define VERSION        "0.10"
 #define BUILD          "0153"
-#define DATE           "07 Feb 22"
+#define DATE           "07 Mar 22"
 #define AUTHOR         "MT"
 
-#define NO_DEBUG
+#define NODEBUG
 
 #include <string.h>
 #include <stdlib.h>
@@ -602,13 +603,6 @@ void v_read_rom(oprocessor *h_processor, char *s_pathname) /* Load rom from 'obj
             if (i_count < ROM_SIZE) i_rom[i_count++] = i_opcode;
          }
       }
-      debug
-      (for (i_count = 0; i_count < ROM_SIZE; i_count++)
-         {
-            fprintf(stdout,h_msg_opcode, i_count >> 12, i_count & 0xfff, i_rom[i_count]);
-            fprintf(stdout,"\n");
-         }
-      );
    }
    else
       v_error(h_err_opening_file, s_pathname); /* Can't open data file */
@@ -1131,7 +1125,6 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                break;
             case 01: /* if 0 = s(n) */
                if (h_processor->trace) fprintf(stdout, "if 0 = s(%d) ", i_opcode >> 6);
-               /** debug(fprintf(stderr, " %d = %s \n", h_processor->status[i_opcode >> 6], h_processor->status[i_opcode >> 6] ? "True" : "False")); */
                h_processor->flags[CARRY] = !h_processor->status[i_opcode >> 6];
                v_op_goto(h_processor);
                break;
@@ -1264,7 +1257,6 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                break;
             case 02: /* Op-Codes matching xx xx 10 11 00 */ /* if p != n */
                if (h_processor->trace) fprintf(stdout, "if p != %d", i_opcode >> 6);
-               /** debug(fprintf(stderr, " %d = %s \n", (h_processor->p != i_opcode >> 6), (h_processor->p != i_opcode >> 6) ? "True" : "False")); */
                h_processor->flags[CARRY] = (h_processor->p != i_opcode >> 6);
                v_op_goto(h_processor);
                break;
@@ -1539,13 +1531,11 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                break;
             case 01: /* if 1 = s(n) */
                if (h_processor->trace) fprintf(stdout, "if 1 = s(%d)", i_opcode >> 6);
-               /** debug(fprintf(stderr, " %d = %s \n", h_processor->status[i_opcode >> 6], h_processor->status[i_opcode >> 6] ? "True" : "False")); */
                h_processor->flags[CARRY] = h_processor->status[i_opcode >> 6];
                v_op_goto(h_processor);
                break;
             case 02: /* if p = n */
                if (h_processor->trace) fprintf(stdout, "if p = %d", i_tst_p[i_opcode >> 6]);
-               /** debug(fprintf(stderr, " %d = %s \n", (h_processor->p == i_tst_p[i_opcode >> 6]), (h_processor->p == i_tst_p[i_opcode >> 6]) ? "True" : "False")); */
                h_processor->flags[CARRY] = (h_processor->p == i_tst_p[i_opcode >> 6]);
                v_op_goto(h_processor);
                break;
@@ -1717,7 +1707,6 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                break;
             case 01: /* if 0 = s(n) */
                if (h_processor->trace) fprintf(stdout, "if 0 = s(%d) ", i_opcode >> 6);
-               /** debug(fprintf(stderr, " %d = %s \n", h_processor->status[i_opcode >> 6], h_processor->status[i_opcode >> 6] ? "True" : "False")); */
                h_processor->flags[CARRY] = !h_processor->status[i_opcode >> 6];
                v_op_goto(h_processor);
                break;
@@ -1730,7 +1719,6 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                 * N/A   if p != 15
                */
                if (h_processor->trace) fprintf(stdout, "if p != %d", i_tst_p[i_opcode >> 6]);
-               /** debug(fprintf(stderr, " %d = %s \n", (h_processor->p != i_tst_p[i_opcode >> 6]), (h_processor->p != i_tst_p[i_opcode >> 6]) ? "True" : "False")); */
                h_processor->flags[CARRY] = (h_processor->p != i_tst_p[i_opcode >> 6]);
                v_op_goto(h_processor);
                break;
@@ -2344,12 +2332,6 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             if (h_processor->trace) fprintf(stdout, "if a >= c[%s]", s_field);
             v_reg_sub(h_processor, NULL, h_processor->reg[A_REG], h_processor->reg[C_REG]); /* Less than */
             h_processor->flags[CARRY] = !h_processor->flags[CARRY];
-            /** debug(
-               fprintf(stderr, "\n\t");
-               v_fprint_register(stderr, h_processor->reg[A_REG]);
-               v_fprint_register(stderr,h_processor->reg[C_REG]);
-               fprintf(stderr, " %d = %s \n", h_processor->flags[CARRY], h_processor->flags[CARRY] ? "True" : "False");
-            ); */
             v_op_goto(h_processor);
             break;
          case 003: /* if c[f] != 0 */
@@ -2413,12 +2395,6 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             if (h_processor->trace) fprintf(stdout, "if a >= b[%s]", s_field);
             v_reg_sub(h_processor, NULL, h_processor->reg[A_REG], h_processor->reg[B_REG]); /* Less than */
             h_processor->flags[CARRY] = !h_processor->flags[CARRY];
-            /** debug(
-               fprintf(stderr, "\n\t");
-               v_fprint_register(stderr, h_processor->reg[A_REG]);
-               v_fprint_register(stderr,h_processor->reg[C_REG]);
-               fprintf(stderr, " %d = %s \n", h_processor->flags[CARRY], h_processor->flags[CARRY] ? "True" : "False");
-            ); */
             v_op_goto(h_processor);
             break;
          case 021: /* b exchange c[f] */
@@ -2648,24 +2624,12 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             if (h_processor->trace) fprintf(stdout, "if a >= c[%s]", s_field);
             v_reg_sub(h_processor, NULL, h_processor->reg[A_REG], h_processor->reg[C_REG]); /* Less than */
             h_processor->flags[CARRY] = !h_processor->flags[CARRY];
-            /** debug(
-               fprintf(stderr, "\n\t");
-               v_fprint_register(stderr, h_processor->reg[A_REG]);
-               v_fprint_register(stderr,h_processor->reg[C_REG]);
-               fprintf(stderr, " %d = %s \n", h_processor->flags[CARRY], h_processor->flags[CARRY] ? "True" : "False");
-            ); */
             v_op_goto(h_processor);
             break;
          case 031: /* if a >= b[f] */
             if (h_processor->trace) fprintf(stdout, "if a >= b[%s]", s_field);
             v_reg_sub(h_processor, NULL, h_processor->reg[A_REG], h_processor->reg[B_REG]); /* Less than */
             h_processor->flags[CARRY] = !h_processor->flags[CARRY];
-            /** debug(
-               fprintf(stderr, "\n\t");
-               v_fprint_register(stderr, h_processor->reg[A_REG]);
-               v_fprint_register(stderr,h_processor->reg[C_REG]);
-               fprintf(stderr, " %d = %s \n", h_processor->flags[CARRY], h_processor->flags[CARRY] ? "True" : "False");
-            ); */
             v_op_goto(h_processor);
             break;
          case 032: /* if a[f] != 0 */
