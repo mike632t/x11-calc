@@ -55,7 +55,7 @@
 #define KEY_NUMERIC        41 * SCALE_WIDTH
 #define KEY_GAP            3 * SCALE_WIDTH
 
-#define MEMORY_SIZE        1024
+#define MEMORY_SIZE        256
 #define ROM_SIZE           034000
 #define CONTINIOUS
 

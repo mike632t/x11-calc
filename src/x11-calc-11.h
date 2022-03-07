@@ -54,7 +54,7 @@
 #define DISPLAY_WIDTH      200 * SCALE_WIDTH
 #define DISPLAY_HEIGHT     48 * SCALE_HEIGHT
 
-#define MEMORY_SIZE        1024
+#define MEMORY_SIZE        256
 #define ROM_SIZE           014000
 #define CONTINIOUS
 

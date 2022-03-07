@@ -20,6 +20,7 @@
  *
  * 31 Jan 22   0.1   - Initial version (derived from x11-calc-11.c) - MT
  * 28 Feb 22         - Fixed key label for SST key - MT
+ * 07 Mar 22         - Fixed shortcut for SST - MT
  *
  */
 
@@ -64,8 +65,6 @@ void v_init_labels(olabel *h_label[]) {
    h_label[0] = h_label_create(001, "CLEAR" , h_alternate_font, KBD_LEFT + KEY_WIDTH + KEY_GAP,
       KBD_TOP + KEY_HEIGHT +  2 * (KBD_ROW - i_height) + h_small_font->descent,
       4 * (KEY_WIDTH + KEY_GAP) + KEY_WIDTH, i_height, YELLOW, BACKGROUND);
-
-
 }
 
 void v_init_buttons(obutton *h_button[]) {
@@ -123,7 +122,7 @@ void v_init_buttons(obutton *h_button[]) {
    i_left = KBD_LEFT;
    h_button[i_count++] = h_button_create(00021, 000, "R/S", "P/R", "", "PSE", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, False, BLACK, YELLOW, MID_BLUE, BLACK);
    i_left += (KEY_WIDTH + KEY_GAP);
-   h_button[i_count++] = h_button_create(00061, 000, "SST", "E", "", "BST", h_normal_font, h_alternate_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, False, BLACK, YELLOW, MID_BLUE, BLACK);
+   h_button[i_count++] = h_button_create(00061, ' ', "SST", "E", "", "BST", h_normal_font, h_alternate_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, False, BLACK, YELLOW, MID_BLUE, BLACK);
    i_left += (KEY_WIDTH + KEY_GAP);
    h_button[i_count++] = h_button_create(00161, 000, "Rv", "PRGM", "", "GTO", h_normal_font, h_alternate_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, False, BLACK, YELLOW, MID_BLUE, BLACK);
    i_left += (KEY_WIDTH + KEY_GAP);
