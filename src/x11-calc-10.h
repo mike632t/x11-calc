@@ -22,12 +22,13 @@
  * 12 Oct 21         - Removed Title and replaced with model number - MT
  * 02 Mar 22         - Modified memory size (still too big) - MT
  * 04 Mar 22         - Enabled continuous memory - MT
+ * 09 Mar 22         - Fixed width and height (when scaled) - MT
  *
  */
 
 #define MODEL              "10"
-#define HEIGHT             276   /* 256 / 280 */
-#define WIDTH              411   /* 381 / 411 */
+#define HEIGHT             276 * SCALE_HEIGHT /* 256 / 280 */
+#define WIDTH              411 * SCALE_WIDTH  /* 381 / 411 */
 #define BUTTONS            39
 #define LABELS             1
 

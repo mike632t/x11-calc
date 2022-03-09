@@ -20,12 +20,13 @@
  *
  * 30 Jan 22   0.1   - Initial version (derived from x11-calc-10.c) - MT
  * 02 Mar 22         - Fixed ROM size - MT
+ * 09 Mar 22         - Fixed width and height (when scaled) - MT
  *
  */
 
 #define MODEL              "15"
-#define HEIGHT             276   /* 256 / 280 */
-#define WIDTH              411   /* 381 / 411 */
+#define HEIGHT             276 * SCALE_HEIGHT /* 256 / 280 */
+#define WIDTH              411 * SCALE_WIDTH  /* 381 / 411 */
 #define BUTTONS            39
 #define LABELS             1
 

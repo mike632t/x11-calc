@@ -19,12 +19,13 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * 31 Jan 22   0.1   - Initial version (derived from x11-calc-10.c) - MT
+ * 09 Mar 22         - Fixed width and height (when scaled) - MT
  *
  */
 
 #define MODEL              "12"
-#define HEIGHT             276   /* 256 / 280 */
-#define WIDTH              411   /* 381 / 411 */
+#define HEIGHT             276 * SCALE_HEIGHT /* 256 / 280 */
+#define WIDTH              411 * SCALE_WIDTH  /* 381 / 411 */
 #define BUTTONS            39
 #define LABELS             3
 
