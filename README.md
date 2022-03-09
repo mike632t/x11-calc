@@ -17,6 +17,7 @@ a separate ROM file.
 
 More [screenshots](./img/)
 
+
 ### Latest News
 
 06/03 - HP10C, HP11C, HP12C, HP15C and HP16C are now working!!
@@ -27,17 +28,8 @@ More [screenshots](./img/)
 
 04/01 - Added HP35 (50 years after the launch of the original)!
 
+
 ### Status
-
-##### HP 10C - Working
-
-##### HP 11C - Working (More testing needed)
-
-##### HP 12C - Working (More testing needed)
-
-##### HP 15C - Working (More testing needed)
-
-##### HP 16C - Working (More testing needed)
 
 ##### HP 35  - Working
 
@@ -74,6 +66,17 @@ More [screenshots](./img/)
 * Cannot read or write to magnetic cards.
 * Has continuous memory.
 
+##### HP 10C - Working
+
+##### HP 11C - Working (More testing needed)
+
+##### HP 12C - Working (More testing needed)
+
+##### HP 15C - Working (More testing needed)
+
+##### HP 16C - Working (More testing needed)
+
+
 ### Compiling
 
 To  build the simulator on Linux check that you have all the  prerequisites
@@ -91,6 +94,7 @@ e.g:
     $ ./bin/x11-calc-29
     x11-calc-29: Version 0.4 [Commit ID: 81c55be] 16 Oct 21 21:15:00 (Build: 0067)
     ROM Size : 4096 words
+
 
 ### Keyboard Shortcuts
 
@@ -111,6 +115,7 @@ exist and 'Space' to 'SST' if not shifted
 memory 'Ctrl-Z' saves the current register contents, and 'Ctrl-C'  restores
 them to the original saved state.
 
+
 ### Loading and saving
 
 For  models with continuous memory the contents of program memory and  data
@@ -126,10 +131,12 @@ copies of programs to be loaded automatically when the simulator starts  or
 the  simulator is reset using 'Ctrl&#8209;C'.  However, any changes will be
 saved in the hidden data file.
 
+
 ### Exiting
 
 Clicking  on the On/Off switch will turn the simulator on and off,  but  if
 you hold down the off switch down for two seconds the program will exit.
+
 
 ### Debugging
 
@@ -141,6 +148,7 @@ instruction, 'Ctrl&#8209;Q' resumes execution, and 'Ctrl&#8209;R' displays the c
 of the CPU registers.
 
 When in trace mode a jump to the same instruction produces no output.
+
 
 ### ROM Images
 
@@ -171,6 +179,7 @@ alternate ROM comprising of pairs of octal values.
 
 This allows you to use your own ROM images with any of the simulators.
 
+
 ### Known Issues
 
 On UNIX/Linux a 24 bit colour display is required.
@@ -188,6 +197,7 @@ HP 67 is unable to read or write to magnetic cards.
 
 HP 37E fails self test.
 
+
 #### VMS Specific Issues
 
 Colour palette assumes a black and white display (if your system has 24-bit
@@ -196,6 +206,7 @@ the simulators with support for colour display).
 
 Not all text is visible due to the limited colour palette and the DEC fonts
 are missing some characters (for example the Pi symbol).
+
 
 ### Tested
 
@@ -217,6 +228,7 @@ are missing some characters (for example the Pi symbol).
 
 - VAX/VMS 5.4-3, VAXC 3.2, VAX (simh)
 
+
 ### Prerequisites
 
 The following packages are required to build and/or run the simulator.
@@ -228,6 +240,7 @@ The following packages are required to build and/or run the simulator.
 - Debian : gcc (or clang), make, libx11&#8209;dev, libc6&#8209;dev, xfonts&#8209;base
 
 - Ubuntu : gcc, make, libx11&#8209;dev, libc6&#8209;dev, xfonts&#8209;base
+
 
 ### Problem Reports
 
