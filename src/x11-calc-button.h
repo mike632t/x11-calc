@@ -59,7 +59,7 @@ obutton *h_button_pressed(obutton *h_button, int i_xpos, int i_ypos);
 obutton *h_button_create(int i_index, char c_key,
    char* s_text, char* s_function ,char* s_alternate ,char* s_label,
    XFontStruct *h_normal_font, XFontStruct *h_shift_font, XFontStruct *h_label_font,
-   int i_left, int i_top, int i_width, int i_height, // int i_offset,
+   int i_left, int i_top, int i_width, int i_height,
    int i_state, int i_style,
    unsigned int i_colour, unsigned int i_function_colour,
    unsigned int i_shifted_colour, unsigned int i_label_colour);
