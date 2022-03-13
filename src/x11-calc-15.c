@@ -19,6 +19,7 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * 30 Jan 22   0.1   - Initial version (derived from x11-calc-10.c) - MT
+ * 12 Mar 22         - Added the label state property - MT
  *
  * TO DO :           -
  */
@@ -55,7 +56,7 @@ void v_init_labels(olabel *h_label[]) {
 
    h_label[0] = h_label_create(001, "CLEAR" , h_alternate_font, KBD_LEFT + KEY_WIDTH + KEY_GAP,
       KBD_TOP + KEY_HEIGHT +  2 * (KBD_ROW - i_height) + h_small_font->descent,
-      3 * (KEY_WIDTH + KEY_GAP) + KEY_WIDTH, i_height, YELLOW, BACKGROUND);
+      3 * (KEY_WIDTH + KEY_GAP) + KEY_WIDTH, i_height, YELLOW, BACKGROUND, -1);
 }
 
 void v_init_buttons(obutton *h_button[]) {

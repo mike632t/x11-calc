@@ -21,6 +21,7 @@
  * 31 Jan 22   0.1   - Initial version (derived from x11-calc-11.c) - MT
  * 28 Feb 22         - Fixed key label for SST key - MT
  * 07 Mar 22         - Fixed shortcut for SST - MT
+ * 12 Mar 22         - Added the label state property - MT
  *
  */
 
@@ -56,15 +57,15 @@ void v_init_labels(olabel *h_label[]) {
    int i_height = h_small_font->ascent + h_small_font->descent;
    h_label[2] = h_label_create(001, "BOND" , h_alternate_font, KBD_LEFT,
       KBD_TOP + KEY_HEIGHT +  KBD_ROW - 2 * i_height + h_small_font->descent,
-      2 * KEY_WIDTH + KEY_GAP, i_height, YELLOW, BACKGROUND);
+      2 * KEY_WIDTH + KEY_GAP, i_height, YELLOW, BACKGROUND, -1);
 
    h_label[1] = h_label_create(001, "DEPRECIATION" , h_alternate_font, KBD_LEFT + 2 * (KEY_WIDTH + KEY_GAP),
       KBD_TOP + KEY_HEIGHT +  KBD_ROW - 2 * i_height + h_small_font->descent,
-      2 * (KEY_WIDTH + KEY_GAP) + KEY_WIDTH, i_height, YELLOW, BACKGROUND);
+      2 * (KEY_WIDTH + KEY_GAP) + KEY_WIDTH, i_height, YELLOW, BACKGROUND, -1);
 
    h_label[0] = h_label_create(001, "CLEAR" , h_alternate_font, KBD_LEFT + KEY_WIDTH + KEY_GAP,
       KBD_TOP + KEY_HEIGHT +  2 * (KBD_ROW - i_height) + h_small_font->descent,
-      4 * (KEY_WIDTH + KEY_GAP) + KEY_WIDTH, i_height, YELLOW, BACKGROUND);
+      4 * (KEY_WIDTH + KEY_GAP) + KEY_WIDTH, i_height, YELLOW, BACKGROUND, -1);
 }
 
 void v_init_buttons(obutton *h_button[]) {

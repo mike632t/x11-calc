@@ -22,6 +22,7 @@
  * 03 Jan 21         - Changed debug() macro so that debug code is executed
  *                     when DEBUG is defined (doesn't need to be true) - MT
  * 31 Jan 22         - Added ROM - MT
+ * 12 Mar 22         - Added the label state property - MT
  *
  * TO DO :           -
  */
@@ -58,7 +59,7 @@ void v_init_labels(olabel *h_label[]) {
    int i_height = h_small_font->ascent + h_small_font->descent;
    h_label[0] = h_label_create(001, "CLEAR" , h_alternate_font, KBD_LEFT + 2 * (KEY_WIDTH + KEY_GAP),
       KBD_TOP + KEY_HEIGHT +  2 * (KBD_ROW - i_height) + h_small_font->descent,
-      2 * (KEY_WIDTH + KEY_GAP) + KEY_WIDTH, i_height, YELLOW, BACKGROUND);
+      2 * (KEY_WIDTH + KEY_GAP) + KEY_WIDTH, i_height, YELLOW, BACKGROUND, -1);
 }
 
 void v_init_buttons(obutton *h_button[]) {

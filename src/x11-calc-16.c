@@ -19,6 +19,7 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * 30 Jan 22   0.1   - Initial version (derived from x11-calc-10.c) - MT
+ * 12 Mar 22         - Added the label state property - MT
  *
  * TO DO :           -
  */
@@ -54,15 +55,15 @@ void v_init_labels(olabel *h_label[]) {
    int i_height = h_small_font->ascent + h_small_font->descent;
    h_label[0] = h_label_create(000, "SHOW" , h_small_font, KBD_LEFT + 2 * (KEY_WIDTH + KEY_GAP),
       KBD_TOP + KEY_HEIGHT +  KBD_ROW - i_height - 1,
-      3 * (KEY_WIDTH + KEY_GAP) + KEY_WIDTH, i_height, YELLOW, BACKGROUND);
+      3 * (KEY_WIDTH + KEY_GAP) + KEY_WIDTH, i_height, YELLOW, BACKGROUND, -1);
 
    h_label[1] = h_label_create(001, "CLEAR" , h_alternate_font, KBD_LEFT + 2 * (KEY_WIDTH + KEY_GAP),
       KBD_TOP + KEY_HEIGHT +  2 * (KBD_ROW - i_height) + h_alternate_font->descent,
-      2 * (KEY_WIDTH + KEY_GAP) + KEY_WIDTH, i_height, YELLOW, BACKGROUND);
+      2 * (KEY_WIDTH + KEY_GAP) + KEY_WIDTH, i_height, YELLOW, BACKGROUND, -1);
 
    h_label[2] = h_label_create(002, "SET COMPL" , h_alternate_font, KBD_LEFT + 6 * (KEY_WIDTH + KEY_GAP),
       KBD_TOP + KEY_HEIGHT +  2 * (KBD_ROW - i_height) + h_alternate_font->descent,
-      2 * (KEY_WIDTH + KEY_GAP) + KEY_WIDTH, i_height, YELLOW, BACKGROUND);
+      2 * (KEY_WIDTH + KEY_GAP) + KEY_WIDTH, i_height, YELLOW, BACKGROUND, -1);
 
 }
 
