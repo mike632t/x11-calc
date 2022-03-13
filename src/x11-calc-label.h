@@ -19,6 +19,8 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * 29 Jul 13         - Initial version - MT
+ * 12 Mar 22         - Implemented a state property allowing the appearance
+ *                     of the label to be changed (hidden, or no line) - MT
  *
  */
 
@@ -32,12 +34,13 @@ typedef struct { /* Calculator label structure */
    int height;
    unsigned int colour; /* Colour */
    unsigned int background; /* Background colour */
+   signed int state; /* Visible */
 } olabel;
 
 olabel *h_label_pressed(olabel *h_label, int i_xpos, int i_ypos);
 
 olabel *h_label_create(int i_index, char* s_text, XFontStruct *h_font,
    int i_left, int i_top, int i_width, int i_height,
-   unsigned int i_colour, unsigned int i_background);
+   unsigned int i_colour, unsigned int i_background, int i_state);
 
 int i_label_draw(Display *h_display, int x_application_window, int i_screen, olabel *h_label);

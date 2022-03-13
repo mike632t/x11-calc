@@ -31,6 +31,7 @@
  * 20 Dec 21         - Updated display for HP67 - MT
  * 29 Jan 22         - Added an optional bezel to the display - MT
  * 01 Mar 22         - Only define constants that are required - MT
+ * 12 Mar 22         - Added display annunciators - MT
  *
  */
 
@@ -80,6 +81,9 @@ typedef struct { /* Calculator display structure. */
    unsigned int background;
    unsigned int fill;
    unsigned int border;
+#if defined(INDECATORS)
+   olabel* label[INDECATORS];
+#endif
 } odisplay;
 
 odisplay *h_display_create(int i_index,

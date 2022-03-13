@@ -30,6 +30,7 @@
 #define LABELS             1
 
 #define DIGITS             11
+#define INDECATORS         8
 
 #define DIGIT_COLOUR       DIM_GREY
 #define DIGIT_BACKGROUND   MID_GREY

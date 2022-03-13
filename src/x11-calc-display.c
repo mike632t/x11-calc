@@ -63,6 +63,7 @@
  * 01 Mar 22         - Fixed digit 3 (11C, 12C, 15C and 16C) - MT
  * 01 Mar 22         - Fixed digits 4 and 10 (11C, 12C, 15C and 16C) tested
  *                     all digits now work as expected - MT
+ * 12 Mar 22         - Added display annunciators - MT
  *
  */
 
@@ -77,6 +78,7 @@
 #include <X11/Xlib.h>  /* XOpenDisplay(), etc. */
 #include <X11/Xutil.h> /* XSizeHints etc. */
 
+#include "x11-calc-font.h"
 #include "x11-calc-button.h"
 #include "x11-calc-switch.h"
 #include "x11-calc-label.h"
@@ -108,6 +110,7 @@ odisplay *h_display_create(int i_index, int i_left, int i_top, int i_width, int 
    odisplay *h_display; /* Pointer to display. */
    int i_count;
 
+
    /* Attempt to allocate memory for a display. */
    if ((h_display = malloc(sizeof(*h_display)))==NULL) v_error("Memory allocation failed!");
    h_display->index = i_index;
@@ -119,15 +122,12 @@ odisplay *h_display_create(int i_index, int i_left, int i_top, int i_width, int 
    h_display->display_top = i_display_top;
    h_display->display_width = i_display_width;
    h_display->display_height = i_display_height;
-
 #if defined(HP67) || defined (HP35) || defined (HP80) || defined (HP45) || defined (HP70) || defined(HP55)
    for (i_count = 0; i_count < DIGITS; i_count++) {
-      //h_display->segment[i_count] = h_segment_create(0, 0, i_display_left + ((4 + 13 * i_count) * SCALE_WIDTH), i_display_top + (21 * SCALE_HEIGHT), 11 * SCALE_WIDTH, 33 * SCALE_HEIGHT, i_foreground, i_background); /* 15 Digit display */
       h_display->segment[i_count] = h_segment_create(0, 0, i_left + i_display_left + ((4 + 13 * i_count) * SCALE_WIDTH), i_top + i_display_top + (i_display_height - 33 * SCALE_HEIGHT) / 2, 11 * SCALE_WIDTH, 33 * SCALE_HEIGHT, i_foreground, i_background); /* 15 Digit display */
    }
 #elif defined(HP31) || defined(HP32) || defined(HP33) || defined(HP34) || defined(HP37) || defined(HP38) ||  defined(HP10) ||  defined(HP11) ||  defined(HP12) ||  defined(HP15) ||  defined(HP16)
    for (i_count = 0; i_count < DIGITS; i_count++) {
-      //h_display->segment[i_count] = h_segment_create(0, 0, i_display_left + ((3 + 18 * i_count) * SCALE_WIDTH) - 2, i_display_top + (18 * SCALE_HEIGHT), 16 * SCALE_WIDTH, 33 * SCALE_HEIGHT, i_foreground, i_background); /* 11 Digit display */
       h_display->segment[i_count] = h_segment_create(0, 0, i_left + i_display_left + ((3 + 18 * i_count) * SCALE_WIDTH) - 2, i_top + i_display_top + (i_display_height - 33 * SCALE_HEIGHT) / 2, 16 * SCALE_WIDTH, 33 * SCALE_HEIGHT, i_foreground, i_background); /* 11 Digit display */
    }
 #else
@@ -138,6 +138,52 @@ odisplay *h_display_create(int i_index, int i_left, int i_top, int i_width, int 
    for (i_count = 0; i_count < DIGITS; i_count++) {
       h_display->segment[i_count]->mask = DISPLAY_SPACE;
    }
+
+#if defined(HP10) || defined(HP11) || defined(HP12) || defined(HP15) || defined(HP16)
+   i_top += i_display_height - h_small_font->descent;
+   i_height = h_small_font->ascent + h_small_font->descent;
+   i_width = 1 + XTextWidth(h_small_font, "USER ", 5) * SCALE_WIDTH;
+   i_left = i_display_left + (i_width / 4) * SCALE_WIDTH;
+   h_display->label[0] = h_label_create(001, "USER " , h_small_font, i_left, i_top,
+      i_width, i_height, i_foreground, i_background, False);
+   i_left += i_width;
+   i_width = 1 + XTextWidth(h_small_font, "f ", 2) * SCALE_WIDTH;
+   h_display->label[1] = h_label_create(002, "f " , h_small_font, i_left, i_top,
+      i_width, i_height, i_foreground, i_background, False);
+   i_left += i_width;
+   i_width = 1 + XTextWidth(h_small_font, "g ", 2) * SCALE_WIDTH;
+   h_display->label[2] = h_label_create(003, "g " , h_small_font, i_left, i_top,
+      i_width, i_height, i_foreground, i_background, False);
+   i_left += i_width;
+#if defined(HP12)
+   i_width = 1 + XTextWidth(h_small_font, "BEGIN ", 6) * SCALE_WIDTH;
+   h_display->label[3] = h_label_create(004, "BEGIN " , h_small_font, i_left, i_top,
+      i_width, i_height, i_foreground, i_background, False);
+   i_left += i_width;
+   h_display->label[4] = NULL;
+#else
+   i_width = 1 + XTextWidth(h_small_font, "  RAD ", 6) * SCALE_WIDTH;
+   h_display->label[3] = h_label_create(004, "  RAD " , h_small_font, i_left, i_top,
+      i_width, i_height, i_foreground, i_background, False);
+   i_width = 1 + XTextWidth(h_small_font, " GRAD ", 6) * SCALE_WIDTH;
+   h_display->label[4] = h_label_create(005, " GRAD " , h_small_font, i_left, i_top,
+      i_width, i_height, i_foreground, i_background, False);
+   i_left += i_width;
+#endif
+   i_width = 1 + XTextWidth(h_small_font, " D.MY ", 6) * SCALE_WIDTH;
+   h_display->label[5] = h_label_create(006, " D.MY " , h_small_font, i_left, i_top,
+      i_width, i_height, i_foreground, i_background, False);
+   i_left += i_width;
+
+   i_width = 1 + XTextWidth(h_small_font, " C ", 3) * SCALE_WIDTH;
+   h_display->label[6] = h_label_create(007, " C " , h_small_font, i_left, i_top,
+      i_width, i_height, i_foreground, i_background, False);
+   i_left += i_width;
+   i_width = 1 + XTextWidth(h_small_font, " PRGM ", 6) * SCALE_WIDTH;
+   h_display->label[7] = h_label_create(010, " PRGM " , h_small_font, i_left, i_top,
+      i_width, i_height, i_foreground, i_background, False);
+#endif
+
    h_display->foreground = i_foreground;
    h_display->background = i_background;
    h_display->fill = i_fill;
@@ -168,7 +214,14 @@ int i_display_draw(Display* x_display, int x_application_window, int i_screen, o
    /* Draw display segments. */
    for (i_count = 0; i_count < DIGITS; i_count++)
       if (!(h_display->segment[i_count] == NULL)) i_segment_draw(x_display, x_application_window, i_screen, h_display->segment[i_count]);
+
+#if defined(HP10) || defined(HP11) || defined(HP12) || defined(HP15) || defined(HP16)
+   for (i_count = 0; i_count < INDECATORS; i_count++)
+      i_label_draw(x_display, x_application_window, i_screen, h_display->label[i_count]);
+#endif
+
   return (True);
+
 }
 
 /*
@@ -364,6 +417,22 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
       {{ 9,  7,  8}, { 9,  7,  4}, { 9,  8,  1}, { 9,  3,  8}, { 9,  8,  2}, { 9,  7,  2}, { 9,  7,  1}, { 9,  3,  2}, { 9,  3,  1}}, /* Digit 9  */
       {{ 9,  6,  2}, { 9,  6,  1}, { 9,  6,  4}, { 9,  4,  8}, { 9,  6,  8}, { 9,  5,  8}, { 9,  5,  4}, { 9,  5,  2}, { 9,  5,  1}}  /* Digit 10 */
    };
+
+   for (i_count = 0; i_count < INDECATORS; i_count++)
+      if (h_display->label[i_count] != NULL)
+         h_display->label[i_count]->state = False;
+
+   if (h_processor->flags[DISPLAY_ENABLE] && h_processor->enabled)
+   {
+      h_display->label[0]->state = False;                                     /* USER - not used */
+      h_display->label[1]->state = (h_processor->mem[10]->nibble[13] & 0x4);  /* f */
+      h_display->label[2]->state = False;                                     /* g - not used */
+      h_display->label[3]->state = (h_processor->mem[9]->nibble[2] & 0x1);    /* RAD */
+      h_display->label[4]->state = (h_processor->mem[9]->nibble[1] & 0x4);    /* GRAD */
+      h_display->label[5]->state = False;                                     /* D.MY - not used */
+      h_display->label[6]->state = False;                                     /* C - not used */
+      h_display->label[7]->state = (h_processor->mem[9]->nibble[4] & 0x4);    /* PRGM */
+   }
 #else
    static int i_map [DIGITS][9][3] =
    { /*      A             B             C             D             E             F             G             H             I                    */
@@ -380,6 +449,26 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
       {{10, 11,  8}, {10, 11,  4}, {10, 11,  1}, {10,  8,  2}, {10, 11,  2}, {10, 12,  2}, {10, 12,  1}, {10,  8,  8}, {10,  8,  4}}, /* Digit 9  */
       {{10, 13,  2}, {10, 13,  1}, {10, 12,  4}, {10, 10,  2}, {10, 12,  8}, {10, 13,  8}, {10, 13,  4}, {10, 10,  8}, {10, 10,  4}}  /* Digit 10 */
    };
+
+   for (i_count = 0; i_count < INDECATORS; i_count++)
+      if (h_display->label[i_count] != NULL)
+         h_display->label[i_count]->state = False;
+
+   if (h_processor->flags[DISPLAY_ENABLE] && h_processor->enabled)
+   {
+      h_display->label[0]->state = (h_processor->mem[9]->nibble[4] & 0x1);    /* USER */
+      h_display->label[1]->state = (h_processor->mem[9]->nibble[3] & 0x1);    /* f */
+      h_display->label[2]->state = (h_processor->mem[9]->nibble[2] & 0x1);    /* g */
+#if defined(HP12)
+      h_display->label[3]->state = (h_processor->mem[9]->nibble[1] & 0x4);    /* BEGIN */
+#else
+      h_display->label[3]->state = (h_processor->mem[10]->nibble[1] & 0x4);   /* RAD */
+      h_display->label[4]->state = (h_processor->mem[10]->nibble[3] & 0x4);   /* GRAD */
+#endif
+      h_display->label[5]->state = (h_processor->mem[10]->nibble[9] & 0x4);   /* D.MY */
+      h_display->label[6]->state = (h_processor->mem[10]->nibble[8] & 0x1);   /* C */
+      h_display->label[7]->state = (h_processor->mem[10]->nibble[10] & 0x1);  /* PRGM */
+}
 #endif
    for (i_count = 0; i_count < DIGITS; i_count++)
    {
