@@ -197,6 +197,8 @@
  *                     loaded from a file - MT
  * 04 Mar 22         - Modified  the delay between each tick for the HP10C,
  *                     HP11C, HP12C, HP15C and HP16C - MT
+ * 14 Mar 22         - Modified delay timings to speed up the HP10C, HP11C,
+ *                     HP12C, HP15C and HP16C slightly.
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Add verbose option.
@@ -617,14 +619,14 @@ int main(int argc, char *argv[])
          i_count = INTERVAL;
 #if defined(HP67) || defined(HP41)
          i_wait(INTERVAL / 4); /* Sleep for ~6.25 ms per tick */
-         if (i_ticks > 0) i_ticks -= 1;
-#elif defined(HP31) || defined(HP32) || defined(HP33) || defined(HP34) || defined(HP37) || defined(HP38) || defined (HP10) || defined (HP11) || defined (HP12) || defined (HP15) || defined (HP16)
+#elif defined (HP10) || defined (HP11) || defined (HP12) || defined (HP15) || defined (HP16)
+         i_wait(INTERVAL / 4); /* Sleep for ~8.33 ms per tick */
+#elif defined(HP31) || defined(HP32) || defined(HP33) || defined(HP34) || defined(HP37) || defined(HP38)
          i_wait(INTERVAL / 3); /* Sleep for ~8.33 ms per tick */
-         if (i_ticks > 0) i_ticks -= 2;
 #else
          i_wait(INTERVAL / 2); /* Sleep for ~12.5 ms per tick */
-         if (i_ticks > 0) i_ticks -= 3;
 #endif
+         if (i_ticks > 0) i_ticks -= 1;
          if (i_ticks == 0) b_abort = True;
       }
       if (((h_processor->pc & 0xfff) == i_breakpoint) || (h_processor->rom[h_processor->pc] == i_trap)) /* Check for Breakpoint or Instruction Trap */
