@@ -199,6 +199,9 @@
  *                     HP11C, HP12C, HP15C and HP16C - MT
  * 14 Mar 22         - Modified delay timings to speed up the HP10C, HP11C,
  *                     HP12C, HP15C and HP16C slightly.
+ * 31 Mar 22         - Modified way the delay values are calculated to make
+ *                     the time needed to hold down the off button the same
+ *                     for all simulators - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Add verbose option.
@@ -216,7 +219,7 @@
 #define AUTHOR         "MT"
 
 #define INTERVAL 25    /* Number of ticks to execute before updating the display */
-#define DELAY 300      /* Number of intervals to wait before exiting (must be a multiple of 6) */
+#define DELAY 75       /* Number of intervals to wait before exiting (must be a multiple of 6) */
 
 #include <stdarg.h>    /* strlen(), etc */
 #include <string.h>    /* strlen(), etc */
@@ -305,7 +308,9 @@ int main(int argc, char *argv[])
    obutton *h_button[BUTTONS]; /* Array to hold pointers to buttons */
    obutton *h_pressed = NULL;
    odisplay *h_display; /* Pointer to display structure */
+#if defined(linux) || defined(__NetBSD__)
    okeyboard *h_keyboard;
+#endif
    oprocessor *h_processor;
 
    char *s_display_name = ""; /* Just use the default display */
@@ -578,7 +583,7 @@ int main(int argc, char *argv[])
       DISPLAY_LEFT, DISPLAY_TOP, DISPLAY_WIDTH, DISPLAY_HEIGHT, DIGIT_COLOUR, DIGIT_BACKGROUND,
       DISPLAY_BACKGROUND, BEZEL_COLOUR); /* Create display */
 
-#if defined(linux)
+#if defined(linux) || defined(__NetBSD__)
    h_keyboard = h_keyboard_create(x_display); /* Only works with Linux */
 #endif
 
@@ -620,7 +625,7 @@ int main(int argc, char *argv[])
 #if defined(HP67) || defined(HP41)
          i_wait(INTERVAL / 4); /* Sleep for ~6.25 ms per tick */
 #elif defined (HP10) || defined (HP11) || defined (HP12) || defined (HP15) || defined (HP16)
-         i_wait(INTERVAL / 4); /* Sleep for ~8.33 ms per tick */
+         i_wait(INTERVAL / 3); /* Sleep for ~8.33 ms per tick */
 #elif defined(HP31) || defined(HP32) || defined(HP33) || defined(HP34) || defined(HP37) || defined(HP38)
          i_wait(INTERVAL / 3); /* Sleep for ~8.33 ms per tick */
 #else
@@ -650,7 +655,7 @@ int main(int argc, char *argv[])
                h_processor->keypressed = False; /* Don't clear the status bit here!! */
             }
             break;
-#if defined(linux)
+#if defined(linux) || defined(__NetBSD__)
          case KeyPress :
             h_key_pressed(h_keyboard, x_display, x_event.xkey.keycode, x_event.xkey.state); /* Attempts to translate a key code into a character */
             if (h_keyboard->key == (XK_BackSpace & 0x1f)) h_keyboard->key = XK_Escape & 0x1f; /* Map backspace to escape */
@@ -742,7 +747,15 @@ int main(int argc, char *argv[])
                      {
                         v_save_state(h_processor); /* Save current settings */
                         h_processor->enabled = False; /* Disable the processor */
-                        i_ticks = DELAY; /* Set count down */
+#if defined(HP67) || defined(HP41)
+                        i_ticks = DELAY * 4; /* Set count down */
+#elif defined (HP10) || defined (HP11) || defined (HP12) || defined (HP15) || defined (HP16)
+                        i_ticks = DELAY * 3;
+#elif defined(HP31) || defined(HP32) || defined(HP33) || defined(HP34) || defined(HP37) || defined(HP38)
+                        i_ticks = DELAY * 3;
+#else
+                        i_ticks = DELAY * 2;
+#endif
                      }
                   }
                   if (!(h_switch_pressed(h_switch[1], x_event.xbutton.x, x_event.xbutton.y) == NULL))
