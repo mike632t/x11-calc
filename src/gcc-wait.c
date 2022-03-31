@@ -26,6 +26,7 @@
  *                     in the debug output (fixed warning) - MT
  * 03 Jan 21         - Changed debug() macro so that debug code is executed
  *                     when DEBUG is defined (doesn't need to be true) - MT
+ * 31 mar 22         - Modified to use usleep() on NetBSD - MT
  *
  */
 
@@ -34,7 +35,7 @@
 #define DATE           "16 Aug 20"
 
 #include <stdio.h>
-#if defined(linux)
+#if defined(linux) || defined(__NetBSD__)
 #include <unistd.h>
 #include <sys/types.h>
 #elif defined(WIN32)
@@ -59,7 +60,7 @@
  *
  */
 int i_wait(long l_delay) { /* wait for milliseconds */
-#if defined(linux) /* Use usleep() function */
+#if defined(linux) || defined(__NetBSD__) /* Use usleep() function */
 debug(fprintf(stderr, "Pausing using usleep() for  %ld ms.\n", l_delay));
 return (usleep(l_delay * 1000));
 #elif defined(WIN32) /* Use usleep() function */
