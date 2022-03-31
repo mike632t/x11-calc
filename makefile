@@ -26,11 +26,12 @@
 #  31 jan 22         - Added support for the HP10C, HP11C, HP12C, HP15C and
 #                      HP16C (all are currently work in progress) - MT
 #  22 Feb 22         - Added place holder for HP41 - MT
+#	31 Mar 22			- Moved ROMs into target folder - MT
 #
 
 PROGRAM	=  x11-calc
 FILES		=  ./src/*.c ./src/*.h ./prg/*.dat ./src/makefile
-FILES		+= ./rom/*.dis ./rom/*.obj ./src/*.rom
+FILES		+= ./bin/*.rom
 FILES		+= ./bin/x11-calc-*
 FILES		+= *.md LICENSE makefile .gitignore .gitattributes
 FILES		+= ./img/x11-calc-*.png
