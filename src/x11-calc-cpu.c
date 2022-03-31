@@ -320,6 +320,7 @@
  *             0.10  - Added 'c =st', 'c = stk', 'c = c and a', and fixed a
  *                     bug in 'cstex' - MT
  * 07 Mar 22         - Removed unused debug code - MT
+ * 31 mar 22         - Modified to compile on NetBSD - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -720,7 +721,7 @@ void v_save_state(oprocessor *h_processor) /* Restore saved processor state */
    if (h_processor != NULL) /* Check processor defined */
    {
       if (s_dir == NULL) s_dir = ""; /* Use current folder if HOME not defined */
-#if defined(unix)
+#if defined(unix) || defined(__unix__)
       s_pathname = malloc((strlen(s_dir) + strlen(s_filename) + strlen(s_filetype) + 2) * sizeof(char*));
       strcpy(s_pathname, s_dir);
       strcat(s_pathname, "/.");
@@ -746,7 +747,7 @@ void v_restore_state(oprocessor *h_processor) /* Restore saved processor state *
    if (h_processor != NULL) /* Check processor defined */
    {
       if (s_dir == NULL) s_dir = ""; /* Use current folder if HOME not defined */
-#if defined(unix)
+#if defined(unix) || defined(__unix__)
       s_pathname = malloc((strlen(s_dir) + strlen(s_filename) + strlen(s_filetype) + 2) * sizeof(char*));
       strcpy(s_pathname, s_dir);
       strcat(s_pathname, "/.");
