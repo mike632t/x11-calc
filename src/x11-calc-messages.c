@@ -32,6 +32,7 @@
  * 02 Feb 22         - Added formatting strings for relative jumps - MT
  * 03 Mar 22         - Updated help text - MT
  * 12 Mar 22         - Updated German translation again - MT
+ * 31 mar 22         - Modified to compile on NetBSD - MT
  *
  */
 
@@ -84,7 +85,7 @@ const char * h_err_invalid_address = "Direccion (%02o) fuera de rango en %1o-%04
 const char * h_err_invalid_register = "Registro inválido (REG[%d]) en %1o-%04o en %s en la línea : %d\n";
 #endif /* Hexadecimal */
 
-#if defined(unix)
+#if defined(unix) || defined(__unix__)
 const char * c_msg_usage = "Uso: %s [OPCION]... [ARCHIVO]\n\
 Simularor de calculadora RPN para X11.\n\n\
   -b  ADDR                 punto de interrupcion (octal)\n\
@@ -142,7 +143,7 @@ const char * h_err_invalid_address = "Ungültige adresse (%02o) an %1o-%04o in %
 const char * h_err_invalid_register = "Ungultiges register (REG[%d]) an %1o-%04o in %s zeile : %d\n";
 #endif /* Hexadecimal */
 
-#if defined(unix)
+#if defined(unix) || defined(__unix__)
 const char * c_msg_usage = "Verwendung: %s [OPTION]... [DATEI]\n\
 Eine RPN rechner-simulation fuer X11.\n\n\
   -b  ADDR                 haltepunkt an adresse setzen (oktal)\n\
@@ -200,7 +201,7 @@ const char * h_err_invalid_address = "Adresse (%02o) hors plage à %1o-%04o dans
 const char * h_err_invalid_register = "Registre invalide (REG[%d]) à %1o-%04o dans la ligne %s : %d\n";
 #endif /* Hexadecmal */
 
-#if defined(unix)
+#if defined(unix) || defined(__unix__)
 const char * c_msg_usage = "Utilisation : %s [OPTION]... [FICHIER]\n\
 Une simulation RPN Calculator pour X11.\n\n\
   -b  ADDR                 définir un point d'arrêt (octal)\n\
@@ -259,7 +260,7 @@ const char * h_err_invalid_address = "Address (%02o) out of range at %1o-%04o in
 const char * h_err_invalid_register = "Invalid register (REG[%d]) at %1o-%04o in %s line : %d\n";
 #endif /* Hexadecimal */
 
-#if defined(unix)
+#if defined(unix) || defined(__unix__)
 const char * c_msg_usage = "Usage: %s [OPTION]... [FILE]\n\
 An RPN Calculator simulation for X11.\n\n\
   -b  ADDR                 set break-point (octal)\n\

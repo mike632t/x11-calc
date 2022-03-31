@@ -20,6 +20,7 @@
  *
  * 13 Jun 13   0.1   - Initial version - MT
  * 02 Feb 22         - Added formatting strings for relative jumps - MT
+ * 31 Mar 22         - Modified to compile on NetBSD - MT
  *
  */
 
@@ -42,7 +43,7 @@ const char * h_msg_rom;
 extern char * c_msg_usage;
 extern char * h_err_invalid_operand;
 extern char * h_err_invalid_option;
-#if defined(unix)
+#if defined(unix) || defined(__unix__)
 extern char * h_err_unrecognised_option;
 extern char * h_err_invalid_number;
 extern char * h_err_address_range;
