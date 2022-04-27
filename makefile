@@ -95,8 +95,8 @@ hp37:
 hp38:
 	@$(MAKE) --no-print-directory -C ./src MODEL=38
 
-#hp41:
-#	@$(MAKE) --no-print-directory -C ./src MODEL=41
+hp41:
+	@$(MAKE) --no-print-directory -C ./src MODEL=41
 
 hp10:
 	@$(MAKE) --no-print-directory -C ./src MODEL=10
