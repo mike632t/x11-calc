@@ -45,7 +45,7 @@
 #                      building the project on NetBSD - MT
 #
 
-MODEL	= 33
+MODEL	= 21
 PROGRAM	= x11-calc
 SOURCES = x11-calc.c x11-calc-cpu.c x11-calc-display.c x11-calc-segment.c
 SOURCES += x11-calc-button.c x11-calc-switch.c x11-calc-label.c x11-calc-colour.c
@@ -59,9 +59,9 @@ LIBS	= -lX11 -lm
 #LIBS	+= -lcompat # NetBSD..
 FLAGS	= -fcommon -Wall -pedantic -ansi -std=gnu99
 FLAGS	+= -Wno-comment -Wno-deprecated-declarations -Wno-builtin-macro-redefined
-#FLAGS	+= -no-pie
-#FLAGS	+= -g # For debugging
+FLAGS	+= -no-pie
 #FLAGS	+= -I /usr/X11R7/include/ -L /usr/X11R7/lib/ -R /usr/X11R7/lib # NetBSD..
+#FLAGS	+= -g # For debugging
 CC	= gcc
 
 
