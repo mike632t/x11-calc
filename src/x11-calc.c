@@ -202,6 +202,8 @@
  * 31 Mar 22         - Modified way the delay values are calculated to make
  *                     the time needed to hold down the off button the same
  *                     for all simulators - MT
+ *                   - Reduced the length of time that the off button  must
+ *                     be held down to exit - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Add verbose option.
@@ -219,7 +221,7 @@
 #define AUTHOR         "MT"
 
 #define INTERVAL 25    /* Number of ticks to execute before updating the display */
-#define DELAY 75       /* Number of intervals to wait before exiting (must be a multiple of 6) */
+#define DELAY 50       /* Number of intervals to wait before exiting */
 
 #include <stdarg.h>    /* strlen(), etc */
 #include <string.h>    /* strlen(), etc */
