@@ -320,7 +320,11 @@
  *             0.10  - Added 'c =st', 'c = stk', 'c = c and a', and fixed a
  *                     bug in 'cstex' - MT
  * 07 Mar 22         - Removed unused debug code - MT
- * 31 mar 22         - Modified to compile on NetBSD - MT
+ * 31 Mar 22         - Modified to compile on NetBSD - MT
+ * 12 May 22         - A branch to subroutine instruction is ignored if the
+ *                     target address does not exist - MT
+ *                   - Print a newline to stdout before an error message if
+ *                     tracing is enabled, to tidy up the output - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -1053,6 +1057,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   if (h_processor->trace) fprintf(stdout, "nop");
                   break;
                default:
+                  if (h_processor->trace) fprintf(stdout, "\n");
                   v_error(h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
                }
                break;
@@ -1070,6 +1075,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   h_processor->pc += h_processor->code;
                   break;
                default:
+                  if (h_processor->trace) fprintf(stdout, "\n");
                   v_error(h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
                }
                break;
@@ -1079,6 +1085,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                case 0:
                   break;
                default:
+                  if (h_processor->trace) fprintf(stdout, "\n");
                   v_error(h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
                }
                break;
@@ -1109,9 +1116,13 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   if (h_processor->addr < MEMORY_SIZE)
                      v_reg_copy(h_processor, h_processor->mem[h_processor->addr], h_processor->reg[C_REG]);
                   else
+                  {
+                     if (h_processor->trace) fprintf(stdout, "\n");
                      v_error(h_err_invalid_register, h_processor->addr, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
+                  }
                   break;
                default:
+                  if (h_processor->trace) fprintf(stdout, "\n");
                   v_error(h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
                }
                break;
@@ -1146,6 +1157,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   break;
                case 01064: /*delayed select group 0 */
                case 01264: /*delayed select group 0 */
+                  if (h_processor->trace) fprintf(stdout, "\n");
                   v_error(h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
                   break;
                default: /* delayed select rom n */
@@ -1217,6 +1229,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   }
                   break;
                default:
+                  if (h_processor->trace) fprintf(stdout, "\n");
                   v_error(h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
                }
                break;
@@ -1229,7 +1242,10 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   if (h_processor->addr < MEMORY_SIZE)
                      v_reg_copy(h_processor, h_processor->mem[h_processor->addr], h_processor->reg[C_REG]);
                   else
+                  {
+                     if (h_processor->trace) fprintf(stdout, "\n");
                      v_error(h_err_invalid_register, h_processor->addr, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
+                  }
                   break;
                case 01370: /* data -> c */
                   if (h_processor->trace) fprintf(stdout, "data -> c");
@@ -1237,10 +1253,12 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   v_reg_copy(h_processor, h_processor->reg[C_REG], h_processor->mem[h_processor->addr]);
                   break;
                default:
+                  if (h_processor->trace) fprintf(stdout, "\n");
                   v_error(h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
                }
                break;
             default:
+               if (h_processor->trace) fprintf(stdout, "\n");
                v_error(h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
             }
             break;
@@ -1266,10 +1284,12 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                v_op_inc_p(h_processor);
                break;
             default:
+               if (h_processor->trace) fprintf(stdout, "\n");
                v_error(h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
             }
             break;
          default:
+            if (h_processor->trace) fprintf(stdout, "\n");
             v_error(h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
          }
          break;
@@ -1354,6 +1374,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   break;
 #endif
                default:
+                  if (h_processor->trace) fprintf(stdout, "\n");
                   v_error(h_err_unexpected_opcode, i_opcode, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
                }
                break;
@@ -1380,7 +1401,10 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                      if (i_addr < ROM_SIZE)
                          h_processor->pc = i_addr;
                      else
+                     {
+                        if (h_processor->trace) fprintf(stdout, "\n");
                         v_error(h_err_invalid_address, i_addr, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
+                     }
                      v_delayed_rom(h_processor);
                   }
                   break;
@@ -1416,6 +1440,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   h_processor->pc = h_processor->stack[h_processor->sp]; /* Pop program counter from the stack */
                   break;
                default:
+                  if (h_processor->trace) fprintf(stdout, "\n");
                   v_error(h_err_unexpected_opcode, i_opcode, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
                }
                break;
@@ -1519,6 +1544,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   if (h_processor->trace) fprintf(stdout, "hi I'm woodstock");
                   break;
                default:
+                  if (h_processor->trace) fprintf(stdout, "\n");
                   v_error(h_err_unexpected_opcode, i_opcode, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
                }
             }
@@ -1649,6 +1675,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   }
                   break;
                default:
+                  if (h_processor->trace) fprintf(stdout, "\n");
                   v_error(h_err_unexpected_opcode, i_opcode, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
                }
                break;
@@ -1668,6 +1695,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                }
                else
                {
+                  if (h_processor->trace) fprintf(stdout, "\n");
                   v_error(h_err_invalid_address, i_opcode >> 6, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
                }
                break;
@@ -1688,13 +1716,20 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                      if ((h_processor->addr) < MEMORY_SIZE)
                         v_reg_copy(h_processor, h_processor->reg[C_REG], h_processor->mem[h_processor->addr]);
                      else
+                     {
+                        if (h_processor->trace) fprintf(stdout, "\n");
                         v_error(h_err_invalid_address, h_processor->addr, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
+                     }
                   }
                }
                else
+               {
+                  if (h_processor->trace) fprintf(stdout, "\n");
                   v_error(h_err_invalid_register, h_processor->addr, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
+               }
                break;
             default:
+               if (h_processor->trace) fprintf(stdout, "\n");
                v_error(h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
             }
             break;
@@ -1751,13 +1786,17 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                if (h_processor->trace) fprintf(stdout, "nop");
                break;
             default:
+               if (h_processor->trace) fprintf(stdout, "\n");
                v_error(h_err_unexpected_opcode, i_opcode, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
             }
             break;
 
          case 0x01: /* 0 -> status[7:0] - Clear status (11 1100 0100) or 0 -> status[d] - Clear status bit (dd dd00 0100) */
             if ((i_opcode >> 6) == 7) /* Reserved opcode (01 1100 0100) */
+            {
+               if (h_processor->trace) fprintf(stdout, "\n");
                v_error(h_err_unexpected_opcode, i_opcode, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
+            }
             if ((i_opcode >> 6) < 15)
             {
                if (h_processor->trace) fprintf(stdout, "st = 0 %-2d\t", n_map_i[i_opcode >> 6]);
@@ -1774,7 +1813,10 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             break;
          case 0x02: /* 0 -> kyf  - Reset keyboard (11 1100 1000) or 1 -> status[d] - Set status bit (dd dd00 0100) */
             if ((i_opcode >> 6) == 7) /* Reserved opcode (01 1100 1000) */
+            {
+               if (h_processor->trace) fprintf(stdout, "\n");
                v_error(h_err_unexpected_opcode, i_opcode, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
+            }
             if ((i_opcode >> 6) < 15)
             {
                if (h_processor->trace) fprintf(stdout, "st = 1 %-2d\t", n_map_i[i_opcode >> 6]);
@@ -1789,7 +1831,10 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             break;
          case 0x03: /* Test status bit [dddd] if 0 <= dddd <= 14 (dd dd00 1100) or test keyboard (11 1100 1100) */
             if ((i_opcode >> 6) == 7) /* Reserved opcode (01 1100 1100) */
+            {
+               if (h_processor->trace) fprintf(stdout, "\n");
                v_error(h_err_unexpected_opcode, i_opcode, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
+            }
             if ((i_opcode >> 6) < 15)
             {
                if (h_processor->trace) fprintf(stdout, "? st = 1 %-2d", n_map_i[i_opcode >> 6]);
@@ -1809,7 +1854,10 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             break;
          case 0x05: /* Test pointer equal to dddd if 0 <= dddd <= 14 (dd dd00 1100) or decrement pointer (11 1101 0100) */
             if ((i_opcode >> 6) == 7) /* Reserved opcode (01 1101 0100) */
+            {
+               if (h_processor->trace) fprintf(stdout, "\n");
                v_error(h_err_unexpected_opcode, i_opcode, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
+            }
             if ((i_opcode >> 6) < 15)
             {
                if (h_processor->trace) fprintf(stdout, "? pt = %d", n_map_i[i_opcode >> 6]);
@@ -1826,6 +1874,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             switch (i_opcode >> 6)
             {
             case 0x0: /* Reserved opcode (00 0001 1000) */
+               if (h_processor->trace) fprintf(stdout, "\n");
                v_error(h_err_unexpected_opcode, i_opcode, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
                break;
             case 0x01: /* c[pt + 1:pt] -> g - Load g from c (00 0101 1000) */
@@ -1919,13 +1968,17 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                if (h_processor->trace) v_fprint_status(stdout, h_processor);
                break;
             default:
+               if (h_processor->trace) fprintf(stdout, "\n");
                debug(fprintf(stderr,"%02x\n", (i_opcode >> 6) & 0xf));
                v_error(h_err_unexpected_opcode, i_opcode, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
             }
             break;
          case 0x07: /* Load pointer with dddd if 0 <= dddd <= 14 (dd dd00 1100) or decrement pointer (11 1101 0100) */
             if ((i_opcode >> 6) == 7) /* Reserved opcode (01 1101 0100)*/
+            {
+               if (h_processor->trace) fprintf(stdout, "\n");
                v_error(h_err_unexpected_opcode, i_opcode, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
+            }
             if ((i_opcode >> 6) < 15)
             {
                if (h_processor->trace) fprintf(stdout, "pt = %d", n_map_i[i_opcode >> 6]);
@@ -2035,6 +2088,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                h_processor->pc = h_processor->stack[h_processor->sp]; /* Pop program counter from the stack */
                break;
             default:
+               if (h_processor->trace) fprintf(stdout, "\n");
                debug(fprintf(stderr,"%02x\n", (i_opcode >> 6) & 0xf));
                v_error(h_err_unexpected_opcode, i_opcode, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
             }
@@ -2163,7 +2217,12 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                v_reg_and(h_processor, h_processor->reg[C_REG], h_processor->reg[C_REG], h_processor->reg[A_REG]);
                if (h_processor->trace) v_fprint_register(stdout, h_processor->reg[C_REG]);
                break;
+            case 0x0f:
+               if (h_processor->trace) fprintf(stdout, "\n");
+               debug(fprintf(stderr,"%02x\n", (i_opcode >> 6) & 0xf));
+               v_error(h_err_unexpected_opcode, i_opcode, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
             default:
+               if (h_processor->trace) fprintf(stdout, "\n");
                debug(fprintf(stderr,"%02x\n", (i_opcode >> 6) & 0xf));
                v_error(h_err_unexpected_opcode, i_opcode, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
             }
@@ -2203,6 +2262,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             break;
 
          default:
+            if (h_processor->trace) fprintf(stdout, "\n");
             debug(fprintf(stderr,"%02x\n", (i_opcode >> 2) & 0xf));
             v_error(h_err_unexpected_opcode, i_opcode, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
          }
@@ -2244,10 +2304,12 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             switch (i_next & 0x3)
             {
             case 0x0: /* if no carry then stack[2] -> stack[3], stack[1] -> stack[2], stack[0] -> stack[1], pc -> stack[0], a -> pc - Branch to subroutine on no carry (aa aaaa aa00, aa aaaa aa00) */
-               if (!h_processor->flags[PREV_CARRY]) op_jsb(h_processor, i_address);
+               if (i_address < ROM_SIZE) /* Check that the target address exists otherwise treat as a 'nop' */
+                  if (!h_processor->flags[PREV_CARRY]) op_jsb(h_processor, i_address);
                break;
             case 0x1: /* if carry then stack[2] -> stack[3], stack[1] -> stack[2], stack[0] -> stack[1], pc -> stack[0], a -> pc - Branch to subroutine on no carry (aa aaaa aa00, aa aaaa aa01) */
-               if (h_processor->flags[PREV_CARRY]) op_jsb(h_processor, i_address);
+               if (i_address < ROM_SIZE) /* Check that the target address exists otherwise treat as a 'nop' */
+                  if (h_processor->flags[PREV_CARRY]) op_jsb(h_processor, i_address);
                break;
             case 0x2:  /* if no carry then a -> pc - Branch on no carry (aa aaaa aa00, aa aaaa aa10) */
                if (!h_processor->flags[PREV_CARRY])
@@ -2284,7 +2346,10 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             s_field = "p";
             h_processor->first = h_processor->p; h_processor->last = h_processor->p;
             if (h_processor->p >= REG_SIZE)
+            {
+               if (h_processor->trace) fprintf(stdout, "\n");
                v_error(h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
+            }
             break;
          case 01: /* M */
             s_field = "m";
@@ -2302,7 +2367,10 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             s_field = "wp";
             h_processor->first =  0; h_processor->last =  h_processor->p; /* break; bug in orig??? */
             if (h_processor->p >= REG_SIZE)
+            {
+               if (h_processor->trace) fprintf(stdout, "\n");
                v_error(h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
+            }
             break;
          case 05: /* MS */
             s_field = "ms";
@@ -2461,6 +2529,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             v_reg_inc(h_processor, h_processor->reg[A_REG]);
             break;
          default:
+            if (h_processor->trace) fprintf(stdout, "\n");
             v_error(h_err_unexpected_opcode, i_opcode, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
          }
          break;
@@ -2483,13 +2552,19 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             s_field = "p";
             h_processor->first = h_processor->p; h_processor->last = h_processor->p;
             if (h_processor->p >= REG_SIZE)
+            {
+               if (h_processor->trace) fprintf(stdout, "\n");
                v_error(h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
+            }
             break;
          case 01: /* WP */
             s_field = "wp";
             h_processor->first =  0; h_processor->last =  h_processor->p; /* break; bug in orig??? */
             if (h_processor->p >= REG_SIZE)
+            {
+               if (h_processor->trace) fprintf(stdout, "\n");
                v_error(h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
+            }
             break;
          case 02: /* XS */
             s_field = "xs";
@@ -2660,6 +2735,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             v_reg_shr(h_processor, h_processor->reg[C_REG]);
             break;
          default:
+            if (h_processor->trace) fprintf(stdout, "\n");
             v_error(h_err_unexpected_opcode, i_opcode, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
          }
          break;
@@ -2685,7 +2761,10 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             else
                h_processor->first = h_processor->last = h_processor->p;
             if (h_processor->p >= REG_SIZE || h_processor->q >= REG_SIZE)
+            {
+               if (h_processor->trace) fprintf(stdout, "\n");
                v_error(h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
+            }
             break;
          case 01: /* Exponent and sign */
             s_field = "x";
@@ -2699,7 +2778,10 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             else
                h_processor->last = h_processor->p;
             if (h_processor->p >= REG_SIZE || h_processor->q >= REG_SIZE)
+            {
+               if (h_processor->trace) fprintf(stdout, "\n");
                v_error(h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
+            }
             break;
          case 03: /* All nibbles in the word */
             s_field = "all";
@@ -2713,7 +2795,10 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             else
                h_processor->last = h_processor->q;
             if (h_processor->p >= REG_SIZE || h_processor->q >= REG_SIZE)
+            {
+               if (h_processor->trace) fprintf(stdout, "\n");
                v_error(h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
+            }
             break;
          case 05: /* XS */
             s_field = "xs";
@@ -2904,6 +2989,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[A_REG]);
             break;
          default:
+            if (h_processor->trace) fprintf(stdout, "\n");
             v_error(h_err_unexpected_opcode, i_opcode, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
          }
          break;
@@ -2914,14 +3000,17 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
          {
          case 00:
             if (h_processor->trace) {fprintf(stdout, "call "); fprintf(stdout, h_msg_address, i_opcode >> 2);}
+            if (h_processor->trace) fprintf(stdout, "\n");
             v_error(h_err_unexpected_opcode, i_opcode, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
             break;
          case 01:
             if (h_processor->trace) {fprintf(stdout, "call "); fprintf(stdout, h_msg_address, i_opcode >> 2);}
+            if (h_processor->trace) fprintf(stdout, "\n");
             v_error(h_err_unexpected_opcode, i_opcode, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
             break;
          case 02:
             if (h_processor->trace) {fprintf(stdout, "jump "); fprintf(stdout, h_msg_address, i_opcode >> 2);}
+            if (h_processor->trace) fprintf(stdout, "\n");
             v_error(h_err_unexpected_opcode, i_opcode, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
             break;
 #if defined (HP10) || defined (HP11) || defined (HP12) || defined (HP15) || defined (HP16) || defined(HP41) /* Group 3 */
@@ -2962,10 +3051,12 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             break;
 #endif
          default:
+            if (h_processor->trace) fprintf(stdout, "\n");
             v_error(h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
          }
          break;
       default:
+         if (h_processor->trace) fprintf(stdout, "\n");
          v_error(h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
       }
       if (h_processor->trace) fprintf(stdout, "\n");
