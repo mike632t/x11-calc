@@ -5,7 +5,8 @@
  *
  * With thanks to Alejandro GARZA for providing the Spanish translation and
  * Martin HEPPERLE for translating the text into German.  Any errors in the
- * text are as the result of changes I've made.
+ * text are as the result of changes I've made to limit the characters used
+ * to those in the 8-bit ACSII character set.
  *
  * This  program is free software: you can redistribute it and/or modify it
  * under  the terms of the GNU General Public License as published  by  the
@@ -251,12 +252,12 @@ const char * h_err_font = "Cannot load font '%s'.\n";
 #if defined(HEXADECIMAL)
 const char * h_err_unexpected_opcode = "Unexpected opcode (%03x) at %1x-%03x in %s line : %d\n";
 const char * h_err_unexpected_error = "Unexpected error at %1x-%03x in %s line : %d\n";
-const char * h_err_invalid_address = "Address (%02o) out of range at %1x-%03x in %s line : %d\n";
+const char * h_err_invalid_address = "Address (%04x) out of range at %1x-%03x in %s line : %d\n";
 const char * h_err_invalid_register = "Invalid register (REG[%d]) at %1x-%03x in %s line : %d\n";
 # else
 const char * h_err_unexpected_opcode = "Unexpected opcode (%04o) at %1o-%04o in %s line : %d\n";
 const char * h_err_unexpected_error = "Unexpected error at %1o-%04o in %s line : %d\n";
-const char * h_err_invalid_address = "Address (%02o) out of range at %1o-%04o in %s line : %d\n";
+const char * h_err_invalid_address = "Address (%06o) out of range at %1o-%04o in %s line : %d\n";
 const char * h_err_invalid_register = "Invalid register (REG[%d]) at %1o-%04o in %s line : %d\n";
 #endif /* Hexadecimal */
 
