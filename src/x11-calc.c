@@ -204,6 +204,7 @@
  *                     for all simulators - MT
  *                   - Reduced the length of time that the off button  must
  *                     be held down to exit - MT
+ * 26 May 22         - Blank line after an error message not needed - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Add verbose option.
@@ -278,7 +279,6 @@ void v_error(const char *s_format, ...) /* Print formatted error message and exi
    fprintf(stderr, "%s : ", FILENAME);
    vfprintf(stderr, s_format, t_args);
    va_end(t_args);
-   fprintf(stdout,"\n");
    exit(-1);
 }
 
@@ -407,7 +407,7 @@ int main(int argc, char *argv[])
                      }
                      if ((i_breakpoint < 0)  ||
                         (i_breakpoint > (unsigned)(sizeof(i_rom) / sizeof i_rom[0])) ||
-                        (i_breakpoint > 07777)) /* Check address range - must be in bank 0*/
+                        (i_breakpoint > 07777)) /* Check address range */
                      {
                         v_error(h_err_address_range, argv[i_count + 1]);
                      }
