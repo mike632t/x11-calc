@@ -23,6 +23,7 @@
  *                     when DEBUG is defined (doesn't need to be true) - MT
  * 31 Jan 22         - Added ROM - MT
  * 12 Mar 22         - Added the label state property - MT
+ * 22 May 22         - Fixed shortcut key for SST - MT
  *
  * TO DO :           -
  */
@@ -117,7 +118,7 @@ void v_init_buttons(obutton *h_button[]) {
    i_left = KBD_LEFT;
    h_button[i_count++] = h_button_create(00021, 000, "R/S", "PSE", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, False, BLACK, YELLOW, MID_BLUE, BLACK);
    i_left += (KEY_WIDTH + KEY_GAP);
-   h_button[i_count++] = h_button_create(00061, 000, "SST", "BST", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, False, BLACK, YELLOW, MID_BLUE, BLACK);
+   h_button[i_count++] = h_button_create(00061, ' ', "SST", "BST", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, False, BLACK, YELLOW, MID_BLUE, BLACK);
    i_left += (KEY_WIDTH + KEY_GAP);
    h_button[i_count++] = h_button_create(00161, 000, "Rv", "PRGM", "", "", h_normal_font, h_alternate_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, False, BLACK, YELLOW, MID_BLUE, BLACK);
    i_left += (KEY_WIDTH + KEY_GAP);
