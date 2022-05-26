@@ -48,6 +48,7 @@
  *                     integers so they can be loaded/saved as hex - MT
  * 05 Mar 22         - Changed the data type of the register nibbles, flags
  *                     and status bits back to unsigned char - MT
+ * 18 May 22         - Added flag out and flag in registers for HP41 - MT
  *
  */
 
@@ -130,10 +131,14 @@ typedef struct {
    unsigned char step;                 /* Step flag */
    unsigned char sleep;                /* Sleep */
    unsigned char enabled;              /* Enabled */
+#if defined(HP41)
+   unsigned char fo[8];                /* Flag out */
+   unsigned char fi[8];                /* Flag in */
+#endif
 #if defined (HP10) || defined (HP11) || defined (HP12) || defined (HP15) || defined (HP16) || defined(HP41)
    unsigned char kyf;                  /* Keyboard flag */
-   unsigned char g[2];                  /* G register */
-   unsigned char q;                     /* Q register */
+   unsigned char g[2];                 /* G register */
+   unsigned char q;                    /* Q register */
    unsigned char ptr;                  /* Selects P or Q registers (Q = True) */
 #else
    unsigned int rom_number;            /* Delayed ROM number */
