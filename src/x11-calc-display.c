@@ -64,6 +64,7 @@
  * 01 Mar 22         - Fixed digits 4 and 10 (11C, 12C, 15C and 16C) tested
  *                     all digits now work as expected - MT
  * 12 Mar 22         - Added display annunciators - MT
+ * 26 May 22         - Added place holder for HP41 display - MT
  *
  */
 
@@ -483,6 +484,15 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
                   if ((h_processor->mem[i_map[i_count][i_counter][0]]->nibble[i_map[i_count][i_counter][1]] & i_map[i_count][i_counter][2]))
                      h_display->segment[i_count]->mask |= (1 << i_counter); /* Mask determines which segments are on */
             }
+         }
+      }
+   }
+#elif defined(HP41)
+   int i_count;
+   for (i_count = 0; i_count < DIGITS; i_count++) {
+      if (h_display->segment[i_count] != NULL) {
+         if (h_processor->flags[DISPLAY_ENABLE] && h_processor->enabled) {
+            h_display->segment[i_count]->mask = DISPLAY_EIGHT | DISPLAY_COMMA;
          }
       }
    }
