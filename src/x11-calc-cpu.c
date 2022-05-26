@@ -325,7 +325,7 @@
  * 12 May 22         - A branch to subroutine instruction is ignored if the
  *                     target address does not exist - MT
  *                   - Print a newline to stdout before an error message if
- *                     tracing is enabled, to tidy up the output - MT
+ *                     trace is enabled, to tidy up the output - MT
  * 18 May 22         - Added  three missing HP41 instructions  ('pfad = c',
  *                     'fo = st', and 'st = c')- MT
  * 22 May 22         - Fixed 'goto c' - MT
