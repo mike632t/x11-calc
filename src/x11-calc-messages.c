@@ -33,11 +33,14 @@
  * 02 Feb 22         - Added formatting strings for relative jumps - MT
  * 03 Mar 22         - Updated help text - MT
  * 12 Mar 22         - Updated German translation again - MT
- * 31 mar 22         - Modified to compile on NetBSD - MT
+ * 31 Mar 22         - Modified to compile on NetBSD - MT
+ * 07 Dec 22         - Didplay register number as a 3 digit value - MT
+ * 11 Dec 22         - Renamed models with continious memory and added hp25
+ *                     hp33e, and hp38e - MT
  *
  */
 
-#if defined (HP10) || defined (HP11) || defined (HP12) || defined (HP15) || defined (HP16) || defined(HP41)
+#if defined(HP10) || defined(HP10c) || defined(HP11c) || defined(HP12c)|| defined(HP15c) || defined(HP16c) || defined(HP41c)
 #define HEXADECIMAL
 #endif
 
@@ -78,12 +81,12 @@ const char * h_err_font = "No se pudo cargar la fuente '%s'.\n";
 const char * h_err_unexpected_opcode = "Codigo de operación inesperado (%03x) en %1x-%03x en %s en la línea : %d\n";
 const char * h_err_unexpected_error = "Error inesperado en %1x-%03x en %s: en la línea: %d\n";
 const char * h_err_invalid_address = "Direccion (%02o) fuera de rango en %1x-%03x en %s en la línea : %d\n";
-const char * h_err_invalid_register = "Registro invalido (REG[%d]) en %1x-%03x en %s en la línea : %d\n";
+const char * h_err_invalid_register = "Registro invalido (REG[%03d]) en %1x-%03x en %s en la línea : %d\n";
 # else
 const char * h_err_unexpected_opcode = "Codigo de operación inesperado (%04o) en %1o-%04o en %s en la línea : %d\n";
 const char * h_err_unexpected_error = "Error inesperado en %1o-%04o en %s: en la línea: %d\n";
 const char * h_err_invalid_address = "Direccion (%02o) fuera de rango en %1o-%04o en %s en la línea : %d\n";
-const char * h_err_invalid_register = "Registro inválido (REG[%d]) en %1o-%04o en %s en la línea : %d\n";
+const char * h_err_invalid_register = "Registro inválido (REG[%03d]) en %1o-%04o en %s en la línea : %d\n";
 #endif /* Hexadecimal */
 
 #if defined(unix) || defined(__unix__)
@@ -136,12 +139,12 @@ const char * h_err_font = "Kann schrift '%s' nicht laden.\n";
 const char * h_err_unexpected_opcode = "Unerwarteter opcode (%03x) an %1x-%03x in %s zeile: %d\n";
 const char * h_err_unexpected_error = "Nicht abgefangener fehler an %1x-%03x in %s zeile: %d\n";
 const char * h_err_invalid_address = "Ungueltige adresse (%02o) an %1x-%03x in %s zeile : %d\n";
-const char * h_err_invalid_register = "Ungueltiges register (REG[%d]) an %1x-%03x in %s zeile : %d\n";
+const char * h_err_invalid_register = "Ungueltiges register (REG[%03d]) an %1x-%03x in %s zeile : %d\n";
 # else
 const char * h_err_unexpected_opcode = "Unerwarteter opcode (%04o) bei %1o-%04o in %s zeile : %d\n";
 const char * h_err_unexpected_error = "Nicht abgefangener fehler an %1o-%04o in %s zeile : %d\n";
 const char * h_err_invalid_address = "Ungültige adresse (%02o) an %1o-%04o in %s zeile : %d\n";
-const char * h_err_invalid_register = "Ungultiges register (REG[%d]) an %1o-%04o in %s zeile : %d\n";
+const char * h_err_invalid_register = "Ungultiges register (REG[%03d]) an %1o-%04o in %s zeile : %d\n";
 #endif /* Hexadecimal */
 
 #if defined(unix) || defined(__unix__)
@@ -194,12 +197,12 @@ const char * h_err_font = "Impossible de charger la police '%s'.\n";
 const char * h_err_unexpected_opcode = "Code opération inattendu (%03x) à %1x-%03x dans la ligne %s : %d\n";
 const char * h_err_unexpected_error = "Erreur inattendue à %1x-%03x dans la ligne %s : %d\n";
 const char * h_err_invalid_address = "Adresse (%02o) hors plage à %1x-%03x dans la ligne %s : %d\n";
-const char * h_err_invalid_register = "Registre invalide (REG[%d]) à %1x-%03x dans la ligne %s : %d\n";
+const char * h_err_invalid_register = "Registre invalide (REG[%03d]) à %1x-%03x dans la ligne %s : %d\n";
 # else
 const char * h_err_unexpected_opcode = "Code opération inattendu (%04o) à %1o-%04o dans la ligne %s : %d\n";
 const char * h_err_unexpected_error = "Erreur inattendue à %1o-%04o dans la ligne %s : %d\n";
 const char * h_err_invalid_address = "Adresse (%02o) hors plage à %1o-%04o dans la ligne %s : %d\n";
-const char * h_err_invalid_register = "Registre invalide (REG[%d]) à %1o-%04o dans la ligne %s : %d\n";
+const char * h_err_invalid_register = "Registre invalide (REG[%03d]) à %1o-%04o dans la ligne %s : %d\n";
 #endif /* Hexadecmal */
 
 #if defined(unix) || defined(__unix__)
@@ -253,12 +256,12 @@ const char * h_err_font = "Cannot load font '%s'.\n";
 const char * h_err_unexpected_opcode = "Unexpected opcode (%03x) at %1x-%03x in %s line : %d\n";
 const char * h_err_unexpected_error = "Unexpected error at %1x-%03x in %s line : %d\n";
 const char * h_err_invalid_address = "Address (%04x) out of range at %1x-%03x in %s line : %d\n";
-const char * h_err_invalid_register = "Invalid register (REG[%d]) at %1x-%03x in %s line : %d\n";
+const char * h_err_invalid_register = "Invalid register (REG[%03d]) at %1x-%03x in %s line : %d\n";
 # else
 const char * h_err_unexpected_opcode = "Unexpected opcode (%04o) at %1o-%04o in %s line : %d\n";
 const char * h_err_unexpected_error = "Unexpected error at %1o-%04o in %s line : %d\n";
 const char * h_err_invalid_address = "Address (%06o) out of range at %1o-%04o in %s line : %d\n";
-const char * h_err_invalid_register = "Invalid register (REG[%d]) at %1o-%04o in %s line : %d\n";
+const char * h_err_invalid_register = "Invalid register (REG[%03d]) at %1o-%04o in %s line : %d\n";
 #endif /* Hexadecimal */
 
 #if defined(unix) || defined(__unix__)

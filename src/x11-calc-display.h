@@ -32,6 +32,8 @@
  * 29 Jan 22         - Added an optional bezel to the display - MT
  * 01 Mar 22         - Only define constants that are required - MT
  * 12 Mar 22         - Added display annunciators - MT
+ * 11 Dec 22         - Renamed models with continious memory and added hp25
+ *                     hp33e, and hp38e - MT
  *
  */
 
@@ -39,7 +41,7 @@
 
 #define DISPLAY_SPACE      0x0000
 
-#if !(defined(HP10) || defined(HP11) || defined(HP12) || defined(HP15) || defined(HP16))
+#if !(defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c))
 
 #define DISPLAY_ONE        0x0030
 #define DISPLAY_TWO        0x006d

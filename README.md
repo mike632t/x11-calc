@@ -1,13 +1,16 @@
 ## x11-calc - Another RPN (Reverse Polish) calculator.
 
-Simulators for the HP 35, HP 80, HP 45, HP 70, HP 21, HP 22, HP 25C, HP 27,
-HP 29C,  HP 31E,  HP 32E,  HP 33C, HP 34C, HP 37E, HP 38C,  HP 67,  HP 10C,
-HP 11C, HP 12C, HP 15C, and HP 16C  written in C using only X11.
+Simulators for the HP 35, HP 80, HP 45, HP 70, HP 21, HP 22, HP 25, HP 25C,
+HP 27,  HP 29C,  HP 31E, HP 32E, HP 33E, HP 33C,  HP 34C,  HP 37E,  HP 38E,
+HP 38C, HP 67, HP 10C, HP 11C, HP 12C, HP 15C, and HP 16C.
+
+All written in C using X11.
 
 Use  of any language extensions or non standard language features has  been
 avoided in order to try to make the code as portable as possible.
 
-Should compile without modification on Linux, VAX/VMS, and Tru64 Unix.
+The  aim  is to have the same source code compile without  modification  on
+Linux, VAX/VMS, and Tru64 Unix.
 
 Unlike all the other simulators the ROM images for the HP10C, HP11C, HP12C,
 HP15C, HP16C are not defined in the the source code and must be loaded from
@@ -28,6 +31,15 @@ More [screenshots](./img/)
 
 04/01 - Added HP35 (50 years after the launch of the original)!
 
+10/12 - Renamed HP10 to HP10C and added HP10.
+
+11/12 - Renamed HP11 to HP11C, HP12 to HP12C, HP15 to HP15C, HP16 to HP16C.
+
+11/12 - Renamed HP25 to HP25C, HP29 to HP29C, HP31 to HP31E, HP32 to HP32E.
+
+11/12 - Renamed HP33 to HP33C, HP34 to HP34C, HP37 to HP37E, HP38 to HP38C.
+
+11/12 - Added HP25, HP33E and HP38E models.
 
 ### Status
 
@@ -39,9 +51,13 @@ More [screenshots](./img/)
 
 ##### HP 70  - Working
 
+##### HP 10  - In development, no printer.
+
 ##### HP 21  - Working
 
 ##### HP 22  - Working
+
+##### HP 25  - Working
 
 ##### HP 25C - Working
 
@@ -53,6 +69,8 @@ More [screenshots](./img/)
 
 ##### HP 32E - Working
 
+##### HP 33E - Working
+
 ##### HP 33C - Working
 
 ##### HP 34C - Working
@@ -60,7 +78,9 @@ More [screenshots](./img/)
 ##### HP 37E - Completed
 * Fails self test.
 
-##### HP 38C - Completed
+##### HP 38E - Working
+
+##### HP 38C - Working
 
 ##### HP 67  - Working
 * Cannot read or write to magnetic cards.

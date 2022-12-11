@@ -69,7 +69,7 @@ all: clean ../bin/$(PROGRAM)-$(MODEL) $(OBJECTS)
 FLAGS	+= -D HP$(MODEL) -D $(LANG)
 SOURCES += x11-calc-$(MODEL).c
 
-../bin/$(PROGRAM)-$(MODEL): $(OBJECTS)
+   ../bin/$(PROGRAM)-$(MODEL): $(OBJECTS)
 	@$(CC) $(FLAGS) $(OBJECTS) -o ../bin/$@ $(LIBS)
 
 $(OBJECTS) : $(SOURCES)

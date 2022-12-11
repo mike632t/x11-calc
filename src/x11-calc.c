@@ -205,6 +205,8 @@
  *                   - Reduced the length of time that the off button  must
  *                     be held down to exit - MT
  * 26 May 22         - Blank line after an error message not needed - MT
+ * 11 Dec 22         - Renamed models with continious memory and added hp25
+ *                     hp33e, and hp38e - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Add verbose option.
@@ -624,11 +626,11 @@ int main(int argc, char *argv[])
          i_display_update(x_display, x_application_window, i_screen, h_display, h_processor);
          i_display_draw(x_display, x_application_window, i_screen, h_display); /* Redraw display */
          i_count = INTERVAL;
-#if defined(HP67) || defined(HP41)
+#if defined(HP67) || defined(HP41c)
          i_wait(INTERVAL / 4); /* Sleep for ~6.25 ms per tick */
-#elif defined (HP10) || defined (HP11) || defined (HP12) || defined (HP15) || defined (HP16)
+#elif defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c)
          i_wait(INTERVAL / 3); /* Sleep for ~8.33 ms per tick */
-#elif defined(HP31) || defined(HP32) || defined(HP33) || defined(HP34) || defined(HP37) || defined(HP38)
+#elif defined(HP31e) || defined(HP32e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38c)
          i_wait(INTERVAL / 3); /* Sleep for ~8.33 ms per tick */
 #else
          i_wait(INTERVAL / 2); /* Sleep for ~12.5 ms per tick */
@@ -749,11 +751,11 @@ int main(int argc, char *argv[])
                      {
                         v_save_state(h_processor); /* Save current settings */
                         h_processor->enabled = False; /* Disable the processor */
-#if defined(HP67) || defined(HP41)
+#if defined(HP67) || defined(HP41c)
                         i_ticks = DELAY * 4; /* Set count down */
-#elif defined (HP10) || defined (HP11) || defined (HP12) || defined (HP15) || defined (HP16)
+#elif defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c)
                         i_ticks = DELAY * 3;
-#elif defined(HP31) || defined(HP32) || defined(HP33) || defined(HP34) || defined(HP37) || defined(HP38)
+#elif defined(HP31e) || defined(HP32e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38c)
                         i_ticks = DELAY * 3;
 #else
                         i_ticks = DELAY * 2;

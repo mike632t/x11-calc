@@ -52,12 +52,15 @@
  * 31 Jan 22         - Added support for the HP10C, HP11C, HP12C, HP15C and
  *                     HP16C - MT
  * 26 May 22         - Added HP41CV - MT
+ * 26 Nov 22         - Added support for HP10 - MT
+ * 11 Dec 22         - Renamed models with continious memory and added hp25
+ *                     hp33e, and hp38e - MT
  *
  * TO DO :           -
  */
 #define COMMIT_ID "[Commit ID: $Format:%h$]"
 
-#if defined (HP35) || defined (HP80) || defined (HP45) || defined (HP70) || defined(HP55) || defined(HP67) /** || defined(HP41) */
+#if defined(HP35) || defined(HP80) || defined(HP45) || defined(HP70) || defined(HP55) || defined(HP67) /** || defined(HP41c) */
 #define SCALE_WIDTH     1.15
 #define SCALE_HEIGHT    1
 #else
@@ -93,6 +96,11 @@
 #define TITLE        "RPN calc 70"
 #include "x11-calc-70.h"
 
+#elif defined(HP10)
+#define FILENAME     "x11-calc-10"
+#define TITLE        "RPN calc 10"
+#include "x11-calc-10.h"
+
 #elif defined(HP21)
 #define FILENAME     "x11-calc-21"
 #define TITLE        "RPN calc 21"
@@ -105,83 +113,98 @@
 
 #elif defined(HP25)
 #define FILENAME     "x11-calc-25"
-#define TITLE        "RPN calc 25C"
+#define TITLE        "RPN calc 25"
 #include "x11-calc-25.h"
+
+#elif defined(HP25c)
+#define FILENAME     "x11-calc-25c"
+#define TITLE        "RPN calc 25C"
+#include "x11-calc-25c.h"
 
 #elif defined(HP27)
 #define FILENAME     "x11-calc-27"
 #define TITLE        "RPN calc 27"
 #include "x11-calc-27.h"
 
-#elif defined(HP29)
-#define FILENAME     "x11-calc-29"
+#elif defined(HP29c)
+#define FILENAME     "x11-calc-29c"
 #define TITLE        "RPN calc 29C"
-#include "x11-calc-29.h"
+#include "x11-calc-29c.h"
 
 #elif defined(HP67)
 #define FILENAME     "x11-calc-67"
 #define TITLE        "RPN calc 67"
 #include "x11-calc-67.h"
 
-#elif defined(HP31)
-#define FILENAME     "x11-calc-31"
+#elif defined(HP31e)
+#define FILENAME     "x11-calc-31e"
 #define TITLE        "RPN calc 31E"
-#include "x11-calc-31.h"
+#include "x11-calc-31e.h"
 
-#elif defined(HP32)
-#define FILENAME     "x11-calc-32"
+#elif defined(HP32e)
+#define FILENAME     "x11-calc-32e"
 #define TITLE        "RPN calc 32E"
-#include "x11-calc-32.h"
+#include "x11-calc-32e.h"
 
-#elif defined(HP33)
-#define FILENAME     "x11-calc-33"
+#elif defined(HP33e)
+#define FILENAME     "x11-calc-33e"
+#define TITLE        "RPN calc 33E"
+#include "x11-calc-33e.h"
+
+#elif defined(HP33c)
+#define FILENAME     "x11-calc-33c"
 #define TITLE        "RPN calc 33C"
-#include "x11-calc-33.h"
+#include "x11-calc-33c.h"
 
-#elif defined(HP34)
-#define FILENAME     "x11-calc-34"
+#elif defined(HP34c)
+#define FILENAME     "x11-calc-34c"
 #define TITLE        "RPN calc 34C"
-#include "x11-calc-34.h"
+#include "x11-calc-34c.h"
 
-#elif defined(HP37)
-#define FILENAME     "x11-calc-37"
+#elif defined(HP37e)
+#define FILENAME     "x11-calc-37e"
 #define TITLE        "RPN calc 37E"
-#include "x11-calc-37.h"
+#include "x11-calc-37e.h"
 
-#elif defined(HP38)
-#define FILENAME     "x11-calc-38"
+#elif defined(HP38e)
+#define FILENAME     "x11-calc-38e"
+#define TITLE        "RPN calc 38E"
+#include "x11-calc-38e.h"
+
+#elif defined(HP38c)
+#define FILENAME     "x11-calc-38c"
 #define TITLE        "RPN calc 38C"
-#include "x11-calc-38.h"
+#include "x11-calc-38c.h"
 
-#elif defined(HP41)
-#define FILENAME     "x11-calc-41"
-#define TITLE        "RPN calc 41CV"
-#include "x11-calc-41.h"
+#elif defined(HP41c)
+#define FILENAME     "x11-calc-41c"
+#define TITLE        "RPN calc 41C"
+#include "x11-calc-41c.h"
 
-#elif defined(HP10)
-#define FILENAME     "x11-calc-10"
+#elif defined(HP10c)
+#define FILENAME     "x11-calc-10c"
 #define TITLE        "RPN calc 10C"
-#include "x11-calc-10.h"
+#include "x11-calc-10c.h"
 
-#elif defined(HP11)
-#define FILENAME     "x11-calc-11"
+#elif defined(HP11c)
+#define FILENAME     "x11-calc-11c"
 #define TITLE        "RPN calc 11C"
-#include "x11-calc-11.h"
+#include "x11-calc-11c.h"
 
-#elif defined(HP12)
-#define FILENAME     "x11-calc-12"
+#elif defined(HP12c)
+#define FILENAME     "x11-calc-12c"
 #define TITLE        "RPN calc 12C"
-#include "x11-calc-12.h"
+#include "x11-calc-12c.h"
 
-#elif defined(HP15)
-#define FILENAME     "x11-calc-15"
+#elif defined(HP15c)
+#define FILENAME     "x11-calc-15c"
 #define TITLE        "RPN calc 15C"
-#include "x11-calc-15.h"
+#include "x11-calc-15c.h"
 
-#elif defined(HP16)
-#define FILENAME     "x11-calc-16"
+#elif defined(HP16c)
+#define FILENAME     "x11-calc-16c"
 #define TITLE        "RPN calc 16C"
-#include "x11-calc-16.h"
+#include "x11-calc-16c.h"
 
 #endif
 

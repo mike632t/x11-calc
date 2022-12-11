@@ -65,6 +65,8 @@
  *                     all digits now work as expected - MT
  * 12 Mar 22         - Added display annunciators - MT
  * 26 May 22         - Added place holder for HP41 display - MT
+ * 11 Dec 22         - Renamed models with continious memory and added hp25
+ *                     hp33e, and hp38e - MT
  *
  */
 
@@ -123,11 +125,11 @@ odisplay *h_display_create(int i_index, int i_left, int i_top, int i_width, int 
    h_display->display_top = i_display_top;
    h_display->display_width = i_display_width;
    h_display->display_height = i_display_height;
-#if defined(HP67) || defined (HP35) || defined (HP80) || defined (HP45) || defined (HP70) || defined(HP55)
+#if defined(HP67) || defined(HP35) || defined(HP80) || defined(HP45) || defined(HP70) || defined(HP55)
    for (i_count = 0; i_count < DIGITS; i_count++) {
       h_display->segment[i_count] = h_segment_create(0, 0, i_left + i_display_left + ((4 + 13 * i_count) * SCALE_WIDTH), i_top + i_display_top + (i_display_height - 33 * SCALE_HEIGHT) / 2, 11 * SCALE_WIDTH, 33 * SCALE_HEIGHT, i_foreground, i_background); /* 15 Digit display */
    }
-#elif defined(HP31) || defined(HP32) || defined(HP33) || defined(HP34) || defined(HP37) || defined(HP38) ||  defined(HP10) ||  defined(HP11) ||  defined(HP12) ||  defined(HP15) ||  defined(HP16)
+#elif defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c) ||  defined(HP10c) ||  defined(HP11c) ||  defined(HP12c) ||  defined(HP15c) ||  defined(HP16c)
    for (i_count = 0; i_count < DIGITS; i_count++) {
       h_display->segment[i_count] = h_segment_create(0, 0, i_left + i_display_left + ((3 + 18 * i_count) * SCALE_WIDTH) - 2, i_top + i_display_top + (i_display_height - 33 * SCALE_HEIGHT) / 2, 16 * SCALE_WIDTH, 33 * SCALE_HEIGHT, i_foreground, i_background); /* 11 Digit display */
    }
@@ -140,7 +142,7 @@ odisplay *h_display_create(int i_index, int i_left, int i_top, int i_width, int 
       h_display->segment[i_count]->mask = DISPLAY_SPACE;
    }
 
-#if defined(HP10) || defined(HP11) || defined(HP12) || defined(HP15) || defined(HP16)
+#if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c)
    i_top += i_display_height - h_small_font->descent;
    i_height = h_small_font->ascent + h_small_font->descent;
    i_width = 1 + XTextWidth(h_small_font, "USER ", 5) * SCALE_WIDTH;
@@ -156,7 +158,7 @@ odisplay *h_display_create(int i_index, int i_left, int i_top, int i_width, int 
    h_display->label[2] = h_label_create(003, "g " , h_small_font, i_left, i_top,
       i_width, i_height, i_foreground, i_background, False);
    i_left += i_width;
-#if defined(HP12)
+#if defined(HP12c)
    i_width = 1 + XTextWidth(h_small_font, "BEGIN ", 6) * SCALE_WIDTH;
    h_display->label[3] = h_label_create(004, "BEGIN " , h_small_font, i_left, i_top,
       i_width, i_height, i_foreground, i_background, False);
@@ -216,7 +218,7 @@ int i_display_draw(Display* x_display, int x_application_window, int i_screen, o
    for (i_count = 0; i_count < DIGITS; i_count++)
       if (!(h_display->segment[i_count] == NULL)) i_segment_draw(x_display, x_application_window, i_screen, h_display->segment[i_count]);
 
-#if defined(HP10) || defined(HP11) || defined(HP12) || defined(HP15) || defined(HP16)
+#if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c)
    for (i_count = 0; i_count < INDECATORS; i_count++)
       i_label_draw(x_display, x_application_window, i_screen, h_display->label[i_count]);
 #endif
@@ -287,7 +289,7 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
             h_display->segment[i_count]->mask = DISPLAY_SPACE;
       }
    }
-#elif defined (HP35) || defined (HP80) || defined (HP45) || defined (HP70) || defined(HP55)
+#elif defined(HP35) || defined(HP80) || defined(HP45) || defined(HP70) || defined(HP55)
    int i_count, i_offset;
    static int c_digits [] =
    {
@@ -338,7 +340,7 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
       }
       i_offset--;
    }
-#elif defined(HP31) || defined(HP32) || defined(HP33) || defined(HP34) || defined(HP37) || defined(HP38)
+#elif defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
    int i_count;
    static int c_digits [] =
    {
@@ -390,7 +392,28 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
             h_display->segment[i_count]->mask = DISPLAY_SPACE;
       }
    }
-#elif defined(HP10) || defined(HP11) || defined(HP12) || defined(HP15) || defined(HP16)
+#elif defined(HP10)
+   int i_count, i_offset;
+   static int c_digits [] =
+   {
+      DISPLAY_ZERO, DISPLAY_ONE, DISPLAY_TWO, DISPLAY_THREE, DISPLAY_FOUR, DISPLAY_FIVE, DISPLAY_SIX, DISPLAY_SEVEN,
+      DISPLAY_EIGHT, DISPLAY_NINE, DISPLAY_r, DISPLAY_DECIMAL, DISPLAY_o, DISPLAY_MINUS, DISPLAY_E, DISPLAY_SPACE
+   };
+
+   i_offset = REG_SIZE - DIGITS + 1;
+   for (i_count = 0; i_count < DIGITS; i_count++) {
+      if (h_display->segment[i_count] != NULL)
+      {
+         if (h_processor->flags[DISPLAY_ENABLE] && h_processor->enabled)
+         {
+            if (h_display->segment[i_count] != NULL)
+               h_display->segment[i_count]->mask = c_digits[h_processor->reg[A_REG]->nibble[REG_SIZE - i_offset - i_count]];
+         }
+         else
+            h_display->segment[i_count]->mask = DISPLAY_SPACE;
+      }
+   }
+#elif defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c)
    /*
     * Unlike the earlier models which display the contents of the processor
     * registers  directly, the voyager series use two memory registers ([9]
@@ -402,7 +425,7 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
     *
     */
    int i_count, i_counter;
-#if defined(HP10) /* Uses a different display to the earlier models so the look up table is different */
+#if defined(HP10c) /* Uses a different display to the earlier models so the look up table is different */
    static int i_map [DIGITS][9][3] =
    { /*      A             B             C             D             E             F             G             H             I                    */
      /*  r   n   b     r   n   b     r   n   b     r   n   b     r   n   b     r   n   b     r   n   b     r   n   b     r   n   b                */
@@ -460,7 +483,7 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
       h_display->label[0]->state = (h_processor->mem[9]->nibble[4] & 0x1);    /* USER */
       h_display->label[1]->state = (h_processor->mem[9]->nibble[3] & 0x1);    /* f */
       h_display->label[2]->state = (h_processor->mem[9]->nibble[2] & 0x1);    /* g */
-#if defined(HP12)
+#if defined(HP12c)
       h_display->label[3]->state = (h_processor->mem[9]->nibble[1] & 0x4);    /* BEGIN */
 #else
       h_display->label[3]->state = (h_processor->mem[10]->nibble[1] & 0x4);   /* RAD */
@@ -487,7 +510,7 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
          }
       }
    }
-#elif defined(HP41)
+#elif defined(HP41c)
    int i_count;
    for (i_count = 0; i_count < DIGITS; i_count++) {
       if (h_display->segment[i_count] != NULL) {

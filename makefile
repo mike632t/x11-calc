@@ -27,6 +27,8 @@
 #                      HP16C (all are currently work in progress) - MT
 #  22 Feb 22         - Added place holder for HP41 - MT
 #	31 Mar 22			- Moved ROMs into target folder - MT
+#  11 Dec 22			- Renamed models with continious memory and added hp25
+#                      hp33e, and hp38e - MT
 #
 
 PROGRAM	=  x11-calc
@@ -37,15 +39,16 @@ FILES		+= *.md LICENSE makefile .gitignore .gitattributes
 FILES		+= ./img/x11-calc-*.png
 MAKE		=  make
 
-all: clean hp35 hp80 hp45 hp70 hp21 hp22 hp25 hp27 hp29 hp31 hp32 hp33 hp34 hp37 hp38 hp67 hp10 hp11 hp12 hp15 hp16
+all: clean hp35 hp80 hp45 hp70 hp10 hp21 hp22 hp25 hp25c hp27 hp29c hp67 hp31e hp32e hp33e hp33c hp34c hp37e hp38e hp38c hp10c hp11c hp12c hp15c hp16c
 
 classic: clean hp35 hp80 hp45 hp70
 
-woodstock: clean hp21 hp22 hp25 hp27 hp29
+woodstock: clean hp21 hp22 hp25 hp25c hp27 hp29c
 
-spice: clean hp31 hp32 hp33 hp34 hp37 hp38
+spice: clean hp31e hp32e hp33e hp33c hp34c hp37e hp38e hp38c
 
-voyager: clean hp10 hp11 hp12 hp15 hp16
+voyager: clean hp10c hp11c hp12c hp15c hp16c
+
 
 hp35:
 	@$(MAKE) --no-print-directory -C ./src MODEL=35
@@ -59,6 +62,9 @@ hp45:
 hp70:
 	@$(MAKE) --no-print-directory -C ./src MODEL=70
 
+hp10:
+	@$(MAKE) --no-print-directory -C ./src MODEL=10
+
 hp21:
 	@$(MAKE) --no-print-directory -C ./src MODEL=21
 
@@ -68,50 +74,59 @@ hp22:
 hp25:
 	@$(MAKE) --no-print-directory -C ./src MODEL=25
 
+hp25c:
+	@$(MAKE) --no-print-directory -C ./src MODEL=25c
+
 hp27:
 	@$(MAKE) --no-print-directory -C ./src MODEL=27
 
-hp29:
-	@$(MAKE) --no-print-directory -C ./src MODEL=29
+hp29c:
+	@$(MAKE) --no-print-directory -C ./src MODEL=29c
 
 hp67:
 	@$(MAKE) --no-print-directory -C ./src MODEL=67
 
-hp31:
-	@$(MAKE) --no-print-directory -C ./src MODEL=31
+hp31e:
+	@$(MAKE) --no-print-directory -C ./src MODEL=31e
 
-hp32:
-	@$(MAKE) --no-print-directory -C ./src MODEL=32
+hp32e:
+	@$(MAKE) --no-print-directory -C ./src MODEL=32e
 
-hp33:
-	@$(MAKE) --no-print-directory -C ./src MODEL=33
+hp33e:
+	@$(MAKE) --no-print-directory -C ./src MODEL=33e
 
-hp34:
-	@$(MAKE) --no-print-directory -C ./src MODEL=34
+hp33c:
+	@$(MAKE) --no-print-directory -C ./src MODEL=33c
 
-hp37:
-	@$(MAKE) --no-print-directory -C ./src MODEL=37
+hp34c:
+	@$(MAKE) --no-print-directory -C ./src MODEL=34c
 
-hp38:
-	@$(MAKE) --no-print-directory -C ./src MODEL=38
+hp37e:
+	@$(MAKE) --no-print-directory -C ./src MODEL=37e
 
-hp41:
-	@$(MAKE) --no-print-directory -C ./src MODEL=41
+hp38e:
+	@$(MAKE) --no-print-directory -C ./src MODEL=38e
 
-hp10:
-	@$(MAKE) --no-print-directory -C ./src MODEL=10
+hp38c:
+	@$(MAKE) --no-print-directory -C ./src MODEL=38c
 
-hp11:
-	@$(MAKE) --no-print-directory -C ./src MODEL=11
+hp41c:
+	@$(MAKE) --no-print-directory -C ./src MODEL=41c
 
-hp12:
-	@$(MAKE) --no-print-directory -C ./src MODEL=12
+hp10c:
+	@$(MAKE) --no-print-directory -C ./src MODEL=10c
 
-hp15:
-	@$(MAKE) --no-print-directory -C ./src MODEL=15
+hp11c:
+	@$(MAKE) --no-print-directory -C ./src MODEL=11c
 
-hp16:
-	@$(MAKE) --no-print-directory -C ./src MODEL=16
+hp12c:
+	@$(MAKE) --no-print-directory -C ./src MODEL=12c
+
+hp15c:
+	@$(MAKE) --no-print-directory -C ./src MODEL=15c
+
+hp16c:
+	@$(MAKE) --no-print-directory -C ./src MODEL=16c
 
 clean:
 	@rm  -f ./src/*.o

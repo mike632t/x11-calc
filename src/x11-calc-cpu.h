@@ -49,6 +49,8 @@
  * 05 Mar 22         - Changed the data type of the register nibbles, flags
  *                     and status bits back to unsigned char - MT
  * 18 May 22         - Added flag out and flag in registers for HP41 - MT
+ * 11 Dec 22         - Renamed models with continious memory and added hp25
+ *                     hp33e, and hp38e - MT
  *
  */
 
@@ -61,7 +63,7 @@
 #define STATUS_BITS     16
 #define FLAGS           9
 
-#if defined (HP10) || defined (HP11) || defined (HP12) || defined (HP15) || defined (HP16) || defined(HP41)
+#if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c) || defined(HP41c)
 #define STACK_SIZE      4
 #else
 #define STACK_SIZE      2
@@ -131,11 +133,11 @@ typedef struct {
    unsigned char step;                 /* Step flag */
    unsigned char sleep;                /* Sleep */
    unsigned char enabled;              /* Enabled */
-#if defined(HP41)
+#if defined(HP41c)
    unsigned char fo[8];                /* Flag out */
    unsigned char fi[8];                /* Flag in */
 #endif
-#if defined (HP10) || defined (HP11) || defined (HP12) || defined (HP15) || defined (HP16) || defined(HP41)
+#if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c) || defined(HP41c)
    unsigned char kyf;                  /* Keyboard flag */
    unsigned char g[2];                 /* G register */
    unsigned char q;                    /* Q register */
