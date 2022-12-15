@@ -342,8 +342,12 @@
  *                     registers are displayed  - MT
  *                   - All models now display the modified registers values
  *                     in the trace output - MT
- * 11 Dec 22         - Renamed models with continious memory and added hp25
- *                     hp33e, and hp38e - MT
+ * 11 Dec 22         - Renamed models with continious memory and added HP25
+ *                     HP33E, and HP38E - MT
+ * 14 Dec 22         - Changed 'keys -> a' to return the state of the print
+ *                     mode  switch for the HP10 and HP19C, currently  this
+ *                     always selects the 'manual' mode as printing has not
+ *                     been implemented yet - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -387,7 +391,7 @@ static void v_fprint_register(FILE *h_file, oregister *h_register) /* Print the 
    {
       fprintf(h_file, "\treg[");
       if (h_register->id < 0)
-         fprintf(h_file, "*%c*", c_name[h_register->id * -1 - 1]);
+         fprintf(h_file, "\'%c\'", c_name[h_register->id * -1 - 1]);
       else
          fprintf(h_file, "%03d", h_register->id);
       fprintf(h_file, "] = 0x");
@@ -1435,9 +1439,15 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   h_processor->pc += h_processor->code;
                   break;
                case 00120: /* keys -> a[2:1] (0 001 010 000) */
-                  if (h_processor->trace) fprintf(stdout, "keys -> a");
+                  if (h_processor->trace) fprintf(stdout, "keys -> a\t");
+#if defined(HP10) || defined(HP19) || defined(HP97)
+                  /* The HP10 and HP19C use this to get the state of the printer mode switch */
+                  h_processor->reg[A_REG]->nibble[1] = 0x4; /* Trace = 1, Normal = 2, Manual = 4 */
+#else
                   h_processor->reg[A_REG]->nibble[2] = (h_processor->code >> 4);
                   h_processor->reg[A_REG]->nibble[1] = (h_processor->code & 0x0f);
+#endif
+                  if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[A_REG]);
                   break;
                case 00220: /* a -> rom address */
                   {
@@ -1841,7 +1851,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   h_processor->addr += (i_opcode >> 6);
                   if (h_processor->trace) fprintf(stdout, "data register(%d) -> c", h_processor->addr);
                   if ((h_processor->addr) < MEMORY_SIZE)
-                     v_reg_copy(h_processor, h_processor->reg[C_REG], h_processor->mem[h_processor->addr]);
+                     v_reg_copy(!h_processor, h_processor->reg[C_REG], h_processor->mem[h_processor->addr]);
                   else
                   {
                      if (h_processor->trace) fprintf(stdout, "\n");
@@ -2919,7 +2929,11 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
          case 007: /* b exchange c[f] */
             if (h_processor->trace) fprintf(stdout, "b exch c[%s]", s_field);
             v_reg_exch(h_processor, h_processor->reg[B_REG], h_processor->reg[C_REG]);
-            if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[B_REG]);
+            if (h_processor->trace)
+            {
+               v_fprint_register(stdout,h_processor->reg[B_REG]);
+               v_fprint_register(stdout,h_processor->reg[C_REG]);
+            }
             break;
          case 010: /* 0 -> c[f] */
             if (h_processor->trace) fprintf(stdout, "0 -> c[%s]\t", s_field);
