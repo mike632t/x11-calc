@@ -22,7 +22,6 @@
  *
  */
 
-//#define MODEL              "10"
 #define HEIGHT             450 * SCALE_HEIGHT
 #define WIDTH              200 * SCALE_WIDTH
 #define BUTTONS            24

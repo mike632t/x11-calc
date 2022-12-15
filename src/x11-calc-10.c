@@ -19,8 +19,14 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * 26 Nov 22         - Initial version - MT
- * 07 Dec 22         - Updated ROM to fix errors (0-617, 0-661, 0-66f, and
+ * 07 Dec 22         - Replaced classic opcode for 14 -> p at 0-141 with an
+ *                     equlivelent for the woodstock processor, though this
+ *                     insruction is not valid it works here - MT
+ *                   - Updated ROM to fix errors (0-617, 0-661, 0-66f, and
  *                     0-6a1 changed to 'data -> c') - MT
+ *                   - Updated ROM to fix another error (0-651 changed  to
+ *                     'data -> c') - MT
+ * 14 Dec 12         - Found another (0-5b5 changed  to 'data -> c') - MT
  *
  */
 
@@ -317,7 +323,7 @@ int i_rom[ROM_SIZE] = {
    0x00d9, 0x0034, 0x00db, 0x03d8, 0x03d8, 0x0398, 0x03d8, 0x02d8, /* 0-598   */
    0x0398, 0x03d8, 0x0218, 0x0158, 0x0058, 0x0118, 0x00d8, 0x0058, /* 0-5a0   */
    0x0118, 0x0210, 0x011a, 0x033c, 0x02d3, 0x011a, 0x033c, 0x0058, /* 0-5a8   */
-   0x02d3, 0x011a, 0x033c, 0x0098, 0x0270, 0x02f0, 0x0210, 0x03ee, /* 0-5b0   */
+   0x02d3, 0x011a, 0x033c, 0x0098, 0x0270, 0x0038, 0x0210, 0x03ee, /* 0-5b0   * 0x02d3, 0x011a, 0x033c, 0x0098, 0x0270, 0x02f0, 0x0210, 0x03ee, */
    0x02c8, 0x009a, 0x02c8, 0x01b4, 0x0139, 0x008e, 0x02f0, 0x0248, /* 0-5b8   */
    0x009a, 0x0248, 0x0210, 0x02c8, 0x011a, 0x033c, 0x032f, 0x02c8, /* 0-5c0   */
    0x011a, 0x033c, 0x0058, 0x0270, 0x0248, 0x02f0, 0x0210, 0x0000, /* 0-5c8   */
