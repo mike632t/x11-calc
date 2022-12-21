@@ -52,7 +52,7 @@
  * 11 Dec 22         - Renamed models with continious memory and added hp25
  *                     hp33e, and hp38e - MT
  * 20 Dec 22         - Added a printer buffer to the CPU properties for the
- *                     HP10, HP19C and HP97 (if it ever ge that far) - MT
+ *                     HP10, HP19C and HP97 (if I ever get that far) - MT
  *
  */
 
