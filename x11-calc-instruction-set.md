@@ -242,34 +242,151 @@ least significant six bits of each opcode into three groups as shown below.
 
 Card Reader Circuit instructions
 
-    00060   0 000 11 00 00    Set display digits
-    00100   0 000 00 10 00    Test ready
-    00160   0 001 11 00 00    Test display digits
-    00260   0 010 11 00 00    Motor On
-    00300   0 011 00 00 00    Test W/PGM switch
-    00360   0 011 11 00 00    Motor Off
-    00400   0 100 00 00 00    A key was pressed
-    00500   0 101 00 00 00    Test of a key was pressed
-    00560   0 101 11 00 00    Test if card inserted
-    00660   0 110 11 00 00    Set card write mode
-    00760   0 111 11 00 00    Set card read mode
-    01000   1 000 00 00 00    Set default function keys
-    01100   1 001 00 00 00    Test if default function keys set
-    01200   1 010 00 00 00    Set merge flag
-    01300   1 011 00 00 00    Test merge flag
-    01400   1 100 00 00 00    Set waiting for card side 2 flag
-    01500   1 101 00 00 00    Test waiting for card side 2 flag
-    01700   1 111 00 00 00    Read/Write data to/from card via RAM $99 and $9B
+The CRC chip (Card Reader Controller) has twelve flags (f0 - f11).
+
+Each  flag has a set instruction, and a test-and-clear instruction,  except
+that flag 0 can only be tested.
+
+Five of the flags control and monitor the card reader hardware:
+
+    f0   buffer ready
+    f7   data valid
+    f9   motor enable
+    f10  card inserted
+    f11  write mode
+
+Four of the flags sense other hardware inputs, of which only one is used in
+the 67:
+
+    f1   PRGM mode (67/97)
+    f2   printer MAN mode (97), unused (67)
+    f3   printer NORM mode (97), unused (67)
+    f4   keyboard sensing for SST, BST, R/S (97), unused (67)
+
+The other three flags appear to have no dedicated hardware function and are
+used by the microocde.
+
+On the 67/97 these are used as follows:
+
+    f5   MERGE
+    f6   PAUSE
+    f8   display-related
+
+    00060   0 000 11 00 00    crc sf 8    Set display digits
+    00100   0 000 00 10 00    crc fs?c 0  Test ready
+    00160   0 001 11 00 00    crc fs?c 8  Test display digits
+    00260   0 010 11 00 00    crc sf 9    Motor On
+    00300   0 011 00 00 00    crc fs?c 1  Test W/PGM switch
+    00360   0 011 11 00 00    crc fs?c 9  Motor Off
+    00400   0 100 00 00 00    crc sf 2    A key was pressed
+    00500   0 101 00 00 00    crc fs?c 2  Test of a key was pressed
+    00560   0 101 11 00 00    crc fs?c 10 Test if card inserted
+    00660   0 110 11 00 00    crc sf 11   Set card write mode
+    00760   0 111 11 00 00    crc fs?c 11 Set card read mode
+    01000   1 000 00 00 00    crc sf 4    Set default function keys
+    01100   1 001 00 00 00    crc fs?c 4  Test if default function keys set
+    01200   1 010 00 00 00    crc sf 5    Set merge flag
+    01300   1 011 00 00 00    crc fs?c 5  Test merge flag
+    01400   1 100 00 00 00    crc sf 6    Set waiting for card side 2 flag
+    01500   1 101 00 00 00    crc fs?c 6  Test waiting for card side 2 flag
+    01600   1 110 00 00 00    crc sf 7    ???
+    01700   1 111 00 00 00    crc fs?c 7  Read/Write data to/from card via RAM $99 and $9B
 
 Printer Interface Control and Keyboard buffer instructions
 
-    01120   1 001 01 00 00    Printer ready (sets/clears S3)
-    01220   1 010 01 00 00    Out of paper (sets/clears S3)
-    01320   1 011 01 00 00    Keypress in buffer (sets/clears S3)
-    01420   1 100 01 00 00    ???
-    01620   1 110 01 00 00    ???
-    01660   1 110 11 00 00    ???
-    01720   1 111 01 00 00    ???
+    01120   1 001 01 00 00    pik1120     Printer ready (Sets S3 if printer is ready)
+    01220   1 010 01 00 00    pik1220     Out of paper (sets/clears S3)
+    01320   1 011 01 00 00    pik1320     Keypress in buffer (Sets S3 if character in buffer)
+    01420   1 100 01 00 00    pik1420     ???
+    01620   1 110 01 00 00    pik1620     ???
+    01660   1 110 11 00 00    pik1660     Print alpha (6 bit data)
+    01720   1 111 01 00 00    pik1720     Print numeric (4 bit data)
+
+The printer character codes are:
+
+    char       code  data (5 bit x 7 rows)
+                     (hex)
+     N         00    17, 17, 25, 21, 19, 17, 17
+     Y         01    17, 17, 10, 04, 04, 04, 04
+     =         02    00, 00, 31, 00, 31, 00, 00
+     0         03    14, 17, 19, 21, 25, 17, 14
+     L         04    16, 16, 16, 16, 16, 16, 31
+     M         05    17, 27, 21, 21, 17, 17, 17
+     NE        06    01, 02, 31, 04, 31, 08, 16
+     1         07    04, 12, 04, 04, 04, 04, 14
+     G         08    14, 17, 16, 23, 17, 17, 14
+     s-1       09    01, 01, 29, 01, 00, 00, 00
+     >         0a    08, 04, 02, 01, 02, 04, 08
+     2         0b    14, 17, 01, 02, 04, 08, 31
+     O         0c    14, 17, 17, 17, 17, 17, 14
+     H         0d    17, 17, 17, 31, 17, 17, 17
+     <=        0e    01, 02, 04, 08, 31, 00, 31
+     3         0f    31, 02, 04, 02, 01, 17, 14
+     P         10    30, 17, 17, 30, 16, 16, 16
+     SQRT      11    07, 04, 04, 04, 04, 20, 08
+     X         12    17, 17, 10, 04, 10, 17, 17
+     4         13    02, 06, 10, 18, 31, 02, 02
+     Q         ??    14, 17, 17, 17, 21, 18, 13
+     R         14    30, 17, 17, 30, 20, 18, 17
+     F         15    31, 16, 16, 30, 16, 16, 16
+     Z         16    31, 01, 02, 04, 08, 16, 31
+     V         ??    17, 17, 17, 17, 17, 10, 04
+     U         ??    17, 17, 17, 17, 17, 17, 14
+     5         17    31, 16, 30, 01, 01, 17, 14
+     S         18    14, 17, 16, 14, 01, 17, 14
+     ?         19    14, 17, 01, 02, 04, 00, 04
+     XBAR      1a    31, 00, 17, 10, 04, 10, 17
+     6         1b    06, 08, 16, 30, 17, 17, 14
+     T         1c    31, 04, 04, 04, 04, 04, 04
+     RTARROW   1d    00, 04, 02, 31, 02, 04, 00
+     <>        1e    02, 31, 02, 00, 08, 31, 08
+     7         1f    31, 01, 02, 02, 04, 04, 04
+     PERCENT   20    24, 25, 02, 04, 08, 19, 03
+     s2        21    12, 18, 04, 08, 30, 00, 00
+     SIG       22    31, 17, 08, 04, 08, 17, 31
+     8         23    14, 17, 17, 14, 17, 17, 14
+     J         24    07, 02, 02, 02, 02, 18, 12
+     sX        25    20, 08, 20, 00, 00, 00, 00
+     >         26    02, 04, 08, 16, 08, 04, 02
+     9         27    14, 17, 17, 15, 01, 02, 12
+     A         28    04, 10, 17, 17, 31, 17, 17
+     #         29    10, 10, 31, 10, 31, 10, 10
+     K         2a    17, 18, 20, 24, 20, 18, 17
+     DP        2b    00, 00, 00, 00, 00, 12, 12
+     B         2c    30, 17, 17, 30, 17, 17, 30
+     b         2d
+     /         2e    00, 01, 02, 04, 08, 16, 00
+     MINUS     2f    00, 00, 00, 31, 00, 00, 00
+     C         30    14, 17, 16, 16, 16, 17, 14
+     c         31
+     DIVIDE    32    00, 04, 00, 31, 00, 04, 00
+     PLUS      33    00, 04, 04, 31, 04, 04, 00
+     D         34    30, 17, 17, 17, 17, 17, 30
+     d         35
+     UPARROW   36    04, 14, 31, 04, 04, 04, 04
+     *         37    04, 21, 14, 04, 14, 21, 04
+     E         38    31, 16, 16, 30, 16, 16, 31
+     e         39    00, 00, 14, 17, 31, 16, 14
+     DNARROW   3a    04, 04, 04, 04, 31, 14, 04
+     BLANK     3b    00, 00, 00, 00, 00, 00, 00
+     I         3c    14, 04, 04, 04, 04, 04, 14
+     i         3d    06, 06, 00, 06, 06, 06, 06
+     MULT      3e    00, 17, 10, 04, 10, 17, 00
+     EOL       3f    00, 00, 00, 00, 00, 00, 00
+
+e.g:
+
+    reg['C'] = 0xffefbef8514314
+
+    1111 1111 1110 1111 1011 1110 1111 1000 0101 0001 0100 0011 0001 0100
+
+    111111 111011 111011 111011 111000 010100 010100 001100 010100
+
+      3f     3b     3b     3b     38     14     14     0c     14
+
+      EOL   BLANK  BLANK  BLANK   E      R      R      O      R
+
+
 
 ### Voyager series (NUT processor)
 
