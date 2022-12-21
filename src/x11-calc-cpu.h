@@ -51,6 +51,8 @@
  * 18 May 22         - Added flag out and flag in registers for HP41 - MT
  * 11 Dec 22         - Renamed models with continious memory and added hp25
  *                     hp33e, and hp38e - MT
+ * 20 Dec 22         - Added a printer buffer to the CPU properties for the
+ *                     HP10, HP19C and HP97 (if it ever ge that far) - MT
  *
  */
 
@@ -101,6 +103,10 @@
 #define STATES          8
 #endif
 
+#if defined(HP10) || defined(HP19) || defined(HP97)
+#define BUFSIZE         20             /* Output buffer size */
+#endif
+
 typedef struct {
    int id;
    unsigned char nibble[REG_SIZE];
@@ -136,6 +142,11 @@ typedef struct {
 #if defined(HP41c)
    unsigned char fo[8];                /* Flag out */
    unsigned char fi[8];                /* Flag in */
+#endif
+#if defined(HP10) || defined(HP19) || defined(HP97)
+   unsigned char mode;                /* Save print mode */
+   unsigned int position;             /* Position of next char in buffer */
+   unsigned char buffer[BUFSIZE];     /* Printer output buffer */
 #endif
 #if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c) || defined(HP41c)
    unsigned char kyf;                  /* Keyboard flag */
