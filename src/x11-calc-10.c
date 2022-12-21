@@ -19,14 +19,19 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * 26 Nov 22         - Initial version - MT
- * 07 Dec 22         - Replaced classic opcode for 14 -> p at 0-141 with an
- *                     equlivelent for the woodstock processor, though this
- *                     insruction is not valid it works here - MT
+ * 07 Dec 22         - Fixed  error at 0-141 by replacing the opcode 0x038c
+ *                     (which is the opcode used for 14 -> p on the classic
+ *                     series) with 0x003c (which is the equlivelent opcode
+ *                     for the woodstock processor).  Note that although it
+ *                     works here it is not a valid opcode and is not  used
+ *                     in any HP model - MT
  *                   - Updated ROM to fix errors (0-617, 0-661, 0-66f, and
  *                     0-6a1 changed to 'data -> c') - MT
  *                   - Updated ROM to fix another error (0-651 changed  to
  *                     'data -> c') - MT
- * 14 Dec 12         - Found another (0-5b5 changed  to 'data -> c') - MT
+ * 14 Dec 22         - Found another (0-5b5 changed  to 'data -> c') - MT
+ * 17 Dec 22         - Found another (0-352 changed  to 'data -> c') - MT
+ * 20 Dec 22         - Added switch to control printer mode - MT
  *
  */
 
@@ -61,7 +66,7 @@ oregister o_mem[MEMORY_SIZE];
 void v_init_switches(oswitch *h_switch[]) /* Define the switches. */
 {
    h_switch[0] = h_switch_create(00000, "OFF", "ON ", h_alternate_font, KBD_LEFT, KBD_TOP, 2 * KEY_WIDTH + KEY_GAP, SWITCH_HEIGHT, True, MID_GREY, DARK_GREY);
-   h_switch[1] = NULL;
+   h_switch[1] = h_switch_create(00000, "DISP", " PRNT", h_alternate_font, KBD_LEFT + 3 * KEY_WIDTH + 2 * KEY_GAP, KBD_TOP, 2 * KEY_WIDTH + KEY_GAP, SWITCH_HEIGHT, True, MID_GREY, DARK_GREY); /** No option for PRINT only **/
 }
 
 void v_init_buttons(obutton *h_button[]) {
@@ -245,7 +250,7 @@ int i_rom[ROM_SIZE] = {
    0x00da, 0x007a, 0x02c8, 0x03cc, 0x0134, 0x0069, 0x00cc, 0x02dc, /* 0-338   */
    0x0343, 0x03c4, 0x0084, 0x0248, 0x0034, 0x00db, 0x01d4, 0x035c, /* 0-340   */
    0x02fa, 0x035c, 0x005c, 0x035c, 0x02c8, 0x00cc, 0x011a, 0x033c, /* 0-348   */
-   0x0098, 0x0270, 0x02f0, 0x02f2, 0x0356, 0x00c4, 0x0248, 0x00dc, /* 0-350   */
+   0x0098, 0x0270, 0x0038, 0x02f2, 0x0356, 0x00c4, 0x0248, 0x00dc, /* 0-350   * 0x0098, 0x0270, 0x02f0, 0x02f2, 0x0356, 0x00c4, 0x0248, 0x00dc, */
    0x035c, 0x026e, 0x026e, 0x00cc, 0x0210, 0x01b4, 0x016d, 0x0314, /* 0-358   */
    0x0369, 0x035c, 0x0371, 0x009a, 0x01c8, 0x009a, 0x0074, 0x01d5, /* 0-360   */
    0x01b7, 0x009a, 0x01c8, 0x0074, 0x029d, 0x00b4, 0x024d, 0x0174, /* 0-368   */
