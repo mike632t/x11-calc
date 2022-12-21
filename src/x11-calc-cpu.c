@@ -348,9 +348,14 @@
  *                     mode  switch for the HP10 and HP19C, currently  this
  *                     always selects the 'manual' mode as printing has not
  *                     been implemented yet - MT
+ * 20 Dec 22         - Can now print to stdout, this works well enough with
+ *                     the HP10 as this doesn't use many special characters
+ *                     and they can be substituted for an ASCII equlivelent
+ *                     but this will be a problem with other models - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
+ *                   - Use a dedicated procesor flag for the printer mode.
  *                   - Figure out how to get the display to blink..?
  *
  */
@@ -361,7 +366,7 @@
 #define DATE           "24 May 22"
 #define AUTHOR         "MT"
 
-#define DEBUG
+//#define DEBUG
 
 #include <string.h>
 #include <stdlib.h>
@@ -823,6 +828,11 @@ void v_processor_reset(oprocessor *h_processor) /* Reset processor */
       h_processor->crc[i_count] = False;
    h_processor->crc[READY] = -4;
 #endif
+#if defined(HP10) || defined(HP19) || defined(HP97)
+   h_processor->position = BUFSIZE;
+   for (i_count = 0; i_count < BUFSIZE; i_count++) /* Reset the character buffer contents */
+      h_processor->buffer[i_count] = 0x3f;
+#endif
 #if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c) || defined(HP41c)
    h_processor->q = 0;
    h_processor->ptr = False;
@@ -1019,6 +1029,15 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
 
 #if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c) || defined(HP41c)
    static const int n_map_i[16] = {  3,  4,  5, 10,  8,  6, 11, -1,  2,  9,  7, 13,  1, 12,  0, -1 }; /* map nnnn to index */
+#endif
+
+#if defined(HP10) || defined(HP19) || defined(HP97)
+   static const unsigned char c_charmap[0x40] = {
+      ' ', ' ', '=', '0', 'L', 'M', ' ', '1', 'G', ' ', '>', '2', 'O', 'H', ' ', '3',  /* ' ', ' ', '=', '0', 'L', 'M', '≠', '1', 'G', '¿', '>', '2', 'O', 'H', '≤', '3', */
+      'P', ' ', 'X', '4', 'R', 'F', 'Z', '5', 'S', '?', 'x', '6', 'T', ' ', ' ', '7',  /* 'P', '√', 'X', '4', 'R', 'F', 'Z', '5', 'S', '?', 'x', '6', 'T', '→', '⇔', '7', */
+      '%', ' ', ' ', '8', 'J', 'X', '>', '9', 'A', '#', 'K', '.', 'B', 'b', '/', '-',  /* '%', ' ', '¿', '8', 'J', 'X', '>', '9', 'A', '#', 'K', '.', 'B', 'b', '/', '-', */
+      'C', 'c', '/', '+', 'D', 'd', ' ', '#', 'E', 'e', ' ', ' ', 'I', 'i', 'x', ' '   /* 'C', 'c', '÷', '+', 'D', 'd', '↑', '#', 'E', 'e', '↓', ' ', 'I', 'i', 'x', ' ' */
+      };
 #endif
 
    unsigned int i_last; /* Save the current PC */
@@ -1442,7 +1461,10 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   if (h_processor->trace) fprintf(stdout, "keys -> a\t");
 #if defined(HP10) || defined(HP19) || defined(HP97)
                   /* The HP10 and HP19C use this to get the state of the printer mode switch */
-                  h_processor->reg[A_REG]->nibble[1] = 0x4; /* Trace = 1, Normal = 2, Manual = 4 */
+                  if (h_processor->select) /** Use a seperate flag? **/
+                     h_processor->reg[A_REG]->nibble[1] = 0x1; /* HP10 - All = 1, Print = 2 (print with display off), Display = 4 */
+                  else
+                     h_processor->reg[A_REG]->nibble[1] = 0x4; /* HP19C/97 - Trace = 1, Normal = 2 (print with display off), Manual = 4 */
 #else
                   h_processor->reg[A_REG]->nibble[2] = (h_processor->code >> 4);
                   h_processor->reg[A_REG]->nibble[1] = (h_processor->code & 0x0f);
@@ -1499,9 +1521,53 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   h_processor->pc = h_processor->stack[h_processor->sp]; /* Pop program counter from the stack */
                   break;
 #if defined(HP10) || defined(HP19) || defined(HP97)
+               case 01120: /* pik1120 */
+                  if (h_processor->trace) fprintf(stdout, "pik1120");
+                  h_processor->status[3] = True; /* Set status bit 3 if printer ready (it always will be!) */
+                  if (h_processor->position < BUFSIZE) /* Are there any characters in the buffer? */
+                  {
+                     for (int i_count = 0; (i_count < BUFSIZE); i_count++) /* Print the contents of the buffer */
+                        fprintf(stdout, "%c", c_charmap[h_processor->buffer[i_count]]);
+                     fprintf(stdout, "\n");
+                     h_processor->position = BUFSIZE; /* Clear the buffer contents */
+                     for (int i_count = 0; i_count < BUFSIZE; i_count++)
+                        h_processor->buffer[i_count] = 0x3f;
+                  }
+                  break;
                case 01320: /* pik1320 */
                   if (h_processor->trace) fprintf(stdout, "pik1320");
+                  if (h_processor->position < BUFSIZE) /* Are there any characters in the buffer? */
+                  {
+                     debug
+                     (
+                        for (int i_count = 0; (i_count < BUFSIZE - 1); i_count++) /* Print the contents of the buffer */
+                           fprintf(stdout, "0x%03x, ", h_processor->buffer[i_count]);
+                        fprintf(stdout, "0x%03x\n", h_processor->buffer[BUFSIZE - 1]);
+                     );
+                     for (int i_count = 0; (i_count < BUFSIZE); i_count++) /* Print the contents of the buffer */
+                        fprintf(stdout, "%c", c_charmap[h_processor->buffer[i_count]]);
+                     fprintf(stdout, "\n");
+                     h_processor->position = BUFSIZE; /* Clear the buffer contents */
+                     for (int i_count = 0; i_count < BUFSIZE; i_count++)
+                        h_processor->buffer[i_count] = 0x3f;
+                  }
                   if (h_processor->keypressed && h_processor->code) h_processor->status[3] = True; /* Set status bit 3 if key is pressed and a key code is pending */
+                  break;
+               case 01720: /* pik1720 print numeric (4 bit data)*/
+                  if (h_processor->trace) fprintf(stdout, "pik1720");
+                  if (h_processor->buffer[h_processor->position] == 0x3f) h_processor->position++;
+
+                  for (int i_count = 0; (i_count < REG_SIZE)  && (h_processor->reg[C_REG]->nibble[i_count] != 0xf); i_count++)
+                  {
+                     h_processor->position--;
+                     h_processor->buffer[h_processor->position] = (h_processor->reg[C_REG]->nibble[i_count] << 2) | 0x3;
+                  }
+                  debug
+                  (
+                     for (int i_count = 0; (i_count < BUFSIZE - 1); i_count++) /* Print the contents of the buffer */
+                        fprintf(stdout, "0x%03x, ", h_processor->buffer[i_count]);
+                     fprintf(stdout, "0x%03x\n", h_processor->buffer[BUFSIZE - 1]);
+                  );
                   break;
 #endif
                default:
@@ -1612,6 +1678,35 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   if (h_processor->trace)
                      v_fprint_register(stdout, h_processor->mem[h_processor->addr]);
                   break;
+#if defined(HP10) || defined(HP19) || defined(HP97)
+               case 01660: /* pik1660 print alpha (6 bit data)*/
+                  if (h_processor->trace) fprintf(stdout, "pik1660");
+                  {
+                     int i_counter = 0;
+                     for (int i_count = 0; (i_count < REG_SIZE - 1) && (h_processor->position >= 0); i_count++)
+                     {
+                        h_processor->position--;
+                        if((i_counter & 1) == 0) /* Even numbered nibble */
+                        {
+                           h_processor->buffer[h_processor->position] = (h_processor->reg[C_REG]->nibble[i_count]) | ((h_processor->reg[C_REG]->nibble[i_count + 1]) & 0x3) << 4;
+                        }
+                        else
+                        {
+                           h_processor->buffer[h_processor->position] = ((h_processor->reg[C_REG]->nibble[i_count]) >> 2) | (h_processor->reg[C_REG]->nibble[i_count + 1]) << 2;
+                           i_count++;
+                        }
+                        i_counter++;
+                        if (h_processor->buffer[h_processor->position] == 0x3f) i_count = REG_SIZE;
+                     }
+                  }
+                  debug
+                  (
+                     for (int i_count = 0; (i_count < BUFSIZE - 1); i_count++) /* Print the contents of the buffer */
+                        fprintf(stdout, "0x%03x, ", h_processor->buffer[i_count]);
+                     fprintf(stdout, "0x%03x\n", h_processor->buffer[BUFSIZE - 1]);
+                  );
+                  break;
+#endif
                case 01460: /* rom checksum */
                   if (h_processor->trace) fprintf(stdout, "rom checksum");
                   h_processor->status[5] = False;
@@ -1851,7 +1946,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   h_processor->addr += (i_opcode >> 6);
                   if (h_processor->trace) fprintf(stdout, "data register(%d) -> c", h_processor->addr);
                   if ((h_processor->addr) < MEMORY_SIZE)
-                     v_reg_copy(!h_processor, h_processor->reg[C_REG], h_processor->mem[h_processor->addr]);
+                     v_reg_copy(h_processor, h_processor->reg[C_REG], h_processor->mem[h_processor->addr]);
                   else
                   {
                      if (h_processor->trace) fprintf(stdout, "\n");
