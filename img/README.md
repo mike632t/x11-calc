@@ -8,11 +8,11 @@ HP 11C, HP 12C, HP 15 C, and HP 16C  written in C using only X11.
 
 ![HP35](./x11-calc-35.png) ![HP80](./x11-calc-80.png) ![HP45](./x11-calc-45.png) ![HP70](./x11-calc-70.png)
 
+![HP10](./x11-calc-10.png)
+
 ![HP21](./x11-calc-21.png) ![HP22](./x11-calc-22.png) ![HP25](./x11-calc-25.png)
 
 ![HP27](./x11-calc-27.png) ![HP29](./x11-calc-29.png)
-
-![HP10](./x11-calc-10.png)
 
 ![HP67](./x11-calc-67.png)
 
