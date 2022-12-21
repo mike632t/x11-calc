@@ -16,20 +16,12 @@ Unlike all the other simulators the ROM images for the HP10C, HP11C, HP12C,
 HP15C, HP16C are not defined in the the source code and must be loaded from
 a separate ROM file.
 
-![HP10](./img/x11-calc-10.png) ![HP11](./img/x11-calc-11.png)
+![HP10](./img/x11-calc-10c.png) ![HP11](./img/x11-calc-11c.png)
 
 More [screenshots](./img/)
 
 
 ### Latest News
-
-06/03 - HP10C, HP11C, HP12C, HP15C and HP16C are now working!!
-
-20/01 - Now compiles cleanly on VAX/VMS.
-
-10/01 - Split code into two branches, stable and unstable.
-
-04/01 - Added HP35 (50 years after the launch of the original)!
 
 10/12 - Renamed HP10 to HP10C and added HP10.
 
@@ -41,6 +33,8 @@ More [screenshots](./img/)
 
 11/12 - Added HP25, HP33E and HP38E models.
 
+21/12 - HP10 now prints to the console.
+
 ### Status
 
 ##### HP 35  - Working
@@ -51,7 +45,7 @@ More [screenshots](./img/)
 
 ##### HP 70  - Working
 
-##### HP 10  - In development, no printer.
+##### HP 10  - Working
 
 ##### HP 21  - Working
 
