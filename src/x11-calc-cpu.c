@@ -352,6 +352,8 @@
  *                     the HP10 as this doesn't use many special characters
  *                     and they can be substituted for an ASCII equlivelent
  *                     but this will be a problem with other models - MT
+ * 21 Dec 22         - Created a seperate function to print the contents of
+ *                     the print buffer to a file - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -366,7 +368,7 @@
 #define DATE           "24 May 22"
 #define AUTHOR         "MT"
 
-//#define DEBUG
+#define DEBUG
 
 #include <string.h>
 #include <stdlib.h>
@@ -422,8 +424,35 @@ static void v_fprint_flags(FILE *h_file, oprocessor *h_processor) /* Display the
    for (i_count = 0; i_count <= FLAGS; i_count++)
       i_temp += h_processor->flags[i_count] << i_count;
    fprintf(h_file, "\tflags = 0x%04X%12c   ", i_temp, ' ');
-
 }
+
+#if defined(HP10) || defined(HP19) || defined(HP97)
+static void v_fprint_buffer(FILE *h_file, oprocessor *h_processor) /* Display the current processor flags */
+{
+   static const unsigned char c_charmap[0x40] = {
+      ' ', ' ', '=', '0', 'L', 'M', ' ', '1', 'G', ' ', '>', '2', 'O', 'H', ' ', '3',  /* ' ', ' ', '=', '0', 'L', 'M', '≠', '1', 'G', '¿', '>', '2', 'O', 'H', '≤', '3', */
+      'P', ' ', 'X', '4', 'R', 'F', 'Z', '5', 'S', '?', 'x', '6', 'T', ' ', ' ', '7',  /* 'P', '√', 'X', '4', 'R', 'F', 'Z', '5', 'S', '?', 'x', '6', 'T', '→', '⇔', '7', */
+      '%', ' ', ' ', '8', 'J', 'X', '>', '9', 'A', '#', 'K', '.', 'B', 'b', '/', '-',  /* '%', ' ', '¿', '8', 'J', 'X', '>', '9', 'A', '#', 'K', '.', 'B', 'b', '/', '-', */
+      'C', 'c', '/', '+', 'D', 'd', ' ', '#', 'E', 'e', ' ', ' ', 'I', 'i', 'x', ' '   /* 'C', 'c', '÷', '+', 'D', 'd', '↑', '#', 'E', 'e', '↓', ' ', 'I', 'i', 'x', ' '  */
+      };
+
+   if (h_processor->position < BUFSIZE) /* Are there any characters in the buffer? */
+   {
+   /** debug
+      (
+         for (int i_count = 0; (i_count < BUFSIZE - 1); i_count++)
+            fprintf(stdout, "0x%03x, ", h_processor->buffer[i_count]);
+         fprintf(stdout, "0x%03x\n", h_processor->buffer[BUFSIZE - 1]);
+      ); **/
+      for (int i_count = 0; (i_count < BUFSIZE); i_count++) /* Print the contents of the buffer */
+         fprintf(h_file, "%c", c_charmap[h_processor->buffer[i_count]]);
+      fprintf(h_file, "\n");
+      h_processor->position = BUFSIZE; /* Clear the buffer contents */
+      for (int i_count = 0; i_count < BUFSIZE; i_count++)
+         h_processor->buffer[i_count] = 0x3f;
+   }
+}
+#endif
 
 void v_fprint_registers(FILE *h_file, oprocessor *h_processor) /* Display current register contents */
 {
@@ -1030,16 +1059,6 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
 #if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c) || defined(HP41c)
    static const int n_map_i[16] = {  3,  4,  5, 10,  8,  6, 11, -1,  2,  9,  7, 13,  1, 12,  0, -1 }; /* map nnnn to index */
 #endif
-
-#if defined(HP10) || defined(HP19) || defined(HP97)
-   static const unsigned char c_charmap[0x40] = {
-      ' ', ' ', '=', '0', 'L', 'M', ' ', '1', 'G', ' ', '>', '2', 'O', 'H', ' ', '3',  /* ' ', ' ', '=', '0', 'L', 'M', '≠', '1', 'G', '¿', '>', '2', 'O', 'H', '≤', '3', */
-      'P', ' ', 'X', '4', 'R', 'F', 'Z', '5', 'S', '?', 'x', '6', 'T', ' ', ' ', '7',  /* 'P', '√', 'X', '4', 'R', 'F', 'Z', '5', 'S', '?', 'x', '6', 'T', '→', '⇔', '7', */
-      '%', ' ', ' ', '8', 'J', 'X', '>', '9', 'A', '#', 'K', '.', 'B', 'b', '/', '-',  /* '%', ' ', '¿', '8', 'J', 'X', '>', '9', 'A', '#', 'K', '.', 'B', 'b', '/', '-', */
-      'C', 'c', '/', '+', 'D', 'd', ' ', '#', 'E', 'e', ' ', ' ', 'I', 'i', 'x', ' '   /* 'C', 'c', '÷', '+', 'D', 'd', '↑', '#', 'E', 'e', '↓', ' ', 'I', 'i', 'x', ' ' */
-      };
-#endif
-
    unsigned int i_last; /* Save the current PC */
    unsigned int i_opcode;
    unsigned int i_field; /* Field modifier */
@@ -1523,34 +1542,12 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
 #if defined(HP10) || defined(HP19) || defined(HP97)
                case 01120: /* pik1120 */
                   if (h_processor->trace) fprintf(stdout, "pik1120");
+                  v_fprint_buffer (stdout, h_processor);
                   h_processor->status[3] = True; /* Set status bit 3 if printer ready (it always will be!) */
-                  if (h_processor->position < BUFSIZE) /* Are there any characters in the buffer? */
-                  {
-                     for (int i_count = 0; (i_count < BUFSIZE); i_count++) /* Print the contents of the buffer */
-                        fprintf(stdout, "%c", c_charmap[h_processor->buffer[i_count]]);
-                     fprintf(stdout, "\n");
-                     h_processor->position = BUFSIZE; /* Clear the buffer contents */
-                     for (int i_count = 0; i_count < BUFSIZE; i_count++)
-                        h_processor->buffer[i_count] = 0x3f;
-                  }
                   break;
                case 01320: /* pik1320 */
                   if (h_processor->trace) fprintf(stdout, "pik1320");
-                  if (h_processor->position < BUFSIZE) /* Are there any characters in the buffer? */
-                  {
-                     debug
-                     (
-                        for (int i_count = 0; (i_count < BUFSIZE - 1); i_count++) /* Print the contents of the buffer */
-                           fprintf(stdout, "0x%03x, ", h_processor->buffer[i_count]);
-                        fprintf(stdout, "0x%03x\n", h_processor->buffer[BUFSIZE - 1]);
-                     );
-                     for (int i_count = 0; (i_count < BUFSIZE); i_count++) /* Print the contents of the buffer */
-                        fprintf(stdout, "%c", c_charmap[h_processor->buffer[i_count]]);
-                     fprintf(stdout, "\n");
-                     h_processor->position = BUFSIZE; /* Clear the buffer contents */
-                     for (int i_count = 0; i_count < BUFSIZE; i_count++)
-                        h_processor->buffer[i_count] = 0x3f;
-                  }
+                  v_fprint_buffer (stdout, h_processor);
                   if (h_processor->keypressed && h_processor->code) h_processor->status[3] = True; /* Set status bit 3 if key is pressed and a key code is pending */
                   break;
                case 01720: /* pik1720 print numeric (4 bit data)*/
@@ -1562,12 +1559,6 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                      h_processor->position--;
                      h_processor->buffer[h_processor->position] = (h_processor->reg[C_REG]->nibble[i_count] << 2) | 0x3;
                   }
-                  debug
-                  (
-                     for (int i_count = 0; (i_count < BUFSIZE - 1); i_count++) /* Print the contents of the buffer */
-                        fprintf(stdout, "0x%03x, ", h_processor->buffer[i_count]);
-                     fprintf(stdout, "0x%03x\n", h_processor->buffer[BUFSIZE - 1]);
-                  );
                   break;
 #endif
                default:
@@ -1699,12 +1690,6 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                         if (h_processor->buffer[h_processor->position] == 0x3f) i_count = REG_SIZE;
                      }
                   }
-                  debug
-                  (
-                     for (int i_count = 0; (i_count < BUFSIZE - 1); i_count++) /* Print the contents of the buffer */
-                        fprintf(stdout, "0x%03x, ", h_processor->buffer[i_count]);
-                     fprintf(stdout, "0x%03x\n", h_processor->buffer[BUFSIZE - 1]);
-                  );
                   break;
 #endif
                case 01460: /* rom checksum */
