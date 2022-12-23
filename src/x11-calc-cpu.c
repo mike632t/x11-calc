@@ -438,17 +438,17 @@ static void v_fprint_buffer(FILE *h_file, oprocessor *h_processor) /* Display th
 
    if (h_processor->position < BUFSIZE) /* Are there any characters in the buffer? */
    {
-   /** debug
-      (
-         for (int i_count = 0; (i_count < BUFSIZE - 1); i_count++)
+      int i_count;
+      /** debug(
+         for (i_count = 0; (i_count < BUFSIZE - 1); i_count++)
             fprintf(stdout, "0x%03x, ", h_processor->buffer[i_count]);
          fprintf(stdout, "0x%03x\n", h_processor->buffer[BUFSIZE - 1]);
       ); **/
-      for (int i_count = 0; (i_count < BUFSIZE); i_count++) /* Print the contents of the buffer */
+      for (i_count = 0; (i_count < BUFSIZE); i_count++) /* Print the contents of the buffer */
          fprintf(h_file, "%c", c_charmap[h_processor->buffer[i_count]]);
       fprintf(h_file, "\n");
       h_processor->position = BUFSIZE; /* Clear the buffer contents */
-      for (int i_count = 0; i_count < BUFSIZE; i_count++)
+      for (i_count = 0; i_count < BUFSIZE; i_count++)
          h_processor->buffer[i_count] = 0x3f;
    }
 }
@@ -465,7 +465,6 @@ void v_fprint_registers(FILE *h_file, oprocessor *h_processor) /* Display curren
          v_fprint_register(h_file, h_processor->reg[i_count]);
       }
       fprintf(h_file, "\n");
-      //for (i_count = 9; i_count < 11; i_count++)
       for (i_count = 0; i_count < MEMORY_SIZE; i_count++)
       {
          if (i_count % 3 == 0) fprintf(h_file, "\n");
@@ -849,7 +848,7 @@ void v_processor_reset(oprocessor *h_processor) /* Reset processor */
    h_processor->keypressed = False;
    h_processor->enabled = True;
    h_processor->sleep = False;
-#if defined(HP10) || defined(HP21) || defined(HP22) || defined(HP25) || defined(HP25c) || defined(HP27) || defined(HP29c) || defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c) || defined(HP67) || defined(HP97)
+#if defined(HP10) || defined(WOODSTOCK) || defined(SPICE) || defined(HP67) || defined(HP97)
    h_processor->status[5] = True; /* TO DO - Check which flags should be set by default */
 #endif
 #if defined(HP67) || defined(HP97)
@@ -922,28 +921,17 @@ static void v_op_dec_pt(oprocessor *h_processor) /* Decrement active pointer */
 
 int i_translate_addr(int i_addr) /* Translate address to a memory register */
 {
-//    /* 0x00 to 0x0A - Registers */
-//    /* 0xE0 to 0xFF - RAM (31 registers)*/
-//    if ((i_addr >= 0xe0) && (i_addr <= 0xff))
-//       i_addr -= 0xe0;
-//    else
-//       if (i_addr > 0x0a) i_addr = MEMORY_SIZE;
-// #elif defined(HP15c)
-//    /* 0x00 to 0x1A - Registers */
-//    /* 0xC0 to 0xFF - RAM */
-//    if ((i_addr >= 0xc0) && (i_addr <= 0xff))
-//       i_addr -= 0xc0;
-//    else
-//       if (i_addr > 0x1a) i_addr = MEMORY_SIZE;
-// #elif defined(HP41c)
-//    /* 0x00 to 0x0f - Registers */
-//    /* 0xC0 to 0x1FF - RAM (319 registers) */
-//    /* 0x200 to 0x2FF - Extended RAM #1 */
-//    /* 0x300 to 0xfFF - Extended RAM #2 */
-//    if ((i_addr >= 0xc0) && (i_addr <= 0x1ff)) /* No extended RAM (HP41C) */
-//       i_addr -= 0xc0;
-//    else
-//       if (i_addr > 0x0f) i_addr = MEMORY_SIZE; /* Non existent location */
+      /* HP10c ?
+      /*    0x00 to 0x0A - Registers */
+      /*    0xE0 to 0xFF - RAM (31 registers)*/
+      /* HP15c
+      /*    0x00 to 0x1A - Registers */
+      /*    0xC0 to 0xFF - RAM */
+      /* HP41c
+      /*    0x00 to 0x0f - Registers */
+      /*    0xC0 to 0x1FF - RAM (319 registers) */
+      /*    0x200 to 0x2FF - Extended RAM #1 */
+      /* 0x300 to 0xfFF - Extended RAM #2 */
    return i_addr;
 }
 
@@ -1051,7 +1039,7 @@ void v_op_goto(oprocessor *h_processor) /* Conditional go to */
 
 void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single instruction */
 {
-#if defined(HP10) || defined(HP21) || defined(HP22) || defined(HP25) || defined(HP25c) || defined(HP27) || defined(HP29c) || defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c) || defined(HP67) || defined(HP97)
+#if defined(HP10) || defined(WOODSTOCK) || defined(SPICE) || defined(HP67) || defined(HP97)
    static const int i_set_p[16] = { 14,  4,  7,  8, 11,  2, 10, 12,  1,  3, 13,  6,  0,  9,  5, 14 };
    static const int i_tst_p[16] = { 4 ,  8, 12,  2,  9,  1,  6,  3,  1, 13,  5,  0, 11, 10,  7,  4 };
 #endif
@@ -1384,7 +1372,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
          break;
 #endif
 
-#if defined(HP10) || defined(HP21) || defined(HP22) || defined(HP25) || defined(HP25c) || defined(HP27) || defined(HP29c) || defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c) || defined(HP67) || defined(HP97)
+#if defined(HP10) || defined(WOODSTOCK) || defined(SPICE) || defined(HP67) || defined(HP97)
       case 00: /* Type 0 - Special operations */
          switch ((i_opcode >> 2) & 03)
          {
@@ -1553,11 +1541,13 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                case 01720: /* pik1720 print numeric (4 bit data)*/
                   if (h_processor->trace) fprintf(stdout, "pik1720");
                   if (h_processor->buffer[h_processor->position] == 0x3f) h_processor->position++;
-
-                  for (int i_count = 0; (i_count < REG_SIZE)  && (h_processor->reg[C_REG]->nibble[i_count] != 0xf); i_count++)
                   {
-                     h_processor->position--;
-                     h_processor->buffer[h_processor->position] = (h_processor->reg[C_REG]->nibble[i_count] << 2) | 0x3;
+                     int i_count;
+                     for (i_count = 0; (i_count < REG_SIZE)  && (h_processor->reg[C_REG]->nibble[i_count] != 0xf); i_count++)
+                     {
+                        h_processor->position--;
+                        h_processor->buffer[h_processor->position] = (h_processor->reg[C_REG]->nibble[i_count] << 2) | 0x3;
+                     }
                   }
                   break;
 #endif
@@ -1674,7 +1664,8 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   if (h_processor->trace) fprintf(stdout, "pik1660");
                   {
                      int i_counter = 0;
-                     for (int i_count = 0; (i_count < REG_SIZE - 1) && (h_processor->position >= 0); i_count++)
+                     int i_count;
+                     for (i_count = 0; (i_count < REG_SIZE - 1) && (h_processor->position >= 0); i_count++)
                      {
                         h_processor->position--;
                         if((i_counter & 1) == 0) /* Even numbered nibble */
@@ -2904,7 +2895,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
          break;
 #endif
 
-#if defined(HP10) || defined(HP21) || defined(HP22) || defined(HP25) || defined(HP25c) || defined(HP27) || defined(HP29c) || defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c) || defined(HP67) || defined(HP97)
+#if defined(HP10) || defined(WOODSTOCK) || defined(SPICE) || defined(HP67) || defined(HP97)
       case 02: /* Type 2 - Arithmetic operations */
          i_field = (i_opcode >> 2) & 7;
          switch (i_field) /* Select field
