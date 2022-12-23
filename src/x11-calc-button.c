@@ -242,12 +242,10 @@ int i_button_draw(Display *h_display, int x_application_window, int i_screen, ob
          i_indent = 1 + h_button->left + (h_button->width - XTextWidth(h_button->text_font, h_button->text, 1)) / 2; /* Find position of the text. */
          if (strlen(h_button->text) > 1)
             i_upper = i_upper - ((h_button->text_font->ascent ) * (strlen(h_button->text) - 1)) / 2;
-            //i_upper = i_upper - ((h_button->text_font->ascent + h_button->text_font->descent) * (strlen(h_button->text) - 1)) / 2;
 
          for (i_count = 0; i_count < (strlen(h_button->text)); i_count++)
          {
             XDrawString(h_display, x_application_window, DefaultGC(h_display, i_screen), i_indent, i_upper ,&h_button->text[i_count], 1); /* Draw the main text. */
-            //i_upper += h_button->text_font->ascent + h_button->text_font->descent;
             i_upper += h_button->text_font->ascent;
          }
       }
