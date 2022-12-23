@@ -22,7 +22,6 @@
  *
  */
 
-#define MODEL              "41"
 #define HEIGHT             433 * SCALE_HEIGHT
 #define WIDTH              208 * SCALE_WIDTH
 #define BUTTONS            39
