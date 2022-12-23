@@ -127,15 +127,18 @@ odisplay *h_display_create(int i_index, int i_left, int i_top, int i_width, int 
    h_display->display_height = i_display_height;
 #if defined(HP67) || defined(HP35) || defined(HP80) || defined(HP45) || defined(HP70) || defined(HP55)
    for (i_count = 0; i_count < DIGITS; i_count++) {
-      h_display->segment[i_count] = h_segment_create(0, 0, i_left + i_display_left + ((4 + 13 * i_count) * SCALE_WIDTH), i_top + i_display_top + (i_display_height - 33 * SCALE_HEIGHT) / 2, 11 * SCALE_WIDTH, 33 * SCALE_HEIGHT, i_foreground, i_background); /* 15 Digit display */
+      h_display->segment[i_count] = h_segment_create(0, 0, i_left + i_display_left + ((4 + 13 * i_count) * SCALE_WIDTH), 
+      i_top + i_display_top + (i_display_height - 33 * SCALE_HEIGHT) / 2, 11 * SCALE_WIDTH, 33 * SCALE_HEIGHT, i_foreground, i_background); /* 15 Digit display */
    }
 #elif defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c) ||  defined(HP10c) ||  defined(HP11c) ||  defined(HP12c) ||  defined(HP15c) ||  defined(HP16c)
    for (i_count = 0; i_count < DIGITS; i_count++) {
-      h_display->segment[i_count] = h_segment_create(0, 0, i_left + i_display_left + ((3 + 18 * i_count) * SCALE_WIDTH) - 2, i_top + i_display_top + (i_display_height - 33 * SCALE_HEIGHT) / 2, 16 * SCALE_WIDTH, 33 * SCALE_HEIGHT, i_foreground, i_background); /* 11 Digit display */
+      h_display->segment[i_count] = h_segment_create(0, 0, i_left + i_display_left + ((3 + 18 * i_count) * SCALE_WIDTH) - 2, 
+      i_top + i_display_top + (i_display_height - 33 * SCALE_HEIGHT) / 2, 16 * SCALE_WIDTH, 33 * SCALE_HEIGHT, i_foreground, i_background); /* 11 Digit display */
    }
 #else
    for (i_count = 0; i_count < DIGITS; i_count++) {
-      h_display->segment[i_count] = h_segment_create(0, 0, i_left + i_display_left + ((5 + 16 * i_count) * SCALE_WIDTH), i_top + i_display_top + (i_display_height - 29 * SCALE_HEIGHT) /2, 14 * SCALE_WIDTH, 29 * SCALE_HEIGHT, i_foreground, i_background); /* 12 Digit display */
+      h_display->segment[i_count] = h_segment_create(0, 0, i_left + i_display_left + ((5 + 16 * i_count) * SCALE_WIDTH), 
+      i_top + i_display_top + (i_display_height - 29 * SCALE_HEIGHT) /2, 14 * SCALE_WIDTH, 29 * SCALE_HEIGHT, i_foreground, i_background); /* 12 Digit display */
    }
 #endif
    for (i_count = 0; i_count < DIGITS; i_count++) {
