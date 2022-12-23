@@ -78,6 +78,7 @@
 
 /* Reserve enough storage in memory to hold eight registers (0 - 7), Lastx,
  * and forty nine program steps */
+
 #define MEMORY_SIZE     (8 + 1 + (49 / 7))
 #define ROM_SIZE        04000
 #define CONTINIOUS
