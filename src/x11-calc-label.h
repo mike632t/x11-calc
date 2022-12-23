@@ -34,7 +34,7 @@ typedef struct { /* Calculator label structure */
    int height;
    unsigned int colour; /* Colour */
    unsigned int background; /* Background colour */
-   signed int state; /* Visible */
+   int state; /* Visible */
 } olabel;
 
 olabel *h_label_pressed(olabel *h_label, int i_xpos, int i_ypos);
