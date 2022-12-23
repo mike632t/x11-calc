@@ -104,31 +104,37 @@
 #elif defined(HP21)
 #define FILENAME     "x11-calc-21"
 #define TITLE        "RPN calc 21"
+#define WOODSTOCK
 #include "x11-calc-21.h"
 
 #elif defined(HP22)
 #define FILENAME     "x11-calc-22"
 #define TITLE        "RPN calc 22"
+#define WOODSTOCK
 #include "x11-calc-22.h"
 
 #elif defined(HP25)
 #define FILENAME     "x11-calc-25"
 #define TITLE        "RPN calc 25"
+#define WOODSTOCK
 #include "x11-calc-25.h"
 
 #elif defined(HP25c)
 #define FILENAME     "x11-calc-25c"
 #define TITLE        "RPN calc 25C"
+#define WOODSTOCK
 #include "x11-calc-25c.h"
 
 #elif defined(HP27)
 #define FILENAME     "x11-calc-27"
 #define TITLE        "RPN calc 27"
+#define WOODSTOCK
 #include "x11-calc-27.h"
 
 #elif defined(HP29c)
 #define FILENAME     "x11-calc-29c"
 #define TITLE        "RPN calc 29C"
+#define WOODSTOCK
 #include "x11-calc-29c.h"
 
 #elif defined(HP67)
@@ -139,41 +145,49 @@
 #elif defined(HP31e)
 #define FILENAME     "x11-calc-31e"
 #define TITLE        "RPN calc 31E"
+#define SPICE
 #include "x11-calc-31e.h"
 
 #elif defined(HP32e)
 #define FILENAME     "x11-calc-32e"
 #define TITLE        "RPN calc 32E"
+#define SPICE
 #include "x11-calc-32e.h"
 
 #elif defined(HP33e)
 #define FILENAME     "x11-calc-33e"
 #define TITLE        "RPN calc 33E"
+#define SPICE
 #include "x11-calc-33e.h"
 
 #elif defined(HP33c)
 #define FILENAME     "x11-calc-33c"
 #define TITLE        "RPN calc 33C"
+#define SPICE
 #include "x11-calc-33c.h"
 
 #elif defined(HP34c)
 #define FILENAME     "x11-calc-34c"
 #define TITLE        "RPN calc 34C"
+#define SPICE
 #include "x11-calc-34c.h"
 
 #elif defined(HP37e)
 #define FILENAME     "x11-calc-37e"
 #define TITLE        "RPN calc 37E"
+#define SPICE
 #include "x11-calc-37e.h"
 
 #elif defined(HP38e)
 #define FILENAME     "x11-calc-38e"
 #define TITLE        "RPN calc 38E"
+#define SPICE
 #include "x11-calc-38e.h"
 
 #elif defined(HP38c)
 #define FILENAME     "x11-calc-38c"
 #define TITLE        "RPN calc 38C"
+#define SPICE
 #include "x11-calc-38c.h"
 
 #elif defined(HP41c)
@@ -184,26 +198,31 @@
 #elif defined(HP10c)
 #define FILENAME     "x11-calc-10c"
 #define TITLE        "RPN calc 10C"
+#define VOYAGER
 #include "x11-calc-10c.h"
 
 #elif defined(HP11c)
 #define FILENAME     "x11-calc-11c"
 #define TITLE        "RPN calc 11C"
+#define VOYAGER
 #include "x11-calc-11c.h"
 
 #elif defined(HP12c)
 #define FILENAME     "x11-calc-12c"
 #define TITLE        "RPN calc 12C"
+#define VOYAGER
 #include "x11-calc-12c.h"
 
 #elif defined(HP15c)
 #define FILENAME     "x11-calc-15c"
 #define TITLE        "RPN calc 15C"
+#define VOYAGER
 #include "x11-calc-15c.h"
 
 #elif defined(HP16c)
 #define FILENAME     "x11-calc-16c"
 #define TITLE        "RPN calc 16C"
+#define VOYAGER
 #include "x11-calc-16c.h"
 
 #endif
