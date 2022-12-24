@@ -207,6 +207,8 @@
  * 26 May 22         - Blank line after an error message not needed - MT
  * 11 Dec 22         - Renamed models with continious memory and added hp25
  *                     hp33e, and hp38e - MT
+ * 24 Dec 22         - Command line parsing routine now uses the same macro
+ *                     definitions as the the error message definitions.
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Add verbose option.
@@ -345,44 +347,7 @@ int main(int argc, char *argv[])
    int i_ticks = -1;
 
    h_processor = h_processor_create(i_rom);
-#if defined(vms) /* Parse DEC style command line options */
-   for (i_count = 1; i_count < argc; i_count++)
-   {
-      if (argv[i_count][0] == '/')
-      {
-         for (i_index = 0; argv[i_count][i_index]; i_index++) /* Convert option to uppercase */
-            if (argv[i_count][i_index] >= 'a' && argv[i_count][i_index] <= 'z')
-               argv[i_count][i_index] = argv[i_count][i_index] - 32; /* TO DO - Assumes 8-bit ASCII encoding */
-         if (!strncmp(argv[i_count], "/STEP", i_index))
-            b_trace = True; /* Start in single step mode */
-         else if (!strncmp(argv[i_count], "/CURSOR", i_index))
-            b_cursor = True; /* Enable tracing */
-         else if (!strncmp(argv[i_count], "/NOCURSOR", i_index))
-            b_trace = False; /* Enable tracing */
-         else if (!strncmp(argv[i_count], "/TRACE", i_index))
-            b_trace = True; /* Enable tracing */
-         else if (!strncmp(argv[i_count], "/VERSION", i_index))
-         {
-            v_version; /* Display version information */
-            fprintf(stdout, h_msg_licence, __DATE__ +7, AUTHOR);
-            exit(0);
-         }
-         else if ((!strncmp(argv[i_count], "/HELP", i_index)) | (!strncmp(argv[i_count], "/?", i_index)))
-         {
-            fprintf(stdout, c_msg_usage, FILENAME);
-            exit(0);
-         }
-         else /* If we get here then the we have an invalid option */
-            v_error(h_err_invalid_option, argv[i_count]);
-         if (argv[i_count][1] != 0)
-         {
-            for (i_index = i_count; i_index < argc - 1; i_index++)
-               argv[i_index] = argv[i_index + 1];
-            argc--; i_count--;
-         }
-      }
-   }
-#else /* Parse UNIX style command line options */
+#if defined(unix) || defined(__unix__) || defined(__APPLE__) /* Parse UNIX style command line options */
    b_abort = False; /* Stop processing command line */
    for (i_count = 1; i_count < argc && (b_abort != True); i_count++)
    {
@@ -507,6 +472,43 @@ int main(int argc, char *argv[])
          {
             for (i_offset = i_count; i_offset < argc - 1; i_offset++)
                argv[i_offset] = argv[i_offset + 1];
+            argc--; i_count--;
+         }
+      }
+   }
+#else /* Parse DEC style command line options */
+   for (i_count = 1; i_count < argc; i_count++)
+   {
+      if (argv[i_count][0] == '/')
+      {
+         for (i_index = 0; argv[i_count][i_index]; i_index++) /* Convert option to uppercase */
+            if (argv[i_count][i_index] >= 'a' && argv[i_count][i_index] <= 'z')
+               argv[i_count][i_index] = argv[i_count][i_index] - 32; /* TO DO - Assumes 8-bit ASCII encoding */
+         if (!strncmp(argv[i_count], "/STEP", i_index))
+            b_trace = True; /* Start in single step mode */
+         else if (!strncmp(argv[i_count], "/CURSOR", i_index))
+            b_cursor = True; /* Enable tracing */
+         else if (!strncmp(argv[i_count], "/NOCURSOR", i_index))
+            b_trace = False; /* Enable tracing */
+         else if (!strncmp(argv[i_count], "/TRACE", i_index))
+            b_trace = True; /* Enable tracing */
+         else if (!strncmp(argv[i_count], "/VERSION", i_index))
+         {
+            v_version; /* Display version information */
+            fprintf(stdout, h_msg_licence, __DATE__ +7, AUTHOR);
+            exit(0);
+         }
+         else if ((!strncmp(argv[i_count], "/HELP", i_index)) | (!strncmp(argv[i_count], "/?", i_index)))
+         {
+            fprintf(stdout, c_msg_usage, FILENAME);
+            exit(0);
+         }
+         else /* If we get here then the we have an invalid option */
+            v_error(h_err_invalid_option, argv[i_count]);
+         if (argv[i_count][1] != 0)
+         {
+            for (i_index = i_count; i_index < argc - 1; i_index++)
+               argv[i_index] = argv[i_index + 1];
             argc--; i_count--;
          }
       }
