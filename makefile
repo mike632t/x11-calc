@@ -25,7 +25,6 @@
 #  07 Jan 22         - Added HP model 70 - MT
 #  31 jan 22         - Added support for the HP10C, HP11C, HP12C, HP15C and
 #                      HP16C (all are currently work in progress) - MT
-#  22 Feb 22         - Added place holder for HP41 - MT
 #	31 Mar 22			- Moved ROMs into target folder - MT
 #  11 Dec 22			- Renamed models with continious memory and added hp25
 #                      hp33e, and hp38e - MT
@@ -110,9 +109,6 @@ hp38e:
 
 hp38c:
 	@$(MAKE) --no-print-directory -C ./src MODEL=38c
-
-hp41c:
-	@$(MAKE) --no-print-directory -C ./src MODEL=41c
 
 hp10c:
 	@$(MAKE) --no-print-directory -C ./src MODEL=10c

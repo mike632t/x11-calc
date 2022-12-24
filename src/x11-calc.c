@@ -628,7 +628,7 @@ int main(int argc, char *argv[])
          i_display_update(x_display, x_application_window, i_screen, h_display, h_processor);
          i_display_draw(x_display, x_application_window, i_screen, h_display); /* Redraw display */
          i_count = INTERVAL;
-#if defined(HP67) || defined(HP41c)
+#if defined(HP67)
          i_wait(INTERVAL / 4); /* Sleep for ~6.25 ms per tick */
 #elif defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c)
          i_wait(INTERVAL / 3); /* Sleep for ~8.33 ms per tick */
@@ -753,7 +753,7 @@ int main(int argc, char *argv[])
                      {
                         v_save_state(h_processor); /* Save current settings */
                         h_processor->enabled = False; /* Disable the processor */
-#if defined(HP67) || defined(HP41c)
+#if defined(HP67)
                         i_ticks = DELAY * 4; /* Set count down */
 #elif defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c)
                         i_ticks = DELAY * 3;

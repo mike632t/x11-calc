@@ -64,7 +64,6 @@
  * 01 Mar 22         - Fixed digits 4 and 10 (11C, 12C, 15C and 16C) tested
  *                     all digits now work as expected - MT
  * 12 Mar 22         - Added display annunciators - MT
- * 26 May 22         - Added place holder for HP41 display - MT
  * 11 Dec 22         - Renamed models with continious memory and added hp25
  *                     hp33e, and hp38e - MT
  *
@@ -127,17 +126,17 @@ odisplay *h_display_create(int i_index, int i_left, int i_top, int i_width, int 
    h_display->display_height = i_display_height;
 #if defined(HP67) || defined(HP35) || defined(HP80) || defined(HP45) || defined(HP70) || defined(HP55)
    for (i_count = 0; i_count < DIGITS; i_count++) {
-      h_display->segment[i_count] = h_segment_create(0, 0, i_left + i_display_left + ((4 + 13 * i_count) * SCALE_WIDTH), 
+      h_display->segment[i_count] = h_segment_create(0, 0, i_left + i_display_left + ((4 + 13 * i_count) * SCALE_WIDTH),
       i_top + i_display_top + (i_display_height - 33 * SCALE_HEIGHT) / 2, 11 * SCALE_WIDTH, 33 * SCALE_HEIGHT, i_foreground, i_background); /* 15 Digit display */
    }
 #elif defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c) ||  defined(HP10c) ||  defined(HP11c) ||  defined(HP12c) ||  defined(HP15c) ||  defined(HP16c)
    for (i_count = 0; i_count < DIGITS; i_count++) {
-      h_display->segment[i_count] = h_segment_create(0, 0, i_left + i_display_left + ((3 + 18 * i_count) * SCALE_WIDTH) - 2, 
+      h_display->segment[i_count] = h_segment_create(0, 0, i_left + i_display_left + ((3 + 18 * i_count) * SCALE_WIDTH) - 2,
       i_top + i_display_top + (i_display_height - 33 * SCALE_HEIGHT) / 2, 16 * SCALE_WIDTH, 33 * SCALE_HEIGHT, i_foreground, i_background); /* 11 Digit display */
    }
 #else
    for (i_count = 0; i_count < DIGITS; i_count++) {
-      h_display->segment[i_count] = h_segment_create(0, 0, i_left + i_display_left + ((5 + 16 * i_count) * SCALE_WIDTH), 
+      h_display->segment[i_count] = h_segment_create(0, 0, i_left + i_display_left + ((5 + 16 * i_count) * SCALE_WIDTH),
       i_top + i_display_top + (i_display_height - 29 * SCALE_HEIGHT) /2, 14 * SCALE_WIDTH, 29 * SCALE_HEIGHT, i_foreground, i_background); /* 12 Digit display */
    }
 #endif
@@ -510,15 +509,6 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
                   if ((h_processor->mem[i_map[i_count][i_counter][0]]->nibble[i_map[i_count][i_counter][1]] & i_map[i_count][i_counter][2]))
                      h_display->segment[i_count]->mask |= (1 << i_counter); /* Mask determines which segments are on */
             }
-         }
-      }
-   }
-#elif defined(HP41c)
-   int i_count;
-   for (i_count = 0; i_count < DIGITS; i_count++) {
-      if (h_display->segment[i_count] != NULL) {
-         if (h_processor->flags[DISPLAY_ENABLE] && h_processor->enabled) {
-            h_display->segment[i_count]->mask = DISPLAY_EIGHT | DISPLAY_COMMA;
          }
       }
    }

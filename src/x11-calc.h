@@ -51,7 +51,6 @@
  * 20 Jan 22         - Model number now defined in make script for VMS - MT
  * 31 Jan 22         - Added support for the HP10C, HP11C, HP12C, HP15C and
  *                     HP16C - MT
- * 26 May 22         - Added HP41CV - MT
  * 26 Nov 22         - Added support for HP10 - MT
  * 11 Dec 22         - Renamed models with continious memory and added hp25
  *                     hp33e, and hp38e - MT
@@ -60,7 +59,7 @@
  */
 #define COMMIT_ID "[Commit ID: $Format:%h$]"
 
-#if defined(HP35) || defined(HP80) || defined(HP45) || defined(HP70) || defined(HP55) || defined(HP67) /** || defined(HP41c) */
+#if defined(HP35) || defined(HP80) || defined(HP45) || defined(HP70) || defined(HP55) || defined(HP67) /** */
 #define SCALE_WIDTH     1.15
 #define SCALE_HEIGHT    1
 #else
@@ -189,11 +188,6 @@
 #define TITLE        "RPN calc 38C"
 #define SPICE
 #include "x11-calc-38c.h"
-
-#elif defined(HP41c)
-#define FILENAME     "x11-calc-41c"
-#define TITLE        "RPN calc 41C"
-#include "x11-calc-41c.h"
 
 #elif defined(HP10c)
 #define FILENAME     "x11-calc-10c"
