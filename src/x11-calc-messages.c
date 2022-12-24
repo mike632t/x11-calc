@@ -37,6 +37,9 @@
  * 07 Dec 22         - Didplay register number as a 3 digit value - MT
  * 11 Dec 22         - Renamed models with continious memory and added hp25
  *                     hp33e, and hp38e - MT
+ * 24 Dec 22         - Added and explicit check for '__APPLE__' in order to
+ *                     allow Mac OS  to be handled in the same way as other
+ *                     unix like systems - MT
  *
  */
 
@@ -89,7 +92,7 @@ const char * h_err_invalid_address = "Direccion (%02o) fuera de rango en %1o-%04
 const char * h_err_invalid_register = "Registro inválido (REG[%03d]) en %1o-%04o en %s en la línea : %d\n";
 #endif /* Hexadecimal */
 
-#if defined(unix) || defined(__unix__)
+#if defined(unix) || defined(__unix__) || defined(__APPLE__)
 const char * c_msg_usage = "Uso: %s [OPCION]... [ARCHIVO]\n\
 Simularor de calculadora RPN para X11.\n\n\
   -b  ADDR                 punto de interrupcion (octal)\n\
@@ -147,7 +150,7 @@ const char * h_err_invalid_address = "Ungültige adresse (%02o) an %1o-%04o in %
 const char * h_err_invalid_register = "Ungultiges register (REG[%03d]) an %1o-%04o in %s zeile : %d\n";
 #endif /* Hexadecimal */
 
-#if defined(unix) || defined(__unix__)
+#if defined(unix) || defined(__unix__) || defined(__APPLE__)
 const char * c_msg_usage = "Verwendung: %s [OPTION]... [DATEI]\n\
 Eine RPN rechner-simulation fuer X11.\n\n\
   -b  ADDR                 haltepunkt an adresse setzen (oktal)\n\
@@ -205,7 +208,7 @@ const char * h_err_invalid_address = "Adresse (%02o) hors plage à %1o-%04o dans
 const char * h_err_invalid_register = "Registre invalide (REG[%03d]) à %1o-%04o dans la ligne %s : %d\n";
 #endif /* Hexadecmal */
 
-#if defined(unix) || defined(__unix__)
+#if defined(unix) || defined(__unix__) || defined(__APPLE__)
 const char * c_msg_usage = "Utilisation : %s [OPTION]... [FICHIER]\n\
 Une simulation RPN Calculator pour X11.\n\n\
   -b  ADDR                 définir un point d'arrêt (octal)\n\
@@ -264,7 +267,7 @@ const char * h_err_invalid_address = "Address (%06o) out of range at %1o-%04o in
 const char * h_err_invalid_register = "Invalid register (REG[%03d]) at %1o-%04o in %s line : %d\n";
 #endif /* Hexadecimal */
 
-#if defined(unix) || defined(__unix__)
+#if defined(unix) || defined(__unix__) || defined(__APPLE__)
 const char * c_msg_usage = "Usage: %s [OPTION]... [FILE]\n\
 An RPN Calculator simulation for X11.\n\n\
   -b  ADDR                 set break-point (octal)\n\
