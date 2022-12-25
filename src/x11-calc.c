@@ -209,6 +209,8 @@
  *                     hp33e, and hp38e - MT
  * 24 Dec 22         - Command line parsing routine now uses the same macro
  *                     definitions as the the error message definitions.
+ *                   - Execution  speed  now uses VOYAGER and  SPICE  macro
+ *                     definitions - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Add verbose option.
@@ -630,9 +632,9 @@ int main(int argc, char *argv[])
          i_count = INTERVAL;
 #if defined(HP67)
          i_wait(INTERVAL / 4); /* Sleep for ~6.25 ms per tick */
-#elif defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c)
+#elif defined(VOYAGER)
          i_wait(INTERVAL / 3); /* Sleep for ~8.33 ms per tick */
-#elif defined(HP31e) || defined(HP32e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38c)
+#elif defined(SPICE)
          i_wait(INTERVAL / 3); /* Sleep for ~8.33 ms per tick */
 #else
          i_wait(INTERVAL / 2); /* Sleep for ~12.5 ms per tick */
