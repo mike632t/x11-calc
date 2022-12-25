@@ -110,6 +110,9 @@ hp38e:
 hp38c:
 	@$(MAKE) --no-print-directory -C ./src MODEL=38c
 
+hp41c:
+	@$(MAKE) --no-print-directory -C ./src MODEL=41c
+
 hp10c:
 	@$(MAKE) --no-print-directory -C ./src MODEL=10c
 

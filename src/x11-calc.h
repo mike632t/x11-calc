@@ -196,6 +196,12 @@
 #define VOYAGER
 #include "x11-calc-10c.h"
 
+#elif defined(HP41c)
+#define FILENAME     "x11-calc-41c"
+#define TITLE        "RPN calc 41C"
+#define VOYAGER
+#include "x11-calc-41c.h"
+
 #elif defined(HP11c)
 #define FILENAME     "x11-calc-11c"
 #define TITLE        "RPN calc 11C"
