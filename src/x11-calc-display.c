@@ -3,10 +3,10 @@
  *
  * Copyright(C) 2013   MT
  *
- * 10 Digit digit display functions.
+ * Display functions.
  *
- * Contains  the functions needed to create and display a 10 digit 7 seven
- * segment display element.
+ * Contains  the  functions needed to create and draw a multi  digit  seven
+ * segment display.
  *
  * This  program is free software: you can redistribute it and/or modify it
  * under  the terms of the GNU General Public License as published  by  the
@@ -66,6 +66,9 @@
  * 12 Mar 22         - Added display annunciators - MT
  * 11 Dec 22         - Renamed models with continious memory and added hp25
  *                     hp33e, and hp38e - MT
+ * 24 Dec 21         - Simplified the display creation routine by using the
+ *                     number digits to determine the size and position  of
+ *                     each digit in the display - MT
  *
  */
 
@@ -110,7 +113,7 @@ odisplay *h_display_create(int i_index, int i_left, int i_top, int i_width, int 
    unsigned int i_foreground, unsigned int i_background, unsigned int i_fill, unsigned int i_border){
 
    odisplay *h_display; /* Pointer to display. */
-   int i_count;
+   int i_count, i_offset, i_size;
 
 
    /* Attempt to allocate memory for a display. */
@@ -124,22 +127,21 @@ odisplay *h_display_create(int i_index, int i_left, int i_top, int i_width, int 
    h_display->display_top = i_display_top;
    h_display->display_width = i_display_width;
    h_display->display_height = i_display_height;
-#if defined(HP67) || defined(HP35) || defined(HP80) || defined(HP45) || defined(HP70) || defined(HP55)
+
+   i_size = ((i_display_width - 1)/ DIGITS);
+   i_offset = (i_display_width - (i_size * DIGITS)) / 2;
+   i_offset = i_offset + i_left + i_display_left + 1;
+
+   i_size = ((i_display_width - 1)/ DIGITS);
+   i_offset = (i_display_width - (i_size * DIGITS)) / 2;
+   i_offset = i_offset + i_left + i_display_left + 1;
    for (i_count = 0; i_count < DIGITS; i_count++) {
-      h_display->segment[i_count] = h_segment_create(0, 0, i_left + i_display_left + ((4 + 13 * i_count) * SCALE_WIDTH),
-      i_top + i_display_top + (i_display_height - 33 * SCALE_HEIGHT) / 2, 11 * SCALE_WIDTH, 33 * SCALE_HEIGHT, i_foreground, i_background); /* 15 Digit display */
+      h_display->segment[i_count] = h_segment_create(i_count, 0,
+         (i_offset + i_size * i_count), /* Left */
+         i_top + i_display_top + (i_display_height - (i_height / 2)) / 2, /* Top */
+         (i_size - 2), (i_height / 2), /* Width and Height */
+         i_foreground, i_background);
    }
-#elif defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c) ||  defined(HP10c) ||  defined(HP11c) ||  defined(HP12c) ||  defined(HP15c) ||  defined(HP16c)
-   for (i_count = 0; i_count < DIGITS; i_count++) {
-      h_display->segment[i_count] = h_segment_create(0, 0, i_left + i_display_left + ((3 + 18 * i_count) * SCALE_WIDTH) - 2,
-      i_top + i_display_top + (i_display_height - 33 * SCALE_HEIGHT) / 2, 16 * SCALE_WIDTH, 33 * SCALE_HEIGHT, i_foreground, i_background); /* 11 Digit display */
-   }
-#else
-   for (i_count = 0; i_count < DIGITS; i_count++) {
-      h_display->segment[i_count] = h_segment_create(0, 0, i_left + i_display_left + ((5 + 16 * i_count) * SCALE_WIDTH),
-      i_top + i_display_top + (i_display_height - 29 * SCALE_HEIGHT) /2, 14 * SCALE_WIDTH, 29 * SCALE_HEIGHT, i_foreground, i_background); /* 12 Digit display */
-   }
-#endif
    for (i_count = 0; i_count < DIGITS; i_count++) {
       h_display->segment[i_count]->mask = DISPLAY_SPACE;
    }
@@ -237,7 +239,7 @@ int i_display_draw(Display* x_display, int x_application_window, int i_screen, o
  */
 
 int i_display_update(Display* x_display, int x_application_window, int i_screen, odisplay *h_display, oprocessor *h_processor){
-#if defined(HP67)
+#if defined(HP67) || defined(HP19c)
    int i_count;
    static int c_digits [] =
    {
