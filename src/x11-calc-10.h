@@ -20,6 +20,7 @@
  *
  * 26 Nov 22         - Initial version - MT
  * 24 Dec 22         - Added dummy digit to the HP10 display - MT
+ *                   - Made space for the third switch position - MT
  *
  */
 
@@ -35,11 +36,11 @@
 #define BEZEL_COLOUR       WHITE
 
 #define KBD_LEFT           7 * SCALE_WIDTH
-#define KBD_TOP            175 * SCALE_HEIGHT /** 67 */
+#define KBD_TOP            165 * SCALE_HEIGHT /** 67 */
 #define KBD_ROW            43 * SCALE_HEIGHT
 
 #define BEZEL_LEFT         0 * SCALE_WIDTH
-#define BEZEL_TOP          112 * SCALE_HEIGHT
+#define BEZEL_TOP          102 * SCALE_HEIGHT
 #define BEZEL_WIDTH        200 * SCALE_WIDTH
 #define BEZEL_HEIGHT       61 * SCALE_HEIGHT
 
