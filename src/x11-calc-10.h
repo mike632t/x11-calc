@@ -1,5 +1,5 @@
 /*
- * x11-calc-10a.h - RPN (Reverse Polish) calculator simulator.
+ * x11-calc-10.h - RPN (Reverse Polish) calculator simulator.
  *
  * Copyright(C) 2018   MEJT
  *
@@ -19,6 +19,7 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * 26 Nov 22         - Initial version - MT
+ * 24 Dec 22         - Added dummy digit to the HP10 display - MT
  *
  */
 
@@ -26,7 +27,7 @@
 #define WIDTH              200 * SCALE_WIDTH
 #define BUTTONS            24
 #define SWITCHES           2
-#define DIGITS             12
+#define DIGITS             13
 
 #define DIGIT_COLOUR       RED
 #define DIGIT_BACKGROUND   DARK_RED

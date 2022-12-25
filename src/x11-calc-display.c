@@ -69,6 +69,7 @@
  * 24 Dec 21         - Simplified the display creation routine by using the
  *                     number digits to determine the size and position  of
  *                     each digit in the display - MT
+ *                   - Added dummy digit to the HP10 display - MT
  *
  */
 
@@ -405,13 +406,13 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
    };
 
    i_offset = REG_SIZE - DIGITS + 1;
-   for (i_count = 0; i_count < DIGITS; i_count++) {
+   for (i_count = 0; i_count < DIGITS - 1; i_count++) {
       if (h_display->segment[i_count] != NULL)
       {
          if (h_processor->flags[DISPLAY_ENABLE] && h_processor->enabled)
          {
             if (h_display->segment[i_count] != NULL)
-               h_display->segment[i_count]->mask = c_digits[h_processor->reg[A_REG]->nibble[REG_SIZE - i_offset - i_count]];
+               h_display->segment[i_count]->mask = c_digits[h_processor->reg[A_REG]->nibble[REG_SIZE - i_offset - i_count - 1]];
          }
          else
             h_display->segment[i_count]->mask = DISPLAY_SPACE;
