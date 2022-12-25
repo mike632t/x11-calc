@@ -55,7 +55,7 @@
 #define DISPLAY_HEIGHT     BEZEL_HEIGHT
 
 
-#define ROM_SIZE           030000
+#define ROM_SIZE           030000   /* Allows for 3x 4K ROMs */
 #define MEMORY_SIZE        320 /* HP41CV */
 //#define CONTINIOUS
 

@@ -326,6 +326,14 @@
  *                     target address does not exist - MT
  *                   - Print a newline to stdout before an error message if
  *                     trace is enabled, to tidy up the output - MT
+ * 18 May 22         - Added  three missing HP41 instructions  ('pfad = c',
+ *                     'fo = st', and 'st = c')- MT
+ * 22 May 22         - Fixed 'goto c' - MT
+ * 24 May 22         - Modified  'cxisa' to check for a valid ROM  address,
+ *                     loading the 'c' register from a non existant  memory
+ *                     location will result in an error except on the HP41C
+ *                     when the value returned will be zero - MT
+ * 25 May 22         - Added '?fd=1'
  * 26 Nov 22         - Added the original HP10 (based on the assumption  it
  *                     uses the same processor as the woodstock series).
  * 03 Dec 22         - Changed the behaviour of the 'p' register in th HP10
@@ -522,7 +530,7 @@ static void v_reg_copy(oprocessor *h_processor, oregister *h_destination, oregis
    }
 }
 
-#if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c)
+#if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c) || defined(HP41c)
 static void v_reg_or(oprocessor *h_processor, oregister *h_destination, oregister *h_source, oregister *h_argument) /* Or the contents of two registers */
 {
    int i_count, i_temp;
@@ -673,7 +681,7 @@ void v_read_state(oprocessor *h_processor, char *s_pathname) /* Read processor s
       h_datafile = fopen(s_pathname, "r");
       if (h_datafile !=NULL) { /* If file exists and can be opened restore state */
          debug(fprintf(stderr,h_msg_loading, s_pathname));
-#if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c)
+#if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c) || defined(HP41c)
          for (i_count = 0; i_count < FLAGS; i_count++)
          {
             fscanf(h_datafile, "%x,", &i_temp);
@@ -725,7 +733,7 @@ void v_write_state(oprocessor *h_processor, char *s_pathname) /* Write processor
       h_datafile = fopen(s_pathname, "w");
       if (h_datafile !=NULL) { /* If file exists and can be opened save state */
          debug(fprintf(stderr,h_msg_saving, s_pathname));
-#if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c)
+#if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c) || defined(HP41c)
          for (i_count = 0; i_count < FLAGS; i_count++)
          {
             fprintf(h_datafile, "%02x,", h_processor->flags[i_count]);
@@ -853,7 +861,7 @@ void v_processor_reset(oprocessor *h_processor) /* Reset processor */
    for (i_count = 0; i_count < BUFSIZE; i_count++) /* Reset the character buffer contents */
       h_processor->buffer[i_count] = 0x3f;
 #endif
-#if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c)
+#if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c) || defined(HP41c)
    h_processor->q = 0;
    h_processor->ptr = False;
    h_processor->flags[CARRY] = True;
@@ -881,7 +889,7 @@ oprocessor *h_processor_create(int *h_rom) /* Create a new processor 'object' */
    return(h_processor);
 }
 
-#if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c)
+#if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c) || defined(HP41c)
 static unsigned char *h_active_pointer (oprocessor *h_processor) /* Return address of active pointer */
 {
    if (h_processor->ptr)
@@ -971,7 +979,7 @@ static void v_op_inc_pc(oprocessor *h_processor) /* Increment program counter */
    h_processor->flags[CARRY] = False;
 }
 
-#if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c)
+#if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c) || defined(HP41c)
 
 void op_jsb(oprocessor *h_processor, int i_address) /* Call to subroutine */
 {
@@ -1031,7 +1039,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
    static const int i_tst_p[16] = { 4 ,  8, 12,  2,  9,  1,  6,  3,  1, 13,  5,  0, 11, 10,  7,  4 };
 #endif
 
-#if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c)
+#if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c) || defined(HP41c)
    static const int n_map_i[16] = {  3,  4,  5, 10,  8,  6, 11, -1,  2,  9,  7, 13,  1, 12,  0, -1 }; /* map nnnn to index */
 #endif
    unsigned int i_last; /* Save the current PC */
@@ -1068,7 +1076,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
       h_processor->status[5] = False; /* Self Test */
 #endif
 
-#if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c)
+#if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c) || defined(HP41c)
       if (h_processor->keypressed) h_processor->kyf = True; /* Set keyboard flag if key pressed */
 #endif
 
@@ -1969,7 +1977,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
          break;
 #endif
 
-#if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c)
+#if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c) || defined(HP41c)
       case 0x00: /* Type 0 - Special operations */
          switch ((i_opcode >> 2) & 0xf)
          {
@@ -2123,6 +2131,32 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                if (h_processor->trace) v_fprint_register(stdout, h_processor->reg[C_REG]);
                if (h_processor->trace) v_fprint_register(stdout, h_processor->reg[M_REG]);
                break;
+#if defined(HP41c)
+            case 0x09: /* st[0:7] -> fo[0:7] - Load flag out from status byte (10 0101 1000) */
+               if (h_processor->trace) fprintf(stdout, "fo = st\t");
+               {
+                  int i_count;
+                  for (i_count = 7; i_count >= 0 ; i_count--)
+                     h_processor->fo[i_count] = (h_processor->status[i_count]);
+               }
+               break;
+            case 0x0d: /* c[0:1] -> st[0:7] - Load status byte from c register (11 0101 1000) */
+               if (h_processor->trace) fprintf(stdout, "st = c\t");
+               {
+                  int i_status, i_count;
+                  i_status = h_processor->reg[C_REG]->nibble[0] | h_processor->reg[C_REG]->nibble[1] << 4;
+                  for (i_count = 0; i_count <=7; i_count++)
+                  {
+                     if (i_status & 0x1)
+                        h_processor->status[i_count] = True;
+                     else
+                        h_processor->status[i_count] = False;
+                     i_status >>= 1;
+                  }
+               }
+               if (h_processor->trace) v_fprint_status(stdout, h_processor);
+               break;
+#endif
             case 0x0e: /* st[0:7] -> c[0:1] - Load c register from the status byte (11 1001 1000) */
                if (h_processor->trace) fprintf(stdout, "c = st\t");
                {
@@ -2303,6 +2337,73 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   if (h_processor->trace) v_fprint_register(stdout, h_processor->mem[i_translate_addr(h_processor->addr)]);
                }
             break;
+#if defined(HP41c)
+         case 0x0b: /* fi[d] -> cy - Test flag input (dddd_1011_00) */
+            /* Flag   Mnemonic   Description
+                 0     ?PBSY     Printer - Busy
+                 1     ?CRDR     Card reader - Interrupt flag set
+                 2     ?WNDB     Wand - Data in buffer
+                 5     ?EDAV     IR LED available
+                 6     ?IFCR     HP-IL interface - Ready (InterFace Clear Received)
+                 7     ?SRQR     HP-IL interface - Needs attention (Service ReQuest Received)
+                 8     ?FRAV     HP-IL interface - Frame available (FRAme aVailable)
+                 9     ?FRNS     HP-IL interface - Frame transmitted does not return as sent (Frame Return Not as Sent)
+                10     ?ORAV     HP-IL interface - Output register is available (Output Register AVailable)
+                12     ?ALM      Time module - Alarm
+                13     ?SER      All - Service Request */
+            switch (n_map_i[i_opcode >> 6])
+            {
+            case 0:
+               if (h_processor->trace) fprintf(stdout, "? pbsy\t");
+               h_processor->flags[CARRY] = False; /* Clear carry */
+               break;
+            case 1:
+               if (h_processor->trace) fprintf(stdout, "? crdr\t");
+               h_processor->flags[CARRY] = False; /* Clear carry */
+               break;
+            case 2:
+               if (h_processor->trace) fprintf(stdout, "? wndb\t");
+               h_processor->flags[CARRY] = False; /* Clear carry */
+               break;
+            case 5:
+               if (h_processor->trace) fprintf(stdout, "? eadv\t");
+               h_processor->flags[CARRY] = False; /* Clear carry */
+               break;
+            case 6:
+               if (h_processor->trace) fprintf(stdout, "? ifcr\t");
+               h_processor->flags[CARRY] = False; /* Clear carry */
+               break;
+            case 7:
+               if (h_processor->trace) fprintf(stdout, "? srqr\t");
+               h_processor->flags[CARRY] = False; /* Clear carry */
+               break;
+            case 8:
+               if (h_processor->trace) fprintf(stdout, "? frav\t");
+               h_processor->flags[CARRY] = False; /* Clear carry */
+               break;
+            case 9:
+               if (h_processor->trace) fprintf(stdout, "? frns\t");
+               h_processor->flags[CARRY] = False; /* Clear carry */
+               break;
+            case 10:
+               if (h_processor->trace) fprintf(stdout, "? orav\t");
+               h_processor->flags[CARRY] = False; /* Clear carry */
+               break;
+            case 12:
+               if (h_processor->trace) fprintf(stdout, "? alm\t");
+               h_processor->flags[CARRY] = False; /* Clear carry */
+               break;
+            case 13:
+               if (h_processor->trace) fprintf(stdout, "? ser\t");
+               h_processor->flags[CARRY] = False; /* Clear carry */
+               break;
+            default: /* Invalid flag in opcode */
+               if (h_processor->trace) fprintf(stdout, "\n");
+               debug(fprintf(stderr,"%02x\n", (i_opcode >> 6) & 0xf));
+               v_error(h_err_unexpected_opcode, i_opcode, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
+            }
+            break;
+#endif
          case 0x0c:
             switch ((i_opcode >> 6) & 0xf)
             {
@@ -2392,10 +2493,14 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   i_addr = (((h_processor->reg[C_REG]->nibble[6])<< 12) | (h_processor->reg[C_REG]->nibble[5] << 8) |
                      (h_processor->reg[C_REG]->nibble[4] << 4) | (h_processor->reg[C_REG]->nibble[3]));
                   if (i_addr > ROM_SIZE)
+#if defined(HP41c)
+                     h_processor->reg[C_REG]->nibble[2] = h_processor->reg[C_REG]->nibble[1] = h_processor->reg[C_REG]->nibble[0] = 0;
+#else
                      {
                         if (h_processor->trace) fprintf(stdout, "\n");
                         v_error(h_err_invalid_address, i_addr, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
                      }
+#endif
                   else
                   {
                      h_processor->reg[C_REG]->nibble[2] = (h_processor->rom[i_addr] >> 8) & 0xf;
@@ -2419,7 +2524,18 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                v_reg_and(h_processor, h_processor->reg[C_REG], h_processor->reg[C_REG], h_processor->reg[A_REG]);
                if (h_processor->trace) v_fprint_register(stdout, h_processor->reg[C_REG]);
                break;
-
+#if defined(HP41c)
+            case 0x0f: /* c[0:1] -> pfad - Load peripheral address from c (1111 1100 00) */
+                       /* Selects the peripheral device using the address in
+                        * the least signifigent byte of the C register.
+                        * 0xFB   Timer
+                        * 0xFC   Card Reader
+                        * 0xFD   Display
+                        * 0xFE   Wand */
+               if (h_processor->trace) fprintf(stdout, "pfad = c");
+               /** Not sure what to do with this so ignore it - for now*/
+               break;
+#endif
             default:
                if (h_processor->trace) fprintf(stdout, "\n");
                debug(fprintf(stderr,"%02x\n", (i_opcode >> 6) & 0xf));
@@ -2471,7 +2587,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
          break;
 #endif
 
-#if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c)
+#if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c) || defined(HP41c)
       case 01: /* Type 1 - Branch instruction (two words) */
          {
             int i_address, i_next;
@@ -3017,7 +3133,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
          break;
 #endif
 
-#if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c)
+#if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c) || defined(HP41c)
       case 0x02: /* Type 2 - Arithmetic operations */
          i_field = (i_opcode >> 2) & 7;
          switch (i_field) /* Select field
@@ -3287,7 +3403,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             if (h_processor->trace) fprintf(stdout, "\n");
             v_error(h_err_unexpected_opcode, i_opcode, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
             break;
-#if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c)
+#if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c) || defined(HP41c)
          case 03: /* Relative jump */
             {
                int i_offset;
