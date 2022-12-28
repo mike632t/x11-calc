@@ -619,7 +619,7 @@ int main(int argc, char *argv[])
 
 #if defined(SWITCHES)
    if (h_switch[0] != NULL) h_processor->enabled = h_switch[0]->state; /* Allow switches to be undefined if not used */
-   if (h_switch[1] != NULL) h_processor->select = h_switch[1]->state;
+   if (h_switch[1] != NULL) h_processor->mode = h_switch[1]->state;
 #endif
 
    while (!b_abort) /* Main program event loop */
@@ -757,9 +757,9 @@ int main(int argc, char *argv[])
                         h_processor->enabled = False; /* Disable the processor */
 #if defined(HP67)
                         i_ticks = DELAY * 4; /* Set count down */
-#elif defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c)
+#elif defined(VOYAGER)
                         i_ticks = DELAY * 3;
-#elif defined(HP31e) || defined(HP32e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38c)
+#elif defined(SPICE)
                         i_ticks = DELAY * 3;
 #else
                         i_ticks = DELAY * 2;
@@ -770,8 +770,11 @@ int main(int argc, char *argv[])
                   {
                      h_switch[1]->state = !(h_switch[1]->state); /* Toggle switch */
                      i_switch_draw(x_display, x_application_window, i_screen, h_switch[1]);
-                     h_processor->select = h_switch[1]->state;
+                     h_processor->mode = h_switch[1]->state;
                   }
+
+
+
                }
 #endif
             }
