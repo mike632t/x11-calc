@@ -211,6 +211,11 @@
  *                     definitions as the the error message definitions.
  *                   - Execution  speed  now uses VOYAGER and  SPICE  macro
  *                     definitions - MT
+ * 28 Dec 22         - Changed the name of printer mode status from mode to
+ *                     print - MT
+ *                   - Fixed HP19C model number in conditionals - MT
+ *                   - Changed the name of prgm/run mode status from select
+ *                     to mode - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Add verbose option.
@@ -619,7 +624,11 @@ int main(int argc, char *argv[])
 
 #if defined(SWITCHES)
    if (h_switch[0] != NULL) h_processor->enabled = h_switch[0]->state; /* Allow switches to be undefined if not used */
+#if defined(HP10) || defined(HP19c)
+   if (h_switch[1] != NULL) h_processor->print = h_switch[1]->state;
+#else
    if (h_switch[1] != NULL) h_processor->mode = h_switch[1]->state;
+#endif
 #endif
 
    while (!b_abort) /* Main program event loop */
@@ -770,11 +779,13 @@ int main(int argc, char *argv[])
                   {
                      h_switch[1]->state = !(h_switch[1]->state); /* Toggle switch */
                      i_switch_draw(x_display, x_application_window, i_screen, h_switch[1]);
+#if defined(HP10) || defined(HP19c)
+                     h_processor->print = h_switch[1]->state;
+#else
                      h_processor->mode = h_switch[1]->state;
+#endif
+
                   }
-
-
-
                }
 #endif
             }

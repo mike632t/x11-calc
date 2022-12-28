@@ -135,7 +135,7 @@ typedef struct {
    unsigned char f;                    /* F register */
    unsigned char p;                    /* P register */
    unsigned char keypressed;           /* Key pressed */
-   unsigned char select;               /* Save run/prgm switch state */
+   unsigned char mode;                 /* Save run/prgm switch state */
    unsigned char timer;                /* Save timer switch state */
    unsigned char trace;                /* Trace flag */
    unsigned char step;                 /* Step flag */

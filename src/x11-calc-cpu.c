@@ -349,6 +349,8 @@
  * 28 Dec 22         - Changed the name of printer mode status from mode to
  *                     print - MT
  *                   - Fixed HP19C model number in conditionals - MT
+ *                   - Changed the name of prgm/run mode status from select
+ *                     to mode - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -876,7 +878,7 @@ oprocessor *h_processor_create(int *h_rom) /* Create a new processor 'object' */
    for (i_count = 0; i_count < MEMORY_SIZE; i_count++)
       h_processor->mem[i_count] = h_register_create(i_count); /* Allocate storage for the RAM */
    h_processor->rom = h_rom ; /* Address of ROM */
-   h_processor->select = False;
+   h_processor->mode = False;
    h_processor->timer = False;
    h_processor->trace = False;
    h_processor->step = False;
@@ -1050,24 +1052,24 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
        * PRGM  : status[11] = 0, status[3] = 1
        * RUN   : status[11] = 0, status[3] = 0 */
       if (h_processor->keypressed) h_processor->status[0] = True; /* Set status bit 0 if key pressed */
-      if (h_processor->select) h_processor->status[3] = True; /* Set status bits based on switch position */
+      if (h_processor->mode) h_processor->status[3] = True; /* Set status bits based on switch position */
       if (h_processor->timer) h_processor->status[11] = True;
 #endif
 
 #if defined(HP21) || defined(HP22) || defined(HP25) || defined(HP25c) || defined(HP27) || defined(HP29c)
       if (h_processor->keypressed) h_processor->status[15] = True; /* Set status bit if key pressed */
-      if (h_processor->select) h_processor->status[3] = True; /* Set status bits based on switch position */
+      if (h_processor->mode) h_processor->status[3] = True; /* Set status bits based on switch position */
       h_processor->status[5] = True; /* Low Power */
 #endif
 
 #if defined(HP67) || defined(HP97) /* Seems to use a flag rather then the status word for the switch position */
       if (h_processor->keypressed) h_processor->status[15] = True; /* Set status bit 15 if key pressed */
-      h_processor->flags[MODE] = h_processor->select; /* Set the program mode flag based on switch position */
+      h_processor->flags[MODE] = h_processor->mode; /* Set the program mode flag based on switch position */
 #endif
 
 #if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c) /* Setting S(5) breaks the self test */
       if (h_processor->keypressed) h_processor->status[15] = True; /* Set status bit if key pressed */
-      if (h_processor->select) h_processor->status[3] = True; /* Set status bits based on switch position */
+      if (h_processor->mode) h_processor->status[3] = True; /* Set status bits based on switch position */
       h_processor->status[5] = False; /* Self Test */
 #endif
 
@@ -1458,7 +1460,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   if (h_processor->trace) fprintf(stdout, "keys -> a\t");
 #if defined(HP10) || defined(hp19c) || defined(HP97)
                   /* The HP10 and HP19C use this to get the state of the printer mode switch */
-                  if (h_processor->select) /** Use a seperate flag? **/
+                  if (h_processor->print)
                      h_processor->reg[A_REG]->nibble[1] = 0x1; /* HP10 - All = 1, Print = 2 (print with display off), Display = 4 */
                   else
                      h_processor->reg[A_REG]->nibble[1] = 0x4; /* HP19C/97 - Trace = 1, Normal = 2 (print with display off), Manual = 4 */
