@@ -35,6 +35,7 @@
  * 23 Jan 22         - Changed the colour of the numeric keys - MT
  * 12 Feb 22         - Updated layout and separated the initialisation code
  *                     for buttons and switches into two functions - MT
+ * 28 Dec 22         - Fixed PRGM/RUN switch label - MT
  *
  */
 
