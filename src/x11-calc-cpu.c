@@ -346,6 +346,9 @@
  *                     but this will be a problem with other models - MT
  * 21 Dec 22         - Created a seperate function to print the contents of
  *                     the print buffer to a file - MT
+ * 28 Dec 22         - Changed the name of printer mode status from mode to
+ *                     print - MT
+ *                   - Fixed HP19C model number in conditionals - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -418,7 +421,7 @@ static void v_fprint_flags(FILE *h_file, oprocessor *h_processor) /* Display the
    fprintf(h_file, "\tflags = 0x%04X%12c   ", i_temp, ' ');
 }
 
-#if defined(HP10) || defined(HP19) || defined(HP97)
+#if defined(HP10) || defined(hp19c) || defined(HP97)
 static void v_fprint_buffer(FILE *h_file, oprocessor *h_processor) /* Display the current processor flags */
 {
    static const unsigned char c_charmap[0x40] = {
@@ -848,7 +851,7 @@ void v_processor_reset(oprocessor *h_processor) /* Reset processor */
       h_processor->crc[i_count] = False;
    h_processor->crc[READY] = -4;
 #endif
-#if defined(HP10) || defined(HP19) || defined(HP97)
+#if defined(HP10) || defined(hp19c) || defined(HP97)
    h_processor->position = BUFSIZE;
    for (i_count = 0; i_count < BUFSIZE; i_count++) /* Reset the character buffer contents */
       h_processor->buffer[i_count] = 0x3f;
@@ -1453,7 +1456,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   break;
                case 00120: /* keys -> a[2:1] (0 001 010 000) */
                   if (h_processor->trace) fprintf(stdout, "keys -> a\t");
-#if defined(HP10) || defined(HP19) || defined(HP97)
+#if defined(HP10) || defined(hp19c) || defined(HP97)
                   /* The HP10 and HP19C use this to get the state of the printer mode switch */
                   if (h_processor->select) /** Use a seperate flag? **/
                      h_processor->reg[A_REG]->nibble[1] = 0x1; /* HP10 - All = 1, Print = 2 (print with display off), Display = 4 */
@@ -1514,7 +1517,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   h_processor->sp = (h_processor->sp - 1) & (STACK_SIZE - 1); /* Update stack pointer */
                   h_processor->pc = h_processor->stack[h_processor->sp]; /* Pop program counter from the stack */
                   break;
-#if defined(HP10) || defined(HP19) || defined(HP97)
+#if defined(HP10) || defined(hp19c) || defined(HP97)
                case 01120: /* pik1120 */
                   if (h_processor->trace) fprintf(stdout, "pik1120");
                   v_fprint_buffer (stdout, h_processor);
@@ -1646,7 +1649,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   if (h_processor->trace)
                      v_fprint_register(stdout, h_processor->mem[h_processor->addr]);
                   break;
-#if defined(HP10) || defined(HP19) || defined(HP97)
+#if defined(HP10) || defined(hp19c) || defined(HP97)
                case 01660: /* pik1660 print alpha (6 bit data)*/
                   if (h_processor->trace) fprintf(stdout, "pik1660");
                   {
