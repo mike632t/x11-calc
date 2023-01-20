@@ -337,7 +337,7 @@
  * 11 Dec 22         - Renamed models with continious memory and added HP25
  *                     HP33E, and HP38E - MT
  * 14 Dec 22         - Changed 'keys -> a' to return the state of the print
- *                     mode  switch for the HP10 and HP19C, currently  this
+ *                     mode  switch  for  printing models,  currently  this
  *                     always selects the 'manual' mode as printing has not
  *                     been implemented yet - MT
  * 20 Dec 22         - Can now print to stdout, this works well enough with
@@ -346,11 +346,17 @@
  *                     but this will be a problem with other models - MT
  * 21 Dec 22         - Created a seperate function to print the contents of
  *                     the print buffer to a file - MT
+ * 24 Dec 22         - Added and explicit check for '__APPLE__' in order to
+ *                     allow Mac OS  to be handled in the same way as other
+ *                     unix like systems - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
- *                   - Use a dedicated procesor flag for the printer mode.
  *                   - Figure out how to get the display to blink..?
+ * 28 Dec 22         - Changed the name of printer mode status from mode to
+ *                     print - MT
+ *                   - Changed the name of prgm/run mode status from select
+ *                     to mode - MT
  *
  */
 
@@ -774,7 +780,7 @@ void v_save_state(oprocessor *h_processor) /* Restore saved processor state */
    if (h_processor != NULL) /* Check processor defined */
    {
       if (s_dir == NULL) s_dir = ""; /* Use current folder if HOME not defined */
-#if defined(unix) || defined(__unix__)
+#if defined(unix) || defined(__unix__) || defined(__APPLE__)
       s_pathname = malloc((strlen(s_dir) + strlen(s_filename) + strlen(s_filetype) + 2) * sizeof(char*));
       strcpy(s_pathname, s_dir);
       strcat(s_pathname, "/.");
@@ -800,7 +806,7 @@ void v_restore_state(oprocessor *h_processor) /* Restore saved processor state *
    if (h_processor != NULL) /* Check processor defined */
    {
       if (s_dir == NULL) s_dir = ""; /* Use current folder if HOME not defined */
-#if defined(unix) || defined(__unix__)
+#if defined(unix) || defined(__unix__) || defined(__APPLE__)
       s_pathname = malloc((strlen(s_dir) + strlen(s_filename) + strlen(s_filetype) + 2) * sizeof(char*));
       strcpy(s_pathname, s_dir);
       strcat(s_pathname, "/.");
@@ -873,11 +879,14 @@ oprocessor *h_processor_create(int *h_rom) /* Create a new processor 'object' */
    for (i_count = 0; i_count < MEMORY_SIZE; i_count++)
       h_processor->mem[i_count] = h_register_create(i_count); /* Allocate storage for the RAM */
    h_processor->rom = h_rom ; /* Address of ROM */
-   h_processor->select = False;
+   h_processor->mode = True;
    h_processor->timer = False;
    h_processor->trace = False;
    h_processor->step = False;
    v_processor_reset(h_processor);
+#if defined(HP10) || defined(HP19) || defined(HP97)
+   h_processor->print = False;
+#endif
    return(h_processor);
 }
 
@@ -1047,24 +1056,24 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
        * PRGM  : status[11] = 0, status[3] = 1
        * RUN   : status[11] = 0, status[3] = 0 */
       if (h_processor->keypressed) h_processor->status[0] = True; /* Set status bit 0 if key pressed */
-      if (h_processor->select) h_processor->status[3] = True; /* Set status bits based on switch position */
+      if (h_processor->mode) h_processor->status[3] = True; /* Set status bits based on switch position */
       if (h_processor->timer) h_processor->status[11] = True;
 #endif
 
 #if defined(HP21) || defined(HP22) || defined(HP25) || defined(HP25c) || defined(HP27) || defined(HP29c)
       if (h_processor->keypressed) h_processor->status[15] = True; /* Set status bit if key pressed */
-      if (h_processor->select) h_processor->status[3] = True; /* Set status bits based on switch position */
+      if (h_processor->mode) h_processor->status[3] = True; /* Set status bits based on switch position */
       h_processor->status[5] = True; /* Low Power */
 #endif
 
 #if defined(HP67) || defined(HP97) /* Seems to use a flag rather then the status word for the switch position */
       if (h_processor->keypressed) h_processor->status[15] = True; /* Set status bit 15 if key pressed */
-      h_processor->flags[MODE] = h_processor->select; /* Set the program mode flag based on switch position */
+      h_processor->flags[MODE] = h_processor->mode; /* Set the program mode flag based on switch position */
 #endif
 
 #if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c) /* Setting S(5) breaks the self test */
       if (h_processor->keypressed) h_processor->status[15] = True; /* Set status bit if key pressed */
-      if (h_processor->select) h_processor->status[3] = True; /* Set status bits based on switch position */
+      if (h_processor->mode) h_processor->status[3] = True; /* Set status bits based on switch position */
       h_processor->status[5] = False; /* Self Test */
 #endif
 
@@ -1454,8 +1463,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                case 00120: /* keys -> a[2:1] (0 001 010 000) */
                   if (h_processor->trace) fprintf(stdout, "keys -> a\t");
 #if defined(HP10) || defined(HP19) || defined(HP97)
-                  /* The HP10 and HP19C use this to get the state of the printer mode switch */
-                  if (h_processor->select) /** Use a seperate flag? **/
+                  if (h_processor->print)
                      h_processor->reg[A_REG]->nibble[1] = 0x1; /* HP10 - All = 1, Print = 2 (print with display off), Display = 4 */
                   else
                      h_processor->reg[A_REG]->nibble[1] = 0x4; /* HP19C/97 - Trace = 1, Normal = 2 (print with display off), Manual = 4 */
