@@ -35,15 +35,17 @@
  * 12 Mar 22         - Updated German translation again - MT
  * 31 Mar 22         - Modified to compile on NetBSD - MT
  * 07 Dec 22         - Didplay register number as a 3 digit value - MT
- * 11 Dec 22         - Renamed models with continious memory and added hp25
- *                     hp33e, and hp38e - MT
+ * 11 Dec 22         - Renamed models with continious memory and added HP25
+ *                     HP33e, and HP38e - MT
  * 24 Dec 22         - Added and explicit check for '__APPLE__' in order to
  *                     allow Mac OS  to be handled in the same way as other
  *                     unix like systems - MT
+ * 18 Jan 23         - Shortened help message (max string length for C90 is
+ *                     509 characters) - MT
  *
  */
 
-#if defined(HP10) || defined(HP10c) || defined(HP11c) || defined(HP12c)|| defined(HP15c) || defined(HP16c)
+#if defined(HP10c) || defined(HP11c) || defined(HP12c)|| defined(HP15c) || defined(HP16c) || defined(HP19c)
 #define HEXADECIMAL
 #endif
 
@@ -272,10 +274,10 @@ const char * c_msg_usage = "Usage: %s [OPTION]... [FILE]\n\
 An RPN Calculator simulation for X11.\n\n\
   -b  ADDR                 set break-point (octal)\n\
   -i, OPCODE               set instruction trap (octal)\n\
-  -r  FILE                 read ROM contents from FILE\n\
+  -r  FILE                 read ROM from FILE\n\
   -s,                      single step\n\
-  -t,                      trace execution\n\
-      --cursor             display cursor (default)\n\
+  -t,                      trace\n\
+      --cursor             display cursor\n\
       --no-cursor          hide cursor\n\
       --help               display this help and exit\n\
       --version            output version information and exit\n\n";
