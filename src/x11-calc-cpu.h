@@ -48,10 +48,12 @@
  *                     integers so they can be loaded/saved as hex - MT
  * 05 Mar 22         - Changed the data type of the register nibbles, flags
  *                     and status bits back to unsigned char - MT
- * 11 Dec 22         - Renamed models with continious memory and added hp25
- *                     hp33e, and hp38e - MT
+ * 11 Dec 22         - Renamed models with continious memory and added HP25
+ *                     HP33e, and HP38e - MT
  * 20 Dec 22         - Added a printer buffer to the CPU properties for the
  *                     HP10, HP19C and HP97 (if I ever get that far) - MT
+ * 28 Dec 22         - Changed the name of printer mode status from mode to
+ *                     print - MT
  *
  */
 
@@ -132,16 +134,16 @@ typedef struct {
    unsigned char f;                    /* F register */
    unsigned char p;                    /* P register */
    unsigned char keypressed;           /* Key pressed */
-   unsigned char select;               /* Save run/prgm switch state */
+   unsigned char mode;                 /* Save run/prgm switch state */
    unsigned char timer;                /* Save timer switch state */
    unsigned char trace;                /* Trace flag */
    unsigned char step;                 /* Step flag */
    unsigned char sleep;                /* Sleep */
    unsigned char enabled;              /* Enabled */
 #if defined(HP10) || defined(HP19) || defined(HP97)
-   unsigned char mode;                /* Save print mode */
-   unsigned int position;             /* Position of next char in buffer */
-   unsigned char buffer[BUFSIZE];     /* Printer output buffer */
+   unsigned char print;                /* Save print mode */
+   unsigned int position ;             /* Position of next char in buffer */
+   unsigned char buffer[BUFSIZE];      /* Printer output buffer */
 #endif
 #if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c)
    unsigned char kyf;                  /* Keyboard flag */
