@@ -349,14 +349,15 @@
  * 24 Dec 22         - Added and explicit check for '__APPLE__' in order to
  *                     allow Mac OS  to be handled in the same way as other
  *                     unix like systems - MT
- *
- * To Do             - Finish adding code to display any modified registers
- *                     to every instruction.
- *                   - Figure out how to get the display to blink..?
  * 28 Dec 22         - Changed the name of printer mode status from mode to
  *                     print - MT
  *                   - Changed the name of prgm/run mode status from select
  *                     to mode - MT
+ * 01 May 23         - Corrected default mode setting - 
+ *
+ * To Do             - Finish adding code to display any modified registers
+ *                     to every instruction.
+ *                   - Figure out how to get the display to blink..?
  *
  */
 
@@ -879,7 +880,7 @@ oprocessor *h_processor_create(int *h_rom) /* Create a new processor 'object' */
    for (i_count = 0; i_count < MEMORY_SIZE; i_count++)
       h_processor->mem[i_count] = h_register_create(i_count); /* Allocate storage for the RAM */
    h_processor->rom = h_rom ; /* Address of ROM */
-   h_processor->mode = True;
+   h_processor->mode = False;
    h_processor->timer = False;
    h_processor->trace = False;
    h_processor->step = False;
