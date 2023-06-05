@@ -142,7 +142,7 @@ typedef struct {
    unsigned char enabled;              /* Enabled */
 #if defined(HP10) || defined(HP19) || defined(HP97)
    unsigned char print;                /* Save print mode */
-   unsigned int position ;             /* Position of next char in buffer */
+   unsigned int position;              /* Position of next char in buffer */
    unsigned char buffer[BUFSIZE];      /* Printer output buffer */
 #endif
 #if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c)
