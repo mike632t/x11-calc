@@ -45,7 +45,7 @@
  *
  */
 
-#if defined(HP10c) || defined(HP11c) || defined(HP12c)|| defined(HP15c) || defined(HP16c) || defined(HP19c)
+#if defined(HP10c) || defined(HP11c) || defined(HP12c)|| defined(HP15c) || defined(HP16c)
 #define HEXADECIMAL
 #endif
 
