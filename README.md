@@ -23,17 +23,25 @@ More [screenshots](./img/)
 
 ### Latest News
 
-10/12 - Renamed HP10 to HP10C and added HP10.
+03 Jun 23
+   - Fixed compiler directive so keyboard works again on linux.
+   - Fixed a problem in the make file.
 
-11/12 - Renamed HP11 to HP11C, HP12 to HP12C, HP15 to HP15C, HP16 to HP16C.
+01 May 23
+   - Fixed ordering of compiler options (affecting recent versions of gcc).
 
-11/12 - Renamed HP25 to HP25C, HP29 to HP29C, HP31 to HP31E, HP32 to HP32E.
+23 Mar 23
+   - Set compiler specific flags for gcc.
 
-11/12 - Renamed HP33 to HP33C, HP34 to HP34C, HP37 to HP37E, HP38 to HP38C.
+21 Dec 22
+   - HP10 now prints to the console.
 
-11/12 - Added HP25, HP33E and HP38E models.
-
-21/12 - HP10 now prints to the console.
+11 Dec 22
+   - Added HP25, HP33E and HP38E models.
+   - Renamed HP33 to HP33C, HP34 to HP34C, HP37 to HP37E, HP38 to HP38C.
+   - Renamed HP25 to HP25C, HP29 to HP29C, HP31 to HP31E, HP32 to HP32E.
+   - Renamed HP11 to HP11C, HP12 to HP12C, HP15 to HP15C, HP16 to HP16C.
+   - Renamed HP10 to HP10C and added HP10.
 
 ### Status
 
@@ -105,9 +113,16 @@ e.g:
     $ cd x11-calc-stable
     $ make all
 
-    $ ./bin/x11-calc-29
-    x11-calc-29: Version 0.4 [Commit ID: 81c55be] 16 Oct 21 21:15:00 (Build: 0067)
+    $ ./bin/x11-calc-29c
+    x11-calc-29c: Version 0.8 [Commit ID: 09bbba6] 03 Jun 23 11:50:14 (Build: 0092)
     ROM Size : 4096 words
+
+If more than one C compiler is installed then you can specify which one to use  on
+the command line.
+
+    $ make CC=tcc VERBOSE=1 all
+
+    $ make CC=clang VERBOSE=1 all
 
 
 ### Keyboard Shortcuts
@@ -228,6 +243,12 @@ are missing some characters (for example the Pi symbol).
 
 - Gentoo, GCC 11.2.0, x64
 
+- Debian 11 (Bullseye, GCC 10.2.1, x64
+
+- Debian 11 (Bullseye, TCC 0.9.27, x64
+
+- Debian 11 (Bullseye, clang 11.0.1-2, x64
+
 - Ubuntu 20.04, GCC 9.3.0, x64
 
 - Debian 10 (Buster), GCC 8.3.0, x64
@@ -239,6 +260,8 @@ are missing some characters (for example the Pi symbol).
 - Debian 9 (Stretch), GCC 6.3.0, arm
 
 - Debian 5 (Lenny), GCC 4.2.4, alpha
+
+- MacOS 10 (Catalina), clang 12.0.0, x64
 
 - VAX/VMS 5.4-3, VAXC 3.2, VAX (simh)
 
