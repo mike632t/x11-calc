@@ -50,6 +50,7 @@
 #                      the command line - MT
 #                    - Conditionally sets operating specific options (don't
 #                      need to comment them out when not required) - MT
+#  26 Mar 23         - Set compiler specific flags for gcc - MT
 #  01 May 23         - Fixed ordering of compiler options - MT
 #
 
@@ -66,7 +67,7 @@ LANG	= LANG_$(shell (echo $$LANG | cut -f 1 -d '_'))
 UNAME	=  $(shell uname)
 
 LIBS	= -lX11 -lm
-FLAGS	= -fcommon -Wall -pedantic -ansi -std=gnu99
+FLAGS	= -fcommon -Wall -pedantic -std=gnu99
 FLAGS	+= -Wno-comment -Wno-deprecated-declarations -Wno-builtin-macro-redefined
 
 # Operating system specific settings
@@ -76,8 +77,9 @@ FLAGS	+= -I /usr/X11R7/include/ -L /usr/X11R7/lib/ -R /usr/X11R7/lib
 endif
 
 # Compiler specific settings
-ifeq ($(CXX), g++)
+ifeq ($(CC), cc)
 LIBS	+=  -no-pie
+FLAGS	+= -ansi
 endif
 
 ifdef DEBUG
