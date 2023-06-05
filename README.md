@@ -239,27 +239,27 @@ are missing some characters (for example the Pi symbol).
 
 ### Tested
 
-- Fedora 34, GCC 11.2.1, x64
+- Fedora 34, gcc 11.2.1, x64
 
-- Gentoo, GCC 11.2.0, x64
+- Gentoo, gcc 11.2.0, x64
 
-- Debian 11 (Bullseye, GCC 10.2.1, x64
+- Debian 11 (Bullseye, gcc 10.2.1, x64
 
-- Debian 11 (Bullseye, TCC 0.9.27, x64
+- Debian 11 (Bullseye, tcc 0.9.27, x64
 
 - Debian 11 (Bullseye, clang 11.0.1-2, x64
 
-- Ubuntu 20.04, GCC 9.3.0, x64
+- Ubuntu 20.04, gcc 9.3.0, x64
 
-- Debian 10 (Buster), GCC 8.3.0, x64
+- Debian 10 (Buster), gcc 8.3.0, x64
 
 - Debian 10 (Buster), clang 7.0.1, x64
 
-- Debian 10 (Buster), GCC 8.3.0, arm
+- Debian 10 (Buster), gcc 8.3.0, arm
 
-- Debian 9 (Stretch), GCC 6.3.0, arm
+- Debian 9 (Stretch), gcc 6.3.0, arm
 
-- Debian 5 (Lenny), GCC 4.2.4, alpha
+- Debian 5 (Lenny), gcc 4.2.4, alpha
 
 - MacOS 10 (Catalina), clang 12.0.0, x64
 
@@ -294,7 +294,7 @@ Your problem report should contain:
 
 - Window Manager and version;
 
-- GCC version used;
+- Compiler and version used;
 
 - Commit ID;
 
