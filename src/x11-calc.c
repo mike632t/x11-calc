@@ -217,6 +217,9 @@
  *                     to mode - MT
  * 18 Jan 23         - Fixed  warnings when adding an offset to the pointer
  *                     to a string (__DATE__ + 9 and __DATE__ +7) - MT
+ * 02 Feb 23         - Changed 'linux' to '__linux__' to fix a problem with
+ *                     conditional compilation that stopped keypress events
+ *                     from being processed - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Add verbose option.
@@ -321,7 +324,7 @@ int main(int argc, char *argv[])
    obutton *h_button[BUTTONS]; /* Array to hold pointers to buttons */
    obutton *h_pressed = NULL;
    odisplay *h_display; /* Pointer to display structure */
-#if defined(linux) || defined(__NetBSD__)
+#if defined(__linux__) || defined(__NetBSD__)
    okeyboard *h_keyboard;
 #endif
    oprocessor *h_processor;
@@ -599,7 +602,7 @@ int main(int argc, char *argv[])
       DISPLAY_LEFT, DISPLAY_TOP, DISPLAY_WIDTH, DISPLAY_HEIGHT, DIGIT_COLOUR, DIGIT_BACKGROUND,
       DISPLAY_BACKGROUND, BEZEL_COLOUR); /* Create display */
 
-#if defined(linux) || defined(__NetBSD__)
+#if defined(__linux__) || defined(__NetBSD__)
    h_keyboard = h_keyboard_create(x_display); /* Only works with Linux */
 #endif
 
@@ -627,7 +630,7 @@ int main(int argc, char *argv[])
 
 #if defined(SWITCHES)
    if (h_switch[0] != NULL) h_processor->enabled = h_switch[0]->state; /* Allow switches to be undefined if not used */
-#if defined(HP10) || defined(HP19c) || defined(HP97)
+#if defined(HP10)
    if (h_switch[1] != NULL) h_processor->print = h_switch[1]->state;
 #else
    if (h_switch[1] != NULL) h_processor->mode = h_switch[1]->state;
@@ -675,7 +678,7 @@ int main(int argc, char *argv[])
                h_processor->keypressed = False; /* Don't clear the status bit here!! */
             }
             break;
-#if defined(linux) || defined(__NetBSD__)
+#if defined(__linux__) || defined(__NetBSD__)
          case KeyPress :
             h_key_pressed(h_keyboard, x_display, x_event.xkey.keycode, x_event.xkey.state); /* Attempts to translate a key code into a character */
             if (h_keyboard->key == (XK_BackSpace & 0x1f)) h_keyboard->key = XK_Escape & 0x1f; /* Map backspace to escape */
@@ -782,7 +785,7 @@ int main(int argc, char *argv[])
                   {
                      h_switch[1]->state = !(h_switch[1]->state); /* Toggle switch */
                      i_switch_draw(x_display, x_application_window, i_screen, h_switch[1]);
-#if defined(HP10) || defined(HP19c) || defined(HP97)
+#if defined(HP10)
                      h_processor->print = h_switch[1]->state;
 #else
                      h_processor->mode = h_switch[1]->state;
