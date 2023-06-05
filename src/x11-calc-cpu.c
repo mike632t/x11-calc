@@ -355,6 +355,7 @@
  *                     to mode - MT
  * 01 May 23         - Corrected default mode setting -
  * 12 Jan 23         - Tidied up some of the processor trace output - MT
+ * 06 Jun 23         - Removed unused references to HP91c and HP97 - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -425,7 +426,7 @@ static void v_fprint_flags(FILE *h_file, oprocessor *h_processor) /* Display the
    fprintf(h_file, "\tflags = 0x%04X%12c   ", i_temp, ' ');
 }
 
-#if defined(HP10) || defined(HP19) || defined(HP97)
+#if defined(HP10)
 static void v_fprint_buffer(FILE *h_file, oprocessor *h_processor) /* Display the current processor flags */
 {
    static const unsigned char c_charmap[0x40] = {
@@ -849,15 +850,15 @@ void v_processor_reset(oprocessor *h_processor) /* Reset processor */
    h_processor->keypressed = False;
    h_processor->enabled = True;
    h_processor->sleep = False;
-#if defined(HP10) || defined(WOODSTOCK) || defined(SPICE) || defined(HP67) || defined(HP97)
+#if defined(WOODSTOCK) || defined(SPICE) || defined(HP10) || defined(HP67)
    h_processor->status[5] = True; /* TO DO - Check which flags should be set by default */
 #endif
-#if defined(HP67) || defined(HP97)
+#if defined(HP67)
    for (i_count = 0; i_count < STATES; i_count++) /* Clear the processor flags */
       h_processor->crc[i_count] = False;
    h_processor->crc[READY] = -4;
 #endif
-#if defined(HP10) || defined(HP19) || defined(HP97)
+#if defined(HP10)
    h_processor->position = BUFSIZE;
    for (i_count = 0; i_count < BUFSIZE; i_count++) /* Reset the character buffer contents */
       h_processor->buffer[i_count] = 0x3f;
@@ -887,7 +888,7 @@ oprocessor *h_processor_create(int *h_rom) /* Create a new processor 'object' */
    h_processor->trace = False;
    h_processor->step = False;
    v_processor_reset(h_processor);
-#if defined(HP10) || defined(HP19) || defined(HP97)
+#if defined(HP10)
    h_processor->print = False;
 #endif
    return(h_processor);
@@ -1038,7 +1039,7 @@ void v_op_goto(oprocessor *h_processor) /* Conditional go to */
 
 void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single instruction */
 {
-#if defined(HP10) || defined(WOODSTOCK) || defined(SPICE) || defined(HP67) || defined(HP97)
+#if defined(HP10) || defined(WOODSTOCK) || defined(SPICE) || defined(HP67)
    static const int i_set_p[16] = { 14,  4,  7,  8, 11,  2, 10, 12,  1,  3, 13,  6,  0,  9,  5, 14 };
    static const int i_tst_p[16] = { 4 ,  8, 12,  2,  9,  1,  6,  3,  1, 13,  5,  0, 11, 10,  7,  4 };
 #endif
@@ -1070,7 +1071,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
       h_processor->status[5] = True; /* Low Power */
 #endif
 
-#if defined(HP67) || defined(HP97) /* Seems to use a flag rather then the status word for the switch position */
+#if defined(HP67) /* Seems to use a flag rather then the status word for the switch position */
       if (h_processor->keypressed) h_processor->status[15] = True; /* Set status bit 15 if key pressed */
       h_processor->flags[MODE] = h_processor->mode; /* Set the program mode flag based on switch position */
 #endif
@@ -1378,7 +1379,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
          break;
 #endif
 
-#if defined(HP10) || defined(WOODSTOCK) || defined(SPICE) || defined(HP67) || defined(HP97)
+#if defined(WOODSTOCK) || defined(SPICE) || defined(HP10) || defined(HP67)
       case 00: /* Type 0 - Special operations */
          switch ((i_opcode >> 2) & 03)
          {
@@ -1391,7 +1392,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                case 00000: /* nop */
                   if (h_processor->trace) fprintf(stdout, "nop");
                   break;
-#if defined(HP67) || defined(HP97)
+#if defined(HP67)
                /*
                 * 00100   Test ready
                 * 00300   Test W/PGM switch
@@ -1472,7 +1473,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   break;
                case 00120: /* keys -> a[2:1] (0 001 010 000) */
                   if (h_processor->trace) fprintf(stdout, "keys -> a\t\t");
-#if defined(HP10) || defined(HP19) || defined(HP97)
+#if defined(HP10)
                   if (h_processor->print)
                      h_processor->reg[A_REG]->nibble[1] = 0x1; /* HP10 - All = 1, Print = 2 (print with display off), Display = 4 */
                   else
@@ -1532,7 +1533,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   h_processor->sp = (h_processor->sp - 1) & (STACK_SIZE - 1); /* Update stack pointer */
                   h_processor->pc = h_processor->stack[h_processor->sp]; /* Pop program counter from the stack */
                   break;
-#if defined(HP10) || defined(HP19) || defined(HP97)
+#if defined(HP10)
                case 01120: /* pik1120 */
                   if (h_processor->trace) fprintf(stdout, "pik1120\t\t");
                   v_fprint_buffer (stdout, h_processor);
@@ -1577,7 +1578,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             case 03: /* Op-Codes matching x xxx 110 000 */
                switch (i_opcode)
                {
-#if defined(HP67) || defined(HP97)
+#if defined(HP67)
                /*
                 * 00060   Set display digits
                 * 00160   Test display digits
@@ -1650,7 +1651,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
 #else
                      int i_count;
                      if (h_processor->trace) fprintf(stdout, "clear data registers");
-#if (defined(HP67) || defined(HP97)) && defined(CONTINIOUS)
+#if (defined(HP67)) && defined(CONTINIOUS)
                      if (h_processor->crc[READY])
                         h_processor->crc[READY]++;
                      else
@@ -1673,7 +1674,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   if (h_processor->trace)
                      v_fprint_register(stdout, h_processor->mem[h_processor->addr]);
                   break;
-#if defined(HP10) || defined(HP19) || defined(HP97)
+#if defined(HP10)
                case 01660: /* pik1660 print alpha (6 bit data)*/
                   if (h_processor->trace) fprintf(stdout, "pik1660");
                   {
@@ -1920,7 +1921,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   if (h_processor->trace) fprintf(stdout, "data -> c\t\t");
                   v_reg_copy(h_processor, h_processor->reg[C_REG], h_processor->mem[h_processor->addr]);
                }
-#if defined(HP10) || defined(HP19) || defined(HP97)
+#if defined(HP10)
                else if (((i_opcode >> 6) == 0xf) && (h_processor->addr == 0xff))
                {
                   if (h_processor->trace) fprintf(stdout, "data -> c\t\t");
@@ -2799,7 +2800,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
          break;
 #endif
 
-#if defined(HP10) || defined(WOODSTOCK) || defined(SPICE) || defined(HP67) || defined(HP97)
+#if defined(WOODSTOCK) || defined(SPICE) || defined(HP10) || defined(HP67)
       case 02: /* Type 2 - Arithmetic operations */
          i_field = (i_opcode >> 2) & 7;
          switch (i_field) /* Select field
