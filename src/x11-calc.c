@@ -213,11 +213,6 @@
  *                     definitions - MT
  * 28 Dec 22         - Changed the name of printer mode status from mode to
  *                     print - MT
-<<<<<<< HEAD
- *                   - Fixed HP19C model number in conditionals - MT
- *                   - Changed the name of prgm/run mode status from select
- *                     to mode - MT
-=======
  *                   - Changed the name of prgm/run mode status from select
  *                     to mode - MT
  * 18 Jan 23         - Fixed  warnings when adding an offset to the pointer
@@ -225,7 +220,6 @@
  * 02 Feb 23         - Changed 'linux' to '__linux__' to fix a problem with
  *                     conditional compilation that stopped keypress events
  *                     from being processed - MT
->>>>>>> stable
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Add verbose option.
@@ -636,11 +630,7 @@ int main(int argc, char *argv[])
 
 #if defined(SWITCHES)
    if (h_switch[0] != NULL) h_processor->enabled = h_switch[0]->state; /* Allow switches to be undefined if not used */
-<<<<<<< HEAD
-#if defined(HP10) || defined(HP19c)
-=======
 #if defined(HP10)
->>>>>>> stable
    if (h_switch[1] != NULL) h_processor->print = h_switch[1]->state;
 #else
    if (h_switch[1] != NULL) h_processor->mode = h_switch[1]->state;
