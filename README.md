@@ -102,11 +102,11 @@ e.g:
 
     $ wget https://github.com/mike632t/x11-calc/archive/refs/heads/stable.zip
     $ unzip stable.zip
-    $ cd x11-calc-stable
+    $ cd x11&#8209calc&#8209stable
     $ make all
 
-    $ ./bin/x11-calc-29
-    x11-calc-29: Version 0.4 [Commit ID: 81c55be] 16 Oct 21 21:15:00 (Build: 0067)
+    $ ./bin/x11&#8209calc&#820929
+    x11&#8209calc&#820929: Version 0.4 [Commit ID: 81c55be] 16 Oct 21 21:15:00 (Build: 0067)
     ROM Size : 4096 words
 
 
@@ -114,7 +114,7 @@ e.g:
 
 The following keyboard shortcuts should work on Linux:
 
-'0' - '9', '+'. '-'. '*'. '/' and 'Enter' should do what you expect them to
+'0' &#8209 '9', '+'. '&#8209'. '*'. '/' and 'Enter' should do what you expect them to
 (when using numeric key pad you need to use numlock as usual).
 
 'f' and where applicable 'g' and 'h' correspond to the shift keys.
@@ -122,11 +122,11 @@ The following keyboard shortcuts should work on Linux:
 'Esc' or 'Backspace' corresponds to 'Clx', 'c' to CHS, 'e' to 'EEX', and on
 financial models 'n' and 'i' correspond to 'n' and 'i' if not shifted.
 
-On programmable models 'A' - 'E' correspond to the function keys where they
+On programmable models 'A' &#8209 'E' correspond to the function keys where they
 exist and 'Space' to 'SST' if not shifted
 
-'Ctrl-Z'  Quits,  and  'Ctrl-C' does a reset.  For models  with  continuous
-memory 'Ctrl-Z' saves the current register contents, and 'Ctrl-C'  restores
+'Ctrl&#8209Z'  Quits,  and  'Ctrl&#8209C' does a reset.  For models  with  continuous
+memory 'Ctrl&#8209Z' saves the current register contents, and 'Ctrl&#8209C'  restores
 them to the original saved state.
 
 
@@ -137,7 +137,7 @@ registers are saved in a hidden file in the users' HOME directory when  the
 program  exits  or the calculator is switched off, and restored  from  this
 hidden file when the simulator is loaded or reset using 'Ctrl&#8209;C'
 
-    ~/.x11-calc-nn.dat
+    ~/.x11&#8209calc&#8209nn.dat
 
 When  starting the simulator the name of the data file used to restore  the
 saved state can be specified on the command line allowing previously  saved
@@ -168,7 +168,7 @@ When in trace mode a jump to the same instruction produces no output.
 
 No ROM images are included for the HP10C, HP11C, HP12C, HP15C, and HP16C.
 
-The '-r <filename>' command line option provides the ability to use the ROM
+The '&#8209r <filename>' command line option provides the ability to use the ROM
 contents held in an separate file.
 
 For the HP10C, HP11C, HP12C, HP15C, and HP16C the ROM comprised of pairs of
@@ -204,8 +204,8 @@ On a Raspberry Pi the display is not updated properly if either FKMS or KMS
 graphics overlays are enabled.  The following entries in '/boot/config.txt'
 should be commented out as shown.
 
-    #dtoverlay=vc4-fkms-v3d
-    #dtoverlay=vc4-kms-v3d
+    #dtoverlay=vc4&#8209fkms&#8209v3d
+    #dtoverlay=vc4&#8209kms&#8209v3d
 
 HP 67 is unable to read or write to magnetic cards.
 
@@ -214,8 +214,8 @@ HP 37E fails self test.
 
 #### VMS Specific Issues
 
-Colour palette assumes a black and white display (if your system has 24-bit
-colour you can modify the definition of COLOUR_DEPTH in x11-calc.h to build
+Colour palette assumes a black and white display (if your system has 24&#8209bit
+colour you can modify the definition of COLOUR_DEPTH in x11&#8209calc.h to build
 the simulators with support for colour display).
 
 Not all text is visible due to the limited colour palette and the DEC fonts
@@ -240,7 +240,7 @@ are missing some characters (for example the Pi symbol).
 
 - Debian 5 (Lenny), GCC 4.2.4, alpha
 
-- VAX/VMS 5.4-3, VAXC 3.2, VAX (simh)
+- VAX/VMS 5.4&#82093, VAXC 3.2, VAX (simh)
 
 
 ### Prerequisites
@@ -251,7 +251,7 @@ The following packages are required to build and/or run the simulator.
 
 - Gentoo : gcc, make, libx11&#8209;dev, libc6&#8209;dev, font&#8209;misc&#8209;misc
 
-- Debian : gcc (or clang), make, libx11&#8209;dev, libc6&#8209;dev, xfonts&#8209;base
+- Debian : gcc (tcc or clang), make, libx11&#8209;dev, libc6&#8209;dev, xfonts&#8209;base
 
 - Ubuntu : gcc, make, libx11&#8209;dev, libc6&#8209;dev, xfonts&#8209;base
 
