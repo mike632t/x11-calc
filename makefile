@@ -29,6 +29,7 @@
 #  11 Dec 22			- Renamed models with continious memory and added hp25
 #                      hp33e, and hp38e - MT
 #  23 Dec 22			- Changed the order in which simulators are built - MT
+#  06 Jun 23         - Added HP41C - MT
 #
 
 PROGRAM	=  x11-calc
@@ -39,7 +40,7 @@ FILES		+= *.md LICENSE makefile .gitignore .gitattributes
 FILES		+= ./img/x11-calc-*.png
 MAKE		=  make
 
-all: clean hp35 hp45 hp70 hp80 hp10 hp21 hp22 hp25 hp25c hp27 hp29c hp67 hp31e hp32e hp33e hp33c hp34c hp37e hp38e hp38c hp10c hp11c hp12c hp15c hp16c
+all: clean hp35 hp45 hp70 hp80 hp10 hp21 hp22 hp25 hp25c hp27 hp29c hp67 hp31e hp32e hp33e hp33c hp34c hp37e hp38e hp38c hp41c hp10c hp11c hp12c hp15c hp16c
 
 classic: clean hp35 hp80 hp45 hp70
 
