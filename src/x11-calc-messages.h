@@ -21,6 +21,9 @@
  * 13 Jun 13   0.1   - Initial version - MT
  * 02 Feb 22         - Added formatting strings for relative jumps - MT
  * 31 Mar 22         - Modified to compile on NetBSD - MT
+ * 24 Dec 22         - Added and explicit check for '__APPLE__' in order to
+ *                     allow Mac OS  to be handled in the same way as other
+ *                     unix like systems - MT
  *
  */
 
@@ -43,7 +46,7 @@ const char * h_msg_rom;
 extern char * c_msg_usage;
 extern char * h_err_invalid_operand;
 extern char * h_err_invalid_option;
-#if defined(unix) || defined(__unix__)
+#if defined(unix) || defined(__unix__) || defined(__APPLE__)
 extern char * h_err_unrecognised_option;
 extern char * h_err_invalid_number;
 extern char * h_err_address_range;

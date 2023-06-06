@@ -337,7 +337,7 @@
  * 11 Dec 22         - Renamed models with continious memory and added HP25
  *                     HP33E, and HP38E - MT
  * 14 Dec 22         - Changed 'keys -> a' to return the state of the print
- *                     mode  switch for the HP10 and HP19C, currently  this
+ *                     mode  switch  for  printing models,  currently  this
  *                     always selects the 'manual' mode as printing has not
  *                     been implemented yet - MT
  * 20 Dec 22         - Can now print to stdout, this works well enough with
@@ -346,11 +346,16 @@
  *                     but this will be a problem with other models - MT
  * 21 Dec 22         - Created a seperate function to print the contents of
  *                     the print buffer to a file - MT
+ * 24 Dec 22         - Added and explicit check for '__APPLE__' in order to
+ *                     allow Mac OS  to be handled in the same way as other
+ *                     unix like systems - MT
  * 28 Dec 22         - Changed the name of printer mode status from mode to
  *                     print - MT
- *                   - Fixed HP19C model number in conditionals - MT
  *                   - Changed the name of prgm/run mode status from select
  *                     to mode - MT
+ * 01 May 23         - Corrected default mode setting -
+ * 12 Jan 23         - Tidied up some of the processor trace output - MT
+ * 06 Jun 23         - Removed unused references to HP91c and HP97 - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -364,8 +369,6 @@
 #define BUILD          "0158"
 #define DATE           "24 May 22"
 #define AUTHOR         "MT"
-
-#define DEBUG
 
 #include <string.h>
 #include <stdlib.h>
@@ -423,11 +426,11 @@ static void v_fprint_flags(FILE *h_file, oprocessor *h_processor) /* Display the
    fprintf(h_file, "\tflags = 0x%04X%12c   ", i_temp, ' ');
 }
 
-#if defined(HP10) || defined(hp19c) || defined(HP97)
+#if defined(HP10)
 static void v_fprint_buffer(FILE *h_file, oprocessor *h_processor) /* Display the current processor flags */
 {
    static const unsigned char c_charmap[0x40] = {
-      ' ', ' ', '=', '0', 'L', 'M', ' ', '1', 'G', ' ', '>', '2', 'O', 'H', ' ', '3',  /* ' ', ' ', '=', '0', 'L', 'M', '≠', '1', 'G', '¿', '>', '2', 'O', 'H', '≤', '3', */
+      ' ', 'Y', '=', '0', 'L', 'M', ' ', '1', 'G', ' ', '>', '2', 'O', 'H', ' ', '3',  /* ' ', ' ', '=', '0', 'L', 'M', '≠', '1', 'G', '¿', '>', '2', 'O', 'H', '≤', '3', */
       'P', ' ', 'X', '4', 'R', 'F', 'Z', '5', 'S', '?', 'x', '6', 'T', ' ', ' ', '7',  /* 'P', '√', 'X', '4', 'R', 'F', 'Z', '5', 'S', '?', 'x', '6', 'T', '→', '⇔', '7', */
       '%', ' ', ' ', '8', 'J', 'X', '>', '9', 'A', '#', 'K', '.', 'B', 'b', '/', '-',  /* '%', ' ', '¿', '8', 'J', 'X', '>', '9', 'A', '#', 'K', '.', 'B', 'b', '/', '-', */
       'C', 'c', '/', '+', 'D', 'd', ' ', '#', 'E', 'e', ' ', ' ', 'I', 'i', 'x', ' '   /* 'C', 'c', '÷', '+', 'D', 'd', '↑', '#', 'E', 'e', '↓', ' ', 'I', 'i', 'x', ' '  */
@@ -436,11 +439,13 @@ static void v_fprint_buffer(FILE *h_file, oprocessor *h_processor) /* Display th
    if (h_processor->position < BUFSIZE) /* Are there any characters in the buffer? */
    {
       int i_count;
-      /** debug(
+      debug(
          for (i_count = 0; (i_count < BUFSIZE - 1); i_count++)
             fprintf(stdout, "0x%03x, ", h_processor->buffer[i_count]);
-         fprintf(stdout, "0x%03x\n", h_processor->buffer[BUFSIZE - 1]);
-      ); **/
+         fprintf(stdout, "pointer = %-3d ",  h_processor->position);
+         fprintf(stdout, "(pointer) = 0x%03x",  h_processor->buffer[h_processor->position]);
+         fprintf(stdout, "\n");
+      );
       for (i_count = 0; (i_count < BUFSIZE); i_count++) /* Print the contents of the buffer */
          fprintf(h_file, "%c", c_charmap[h_processor->buffer[i_count]]);
       fprintf(h_file, "\n");
@@ -470,8 +475,8 @@ void v_fprint_registers(FILE *h_file, oprocessor *h_processor) /* Display curren
       fprintf(h_file, "\n");
       v_fprint_flags(h_file, h_processor);
       v_fprint_status(h_file, h_processor);
-      fprintf(h_file, "\tp = %d\t", h_processor->p);
-      fprintf(h_file, "   addr = %02d\n", h_processor->addr);
+      fprintf(h_file, "\tp = %d\t\t", h_processor->p);
+      fprintf(h_file, "  addr = %02d\n", h_processor->addr);
    }
 }
 
@@ -483,7 +488,7 @@ void v_fprint_memory(FILE *h_file, oprocessor *h_processor) /* Display current m
       if (MEMORY_SIZE > 1) { /* Bit of a fudge but... */
          for (i_count = 0; i_count < MEMORY_SIZE; i_count++)
          {
-            if (i_count % 3 == 0) fprintf(h_file, "\n\t");
+            if (i_count % 3 == 0) fprintf(h_file, "\n\t\t");
             v_fprint_register(h_file, h_processor->mem[i_count]);
          }
          fprintf(h_file, "\n");
@@ -779,7 +784,7 @@ void v_save_state(oprocessor *h_processor) /* Restore saved processor state */
    if (h_processor != NULL) /* Check processor defined */
    {
       if (s_dir == NULL) s_dir = ""; /* Use current folder if HOME not defined */
-#if defined(unix) || defined(__unix__)
+#if defined(unix) || defined(__unix__) || defined(__APPLE__)
       s_pathname = malloc((strlen(s_dir) + strlen(s_filename) + strlen(s_filetype) + 2) * sizeof(char*));
       strcpy(s_pathname, s_dir);
       strcat(s_pathname, "/.");
@@ -805,7 +810,7 @@ void v_restore_state(oprocessor *h_processor) /* Restore saved processor state *
    if (h_processor != NULL) /* Check processor defined */
    {
       if (s_dir == NULL) s_dir = ""; /* Use current folder if HOME not defined */
-#if defined(unix) || defined(__unix__)
+#if defined(unix) || defined(__unix__) || defined(__APPLE__)
       s_pathname = malloc((strlen(s_dir) + strlen(s_filename) + strlen(s_filetype) + 2) * sizeof(char*));
       strcpy(s_pathname, s_dir);
       strcat(s_pathname, "/.");
@@ -845,15 +850,15 @@ void v_processor_reset(oprocessor *h_processor) /* Reset processor */
    h_processor->keypressed = False;
    h_processor->enabled = True;
    h_processor->sleep = False;
-#if defined(HP10) || defined(WOODSTOCK) || defined(SPICE) || defined(HP67) || defined(HP97)
+#if defined(WOODSTOCK) || defined(SPICE) || defined(HP10) || defined(HP67)
    h_processor->status[5] = True; /* TO DO - Check which flags should be set by default */
 #endif
-#if defined(HP67) || defined(HP97)
+#if defined(HP67)
    for (i_count = 0; i_count < STATES; i_count++) /* Clear the processor flags */
       h_processor->crc[i_count] = False;
    h_processor->crc[READY] = -4;
 #endif
-#if defined(HP10) || defined(hp19c) || defined(HP97)
+#if defined(HP10)
    h_processor->position = BUFSIZE;
    for (i_count = 0; i_count < BUFSIZE; i_count++) /* Reset the character buffer contents */
       h_processor->buffer[i_count] = 0x3f;
@@ -883,6 +888,9 @@ oprocessor *h_processor_create(int *h_rom) /* Create a new processor 'object' */
    h_processor->trace = False;
    h_processor->step = False;
    v_processor_reset(h_processor);
+#if defined(HP10)
+   h_processor->print = False;
+#endif
    return(h_processor);
 }
 
@@ -1031,7 +1039,7 @@ void v_op_goto(oprocessor *h_processor) /* Conditional go to */
 
 void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single instruction */
 {
-#if defined(HP10) || defined(WOODSTOCK) || defined(SPICE) || defined(HP67) || defined(HP97)
+#if defined(HP10) || defined(WOODSTOCK) || defined(SPICE) || defined(HP67)
    static const int i_set_p[16] = { 14,  4,  7,  8, 11,  2, 10, 12,  1,  3, 13,  6,  0,  9,  5, 14 };
    static const int i_tst_p[16] = { 4 ,  8, 12,  2,  9,  1,  6,  3,  1, 13,  5,  0, 11, 10,  7,  4 };
 #endif
@@ -1039,6 +1047,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
 #if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c)
    static const int n_map_i[16] = {  3,  4,  5, 10,  8,  6, 11, -1,  2,  9,  7, 13,  1, 12,  0, -1 }; /* map nnnn to index */
 #endif
+
    unsigned int i_last; /* Save the current PC */
    unsigned int i_opcode;
    unsigned int i_field; /* Field modifier */
@@ -1062,7 +1071,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
       h_processor->status[5] = True; /* Low Power */
 #endif
 
-#if defined(HP67) || defined(HP97) /* Seems to use a flag rather then the status word for the switch position */
+#if defined(HP67) /* Seems to use a flag rather then the status word for the switch position */
       if (h_processor->keypressed) h_processor->status[15] = True; /* Set status bit 15 if key pressed */
       h_processor->flags[MODE] = h_processor->mode; /* Set the program mode flag based on switch position */
 #endif
@@ -1142,7 +1151,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                case 01160: /* c -> data address */
                   {
                      int i_addr;
-                     if (h_processor->trace) fprintf(stdout, "c -> data address ");
+                     if (h_processor->trace) fprintf(stdout, "c -> data address\t");
                      i_addr = h_processor->reg[C_REG]->nibble[12];
                      h_processor->addr = i_addr;
                      if (i_addr < MEMORY_SIZE)
@@ -1151,9 +1160,10 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                         h_processor->addr = MEMORY_SIZE - 1;
                      }
                   }
+                  if (h_processor->trace) fprintf(stdout, "addr = %d", h_processor->addr);
                   break;
                case 01360: /* c -> data */
-                  if (h_processor->trace) fprintf(stdout, "c -> data");
+                  if (h_processor->trace) fprintf(stdout, "c -> data\t\t");
                   h_processor->first = 0; h_processor->last = REG_SIZE - 1;
                   if (h_processor->addr < MEMORY_SIZE)
                      v_reg_copy(h_processor, h_processor->mem[h_processor->addr], h_processor->reg[C_REG]);
@@ -1162,6 +1172,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                      if (h_processor->trace) fprintf(stdout, "\n");
                      v_error(h_err_invalid_register, h_processor->addr, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
                   }
+                  if (h_processor->trace) v_fprint_register(stdout,h_processor->mem[h_processor->addr]);
                   break;
                default:
                   if (h_processor->trace) fprintf(stdout, "\n");
@@ -1174,7 +1185,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             switch ((i_opcode >> 4) & 03)
             {
             case 00: /* 1 -> s(n) */
-               if (h_processor->trace) fprintf(stdout, "1 -> s(%d)\t", i_opcode >> 6);
+               if (h_processor->trace) fprintf(stdout, "1 -> s(%d)\t\t", i_opcode >> 6);
                h_processor->status[i_opcode >> 6] = True;
                if (h_processor->trace) v_fprint_status(stdout, h_processor);
                break;
@@ -1184,7 +1195,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                v_op_goto(h_processor);
                break;
             case 02: /* 0 -> s(n) */
-               if (h_processor->trace) fprintf(stdout, "0 -> s(%d)\t", i_opcode >> 6);
+               if (h_processor->trace) fprintf(stdout, "0 -> s(%d)\t\t", i_opcode >> 6);
                h_processor->status[i_opcode >> 6] = False;
                if (h_processor->trace) v_fprint_status(stdout, h_processor);
                break;
@@ -1192,12 +1203,13 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                switch (i_opcode)
                {
                case 00064: /* clear status */
-                  if (h_processor->trace) fprintf(stdout, "clear status");
+                  if (h_processor->trace) fprintf(stdout, "clear status\t");
                   {
                      int i_count;
                      for (i_count = 0; i_count < sizeof(h_processor->status) / sizeof(*h_processor->status); i_count++)
                         h_processor->status[i_count] = False; /* Clear all bits */
                   }
+                  if (h_processor->trace) v_fprint_status(stdout, h_processor);
                   break;
                case 01064: /*delayed select */
                case 01264: /*delayed select */
@@ -1205,7 +1217,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   v_error(h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
                   break;
                default: /* delayed select rom n */
-                  if (h_processor->trace) fprintf(stdout, "delayed select rom %02o", i_opcode >> 7); /* Note - Not the same as the Woodstock CPU */
+                  if (h_processor->trace) fprintf(stdout, "delayed select rom %d", i_opcode >> 7); /* Note - Not the same as the Woodstock CPU */
                   h_processor->rom_number = i_opcode >> 7;
                   h_processor->flags[DELAYED_ROM] = True;
                }
@@ -1217,9 +1229,10 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             switch ((i_opcode >> 4) & 03)
             {
             case 01: /* Op-Codes matching xx xx 01 10 00 */ /* load constant n */
-               if (h_processor->trace) fprintf(stdout, "load constant %d", i_opcode >> 6);
+               if (h_processor->trace) fprintf(stdout, "load constant %d\t", i_opcode >> 6);
                h_processor->reg[C_REG]->nibble[h_processor->p] = i_opcode >> 6;
                v_op_dec_p(h_processor);
+               if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[C_REG]);
                break;
             case 02: /* Op-Codes matching x xx 10 10 00 */
                switch (i_opcode)
@@ -1229,7 +1242,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   h_processor->flags[DISPLAY_ENABLE] = (!h_processor->flags[DISPLAY_ENABLE]);
                   break;
                case 00250: /* m exch c */
-                  if (h_processor->trace) fprintf(stdout, "m exch c\t");
+                  if (h_processor->trace) fprintf(stdout, "m exch c\t\t");
                   h_processor->first = 0; h_processor->last = REG_SIZE - 1;
                   v_reg_exch(h_processor, h_processor->reg[M_REG], h_processor->reg[C_REG]);
                   if (h_processor->trace)
@@ -1239,7 +1252,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   }
                   break;
                case 00450: /* c -> stack */
-                  if (h_processor->trace) fprintf(stdout, "c -> stack\t");
+                  if (h_processor->trace) fprintf(stdout, "c -> stack\t\t");
                      h_processor->first = 0; h_processor->last = REG_SIZE - 1;
                      v_reg_copy(h_processor, h_processor->reg[T_REG], h_processor->reg[Z_REG]); /* T = Z */
                      v_reg_copy(h_processor, h_processor->reg[Z_REG], h_processor->reg[Y_REG]); /* T = Z */
@@ -1252,7 +1265,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                      }
                   break;
                case 00650: /* stack -> a */
-                  if (h_processor->trace) fprintf(stdout, "stack -> a");
+                  if (h_processor->trace) fprintf(stdout, "stack -> a\t\t");
                      h_processor->first = 0; h_processor->last = REG_SIZE - 1;
                      v_reg_copy(h_processor, h_processor->reg[A_REG], h_processor->reg[Y_REG]); /* T = Z */
                      v_reg_copy(h_processor, h_processor->reg[Y_REG], h_processor->reg[Z_REG]); /* T = Z */
@@ -1269,13 +1282,13 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   h_processor->flags[DISPLAY_ENABLE] = False;
                   break;
                case 01250: /* m -> c */
-                  if (h_processor->trace) fprintf(stdout, "m -> c\t");
+                  if (h_processor->trace) fprintf(stdout, "m -> c\t\t");
                   h_processor->first = 0; h_processor->last = REG_SIZE - 1;
                   v_reg_copy(h_processor, h_processor->reg[C_REG], h_processor->reg[M_REG]);
                   if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[C_REG]);
                   break;
                case 01450: /* down rotate */
-                  if (h_processor->trace) fprintf(stdout, "down rotate");
+                  if (h_processor->trace) fprintf(stdout, "down rotate\t\t");
                      h_processor->first = 0; h_processor->last = REG_SIZE - 1;
                      v_reg_exch(h_processor, h_processor->reg[T_REG], h_processor->reg[C_REG]); /* T <> C - C to T */
                      v_reg_exch(h_processor, h_processor->reg[C_REG], h_processor->reg[Y_REG]); /* C <> Y - Y to C */
@@ -1306,7 +1319,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                switch (i_opcode)
                {
                case 01360: /* c -> data */
-                  if (h_processor->trace) fprintf(stdout, "c -> data");
+                  if (h_processor->trace) fprintf(stdout, "c -> data\t\t");
                   h_processor->first = 0; h_processor->last = REG_SIZE - 1;
                   if (h_processor->addr < MEMORY_SIZE)
                      v_reg_copy(h_processor, h_processor->mem[h_processor->addr], h_processor->reg[C_REG]);
@@ -1315,11 +1328,13 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                      if (h_processor->trace) fprintf(stdout, "\n");
                      v_error(h_err_invalid_register, h_processor->addr, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
                   }
+                  if (h_processor->trace) v_fprint_register(stdout,h_processor->mem[h_processor->addr]);
                   break;
                case 01370: /* data -> c */
-                  if (h_processor->trace) fprintf(stdout, "data -> c");
+                  if (h_processor->trace) fprintf(stdout, "data -> c\t\t");
                   h_processor->first = 0; h_processor->last = REG_SIZE - 1;
                   v_reg_copy(h_processor, h_processor->reg[C_REG], h_processor->mem[h_processor->addr]);
+                  if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[C_REG]);
                   break;
                default:
                   if (h_processor->trace) fprintf(stdout, "\n");
@@ -1364,7 +1379,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
          break;
 #endif
 
-#if defined(HP10) || defined(WOODSTOCK) || defined(SPICE) || defined(HP67) || defined(HP97)
+#if defined(WOODSTOCK) || defined(SPICE) || defined(HP10) || defined(HP67)
       case 00: /* Type 0 - Special operations */
          switch ((i_opcode >> 2) & 03)
          {
@@ -1377,7 +1392,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                case 00000: /* nop */
                   if (h_processor->trace) fprintf(stdout, "nop");
                   break;
-#if defined(HP67) || defined(HP97)
+#if defined(HP67)
                /*
                 * 00100   Test ready
                 * 00300   Test W/PGM switch
@@ -1457,15 +1472,15 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   h_processor->pc += h_processor->code;
                   break;
                case 00120: /* keys -> a[2:1] (0 001 010 000) */
-                  if (h_processor->trace) fprintf(stdout, "keys -> a\t");
-#if defined(HP10) || defined(hp19c) || defined(HP97)
+                  if (h_processor->trace) fprintf(stdout, "keys -> a\t\t");
                   /* The HP10 and HP19C use this to get the state of the printer mode switch */
+#if defined(HP10)
                   if (h_processor->print)
                      h_processor->reg[A_REG]->nibble[1] = 0x1; /* HP10 - All = 1, Print = 2 (print with display off), Display = 4 */
                   else
                      h_processor->reg[A_REG]->nibble[1] = 0x4; /* HP19C/97 - Trace = 1, Normal = 2 (print with display off), Manual = 4 */
 #else
-                  h_processor->reg[A_REG]->nibble[2] = (h_processor->code >> 4);
+                  h_processor->reg[A_REG]->nibble[2] = (h_processor->code >> 4); /* Put keycode in A_REG */
                   h_processor->reg[A_REG]->nibble[1] = (h_processor->code & 0x0f);
 #endif
                   if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[A_REG]);
@@ -1505,12 +1520,12 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   }
                   break;
                case 00620: /* p - 1 -> p */
-                  if (h_processor->trace) fprintf(stdout, "p - 1 -> p\t\t");
+                  if (h_processor->trace) fprintf(stdout, "p - 1 -> p\t\t\t");
                   v_op_dec_p(h_processor);
                   if (h_processor->trace) fprintf(stdout, "p = %d", h_processor->p);
                   break;
                case 00720: /* p + 1 -> p */
-                  if (h_processor->trace) fprintf(stdout, "p + 1 -> p\t\t");
+                  if (h_processor->trace) fprintf(stdout, "p + 1 -> p\t\t\t");
                   v_op_inc_p(h_processor);
                   if (h_processor->trace) fprintf(stdout, "p = %d", h_processor->p);
                   break;
@@ -1519,19 +1534,28 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   h_processor->sp = (h_processor->sp - 1) & (STACK_SIZE - 1); /* Update stack pointer */
                   h_processor->pc = h_processor->stack[h_processor->sp]; /* Pop program counter from the stack */
                   break;
-#if defined(HP10) || defined(hp19c) || defined(HP97)
+#if defined(HP10)
                case 01120: /* pik1120 */
-                  if (h_processor->trace) fprintf(stdout, "pik1120");
+                  if (h_processor->trace) fprintf(stdout, "pik1120\t\t");
                   v_fprint_buffer (stdout, h_processor);
                   h_processor->status[3] = True; /* Set status bit 3 if printer ready (it always will be!) */
+                  if (h_processor->trace) v_fprint_status(stdout, h_processor);
+                  break;
+               case 01220: /* pik1220 */
+                  if (h_processor->trace) fprintf(stdout, "pik1220\t\t");
+                  v_fprint_buffer (stdout, h_processor);
+                  h_processor->status[3] = True; /* Clear status bit 3 if printer is out of paper */
+                  if (h_processor->trace) v_fprint_status(stdout, h_processor);
                   break;
                case 01320: /* pik1320 */
-                  if (h_processor->trace) fprintf(stdout, "pik1320");
+                  if (h_processor->trace) fprintf(stdout, "pik1320\t\t");
                   v_fprint_buffer (stdout, h_processor);
                   if (h_processor->keypressed && h_processor->code) h_processor->status[3] = True; /* Set status bit 3 if key is pressed and a key code is pending */
+                  if (h_processor->trace) v_fprint_status(stdout, h_processor);
                   break;
                case 01720: /* pik1720 print numeric (4 bit data)*/
-                  if (h_processor->trace) fprintf(stdout, "pik1720");
+                  if (h_processor->trace) fprintf(stdout, "pik1720\t\t");
+                  if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[C_REG]);
                   if (h_processor->buffer[h_processor->position] == 0x3f) h_processor->position++;
                   {
                      int i_count;
@@ -1555,7 +1579,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             case 03: /* Op-Codes matching x xxx 110 000 */
                switch (i_opcode)
                {
-#if defined(HP67) || defined(HP97)
+#if defined(HP67)
                /*
                 * 00060   Set display digits
                 * 00160   Test display digits
@@ -1599,7 +1623,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                case 01160: /* c -> data address */
                   {
                      int i_addr;
-                     if (h_processor->trace) fprintf(stdout, "c -> data address");
+                     if (h_processor->trace) fprintf(stdout, "c -> data address\t");
                      i_addr = (h_processor->reg[C_REG]->nibble[1] << 4) + h_processor->reg[C_REG]->nibble[0];
 #if defined(HP10)
                      if ((i_addr < MEMORY_SIZE) || (i_addr == 0xFF)) /* Address 0xFF tells the PIK chip to put the key code on the data bus */
@@ -1628,7 +1652,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
 #else
                      int i_count;
                      if (h_processor->trace) fprintf(stdout, "clear data registers");
-#if (defined(HP67) || defined(HP97)) && defined(CONTINIOUS)
+#if (defined(HP67)) && defined(CONTINIOUS)
                      if (h_processor->crc[READY])
                         h_processor->crc[READY]++;
                      else
@@ -1645,13 +1669,13 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   }
                   break;
                case 01360: /* c -> data */
-                  if (h_processor->trace) fprintf(stdout, "c -> data\t");
+                  if (h_processor->trace) fprintf(stdout, "c -> data\t\t");
                   h_processor->first = 0; h_processor->last = REG_SIZE - 1;
                   v_reg_copy(h_processor, h_processor->mem[h_processor->addr], h_processor->reg[C_REG]);
                   if (h_processor->trace)
                      v_fprint_register(stdout, h_processor->mem[h_processor->addr]);
                   break;
-#if defined(HP10) || defined(hp19c) || defined(HP97)
+#if defined(HP10)
                case 01660: /* pik1660 print alpha (6 bit data)*/
                   if (h_processor->trace) fprintf(stdout, "pik1660");
                   {
@@ -1694,7 +1718,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             switch ((i_opcode >> 4) & 03)
             {
             case 00: /* 1 -> s(n) */
-               if (h_processor->trace) fprintf(stdout, "1 -> s(%d)\t", i_opcode >> 6);
+               if (h_processor->trace) fprintf(stdout, "1 -> s(%d)\t\t", i_opcode >> 6);
                h_processor->status[i_opcode >> 6] = True;
                if (h_processor->trace) v_fprint_status(stdout, h_processor);
                break;
@@ -1709,7 +1733,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                v_op_goto(h_processor);
                break;
             case 03: /* delayed select rom n */
-               if (h_processor->trace) fprintf(stdout, "delayed select rom %02o", i_opcode >> 6);
+               if (h_processor->trace) fprintf(stdout, "delayed select rom %d", i_opcode >> 6);
                h_processor->rom_number = i_opcode >> 6;
                h_processor->flags[DELAYED_ROM] = True;
             }
@@ -1730,7 +1754,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   }
                   break;
                case 00110: /* clear status */
-                  if (h_processor->trace) fprintf(stdout, "clear status");
+                  if (h_processor->trace) fprintf(stdout, "clear status\t");
                   {
                      int i_count;
                      for (i_count = 0; i_count < sizeof(h_processor->status) / sizeof(*h_processor->status); i_count++)
@@ -1746,7 +1770,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                               h_processor->status[i_count] = False; /* Clear all bits except bits 1, 2, 5, 15 */
                         }
                   }
-               if (h_processor->trace)v_fprint_status(stdout, h_processor);
+               if (h_processor->trace) v_fprint_status(stdout, h_processor);
                   break;
                case 00210: /* display toggle */
                   if (h_processor->trace) fprintf(stdout, "display toggle");
@@ -1757,7 +1781,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   h_processor->flags[DISPLAY_ENABLE] = False;
                   break;
                case 00410: /* m exch c */
-                  if (h_processor->trace) fprintf(stdout, "m exch c\t");
+                  if (h_processor->trace) fprintf(stdout, "m exch c\t\t");
                   h_processor->first = 0; h_processor->last = REG_SIZE - 1;
                   v_reg_exch(h_processor, h_processor->reg[M_REG], h_processor->reg[C_REG]);
                   if (h_processor->trace)
@@ -1767,14 +1791,14 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   }
                   break;
                case 00510: /* m -> c */
-                  if (h_processor->trace) fprintf(stdout, "m -> c\t");
+                  if (h_processor->trace) fprintf(stdout, "m -> c\t\t");
                   h_processor->first = 0; h_processor->last = REG_SIZE - 1;
                   v_reg_copy(h_processor, h_processor->reg[C_REG], h_processor->reg[M_REG]);
                   if (h_processor->trace)
                      v_fprint_register(stdout,h_processor->reg[C_REG]);
                   break;
                case 00610: /* n exch c */
-                  if (h_processor->trace) fprintf(stdout, "n exch c\t");
+                  if (h_processor->trace) fprintf(stdout, "n exch c\t\t");
                   h_processor->first = 0; h_processor->last = REG_SIZE - 1;
                   v_reg_exch(h_processor, h_processor->reg[N_REG], h_processor->reg[C_REG]);
                   if (h_processor->trace)
@@ -1784,7 +1808,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   }
                   break;
                case 00710: /* n -> c */
-                  if (h_processor->trace) fprintf(stdout, "n -> c\t");
+                  if (h_processor->trace) fprintf(stdout, "n -> c\t\t");
                   h_processor->first = 0; h_processor->last = REG_SIZE - 1;
                   v_reg_copy(h_processor, h_processor->reg[C_REG], h_processor->reg[N_REG]);
                   if (h_processor->trace)
@@ -1804,7 +1828,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   }
                   break;
                case 01110: /* down rotate */
-                  if (h_processor->trace) fprintf(stdout, "down rotate");
+                  if (h_processor->trace) fprintf(stdout, "down rotate\t");
                      h_processor->first = 0; h_processor->last = REG_SIZE - 1;
                      v_reg_exch(h_processor, h_processor->reg[T_REG], h_processor->reg[C_REG]); /* T <> C - C to T */
                      v_reg_exch(h_processor, h_processor->reg[C_REG], h_processor->reg[Y_REG]); /* C <> Y - Y to C */
@@ -1818,14 +1842,14 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                      }
                   break;
                case 01210: /* y -> a */
-                  if (h_processor->trace) fprintf(stdout, "y -> a\t");
+                  if (h_processor->trace) fprintf(stdout, "y -> a\t\t");
                   h_processor->first = 0; h_processor->last = REG_SIZE - 1;
                   v_reg_copy(h_processor, h_processor->reg[A_REG], h_processor->reg[Y_REG]);
                   if (h_processor->trace)
                      v_fprint_register(stdout,h_processor->reg[A_REG]);
                   break;
                case 01310: /* c _> stack */
-                  if (h_processor->trace) fprintf(stdout, "c -> stack\t");
+                  if (h_processor->trace) fprintf(stdout, "c -> stack\t\t");
                   h_processor->first = 0; h_processor->last = REG_SIZE - 1;
                   v_reg_copy(h_processor, h_processor->reg[T_REG], h_processor->reg[Z_REG]); /* T = Z */
                   v_reg_copy(h_processor, h_processor->reg[Z_REG], h_processor->reg[Y_REG]); /* T = Z */
@@ -1844,11 +1868,11 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   break;
                case 01610: /* f -> a */
                   h_processor->reg[A_REG]->nibble[0] = h_processor->f;
-                  if (h_processor->trace) fprintf(stdout, "f -> a\t");
+                  if (h_processor->trace) fprintf(stdout, "f -> a\t\t");
                   if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[A_REG]);
                   break;
                case 01710: /* f exch a */
-                  if (h_processor->trace) fprintf(stdout, "f exch a\t");
+                  if (h_processor->trace) fprintf(stdout, "f exch a\t\t");
                   {
                      int i_temp;
                      i_temp = h_processor->reg[A_REG]->nibble[0];
@@ -1867,7 +1891,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                }
                break;
             case 01: /* load constant n */
-               if (h_processor->trace) fprintf(stdout, "load constant %d", i_opcode >> 6);
+               if (h_processor->trace) fprintf(stdout, "load constant %d\t", i_opcode >> 6);
                h_processor->reg[C_REG]->nibble[h_processor->p] = i_opcode >> 6;
                v_op_dec_p(h_processor);
                if (h_processor->trace)
@@ -1895,19 +1919,19 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                h_processor->first = 0; h_processor->last = REG_SIZE - 1;
                if ((i_opcode >> 6) == 0)
                {
-                  if (h_processor->trace) fprintf(stdout, "data -> c\t");
+                  if (h_processor->trace) fprintf(stdout, "data -> c\t\t");
                   v_reg_copy(h_processor, h_processor->reg[C_REG], h_processor->mem[h_processor->addr]);
                }
 #if defined(HP10)
                else if (((i_opcode >> 6) == 0xf) && (h_processor->addr == 0xff))
                {
-                  if (h_processor->trace) fprintf(stdout, "data -> c\t");
+                  if (h_processor->trace) fprintf(stdout, "data -> c\t\t");
                   h_processor->reg[C_REG]->nibble[2] = (h_processor->code >> 4);
                   h_processor->reg[C_REG]->nibble[1] = (h_processor->code & 0x0f);
                   h_processor->reg[C_REG]->nibble[0] = 0;
                   h_processor->code = 0; /* Clear the key code (so it isn't read twice if the key is held down) */
                }
-#else
+#endif
                else
                {
                   h_processor->addr &= 0xfff0;
@@ -1921,7 +1945,6 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                      v_error(h_err_invalid_address, h_processor->addr, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
                   }
                }
-#endif
                if (h_processor->trace)
                   v_fprint_register(stdout,h_processor->reg[C_REG]);
                break;
@@ -1935,7 +1958,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             switch ((i_opcode >> 4) & 03)
             {
             case 00: /* 0 -> s(n) */
-               if (h_processor->trace) fprintf(stdout, "0 -> s(%d)\t", i_opcode >> 6);
+               if (h_processor->trace) fprintf(stdout, "0 -> s(%d)\t\t", i_opcode >> 6);
                h_processor->status[i_opcode >> 6] = False;
                if (h_processor->trace) v_fprint_status(stdout, h_processor);
                break;
@@ -1964,7 +1987,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                 * 00774 12 -> p  01274 13 -> p  N/A   14 -> p
                 * N/A   15 -> p
                 * */
-               if (h_processor->trace) fprintf(stdout, "%d -> p\t\t", i_set_p[i_opcode >> 6]);
+               if (h_processor->trace) fprintf(stdout, "%d -> p\t\t\t", i_set_p[i_opcode >> 6]);
                h_processor->p = i_set_p[i_opcode >> 6];
                if (h_processor->trace) fprintf(stdout, "p = %d", h_processor->p);
                break;
@@ -1998,13 +2021,13 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             }
             if ((i_opcode >> 6) < 15)
             {
-               if (h_processor->trace) fprintf(stdout, "st = 0 %-2d\t", n_map_i[i_opcode >> 6]);
+               if (h_processor->trace) fprintf(stdout, "st = 0 %-2d\t\t", n_map_i[i_opcode >> 6]);
                h_processor->status[n_map_i[i_opcode >> 6]] = False;
             }
             else
             {
                int i_count;
-               if (h_processor->trace) fprintf(stdout, "clrst\t");
+               if (h_processor->trace) fprintf(stdout, "clrst\t\t");
                for (i_count = 7; i_count >= 0; i_count--) /* Note only clears bits 7-0 of the status register */
                   h_processor->status[n_map_i[i_opcode >> 6]] = False;
             }
@@ -2018,7 +2041,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             }
             if ((i_opcode >> 6) < 15)
             {
-               if (h_processor->trace) fprintf(stdout, "st = 1 %-2d\t", n_map_i[i_opcode >> 6]);
+               if (h_processor->trace) fprintf(stdout, "st = 1 %-2d\t\t", n_map_i[i_opcode >> 6]);
                h_processor->status[n_map_i[i_opcode >> 6]] = True;
                if (h_processor->trace) v_fprint_status(stdout, h_processor);
             }
@@ -2046,7 +2069,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             }
             break;
          case 0x04: /* nn -> c[pt] - Load constant n (nn nn01 0000) */
-            if (h_processor->trace) fprintf(stdout, "lc %1x\t", i_opcode >> 6);
+            if (h_processor->trace) fprintf(stdout, "lc %1x\t\t", i_opcode >> 6);
             h_processor->reg[C_REG]->nibble[*h_active_pointer(h_processor)] = i_opcode >> 6;
             v_op_dec_pt(h_processor);
             if (h_processor->trace)
@@ -2086,7 +2109,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   fprintf(stdout, "g = 0x%02x", h_processor->g[0] | (h_processor->g[1] << 4));
                break;
             case 0x02: /* g -> c[pt + 1:pt] - Load c from g (00 0101 1000) */
-               if (h_processor->trace) fprintf(stdout, "c = g\t");
+               if (h_processor->trace) fprintf(stdout, "c = g\t\t");
                h_processor->reg[C_REG]->nibble[*h_active_pointer(h_processor)] = h_processor->g[0]; /* g[0] -> c[pt] */
                if (*h_active_pointer(h_processor) < (REG_SIZE - 1))  /* Check that pt + 1 is valid */
                   h_processor->reg[C_REG]->nibble[*h_active_pointer(h_processor) + 1] = h_processor->g[1]; /* g[1] -> c[pt + 1] */
@@ -2110,26 +2133,26 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                if (h_processor->trace) fprintf(stdout, "g = 0x%02x", h_processor->g[0] | (h_processor->g[1] << 4));
                break;
             case 0x05: /* c -> m - Copy C register to M register (01 0101 1000) */
-               if (h_processor->trace) fprintf(stdout, "m = c\t");
+               if (h_processor->trace) fprintf(stdout, "m = c\t\t");
                h_processor->first = 0; h_processor->last = REG_SIZE - 1;
                v_reg_copy(h_processor, h_processor->reg[M_REG], h_processor->reg[C_REG]);
                if (h_processor->trace) v_fprint_register(stdout, h_processor->reg[M_REG]);
                break;
             case 0x06: /* m -> c - Copy M register to C register (01 1001 1000) */
-               if (h_processor->trace) fprintf(stdout, "c = m\t");
+               if (h_processor->trace) fprintf(stdout, "c = m\t\t");
                h_processor->first = 0; h_processor->last = REG_SIZE - 1;
                v_reg_copy(h_processor, h_processor->reg[C_REG], h_processor->reg[M_REG]);
                if (h_processor->trace) v_fprint_register(stdout, h_processor->reg[C_REG]);
                break;
             case 0x07: /* c -> m, m -> c - Exchange C register and M register (01 1101 1000) */
-               if (h_processor->trace) fprintf(stdout, "cmex\t");
+               if (h_processor->trace) fprintf(stdout, "cmex\t\t");
                h_processor->first = 0; h_processor->last = REG_SIZE - 1;
                v_reg_exch(h_processor, h_processor->reg[M_REG], h_processor->reg[C_REG]);
                if (h_processor->trace) v_fprint_register(stdout, h_processor->reg[C_REG]);
                if (h_processor->trace) v_fprint_register(stdout, h_processor->reg[M_REG]);
                break;
             case 0x0e: /* st[0:7] -> c[0:1] - Load c register from the status byte (11 1001 1000) */
-               if (h_processor->trace) fprintf(stdout, "c = st\t");
+               if (h_processor->trace) fprintf(stdout, "c = st\t\t");
                {
                   int i_status, i_count;
                   i_status = 0;
@@ -2144,7 +2167,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                if (h_processor->trace) v_fprint_register(stdout, h_processor->reg[C_REG]);
                break;
             case 0x0f: /* c[0:1] -> st[0:7], st[0:7] -> c[0:1] - Exchange c register and the status byte (11 1101 1000) */
-               if (h_processor->trace) fprintf(stdout, "cstex\t");
+               if (h_processor->trace) fprintf(stdout, "cstex\t\t");
                {
                   int i_temp, i_status, i_count;
                   i_status = 0; /* Save st[0:7] */
@@ -2210,23 +2233,23 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                h_processor->pc = 0;
                break;
             case 0x02: /* pt = p - Select pointer p (00 1010 0000) */
-               if (h_processor->trace) fprintf(stdout, "sel p\t");
+               if (h_processor->trace) fprintf(stdout, "sel p\t\t");
                h_processor->ptr = False;
                break;
             case 0x03: /* pt = q - Select pointer q (00 1110 0000) */
-               if (h_processor->trace) fprintf(stdout, "sel q\t");
+               if (h_processor->trace) fprintf(stdout, "sel q\t\t");
                h_processor->ptr = True;
                break;
             case 0x04: /* ? p == q - Test p equal to q  (01 0010 0000) */
-               if (h_processor->trace) fprintf(stdout, "? p = q\t");
+               if (h_processor->trace) fprintf(stdout, "? p = q\t\t");
                if (h_processor->p == h_processor->q) h_processor->flags[CARRY] = True;
                break;
             case 0x05: /* ? low level detect - Test battery state (01 0110 0000) */
-               if (h_processor->trace) fprintf(stdout, "? lld\t");
+               if (h_processor->trace) fprintf(stdout, "? lld\t\t");
                /* Do nothing - battery can never go flat */
                break;
             case 0x06: /* 0 -> a, 0 -> b, 0 -> c - Clear registers a, b and c (01 1010 0000) */
-               if (h_processor->trace) fprintf(stdout, "clrabc\t");
+               if (h_processor->trace) fprintf(stdout, "clrabc\t\t");
                h_processor->first = 0; h_processor->last = REG_SIZE - 1;
                v_reg_copy(h_processor, h_processor->reg[A_REG], NULL);
                v_reg_copy(h_processor, h_processor->reg[B_REG], NULL);
@@ -2239,14 +2262,14 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                }
                break;
             case 0x07: /* c[6:3] -> pc - Branch using C register (01 1110 0000) */
-               if (h_processor->trace) fprintf(stdout, "goto c\t");
+               if (h_processor->trace) fprintf(stdout, "goto c\t\t");
                h_processor->pc = (((h_processor->reg[C_REG]->nibble[6])<< 12) |
                   (h_processor->reg[C_REG]->nibble[5] << 8) |
                   (h_processor->reg[C_REG]->nibble[4] << 4) |
                   (h_processor->reg[C_REG]->nibble[3]));
                break;
             case 0x08: /* keys -> c[4:3] - Load c from keys (10 0010 0000) */
-               if (h_processor->trace) fprintf(stdout, "c = keys\t");
+               if (h_processor->trace) fprintf(stdout, "c = keys\t\t");
                h_processor->reg[C_REG]->nibble[3] = h_processor->code & 0xf;
                h_processor->reg[C_REG]->nibble[4] = (h_processor->code >> 4) & 0xf;
                if (h_processor->trace) v_fprint_register(stdout, h_processor->reg[C_REG]);
@@ -2313,19 +2336,19 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             {
 #if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c)
             case 0x00: /* display blink- Display blink (00 0011 0000) */
-               if (h_processor->trace) fprintf(stdout, "blink\t");
+               if (h_processor->trace) fprintf(stdout, "blink\t\t");
                h_processor->flags[DISPLAY_ENABLE] = True;
                break;
 #endif
             case 0x01: /* c -> n - Load n from c (00 0111 0000) */
-               if (h_processor->trace) fprintf(stdout, "n = c\t");
+               if (h_processor->trace) fprintf(stdout, "n = c\t\t");
                h_processor->first = 0;
                h_processor->last = REG_SIZE - 1;
                v_reg_copy(h_processor, h_processor->reg[N_REG], h_processor->reg[C_REG]);
                if (h_processor->trace) v_fprint_register(stdout, h_processor->reg[N_REG]);
                break;
             case 0x02: /* n -> c - Load C from N (00 1011 0000) */
-               if (h_processor->trace) fprintf(stdout, "c = n\t");
+               if (h_processor->trace) fprintf(stdout, "c = n\t\t");
                h_processor->first = 0;
                h_processor->last = REG_SIZE - 1;
                v_reg_copy(h_processor, h_processor->reg[C_REG], h_processor->reg[N_REG]);
@@ -2334,7 +2357,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             case 0x03: /* c -> n, n-> c - Exchange c and n (00 1111 0000) */
                h_processor->first = 0;
                h_processor->last = REG_SIZE - 1;
-               if (h_processor->trace) fprintf(stdout, "cnex\t");
+               if (h_processor->trace) fprintf(stdout, "cnex\t\t");
                v_reg_exch(h_processor, h_processor->reg[N_REG], h_processor->reg[C_REG]);
                if (h_processor->trace)
                {
@@ -2355,19 +2378,19 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                      fprintf(stdout, h_msg_opcode, (h_processor->pc >> 12), (h_processor->pc & 0x0fff), h_processor->rom[h_processor->pc]);
                      fprintf(stdout,"  ");
                      fprintf(stdout, h_msg_address, i_next);
-                     fprintf(stdout, "\t");
+                     fprintf(stdout, "\t\t");
                      v_fprint_register(stdout, h_processor->reg[C_REG]);
                   }
                   v_op_inc_pc(h_processor); /* Increment program counter */
                }
                break;
             case 0x05: /* stack[2] -> stack[3], stack[1] -> stack[2], stack[0] -> stack[1], c -> stack[0] - Push c[6:3] onto the stack (01 0111 0000) */
-               if (h_processor->trace) fprintf(stdout, "stk = c\t");
+               if (h_processor->trace) fprintf(stdout, "stk = c\t\t");
                h_processor->stack[h_processor->sp] = (h_processor->reg[C_REG]->nibble[6] << 12) | (h_processor->reg[C_REG]->nibble[5] << 8) | (h_processor->reg[C_REG]->nibble[4] << 4) | (h_processor->reg[C_REG]->nibble[3]);
                h_processor->sp = (h_processor->sp + 1) & (STACK_SIZE - 1); /* Update stack pointer */
                break;
             case 0x06: /* stack[2] -> stack[3], stack[1] -> stack[2], stack[0] -> stack[1], c -> stack[0] - Pop c[6:3] from the stack (01 0111 0000) */
-               if (h_processor->trace) fprintf(stdout, "c = stk\t");
+               if (h_processor->trace) fprintf(stdout, "c = stk\t\t");
                h_processor->sp = (h_processor->sp - 1) & (STACK_SIZE - 1); /* Update stack pointer */
                h_processor->reg[C_REG]->nibble[3] = h_processor->stack[h_processor->sp] & 0xf;
                h_processor->reg[C_REG]->nibble[4] = (h_processor->stack[h_processor->sp] >> 4) & 0xf;
@@ -2382,7 +2405,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   if (h_processor->trace) fprintf(stdout, "addr = %d", h_processor->addr);
                break;
             case 0x0b: /* data = c - Load register from c (10 1111 0000) */
-               if (h_processor->trace) fprintf(stdout, "data = c\t");
+               if (h_processor->trace) fprintf(stdout, "data = c\t\t");
                if ((i_translate_addr(h_processor->addr) < MEMORY_SIZE) && (h_processor->addr != 0x08) && (h_processor->addr != 0x18))
                {
                   h_processor->first = 0; h_processor->last = REG_SIZE - 1;
@@ -2391,7 +2414,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                }
                break;
             case 0x0c: /* c[6:3] -> addr, ram[addr] -> c[2:0] - Exchange c and memory (11 0011 0000) */
-               if (h_processor->trace) fprintf(stdout, "cxisa\t");
+               if (h_processor->trace) fprintf(stdout, "cxisa\t\t");
                {
                   int i_addr;
                   i_addr = (((h_processor->reg[C_REG]->nibble[6])<< 12) | (h_processor->reg[C_REG]->nibble[5] << 8) |
@@ -2411,7 +2434,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                if (h_processor->trace) v_fprint_register(stdout, h_processor->reg[C_REG]);
                break;
             case 0x0d: /* c | a -> c - Load c with c or a (11 0111 0000) */
-               if (h_processor->trace) fprintf(stdout, "c = c or a\t");
+               if (h_processor->trace) fprintf(stdout, "c = c or a\t\t");
                h_processor->first = 0;
                h_processor->last = REG_SIZE - 1;
                v_reg_or(h_processor, h_processor->reg[C_REG], h_processor->reg[C_REG], h_processor->reg[A_REG]);
@@ -2438,7 +2461,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                h_processor->addr = (h_processor->addr & 0xff0) | (i_opcode >> 6);
             }
             else
-               if (h_processor->trace) fprintf(stdout, "c = data\t");
+               if (h_processor->trace) fprintf(stdout, "c = data\t\t");
             h_processor->first = 0;
             h_processor->last = REG_SIZE - 1;
             if ((i_translate_addr(h_processor->addr) < MEMORY_SIZE) && (h_processor->addr != 0x08) && (h_processor->addr != 0x18)) /* Treat registers 8 and 18 as if they dont exist */
@@ -2452,7 +2475,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             }
             break;
          case 0x0f: /* Rotate c register right (dddd 1111 00) */
-            if (h_processor->trace) fprintf(stdout, "rcr %-3d\t", n_map_i[i_opcode >> 6]);
+            if (h_processor->trace) fprintf(stdout, "rcr %-3d\t\t", n_map_i[i_opcode >> 6]);
             {
                int i_count; ;
                for (i_count = n_map_i[i_opcode >> 6]; i_count > 0; i_count--)
@@ -2488,16 +2511,16 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                switch (i_next & 0x3)
                {
                case 0x0:
-                  fprintf(stdout, "? nc gsb\t");
+                  fprintf(stdout, "? nc gsb\t\t");
                   break;
                case 0x1:
-                  fprintf(stdout, "? c gsb\t");
+                  fprintf(stdout, "? c gsb\t\t");
                   break;
                case 0x2:
-                  fprintf(stdout, "? nc goto\t");
+                  fprintf(stdout, "? nc goto\t\t");
                   break;
                case 0x3:
-                  fprintf(stdout, "? c goto\t");
+                  fprintf(stdout, "? c goto\t\t");
                   break;
                }
                fprintf(stdout, "\n");
@@ -2600,7 +2623,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             v_op_goto(h_processor);
             break;
          case 001: /* 0 -> b[f] */
-            if (h_processor->trace)fprintf(stdout, "0 -> b[%s]\t", s_field);
+            if (h_processor->trace)fprintf(stdout, "0 -> b[%s]\t\t", s_field);
             v_reg_copy(h_processor, h_processor->reg[B_REG], NULL);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[B_REG]);
             break;
@@ -2616,7 +2639,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             v_op_goto(h_processor);
             break;
          case 004: /* b -> c[f] */
-            if (h_processor->trace) fprintf(stdout, "b -> c[%s]\t", s_field);
+            if (h_processor->trace) fprintf(stdout, "b -> c[%s]\t\t", s_field);
             v_reg_copy(h_processor, h_processor->reg[C_REG], h_processor->reg[B_REG]);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[B_REG]);
             break;
@@ -2626,39 +2649,39 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[C_REG]);
             break;
          case 006: /* 0 -> c[f] */
-            if (h_processor->trace) fprintf(stdout, "0 -> c[%s]\t", s_field);
+            if (h_processor->trace) fprintf(stdout, "0 -> c[%s]\t\t", s_field);
             v_reg_copy(h_processor, h_processor->reg[C_REG], NULL);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[C_REG]);
             break;
          case 007: /* 0 - c - 1 -> c[f] */
-            if (h_processor->trace) fprintf(stdout, "0 - c - 1 -> c[%s]", s_field);
+            if (h_processor->trace) fprintf(stdout, "0 - c - 1 -> c[%s]\t\t", s_field);
             h_processor->flags[CARRY] = True; /* Set carry */
             v_reg_sub(h_processor, h_processor->reg[C_REG], NULL, h_processor->reg[C_REG]);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[C_REG]);
             break;
          case 010: /* shift left a[f] */
-            if (h_processor->trace) fprintf(stdout, "shift left a[%s]", s_field);
-            fflush(stdout);
+            if (h_processor->trace) fprintf(stdout, "shift left a[%s]\t\t", s_field);
             v_reg_shl(h_processor, h_processor->reg[A_REG]);
+            if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[B_REG]);
             break;
          case 011: /* a -> b[f] */
-            if (h_processor->trace) fprintf(stdout, "a -> b[%s]\t", s_field);
+            if (h_processor->trace) fprintf(stdout, "a -> b[%s]\t\t", s_field);
             v_reg_copy(h_processor, h_processor->reg[B_REG], h_processor->reg[A_REG]);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[B_REG]);
             break;
          case 012: /* a - c -> c[f] */
-            if (h_processor->trace) fprintf(stdout, "a - c -> c[%s]", s_field);
+            if (h_processor->trace) fprintf(stdout, "a - c -> c[%s]\t\t", s_field);
             v_reg_sub(h_processor, h_processor->reg[C_REG], h_processor->reg[A_REG], h_processor->reg[C_REG]);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[C_REG]);
             break;
          case 013: /* c - 1 -> c[f] */
-            if (h_processor->trace) fprintf(stdout, "c - 1 -> c[%s]", s_field);
+            if (h_processor->trace) fprintf(stdout, "c - 1 -> c[%s]\t\t", s_field);
             h_processor->flags[CARRY] = True; /* Set carry */
             v_reg_sub(h_processor, h_processor->reg[C_REG], h_processor->reg[C_REG], NULL);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[C_REG]);
             break;
          case 014: /* c -> a[f] */
-            if (h_processor->trace) fprintf(stdout, "c -> a[%s]\t", s_field);
+            if (h_processor->trace) fprintf(stdout, "c -> a[%s]\t\t", s_field);
             v_reg_copy(h_processor, h_processor->reg[A_REG], h_processor->reg[C_REG]);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[A_REG]);
             break;
@@ -2668,12 +2691,12 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             v_op_goto(h_processor);
             break;
          case 016: /* a + c -> c[f] */
-            if (h_processor->trace) fprintf(stdout, "a + c -> c[%s]", s_field);
+            if (h_processor->trace) fprintf(stdout, "a + c -> c[%s]\t\t", s_field);
             v_reg_add(h_processor, h_processor->reg[C_REG], h_processor->reg[C_REG], h_processor->reg[A_REG]);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[C_REG]);
             break;
          case 017: /* c + 1 -> c[f] */
-            if (h_processor->trace) fprintf(stdout, "c + 1 -> c[%s]", s_field);
+            if (h_processor->trace) fprintf(stdout, "c + 1 -> c[%s]\t\t", s_field);
             v_reg_inc(h_processor, h_processor->reg[C_REG]);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[C_REG]);
             break;
@@ -2684,7 +2707,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             v_op_goto(h_processor);
             break;
          case 021: /* b exchange c[f] */
-            if (h_processor->trace) fprintf(stdout, "b exch c[%s]\t", s_field);
+            if (h_processor->trace) fprintf(stdout, "b exch c[%s]\t\t", s_field);
             v_reg_exch(h_processor, h_processor->reg[B_REG], h_processor->reg[C_REG]);
             if (h_processor->trace)
             {
@@ -2693,7 +2716,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             }
             break;
          case 022: /* shift right c[f] */
-            if (h_processor->trace) fprintf(stdout, "shift right c[%s]", s_field);
+            if (h_processor->trace) fprintf(stdout, "shift right c[%s]\t", s_field);
             v_reg_shr(h_processor, h_processor->reg[C_REG]);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[C_REG]);
             break;
@@ -2704,26 +2727,26 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             break;
          case 024: /* shift right b[f] */
             v_reg_shr(h_processor, h_processor->reg[B_REG]);
-            if (h_processor->trace) fprintf(stdout, "shift right b[%s]", s_field);
+            if (h_processor->trace) fprintf(stdout, "shift right b[%s]\t", s_field);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[B_REG]);
             break;
          case 025: /* c + c -> c[f] */
-            if (h_processor->trace) fprintf(stdout, "c + c -> c[%s]", s_field);
+            if (h_processor->trace) fprintf(stdout, "c + c -> c[%s]\t", s_field);
             v_reg_add(h_processor, h_processor->reg[C_REG], h_processor->reg[C_REG], h_processor->reg[C_REG]);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[C_REG]);
             break;
          case 026: /* shift right a[f] */
-            if (h_processor->trace) fprintf(stdout, "shift right a[%s]", s_field);
+            if (h_processor->trace) fprintf(stdout, "shift right a[%s]\t", s_field);
             v_reg_shr(h_processor, h_processor->reg[A_REG]);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[A_REG]);
             break;
          case 027: /* 0 -> a[f] */
-            if (h_processor->trace) fprintf(stdout, "0 -> a[%s]\t", s_field);
+            if (h_processor->trace) fprintf(stdout, "0 -> a[%s]\t\t", s_field);
             v_reg_copy(h_processor, h_processor->reg[A_REG], NULL);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[A_REG]);
             break;
          case 030: /* a - b -> a[f] */
-            if (h_processor->trace) fprintf(stdout, "a - b -> a[%s]", s_field);
+            if (h_processor->trace) fprintf(stdout, "a - b -> a[%s]\t", s_field);
             v_reg_sub(h_processor, h_processor->reg[A_REG], h_processor->reg[A_REG], h_processor->reg[B_REG]);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[A_REG]);
             break;
@@ -2737,23 +2760,23 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             }
             break;
          case 032: /* a - c -> a[f] */
-            if (h_processor->trace) fprintf(stdout, "a - c -> a[%s]", s_field);
+            if (h_processor->trace) fprintf(stdout, "a - c -> a[%s]\t", s_field);
             v_reg_sub(h_processor, h_processor->reg[A_REG], h_processor->reg[A_REG], h_processor->reg[C_REG]);
-            if (h_processor->trace)v_fprint_register(stdout,h_processor->reg[A_REG]);
+            if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[A_REG]);
             break;
          case 033: /* a - 1 -> a[f] */
-            if (h_processor->trace) fprintf(stdout, "a - 1 -> a[%s]", s_field);
+            if (h_processor->trace) fprintf(stdout, "a - 1 -> a[%s]\t", s_field);
             h_processor->flags[CARRY] = True; /* Set carry */
             v_reg_sub(h_processor, h_processor->reg[A_REG], h_processor->reg[A_REG], NULL);
-            if (h_processor->trace)v_fprint_register(stdout,h_processor->reg[A_REG]);
+            if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[A_REG]);
             break;
          case 034: /* a + b -> a[f] */
-            if (h_processor->trace) fprintf(stdout, "a + b -> a[%s]", s_field);
+            if (h_processor->trace) fprintf(stdout, "a + b -> a[%s]\t", s_field);
             v_reg_add(h_processor, h_processor->reg[A_REG], h_processor->reg[A_REG], h_processor->reg[B_REG]);
-            if (h_processor->trace)v_fprint_register(stdout,h_processor->reg[A_REG]);
+            if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[A_REG]);
             break;
          case 035: /* a exch c[f] */
-            if (h_processor->trace) fprintf(stdout, "a exch c[%s]\t", s_field);
+            if (h_processor->trace) fprintf(stdout, "a exch c[%s]\t\t", s_field);
             v_reg_exch(h_processor, h_processor->reg[A_REG], h_processor->reg[C_REG]);
             if (h_processor->trace)
             {
@@ -2764,12 +2787,12 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
          case 036: /* a + c -> a[a + c -> a[f] */
             if (h_processor->trace) fprintf(stdout, "a + c -> a[%s]", s_field);
             v_reg_add(h_processor, h_processor->reg[A_REG], h_processor->reg[A_REG], h_processor->reg[C_REG]);
-            if (h_processor->trace)v_fprint_register(stdout,h_processor->reg[A_REG]);
+            if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[A_REG]);
             break;
          case 037: /* a + 1 -> a[f] */
             if (h_processor->trace) fprintf(stdout, "a + 1 -> a[%s]", s_field);
             v_reg_inc(h_processor, h_processor->reg[A_REG]);
-            if (h_processor->trace)v_fprint_register(stdout,h_processor->reg[A_REG]);
+            if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[A_REG]);
             break;
          default:
             if (h_processor->trace) fprintf(stdout, "\n");
@@ -2778,7 +2801,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
          break;
 #endif
 
-#if defined(HP10) || defined(WOODSTOCK) || defined(SPICE) || defined(HP67) || defined(HP97)
+#if defined(WOODSTOCK) || defined(SPICE) || defined(HP10) || defined(HP67)
       case 02: /* Type 2 - Arithmetic operations */
          i_field = (i_opcode >> 2) & 7;
          switch (i_field) /* Select field
@@ -2838,17 +2861,17 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
          switch (i_opcode >> 5)
          {
          case 000: /* 0 -> a[f] */
-            if (h_processor->trace) fprintf(stdout, "0 -> a[%s]\t", s_field);
+            if (h_processor->trace) fprintf(stdout, "0 -> a[%s]\t\t", s_field);
             v_reg_copy(h_processor, h_processor->reg[A_REG], NULL);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[A_REG]);
             break;
          case 001: /* 0 -> b[f] */
-            if (h_processor->trace)fprintf(stdout, "0 -> b[%s]\t", s_field);
+            if (h_processor->trace)fprintf(stdout, "0 -> b[%s]\t\t", s_field);
             v_reg_copy(h_processor, h_processor->reg[B_REG], NULL);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[B_REG]);
             break;
          case 002: /* a exch b[f] */
-            if (h_processor->trace) fprintf(stdout, "a exch b[%s]", s_field);
+            if (h_processor->trace) fprintf(stdout, "a exch b[%s]\t", s_field);
             v_reg_exch(h_processor, h_processor->reg[A_REG], h_processor->reg[B_REG]);
             if (h_processor->trace)
             {
@@ -2857,12 +2880,12 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             }
             break;
          case 003: /* a -> b[f] */
-            if (h_processor->trace) fprintf(stdout, "a -> b[%s]\t", s_field);
+            if (h_processor->trace) fprintf(stdout, "a -> b[%s]\t\t", s_field);
             v_reg_copy(h_processor, h_processor->reg[B_REG], h_processor->reg[A_REG]);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[B_REG]);
             break;
          case 004: /* a exch c[f] */
-            if (h_processor->trace) fprintf(stdout, "a exch c[%s]", s_field);
+            if (h_processor->trace) fprintf(stdout, "a exch c[%s]\t", s_field);
             v_reg_exch(h_processor, h_processor->reg[A_REG], h_processor->reg[C_REG]);
             if (h_processor->trace)
             {
@@ -2871,17 +2894,17 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             }
             break;
          case 005: /* c -> a[f] */
-            if (h_processor->trace) fprintf(stdout, "c -> a[%s]\t", s_field);
+            if (h_processor->trace) fprintf(stdout, "c -> a[%s]\t\t", s_field);
             v_reg_copy(h_processor, h_processor->reg[A_REG], h_processor->reg[C_REG]);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[A_REG]);
             break;
          case 006: /* b -> c[f] */
-            if (h_processor->trace) fprintf(stdout, "b -> c[%s]", s_field);
+            if (h_processor->trace) fprintf(stdout, "b -> c[%s]\t\t", s_field);
             v_reg_copy(h_processor, h_processor->reg[C_REG], h_processor->reg[B_REG]);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[C_REG]);
             break;
          case 007: /* b exchange c[f] */
-            if (h_processor->trace) fprintf(stdout, "b exch c[%s]", s_field);
+            if (h_processor->trace) fprintf(stdout, "b exch c[%s]\t", s_field);
             v_reg_exch(h_processor, h_processor->reg[B_REG], h_processor->reg[C_REG]);
             if (h_processor->trace)
             {
@@ -2890,78 +2913,78 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             }
             break;
          case 010: /* 0 -> c[f] */
-            if (h_processor->trace) fprintf(stdout, "0 -> c[%s]\t", s_field);
+            if (h_processor->trace) fprintf(stdout, "0 -> c[%s]\t\t", s_field);
             v_reg_copy(h_processor, h_processor->reg[C_REG], NULL);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[C_REG]);
             break;
          case 011: /* a + b -> a[f] */
-            if (h_processor->trace) fprintf(stdout, "a + b -> a[%s]", s_field);
+            if (h_processor->trace) fprintf(stdout, "a + b -> a[%s]\t", s_field);
             v_reg_add(h_processor, h_processor->reg[A_REG], h_processor->reg[A_REG], h_processor->reg[B_REG]);
-            if (h_processor->trace)v_fprint_register(stdout,h_processor->reg[A_REG]);
+            if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[A_REG]);
             break;
          case 012: /* a + c -> a[f] */
-            if (h_processor->trace) fprintf(stdout, "a + c -> a[%s]", s_field);
+            if (h_processor->trace) fprintf(stdout, "a + c -> a[%s]\t", s_field);
             v_reg_add(h_processor, h_processor->reg[A_REG], h_processor->reg[A_REG], h_processor->reg[C_REG]);
-            if (h_processor->trace)v_fprint_register(stdout,h_processor->reg[A_REG]);
+            if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[A_REG]);
             break;
          case 013: /* c + c -> c[f] */
-            if (h_processor->trace) fprintf(stdout, "c + c -> c[%s]", s_field);
+            if (h_processor->trace) fprintf(stdout, "c + c -> c[%s]\t", s_field);
             v_reg_add(h_processor, h_processor->reg[C_REG], h_processor->reg[C_REG], h_processor->reg[C_REG]);
-            if (h_processor->trace)v_fprint_register(stdout,h_processor->reg[C_REG]);
+            if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[C_REG]);
             break;
          case 014: /* a + c -> c[f] */
-            if (h_processor->trace) fprintf(stdout, "a + c -> c[%s]", s_field);
+            if (h_processor->trace) fprintf(stdout, "a + c -> c[%s]\t", s_field);
             v_reg_add(h_processor, h_processor->reg[C_REG], h_processor->reg[C_REG], h_processor->reg[A_REG]);
-            if (h_processor->trace)v_fprint_register(stdout,h_processor->reg[C_REG]);
+            if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[C_REG]);
             break;
          case 015: /* a + 1 -> a[f] */
-            if (h_processor->trace) fprintf(stdout, "a + 1 -> a[%s]", s_field);
+            if (h_processor->trace) fprintf(stdout, "a + 1 -> a[%s]\t", s_field);
             v_reg_inc(h_processor, h_processor->reg[A_REG]);
-            if (h_processor->trace)v_fprint_register(stdout,h_processor->reg[A_REG]);
+            if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[A_REG]);
             break;
          case 016: /* shift left a[f] */
-            if (h_processor->trace) fprintf(stdout, "shift left a[%s]", s_field);
+            if (h_processor->trace) fprintf(stdout, "shift left a[%s]\t", s_field);
             fflush(stdout);
             v_reg_shl(h_processor, h_processor->reg[A_REG]);
-            if (h_processor->trace)v_fprint_register(stdout,h_processor->reg[A_REG]);
+            if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[A_REG]);
             break;
          case 017: /* c + 1 -> c[f] */
-            if (h_processor->trace) fprintf(stdout, "c + 1 -> c[%s]", s_field);
+            if (h_processor->trace) fprintf(stdout, "c + 1 -> c[%s]\t", s_field);
             v_reg_inc(h_processor, h_processor->reg[C_REG]);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[C_REG]);
             break;
          case 020: /* a - b -> a[f] */
-            if (h_processor->trace) fprintf(stdout, "a - b -> a[%s]", s_field);
+            if (h_processor->trace) fprintf(stdout, "a - b -> a[%s]\t", s_field);
             v_reg_sub(h_processor, h_processor->reg[A_REG], h_processor->reg[A_REG], h_processor->reg[B_REG]);
-            if (h_processor->trace)v_fprint_register(stdout,h_processor->reg[A_REG]);
+            if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[A_REG]);
             break;
          case 021: /* a - c -> c[f] */
-            if (h_processor->trace) fprintf(stdout, "a - c -> c[%s]", s_field);
+            if (h_processor->trace) fprintf(stdout, "a - c -> c[%s]\t", s_field);
             v_reg_sub(h_processor, h_processor->reg[C_REG], h_processor->reg[A_REG], h_processor->reg[C_REG]);
-            if (h_processor->trace)v_fprint_register(stdout,h_processor->reg[C_REG]);
+            if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[C_REG]);
             break;
          case 022: /* a - 1 -> a[f] */
-            if (h_processor->trace) fprintf(stdout, "a - 1 -> a[%s]", s_field);
+            if (h_processor->trace) fprintf(stdout, "a - 1 -> a[%s]\t", s_field);
             h_processor->flags[CARRY] = True; /* Set carry */
             v_reg_sub(h_processor, h_processor->reg[A_REG], h_processor->reg[A_REG], NULL);
-            if (h_processor->trace)v_fprint_register(stdout,h_processor->reg[A_REG]);
+            if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[A_REG]);
             break;
          case 023: /* c - 1 -> c[f] */
-            if (h_processor->trace) fprintf(stdout, "c - 1 -> c[%s]", s_field);
+            if (h_processor->trace) fprintf(stdout, "c - 1 -> c[%s]\t", s_field);
             h_processor->flags[CARRY] = True; /* Set carry */
             v_reg_sub(h_processor, h_processor->reg[C_REG], h_processor->reg[C_REG], NULL);
-            if (h_processor->trace)v_fprint_register(stdout,h_processor->reg[C_REG]);
+            if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[C_REG]);
             break;
          case 024: /* 0 - c -> c[f] */
-            if (h_processor->trace) fprintf(stdout, "0 - c -> c[%s]", s_field);
+            if (h_processor->trace) fprintf(stdout, "0 - c -> c[%s]\t", s_field);
             v_reg_sub(h_processor, h_processor->reg[C_REG], NULL, h_processor->reg[C_REG]);
-            if (h_processor->trace)v_fprint_register(stdout,h_processor->reg[C_REG]);
+            if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[C_REG]);
             break;
          case 025: /* 0 - c - 1 -> c[f] */
-            if (h_processor->trace) fprintf(stdout, "0 - c - 1 -> c[%s]", s_field);
+            if (h_processor->trace) fprintf(stdout, "0 - c - 1 -> c[%s]\t", s_field);
             h_processor->flags[CARRY] = True; /* Set carry */
             v_reg_sub(h_processor, h_processor->reg[C_REG], NULL, h_processor->reg[C_REG]);
-            if (h_processor->trace)v_fprint_register(stdout,h_processor->reg[C_REG]);
+            if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[C_REG]);
             break;
          case 026: /* if b[f] = 0 */
             if (h_processor->trace) fprintf(stdout, "if b[%s] = 0", s_field);
@@ -2996,24 +3019,24 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             v_op_goto(h_processor);
             break;
          case 034: /* a - c -> a[f] */
-            if (h_processor->trace) fprintf(stdout, "a - c -> a[%s]", s_field);
+            if (h_processor->trace) fprintf(stdout, "a - c -> a[%s]\t", s_field);
             v_reg_sub(h_processor, h_processor->reg[A_REG], h_processor->reg[A_REG], h_processor->reg[C_REG]);
-            if (h_processor->trace)v_fprint_register(stdout,h_processor->reg[A_REG]);
+            if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[A_REG]);
             break;
          case 035: /* shift right a[f] */
-            if (h_processor->trace) fprintf(stdout, "shift right a[%s]", s_field);
+            if (h_processor->trace) fprintf(stdout, "shift right a[%s]\t", s_field);
             v_reg_shr(h_processor, h_processor->reg[A_REG]);
-            if (h_processor->trace)v_fprint_register(stdout,h_processor->reg[A_REG]);
+            if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[A_REG]);
             break;
          case 036: /* shift right b[f] */
             v_reg_shr(h_processor, h_processor->reg[B_REG]);
-            if (h_processor->trace) fprintf(stdout, "shift right b[%s]", s_field);
-            if (h_processor->trace)v_fprint_register(stdout,h_processor->reg[B_REG]);
+            if (h_processor->trace) fprintf(stdout, "shift right b[%s]\t", s_field);
+            if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[B_REG]);
             break;
          case 037: /* shift right c[f] */
-            if (h_processor->trace) fprintf(stdout, "shift right c[%s]", s_field);
+            if (h_processor->trace) fprintf(stdout, "shift right c[%s]\t", s_field);
             v_reg_shr(h_processor, h_processor->reg[C_REG]);
-            if (h_processor->trace)v_fprint_register(stdout,h_processor->reg[C_REG]);
+            if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[C_REG]);
             break;
          default:
             if (h_processor->trace) fprintf(stdout, "\n");
@@ -3098,22 +3121,22 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
          switch (i_opcode >> 5)
          {
          case 0x00: /* 0 -> a[f] - Clear a (00 000f ff10) */
-            if (h_processor->trace) fprintf(stdout, "a = 0 %s\t", s_field);
+            if (h_processor->trace) fprintf(stdout, "a = 0 %s\t\t", s_field);
             v_reg_copy(h_processor, h_processor->reg[A_REG], NULL);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[A_REG]);
             break;
          case 0x01: /* 0 -> b[f] - Clear b (00 001f ff10) */
-            if (h_processor->trace)fprintf(stdout, "b = 0 %s\t", s_field);
+            if (h_processor->trace)fprintf(stdout, "b = 0 %s\t\t", s_field);
             v_reg_copy(h_processor, h_processor->reg[B_REG], NULL);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[B_REG]);
             break;
          case 0x02: /* 0 -> c[f] - Clear c (00 010f ff10) */
-            if (h_processor->trace) fprintf(stdout, "c = 0 %s\t", s_field);
+            if (h_processor->trace) fprintf(stdout, "c = 0 %s\t\t", s_field);
             v_reg_copy(h_processor, h_processor->reg[C_REG], NULL);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[C_REG]);
             break;
          case 0x03: /* a exch b[f] - Exchange a and b (00 011f ff10) */
-            if (h_processor->trace) fprintf(stdout, "abex %s\t", s_field);
+            if (h_processor->trace) fprintf(stdout, "abex %s\t\t", s_field);
             v_reg_exch(h_processor, h_processor->reg[A_REG], h_processor->reg[B_REG]);
             if (h_processor->trace)
             {
@@ -3122,12 +3145,12 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             }
             break;
          case 0x04: /* a -> b[f] - Load b from a (00 100f ff10) */
-            if (h_processor->trace) fprintf(stdout, "b = a %s\t", s_field);
+            if (h_processor->trace) fprintf(stdout, "b = a %s\t\t", s_field);
             v_reg_copy(h_processor, h_processor->reg[B_REG], h_processor->reg[A_REG]);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[B_REG]);
             break;
          case 0x05: /* a exch c[f] - Exchange a and c (00 101f ff10) */
-            if (h_processor->trace) fprintf(stdout, "acex %s\t", s_field);
+            if (h_processor->trace) fprintf(stdout, "acex %s\t\t", s_field);
             v_reg_exch(h_processor, h_processor->reg[A_REG], h_processor->reg[C_REG]);
             if (h_processor->trace)
             {
@@ -3136,12 +3159,12 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             }
             break;
          case 0x06: /* b -> c[f] - Load c from b (00 110f ff10) */
-            if (h_processor->trace) fprintf(stdout, "c = b %s\t", s_field);
+            if (h_processor->trace) fprintf(stdout, "c = b %s\t\t", s_field);
             v_reg_copy(h_processor, h_processor->reg[C_REG], h_processor->reg[B_REG]);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[C_REG]);
             break;
          case 0x07: /* b exch c[f] - Exchange b and c (00 111f ff10) */
-            if (h_processor->trace) fprintf(stdout, "bcex %s\t", s_field);
+            if (h_processor->trace) fprintf(stdout, "bcex %s\t\t", s_field);
             v_reg_exch(h_processor, h_processor->reg[B_REG], h_processor->reg[C_REG]);
             if (h_processor->trace)
             {
@@ -3150,7 +3173,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             }
             break;
          case 0x08: /* c -> a[f] - Load a from c (01 000f ff10) */
-            if (h_processor->trace) fprintf(stdout, "a = c %-3s\t", s_field);
+            if (h_processor->trace) fprintf(stdout, "a = c %-3s\t\t", s_field);
             v_reg_copy(h_processor, h_processor->reg[A_REG], h_processor->reg[C_REG]);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[A_REG]);
             break;
@@ -3247,22 +3270,22 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             v_reg_test_ne(h_processor, h_processor->reg[A_REG], h_processor->reg[C_REG]);
             break;
          case 0x1c: /* a >> 1 -> a[f] - Shift right a (11 100f ff10) */
-            if (h_processor->trace) fprintf(stdout, "shr a %s\t", s_field);
+            if (h_processor->trace) fprintf(stdout, "shr a %s\t\t", s_field);
             v_reg_shr(h_processor, h_processor->reg[A_REG]);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[A_REG]);
             break;
          case 0x1d: /* b >> 1 -> b[f] - Shift right b (11 101f ff10) */
             v_reg_shr(h_processor, h_processor->reg[B_REG]);
-            if (h_processor->trace) fprintf(stdout, "shr b %s\t", s_field);
+            if (h_processor->trace) fprintf(stdout, "shr b %s\t\t", s_field);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[B_REG]);
             break;
          case 0x1e: /* c >> 1 -> c[f] - Shift right c (11 110f ff10) */
-            if (h_processor->trace) fprintf(stdout, "shr c %s\t", s_field);
+            if (h_processor->trace) fprintf(stdout, "shr c %s\t\t", s_field);
             v_reg_shr(h_processor, h_processor->reg[C_REG]);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[C_REG]);
             break;
          case 0x1f: /* a << 1 -> a[f] - Shift left a (11 111f ff10) */
-            if (h_processor->trace) fprintf(stdout, "shl a %s\t", s_field);
+            if (h_processor->trace) fprintf(stdout, "shl a %s\t\t", s_field);
             fflush(stdout);
             v_reg_shl(h_processor, h_processor->reg[A_REG]);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[A_REG]);

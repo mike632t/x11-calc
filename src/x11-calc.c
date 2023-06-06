@@ -206,21 +206,30 @@
  *                     be held down to exit - MT
  * 26 May 22         - Blank line after an error message not needed - MT
  * 11 Dec 22         - Renamed models with continious memory and added hp25
- *                     hp33e, and hp38e - MT
+ *                     HP33e, and HP38e - MT
  * 24 Dec 22         - Command line parsing routine now uses the same macro
  *                     definitions as the the error message definitions.
  *                   - Execution  speed  now uses VOYAGER and  SPICE  macro
  *                     definitions - MT
  * 28 Dec 22         - Changed the name of printer mode status from mode to
  *                     print - MT
+<<<<<<< HEAD
  *                   - Fixed HP19C model number in conditionals - MT
  *                   - Changed the name of prgm/run mode status from select
  *                     to mode - MT
+=======
+ *                   - Changed the name of prgm/run mode status from select
+ *                     to mode - MT
+ * 18 Jan 23         - Fixed  warnings when adding an offset to the pointer
+ *                     to a string (__DATE__ + 9 and __DATE__ +7) - MT
+ * 02 Feb 23         - Changed 'linux' to '__linux__' to fix a problem with
+ *                     conditional compilation that stopped keypress events
+ *                     from being processed - MT
+>>>>>>> stable
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Add verbose option.
  *                   - Allow VMS users to set breakpoints?
- *                   - Load ROMs from a separate file?
  *                   - Free up allocated memory on exit.
  *                   - Sort out colour mapping.
  *
@@ -270,7 +279,7 @@ void v_version() /* Display version information */
    fprintf(stdout, "%s: Version %s %s", FILENAME, VERSION, COMMIT_ID);
    if (__DATE__[4] == ' ') fprintf(stdout, " 0"); else fprintf(stdout, " %c", __DATE__[4]);
    fprintf(stdout, "%c %c%c%c %s %s", __DATE__[5],
-      __DATE__[0], __DATE__[1], __DATE__[2], __DATE__ +9, __TIME__ );
+      __DATE__[0], __DATE__[1], __DATE__[2], &__DATE__[9], __TIME__ );
    fprintf(stdout, " (Build: %s)\n", BUILD );
 }
 
@@ -321,7 +330,7 @@ int main(int argc, char *argv[])
    obutton *h_button[BUTTONS]; /* Array to hold pointers to buttons */
    obutton *h_pressed = NULL;
    odisplay *h_display; /* Pointer to display structure */
-#if defined(linux) || defined(__NetBSD__)
+#if defined(__linux__) || defined(__NetBSD__)
    okeyboard *h_keyboard;
 #endif
    oprocessor *h_processor;
@@ -458,7 +467,7 @@ int main(int argc, char *argv[])
                   else if (!strncmp(argv[i_count], "--version", i_index))
                   {
                      v_version(); /* Display version information */
-                     fprintf(stdout, h_msg_licence, __DATE__ +7, AUTHOR);
+                     fprintf(stdout, h_msg_licence, &__DATE__[7], AUTHOR);
                      exit(0);
                   }
                   else if (!strncmp(argv[i_count], "--help", i_index))
@@ -502,7 +511,7 @@ int main(int argc, char *argv[])
          else if (!strncmp(argv[i_count], "/VERSION", i_index))
          {
             v_version; /* Display version information */
-            fprintf(stdout, h_msg_licence, __DATE__ +7, AUTHOR);
+            fprintf(stdout, h_msg_licence, &__DATE__[7], AUTHOR);
             exit(0);
          }
          else if ((!strncmp(argv[i_count], "/HELP", i_index)) | (!strncmp(argv[i_count], "/?", i_index)))
@@ -586,17 +595,20 @@ int main(int argc, char *argv[])
    if (!(h_large_font = XLoadQueryFont(x_display, s_font))) v_error(h_err_font, s_font);
 
    v_init_buttons(h_button); /* Create buttons */
+
 #if defined(SWITCHES)
    v_init_switches(h_switch);
 #endif
+
 #if defined(LABELS)
    v_init_labels(h_label);
 #endif
+
    h_display = h_display_create(0, BEZEL_LEFT, BEZEL_TOP, BEZEL_WIDTH, BEZEL_HEIGHT,
       DISPLAY_LEFT, DISPLAY_TOP, DISPLAY_WIDTH, DISPLAY_HEIGHT, DIGIT_COLOUR, DIGIT_BACKGROUND,
       DISPLAY_BACKGROUND, BEZEL_COLOUR); /* Create display */
 
-#if defined(linux) || defined(__NetBSD__)
+#if defined(__linux__) || defined(__NetBSD__)
    h_keyboard = h_keyboard_create(x_display); /* Only works with Linux */
 #endif
 
@@ -624,7 +636,11 @@ int main(int argc, char *argv[])
 
 #if defined(SWITCHES)
    if (h_switch[0] != NULL) h_processor->enabled = h_switch[0]->state; /* Allow switches to be undefined if not used */
+<<<<<<< HEAD
 #if defined(HP10) || defined(HP19c)
+=======
+#if defined(HP10)
+>>>>>>> stable
    if (h_switch[1] != NULL) h_processor->print = h_switch[1]->state;
 #else
    if (h_switch[1] != NULL) h_processor->mode = h_switch[1]->state;
@@ -672,7 +688,7 @@ int main(int argc, char *argv[])
                h_processor->keypressed = False; /* Don't clear the status bit here!! */
             }
             break;
-#if defined(linux) || defined(__NetBSD__)
+#if defined(__linux__) || defined(__NetBSD__)
          case KeyPress :
             h_key_pressed(h_keyboard, x_display, x_event.xkey.keycode, x_event.xkey.state); /* Attempts to translate a key code into a character */
             if (h_keyboard->key == (XK_BackSpace & 0x1f)) h_keyboard->key = XK_Escape & 0x1f; /* Map backspace to escape */
@@ -779,12 +795,11 @@ int main(int argc, char *argv[])
                   {
                      h_switch[1]->state = !(h_switch[1]->state); /* Toggle switch */
                      i_switch_draw(x_display, x_application_window, i_screen, h_switch[1]);
-#if defined(HP10) || defined(HP19c)
+#if defined(HP10)
                      h_processor->print = h_switch[1]->state;
 #else
                      h_processor->mode = h_switch[1]->state;
 #endif
-
                   }
                }
 #endif
