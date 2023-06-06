@@ -277,6 +277,8 @@ On the 67/97 these are used as follows:
     00160   0 001 11 00 00    crc fs?c 8  Test display digits
     00260   0 010 11 00 00    crc sf 9    Motor On
     00300   0 011 00 00 00    crc fs?c 1  Test W/PGM switch
+                                          Sets s3 in 'W/PRGM' mode otherwise
+                                          it clears s3 in 'RUN' mode.
     00360   0 011 11 00 00    crc fs?c 9  Motor Off
     00400   0 100 00 00 00    crc sf 2    A key was pressed
     00500   0 101 00 00 00    crc fs?c 2  Test of a key was pressed
@@ -289,18 +291,28 @@ On the 67/97 these are used as follows:
     01300   1 011 00 00 00    crc fs?c 5  Test merge flag
     01400   1 100 00 00 00    crc sf 6    Set waiting for card side 2 flag
     01500   1 101 00 00 00    crc fs?c 6  Test waiting for card side 2 flag
+                                          Checks a flag in the card reader
+                                          and if set, sets the s 3 flag in
+                                          the calculator (and clears the
+                                          card reader flag)
     01600   1 110 00 00 00    crc sf 7    ???
     01700   1 111 00 00 00    crc fs?c 7  Read/Write data to/from card via RAM $99 and $9B
+
+
 
 Printer Interface Control and Keyboard buffer instructions
 
     01120   1 001 01 00 00    pik1120     Printer ready (Sets S3 if printer is ready)
-    01220   1 010 01 00 00    pik1220     Out of paper (sets/clears S3)
+    01220   1 010 01 00 00    pik1220     Out of paper (Sets S3 if out of paper)
     01320   1 011 01 00 00    pik1320     Keypress in buffer (Sets S3 if character in buffer)
     01420   1 100 01 00 00    pik1420     ???
     01620   1 110 01 00 00    pik1620     ???
     01660   1 110 11 00 00    pik1660     Print alpha (6 bit data)
     01720   1 111 01 00 00    pik1720     Print numeric (4 bit data)
+
+    Notes:  HP67 - s15 is set whern a key is pressed.
+
+
 
 The printer character codes are:
 

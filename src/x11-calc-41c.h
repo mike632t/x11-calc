@@ -57,7 +57,7 @@
 
 #define ROM_SIZE           030000   /* Allows for 3x 4K ROMs */
 #define MEMORY_SIZE        320 /* HP41CV */
-//#define CONTINIOUS
+/** #define CONTINIOUS */
 
 extern int i_rom [ROM_SIZE];
 

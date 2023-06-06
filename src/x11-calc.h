@@ -52,8 +52,8 @@
  * 31 Jan 22         - Added support for the HP10C, HP11C, HP12C, HP15C and
  *                     HP16C - MT
  * 26 Nov 22         - Added support for HP10 - MT
- * 11 Dec 22         - Renamed models with continious memory and added hp25
- *                     hp33e, and hp38e - MT
+ * 11 Dec 22         - Renamed models with continious memory and added HP25
+ *                     HP33e, and HP38e - MT
  * 24 Dec 22         - Modified scale width for HP10 - MT
  *
  * TO DO :           -

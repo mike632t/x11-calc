@@ -55,7 +55,7 @@ void v_init_buttons(obutton *h_button[]) {
    int i_left, i_top, i_count;
 
    /* Define the switches. */
-   //i_top = KBD_TOP + (KEY_HEIGHT - SWITCH_HEIGHT) / 2;
+   /** i_top = KBD_TOP + (KEY_HEIGHT - SWITCH_HEIGHT) / 2; */
    i_top = KBD_TOP;
    i_left = KBD_LEFT - KEY_GAP;
    i_count = 0;
@@ -68,7 +68,7 @@ void v_init_buttons(obutton *h_button[]) {
    h_button[i_count++] = h_button_create(0xc4, 000, "ALPHA", "", "", "", h_alternate_font, h_alternate_font, h_alternate_font, i_left, i_top, KEY_WIDTH + KEY_GAP, SWITCH_HEIGHT, False, True, BLACK, YELLOW, BLACK, BLACK);
 
    /* Define top row of keys. */
-   //i_top = KBD_TOP + KBD_ROW;
+   /** i_top = KBD_TOP + KBD_ROW; */
    i_top = KBD_TOP + SWITCH_HEIGHT + (KBD_ROW - KEY_HEIGHT);
    i_left = KBD_LEFT;
    h_button[i_count++] = h_button_create(0x10, 000, "E+", "E-", "", "A", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, False, BLACK, YELLOW, MID_BLUE, BLACK);

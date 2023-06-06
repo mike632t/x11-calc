@@ -20,6 +20,8 @@
 #
 #  Note seperator (tab) at the beginning of the line CANNOT be a space..!
 #
+#  https://stackoverflow.com/questions/50941196/
+#
 #  01 May 13   0.1   - Initial version - MT
 #  02 Jul 13         - Separated  code  and headers for button  and  colour
 #                      manipulation into separate files - MT
@@ -43,6 +45,13 @@
 #  24 Feb 22         - Clean now deletes ALL object files - MT
 #  31 Mar 22         - Added additional libs and flags that are needed when
 #                      building the project on NetBSD - MT
+#  15 jan 23         - Delete execuitable before re-compiling - MT
+#  18 Jan 23         - Allow VERBOSE and DEBUG options to be specified from
+#                      the command line - MT
+#                    - Conditionally sets operating specific options (don't
+#                      need to comment them out when not required) - MT
+#  26 Mar 23         - Set compiler specific flags for gcc - MT
+#  01 May 23         - Fixed ordering of compiler options - MT
 #
 
 MODEL	= 41c
@@ -50,30 +59,52 @@ PROGRAM	= x11-calc
 SOURCES = x11-calc.c x11-calc-cpu.c x11-calc-display.c x11-calc-segment.c
 SOURCES += x11-calc-button.c x11-calc-switch.c x11-calc-label.c x11-calc-colour.c
 SOURCES += x11-keyboard.c x11-calc-messages.c gcc-wait.c
-FILES	= *.c *.h LICENSE README.md makefile x11-calc-instruction-set.md .gitignore .gitattributes
+FILES	= *.c *.h LICENSE README.md makefile x11-calc-*.md .gitignore .gitattributes
 FILES	+= x11-calc-*.png
 OBJECTS	= $(SOURCES:.c=.o)
 OUTPUT	= $(PROGRAM).out
 LANG	= LANG_$(shell (echo $$LANG | cut -f 1 -d '_'))
-LIBS	= -lX11 -lm
-#LIBS	+= -lcompat # NetBSD..
-FLAGS	= -fcommon -Wall -pedantic -ansi -std=gnu99
-FLAGS	+= -Wno-comment -Wno-deprecated-declarations -Wno-builtin-macro-redefined
-FLAGS	+= -no-pie
-#FLAGS	+= -I /usr/X11R7/include/ -L /usr/X11R7/lib/ -R /usr/X11R7/lib # NetBSD..
-#FLAGS	+= -g # For debugging
-CC	= gcc
+UNAME	=  $(shell uname)
 
+LIBS	= -lX11 -lm
+FLAGS	= -fcommon -Wall -pedantic -std=gnu99
+FLAGS	+= -Wno-comment -Wno-deprecated-declarations -Wno-builtin-macro-redefined
+
+# Operating system specific settings
+ifeq ($(UNAME), NetBSD) # NetBSD..
+LIBS	+= -lcompat
+FLAGS	+= -I /usr/X11R7/include/ -L /usr/X11R7/lib/ -R /usr/X11R7/lib
+endif
+
+# Compiler specific settings
+ifeq ($(CC), cc)
+LIBS	+=  -no-pie
+FLAGS	+= -ansi
+endif
+
+ifdef DEBUG
+FLAGS	+=  -g
+endif
 
 all: clean ../bin/$(PROGRAM)-$(MODEL) $(OBJECTS)
 FLAGS	+= -D HP$(MODEL) -D $(LANG)
 SOURCES += x11-calc-$(MODEL).c
 
-   ../bin/$(PROGRAM)-$(MODEL): $(OBJECTS)
+../bin/$(PROGRAM)-$(MODEL): $(OBJECTS)
+ifdef VERBOSE
+	@echo
+	@echo $(CC) $(OBJECTS) $(LIBS) -o ../bin/$@
+	@echo
+endif
 	@$(CC) $(FLAGS) $(OBJECTS) -o ../bin/$@ $(LIBS)
 
 $(OBJECTS) : $(SOURCES)
 	@echo $(PROGRAM)-$(MODEL)
+ifdef VERBOSE
+	@echo
+	@echo $(CC) $(FLAGS) -c $(SOURCES)
+endif
+	@rm -f ../bin/$(PROGRAM)-$(MODEL)
 	@$(CC) $(FLAGS) -c $(SOURCES)
 
 clean:

@@ -35,6 +35,7 @@
  * 23 Jan 22         - Changed the colour of the numeric keys - MT
  * 12 Feb 22         - Updated layout and separated the initialisation code
  *                     for buttons and switches into two functions - MT
+ * 28 Dec 22         - Fixed PRGM/RUN switch label - MT
  *
  */
 
@@ -65,7 +66,7 @@
 void v_init_switches(oswitch *h_switch[]) /* Define the switches. */
 {
    h_switch[0] = h_switch_create(00000, "OFF", "ON ", h_alternate_font, KBD_LEFT, KBD_TOP, 2 * KEY_WIDTH + KEY_GAP, SWITCH_HEIGHT, True, MID_GREY, DARK_GREY);
-   h_switch[1] = h_switch_create(00000, "DEG", "RAD", h_alternate_font, KBD_LEFT + 3 * KEY_WIDTH + 2 * KEY_GAP, KBD_TOP, 2 * KEY_WIDTH + KEY_GAP, SWITCH_HEIGHT, True, MID_GREY, DARK_GREY);
+   h_switch[1] = h_switch_create(00000, "PRGM", "RUN", h_alternate_font, KBD_LEFT + 3 * KEY_WIDTH + 2 * KEY_GAP, KBD_TOP, 2 * KEY_WIDTH + KEY_GAP, SWITCH_HEIGHT, True, MID_GREY, DARK_GREY);
 }
 
 void v_init_buttons(obutton *h_button[]) {
