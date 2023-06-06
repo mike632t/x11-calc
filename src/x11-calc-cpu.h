@@ -48,14 +48,9 @@
  *                     integers so they can be loaded/saved as hex - MT
  * 05 Mar 22         - Changed the data type of the register nibbles, flags
  *                     and status bits back to unsigned char - MT
-<<<<<<< HEAD
  * 18 May 22         - Added flag out and flag in registers for HP41 - MT
- * 11 Dec 22         - Renamed models with continious memory and added hp25
- *                     hp33e, and hp38e - MT
-=======
  * 11 Dec 22         - Renamed models with continious memory and added HP25
  *                     HP33e, and HP38e - MT
->>>>>>> unstable
  * 20 Dec 22         - Added a printer buffer to the CPU properties for the
  *                     HP10, HP19C and HP97 (if I ever get that far) - MT
  * 28 Dec 22         - Changed the name of printer mode status from mode to
