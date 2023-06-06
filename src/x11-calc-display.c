@@ -241,7 +241,7 @@ int i_display_draw(Display* x_display, int x_application_window, int i_screen, o
  */
 
 int i_display_update(Display* x_display, int x_application_window, int i_screen, odisplay *h_display, oprocessor *h_processor){
-#if defined(HP67) || defined(HP19c)
+#if defined(HP67)
    int i_count;
    static int c_digits [] =
    {
