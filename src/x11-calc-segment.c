@@ -138,7 +138,7 @@ int i_segment_draw(Display *h_display, int x_application_window, int i_screen, o
    XDrawRectangle(h_display, x_application_window, DefaultGC(h_display, i_screen), h_segment->left, h_segment->top, h_segment->width, h_segment->height);
 
    /* Fill in the background for each active display segment */
-   XSetForeground(h_display, DefaultGC(h_display, i_screen),i_shade( h_segment->foreground));
+   XSetForeground(h_display, DefaultGC(h_display, i_screen), i_shade(h_segment->foreground));
 
    if (h_segment->mask & SEG_A) { /* Draw the segment A */
       XDrawLine(h_display, x_application_window, DefaultGC(h_display, i_screen), i_left, i_upper, i_right, i_upper);
