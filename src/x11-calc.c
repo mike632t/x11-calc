@@ -5,8 +5,7 @@
  *
  * Emulation of various models of HP calculator for X11.
  *
- * Deliberately parses the command line without using 'getopt' or 'argparse'
- * to maximise portability.
+ * Deliberatly avoids using 'getopt' or 'argparse' to maximize portability.
  *
  * This  program is free software: you can redistribute it and/or modify it
  * under  the terms of the GNU General Public License as published  by  the
