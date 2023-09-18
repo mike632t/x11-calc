@@ -113,8 +113,8 @@ e.g:
     $ cd x11-calc-stable
     $ make all
 
-    $ ./bin/x11-calc-29c
-    x11-calc-29c: Version 0.8 [Commit ID: 09bbba6] 03 Jun 23 11:50:14 (Build: 0092)
+    $ ./bin/x11-calc-29
+    x11-calc-29: Version 0.4 [Commit ID: 81c55be] 16 Oct 21 21:15:00 (Build: 0067)
     ROM Size : 4096 words
 
 If more than one C compiler is installed then you can specify which one to use  on
@@ -150,14 +150,14 @@ them to the original saved state.
 For  models with continuous memory the contents of program memory and  data
 registers are saved in a hidden file in the users' HOME directory when  the
 program  exits  or the calculator is switched off, and restored  from  this
-hidden file when the simulator is loaded or reset using 'Ctrl&#8209;C'
+hidden file when the simulator is loaded or reset using 'Ctrl-;C'
 
     ~/.x11-calc-nn.dat
 
 When  starting the simulator the name of the data file used to restore  the
 saved state can be specified on the command line allowing previously  saved
 copies of programs to be loaded automatically when the simulator starts  or
-the  simulator is reset using 'Ctrl&#8209;C'.  However, any changes will be
+the  simulator is reset using 'Ctrl-;C'.  However, any changes will be
 saved in the hidden data file.
 
 
@@ -169,11 +169,11 @@ you hold down the off switch down for two seconds the program will exit.
 
 ### Debugging
 
-You  can  start the simulation in trace mode using '&#8209;t', or in single  step
-mode using '&#8209;s', and set a breakpoint using '&#8209;b &lt;octal address&gt;'.
+You  can  start the simulation in trace mode using '-;t', or in single  step
+mode using '-;s', and set a breakpoint using '-;b &lt;octal address&gt;'.
 
-'Ctrl&#8209;T'  also toggles trace mode when running, 'Ctrl&#8209;S' executes the  next
-instruction, 'Ctrl&#8209;Q' resumes execution, and 'Ctrl&#8209;R' displays the contents
+'Ctrl-;T'  also toggles trace mode when running, 'Ctrl-;S' executes the  next
+instruction, 'Ctrl-;Q' resumes execution, and 'Ctrl-;R' displays the contents
 of the CPU registers.
 
 When in trace mode a jump to the same instruction produces no output.
@@ -270,13 +270,13 @@ are missing some characters (for example the Pi symbol).
 
 The following packages are required to build and/or run the simulator.
 
-- Fedora : gcc, make, libx11&#8209;dev, libc6&#8209;dev, xorg&#8209;x11&#8209;xfonts&#8209;base
+- Fedora : gcc, make, libx11-;dev, libc6-;dev, xorg-;x11-;xfonts-;base
 
-- Gentoo : gcc, make, libx11&#8209;dev, libc6&#8209;dev, font&#8209;misc&#8209;misc
+- Gentoo : gcc, make, libx11-;dev, libc6-;dev, font-;misc-;misc
 
-- Debian : gcc (or clang), make, libx11&#8209;dev, libc6&#8209;dev, xfonts&#8209;base
+- Debian : gcc (tcc or clang), make, libx11-;dev, libc6-;dev, xfonts-;base
 
-- Ubuntu : gcc, make, libx11&#8209;dev, libc6&#8209;dev, xfonts&#8209;base
+- Ubuntu : gcc, make, libx11-;dev, libc6-;dev, xfonts-;base
 
 
 ### Problem Reports
