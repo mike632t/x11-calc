@@ -32,6 +32,7 @@
  * 14 Dec 22         - Found another (0-5b5 changed  to 'data -> c') - MT
  * 17 Dec 22         - Found another (0-352 changed  to 'data -> c') - MT
  * 20 Dec 22         - Added switch to control printer mode - MT
+ * 24 Dec 22         - Made space for the third switch position - MT
  *
  */
 
@@ -73,7 +74,7 @@ void v_init_buttons(obutton *h_button[]) {
    int i_left, i_top, i_count = 0;
 
    /* Define top row of keys. */
-   i_top = KBD_TOP + 2* (SWITCH_HEIGHT + 1); /* Assumes the function label and switch text use the same font */
+   i_top = KBD_TOP + 3 * (SWITCH_HEIGHT + 1); /* Assumes the function label and switch text use the same font */
    i_left = KBD_LEFT;
    h_button[i_count++] = h_button_create(00065, 000, " ^ ", "", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, True, BLACK, BACKGROUND, BACKGROUND, BACKGROUND);
    i_left += (KEY_WIDTH + KEY_GAP);

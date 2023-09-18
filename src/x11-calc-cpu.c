@@ -1473,6 +1473,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   break;
                case 00120: /* keys -> a[2:1] (0 001 010 000) */
                   if (h_processor->trace) fprintf(stdout, "keys -> a\t\t");
+                  /* The HP10 and HP19C use this to get the state of the printer mode switch */
 #if defined(HP10)
                   if (h_processor->print)
                      h_processor->reg[A_REG]->nibble[1] = 0x1; /* HP10 - All = 1, Print = 2 (print with display off), Display = 4 */
