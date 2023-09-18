@@ -150,14 +150,14 @@ them to the original saved state.
 For  models with continuous memory the contents of program memory and  data
 registers are saved in a hidden file in the users' HOME directory when  the
 program  exits  or the calculator is switched off, and restored  from  this
-hidden file when the simulator is loaded or reset using 'Ctrl-;C'
+hidden file when the simulator is loaded or reset using 'Ctrl-C'
 
     ~/.x11-calc-nn.dat
 
 When  starting the simulator the name of the data file used to restore  the
 saved state can be specified on the command line allowing previously  saved
 copies of programs to be loaded automatically when the simulator starts  or
-the  simulator is reset using 'Ctrl-;C'.  However, any changes will be
+the  simulator is reset using 'Ctrl-C'.  However, any changes will be
 saved in the hidden data file.
 
 
@@ -169,11 +169,11 @@ you hold down the off switch down for two seconds the program will exit.
 
 ### Debugging
 
-You  can  start the simulation in trace mode using '-;t', or in single  step
-mode using '-;s', and set a breakpoint using '-;b &lt;octal address&gt;'.
+You  can  start the simulation in trace mode using '-t', or in single  step
+mode using '-s', and set a breakpoint using '-b &lt;octal address&gt;'.
 
-'Ctrl-;T'  also toggles trace mode when running, 'Ctrl-;S' executes the  next
-instruction, 'Ctrl-;Q' resumes execution, and 'Ctrl-;R' displays the contents
+'Ctrl-T'  also toggles trace mode when running, 'Ctrl-S' executes the  next
+instruction, 'Ctrl-Q' resumes execution, and 'Ctrl-R' displays the contents
 of the CPU registers.
 
 When in trace mode a jump to the same instruction produces no output.
@@ -270,13 +270,13 @@ are missing some characters (for example the Pi symbol).
 
 The following packages are required to build and/or run the simulator.
 
-- Fedora : gcc, make, libx11-;dev, libc6-;dev, xorg-;x11-;xfonts-;base
+- Fedora : gcc, make, libx11-dev, libc6-dev, xorg-x11-xfonts-base
 
-- Gentoo : gcc, make, libx11-;dev, libc6-;dev, font-;misc-;misc
+- Gentoo : gcc, make, libx11-dev, libc6-dev, font-misc-misc
 
-- Debian : gcc (tcc or clang), make, libx11-;dev, libc6-;dev, xfonts-;base
+- Debian : gcc (tcc or clang), make, libx11-dev, libc6-dev, xfonts-base
 
-- Ubuntu : gcc, make, libx11-;dev, libc6-;dev, xfonts-;base
+- Ubuntu : gcc, make, libx11-dev, libc6-dev, xfonts-base
 
 
 ### Problem Reports
