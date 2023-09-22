@@ -283,6 +283,8 @@ The following packages are required to build and/or run the simulator.
 
 - Ubuntu : gcc, make, libx11-dev, libc6-dev, xfonts-base
 
+- MacOs : xquartz
+
 
 ### Problem Reports
 
