@@ -124,7 +124,7 @@ the command line.
 
     $ make CC=clang VERBOSE=1 all
 
-To build the simulator on MacOS 10.9 or later, you need to install [XQuartz](https://www.xquartz.org/) which provides support for X11. You can then down load and build application in the same way as on Linux.
+To build the simulator on MacOS 10.9 or later, you need to install [XQuartz](https://www.xquartz.org/) which provides support for X11. You can then download and build the application in the same way as on Linux.
 
 
 ### Keyboard Shortcuts
