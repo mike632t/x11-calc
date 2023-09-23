@@ -52,6 +52,7 @@
 #                      need to comment them out when not required) - MT
 #  26 Mar 23         - Set compiler specific flags for gcc - MT
 #  01 May 23         - Fixed ordering of compiler options - MT
+#  22 Sep 23         - Added build options for MacOs
 #
 
 MODEL	= 21
@@ -74,6 +75,10 @@ FLAGS	+= -Wno-comment -Wno-deprecated-declarations -Wno-builtin-macro-redefined
 ifeq ($(UNAME), NetBSD) # NetBSD..
 LIBS	+= -lcompat
 FLAGS	+= -I /usr/X11R7/include/ -L /usr/X11R7/lib/ -R /usr/X11R7/lib
+endif
+
+ifeq ($(UNAME), Darwin) # MacOS
+FLAGS	+= -I /opt/X11/include/X11/ -L /opt/X11/lib/
 endif
 
 # Compiler specific settings

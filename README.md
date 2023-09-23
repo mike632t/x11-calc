@@ -125,6 +125,9 @@ the command line.
     $ make CC=clang VERBOSE=1 all
 
 
+To build the simulator on **MacOS**, you have to have installed XQuartz from https://www.xquartz.org/ to support X11, before building. Other steps are the same (run ```make all``` in root directory of the source code).
+
+
 ### Keyboard Shortcuts
 
 The following keyboard shortcuts should work on Linux:
@@ -263,6 +266,8 @@ are missing some characters (for example the Pi symbol).
 
 - MacOS 10 (Catalina), clang 12.0.0, x64
 
+- MacOS 13.4.1 (Venture), clang 14.0.3, arm64
+
 - VAX/VMS 5.4-3, VAXC 3.2, VAX (simh)
 
 
@@ -277,6 +282,8 @@ The following packages are required to build and/or run the simulator.
 - Debian : gcc (tcc or clang), make, libx11-dev, libc6-dev, xfonts-base
 
 - Ubuntu : gcc, make, libx11-dev, libc6-dev, xfonts-base
+
+- MacOs : xquartz
 
 
 ### Problem Reports
