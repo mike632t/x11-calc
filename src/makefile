@@ -52,7 +52,7 @@
 #                      need to comment them out when not required) - MT
 #  26 Mar 23         - Set compiler specific flags for gcc - MT
 #  01 May 23         - Fixed ordering of compiler options - MT
-#  22 Sep 23         - Added build options for MacOs
+#  22 Sep 23         - Added build options for MacOS - MT
 #
 
 MODEL	= 21
