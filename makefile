@@ -20,15 +20,16 @@
 #
 #	09 Oct 21   0.1   - Initial version - MT
 #  22 Nov 21   0.2   - Added data files to backups - MT
-#  04 Jan 22			- Added HP model 35 - MT
-#  07 Jan 22         - Added HP model 80 - MT
-#  07 Jan 22         - Added HP model 70 - MT
+#  04 Jan 22			- Added HP35 - MT
+#  07 Jan 22         - Added HP80 - MT
+#  07 Jan 22         - Added HP70 - MT
 #  31 jan 22         - Added support for the HP10C, HP11C, HP12C, HP15C and
-#                      HP16C (all are currently work in progress) - MT
+#                      HP16C - MT
 #	31 Mar 22			- Moved ROMs into target folder - MT
-#  11 Dec 22			- Renamed models with continious memory and added hp25
-#                      hp33e, and hp38e - MT
+#  11 Dec 22			- Renamed models with continious memory and added HP25
+#                      HP33E, and HP38E - MT
 #  23 Dec 22			- Changed the order in which simulators are built - MT
+#  30 Sep 23         - Added HP19C - MT
 #
 
 PROGRAM	=  x11-calc
@@ -39,7 +40,7 @@ FILES		+= *.md LICENSE makefile .gitignore .gitattributes
 FILES		+= ./img/x11-calc-*.png
 MAKE		=  make
 
-all: clean hp35 hp45 hp70 hp80 hp10 hp21 hp22 hp25 hp25c hp27 hp29c hp67 hp31e hp32e hp33e hp33c hp34c hp37e hp38e hp38c hp10c hp11c hp12c hp15c hp16c
+all: clean hp35 hp45 hp70 hp80 hp10 hp21 hp22 hp25 hp25c hp27 hp29c hp19c hp67 hp31e hp32e hp33e hp33c hp34c hp37e hp38e hp38c hp10c hp11c hp12c hp15c hp16c
 
 classic: clean hp35 hp80 hp45 hp70
 
@@ -82,6 +83,9 @@ hp27:
 
 hp29c:
 	@$(MAKE) --no-print-directory -C ./src MODEL=29c
+
+hp19c:
+	@$(MAKE) --no-print-directory -C ./src MODEL=19c
 
 hp67:
 	@$(MAKE) --no-print-directory -C ./src MODEL=67
