@@ -23,6 +23,10 @@ More [screenshots](./img/)
 
 ### Latest News
 
+22 Sep 23
+   - Updated build instructions.
+   - Added ability to build using make on MacOS.
+
 03 Jun 23
    - Fixed compiler directive so keyboard works again on linux.
    - Fixed a problem in the make file.
@@ -43,61 +47,6 @@ More [screenshots](./img/)
    - Renamed HP11 to HP11C, HP12 to HP12C, HP15 to HP15C, HP16 to HP16C.
    - Renamed HP10 to HP10C and added HP10.
 
-### Status
-
-##### HP 35  - Working
-
-##### HP 80  - Working
-
-##### HP 45  - Working
-
-##### HP 70  - Working
-
-##### HP 10  - Working
-
-##### HP 21  - Working
-
-##### HP 22  - Working
-
-##### HP 25  - Working
-
-##### HP 25C - Working
-
-##### HP 27  - Working
-
-##### HP 29C - Working
-
-##### HP 31E - Working
-
-##### HP 32E - Working
-
-##### HP 33E - Working
-
-##### HP 33C - Working
-
-##### HP 34C - Working
-
-##### HP 37E - Completed
-* Fails self test.
-
-##### HP 38E - Working
-
-##### HP 38C - Working
-
-##### HP 67  - Working
-* Cannot read or write to magnetic cards.
-* Has continuous memory.
-
-##### HP 10C - Working
-
-##### HP 11C - Working (More testing needed)
-
-##### HP 12C - Working (More testing needed)
-
-##### HP 15C - Working (More testing needed)
-
-##### HP 16C - Working (More testing needed)
-
 
 ### Compiling
 
@@ -111,18 +60,77 @@ e.g:
     $ wget https://github.com/mike632t/x11-calc/archive/refs/heads/stable.zip
     $ unzip stable.zip
     $ cd x11-calc-stable
+    $ mkdir bin
     $ make all
 
     $ ./bin/x11-calc-29
     x11-calc-29: Version 0.4 [Commit ID: 81c55be] 16 Oct 21 21:15:00 (Build: 0067)
     ROM Size : 4096 words
 
-If more than one C compiler is installed then you can specify which one to use  on
-the command line.
+If more than one C compiler is installed or if gcc is not available you can
+specify which one to use from the command line.
+
+    $ make CC=clang VERBOSE=1 all
 
     $ make CC=tcc VERBOSE=1 all
 
-    $ make CC=clang VERBOSE=1 all
+
+### Tested
+
+- Debian 11 (Bullseye, gcc 10.2.1, x64
+
+- Debian 11 (Bullseye, tcc 0.9.27, x64
+
+- Debian 11 (Bullseye, clang 11.0.1-2, x64
+
+- Debian 10 (Buster), gcc 8.3.0, x64
+
+- Debian 10 (Buster), clang 7.0.1, x64
+
+- Debian 10 (Buster), gcc 8.3.0, arm
+
+- Debian 9 (Stretch), gcc 6.3.0, arm
+
+- Debian 5 (Lenny), gcc 4.2.4, alpha
+
+- Fedora 34, gcc 11.2.1, x64
+
+- Gentoo, gcc 11.2.0, x64
+
+- MacOS 10 (Catalina), clang 12.0.0, x64
+
+- MacOS 13.4.1 (Venture), clang 14.0.3, arm64
+
+- SUSE 15.4, gcc 7.5.0, x64
+
+- SUSE 15.4, clang 13. 0.1, x64
+
+- SUSE 15.4, gcc 7.5.0, x64
+
+- Ubuntu 20.04, gcc 9.4.0, x64
+
+- Ubuntu 20.04, clang 10.0.0, x64
+
+- Ubuntu 20.04, tcc 0.9.27, x64
+
+- VAX/VMS 5.4-3, VAXC 3.2, VAX (simh)
+
+
+### Prerequisites
+
+The following packages are required to build and/or run the simulator.
+
+- Debian : gcc | clang | tcc, make, libx11-dev, libc6-dev, xfonts-base
+
+- Fedora : gcc, make, libx11-dev, libc6-dev, xorg-x11-xfonts-base
+
+- Gentoo : gcc, make, libx11-dev, libc6-dev, font-misc-misc
+
+- MacOS  : clang, make, [xquartz](https://www.xquartz.org/)
+
+- SUSE   : gcc | clang, make, libX11-devel
+
+- Ubuntu : gcc, make, libx11-dev, libc6-dev, xfonts-base
 
 
 ### Keyboard Shortcuts
@@ -211,20 +219,23 @@ This allows you to use your own ROM images with any of the simulators.
 
 ### Known Issues
 
-On UNIX/Linux a 24 bit colour display is required.
+* Keyboard shortcuts only work on Linux.
 
-Keyboard shortcuts only work on Linux.
+* A 24 bit colour display is required.
 
-On a Raspberry Pi the display is not updated properly if either FKMS or KMS
+* On a Raspberry Pi the display is not updated properly if either FKMS or KMS
 graphics overlays are enabled.  The following entries in '/boot/config.txt'
 should be commented out as shown.
 
     #dtoverlay=vc4-fkms-v3d
     #dtoverlay=vc4-kms-v3d
 
-HP 67 is unable to read or write to magnetic cards.
+##### HP 37E - Completed
+* Fails self test.
 
-HP 37E fails self test.
+##### HP 67  - Working
+* Cannot read or write to magnetic cards.
+* Has continuous memory.
 
 
 #### VMS Specific Issues
@@ -235,65 +246,6 @@ the simulators with support for colour display).
 
 Not all text is visible due to the limited colour palette and the DEC fonts
 are missing some characters (for example the Pi symbol).
-
-
-### Tested
-
-
-- Debian 11 (Bullseye, gcc 10.2.1, x64
-
-- Debian 11 (Bullseye, tcc 0.9.27, x64
-
-- Debian 11 (Bullseye, clang 11.0.1-2, x64
-
-- Debian 10 (Buster), gcc 8.3.0, x64
-
-- Debian 10 (Buster), clang 7.0.1, x64
-
-- Debian 10 (Buster), gcc 8.3.0, arm
-
-- Debian 9 (Stretch), gcc 6.3.0, arm
-
-- Debian 5 (Lenny), gcc 4.2.4, alpha
-
-- Fedora 34, gcc 11.2.1, x64
-
-- Gentoo, gcc 11.2.0, x64
-
-- MacOS 10 (Catalina), clang 12.0.0, x64
-
-- MacOS 13.4.1 (Venture), clang 14.0.3, arm64
-
-- SUSE 15.4, gcc 7.5.0, x64
-
-- SUSE 15.4, clang 13. 0.1, x64
-
-- SUSE 15.4, gcc 7.5.0, x64
-
-- Ubuntu 20.04, gcc 9.4.0, x64
-
-- Ubuntu 20.04, clang 10.0.0, x64
-
-- Ubuntu 20.04, tcc 0.9.27, x64
-
-- VAX/VMS 5.4-3, VAXC 3.2, VAX (simh)
-
-
-### Prerequisites
-
-The following packages are required to build and/or run the simulator.
-
-- Debian : gcc | clang | tcc, make, libx11-dev, libc6-dev, xfonts-base
-
-- Fedora : gcc, make, libx11-dev, libc6-dev, xorg-x11-xfonts-base
-
-- Gentoo : gcc, make, libx11-dev, libc6-dev, font-misc-misc
-
-- MacOS  : clang, make, [xquartz](https://www.xquartz.org/)
-
-- SUSE   : gcc | clang, make, libX11-devel
-
-- Ubuntu : gcc, make, libx11-dev, libc6-dev, xfonts-base
 
 
 ### Problem Reports
