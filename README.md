@@ -124,8 +124,6 @@ the command line.
 
     $ make CC=clang VERBOSE=1 all
 
-To build the simulator on MacOS 10.9 or later, you need to install [XQuartz](https://www.xquartz.org/) which provides support for X11. You can then download and build the application in the same way as on Linux.
-
 
 ### Keyboard Shortcuts
 
@@ -241,17 +239,12 @@ are missing some characters (for example the Pi symbol).
 
 ### Tested
 
-- Fedora 34, gcc 11.2.1, x64
-
-- Gentoo, gcc 11.2.0, x64
 
 - Debian 11 (Bullseye, gcc 10.2.1, x64
 
 - Debian 11 (Bullseye, tcc 0.9.27, x64
 
 - Debian 11 (Bullseye, clang 11.0.1-2, x64
-
-- Ubuntu 20.04, gcc 9.3.0, x64
 
 - Debian 10 (Buster), gcc 8.3.0, x64
 
@@ -263,9 +256,25 @@ are missing some characters (for example the Pi symbol).
 
 - Debian 5 (Lenny), gcc 4.2.4, alpha
 
+- Fedora 34, gcc 11.2.1, x64
+
+- Gentoo, gcc 11.2.0, x64
+
 - MacOS 10 (Catalina), clang 12.0.0, x64
 
 - MacOS 13.4.1 (Venture), clang 14.0.3, arm64
+
+- SUSE 15.4, gcc 7.5.0, x64
+
+- SUSE 15.4, clang 13. 0.1, x64
+
+- SUSE 15.4, gcc 7.5.0, x64
+
+- Ubuntu 20.04, gcc 9.4.0, x64
+
+- Ubuntu 20.04, clang 10.0.0, x64
+
+- Ubuntu 20.04, tcc 0.9.27, x64
 
 - VAX/VMS 5.4-3, VAXC 3.2, VAX (simh)
 
@@ -274,15 +283,17 @@ are missing some characters (for example the Pi symbol).
 
 The following packages are required to build and/or run the simulator.
 
+- Debian : gcc | clang | tcc, make, libx11-dev, libc6-dev, xfonts-base
+
 - Fedora : gcc, make, libx11-dev, libc6-dev, xorg-x11-xfonts-base
 
 - Gentoo : gcc, make, libx11-dev, libc6-dev, font-misc-misc
 
-- Debian : gcc (tcc or clang), make, libx11-dev, libc6-dev, xfonts-base
+- MacOS  : clang, make, [xquartz](https://www.xquartz.org/)
+
+- SUSE   : gcc | clang, make, libX11-devel
 
 - Ubuntu : gcc, make, libx11-dev, libc6-dev, xfonts-base
-
-- MacOS  : xquartz
 
 
 ### Problem Reports
