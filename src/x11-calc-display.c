@@ -64,8 +64,8 @@
  * 01 Mar 22         - Fixed digits 4 and 10 (11C, 12C, 15C and 16C) tested
  *                     all digits now work as expected - MT
  * 12 Mar 22         - Added display annunciators - MT
- * 11 Dec 22         - Renamed models with continious memory and added hp25
- *                     hp33e, and hp38e - MT
+ * 11 Dec 22         - Renamed models with continious memory and added HP25
+ *                     HP33E, and HP38E - MT
  * 24 Dec 21         - Simplified the display creation routine by using the
  *                     number digits to determine the size and position  of
  *                     each digit in the display - MT
