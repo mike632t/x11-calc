@@ -101,8 +101,6 @@ specify which one to use from the command line.
 
 - MacOS 13.4.1 (Venture), clang 14.0.3, arm64
 
-- SUSE 15.4, gcc 7.5.0, x64
-
 - SUSE 15.4, clang 13. 0.1, x64
 
 - SUSE 15.4, gcc 7.5.0, x64
