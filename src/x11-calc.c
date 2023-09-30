@@ -205,8 +205,8 @@
  *                   - Reduced the length of time that the off button  must
  *                     be held down to exit - MT
  * 26 May 22         - Blank line after an error message not needed - MT
- * 11 Dec 22         - Renamed models with continious memory and added hp25
- *                     HP33e, and HP38e - MT
+ * 11 Dec 22         - Renamed models with continious memory and added HP25
+ *                     HP33E, and HP38E - MT
  * 24 Dec 22         - Command line parsing routine now uses the same macro
  *                     definitions as the the error message definitions.
  *                   - Execution  speed  now uses VOYAGER and  SPICE  macro
