@@ -220,6 +220,7 @@
  * 02 Feb 23         - Changed 'linux' to '__linux__' to fix a problem with
  *                     conditional compilation that stopped keypress events
  *                     from being processed - MT
+ * 30 Sep 23         - Started to add support for HP19C - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Add verbose option.
@@ -630,7 +631,7 @@ int main(int argc, char *argv[])
 
 #if defined(SWITCHES)
    if (h_switch[0] != NULL) h_processor->enabled = h_switch[0]->state; /* Allow switches to be undefined if not used */
-#if defined(HP10)
+#if defined(HP10) || defined(HP19c)
    if (h_switch[1] != NULL) h_processor->print = h_switch[1]->state;
 #else
    if (h_switch[1] != NULL) h_processor->mode = h_switch[1]->state;
@@ -785,7 +786,7 @@ int main(int argc, char *argv[])
                   {
                      h_switch[1]->state = !(h_switch[1]->state); /* Toggle switch */
                      i_switch_draw(x_display, x_application_window, i_screen, h_switch[1]);
-#if defined(HP10)
+#if defined(HP10) || defined(HP19c)
                      h_processor->print = h_switch[1]->state;
 #else
                      h_processor->mode = h_switch[1]->state;

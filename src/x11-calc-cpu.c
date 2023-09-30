@@ -356,6 +356,7 @@
  * 01 May 23         - Corrected default mode setting -
  * 12 Jan 23         - Tidied up some of the processor trace output - MT
  * 06 Jun 23         - Removed unused references to HP91c and HP97 - MT
+ * 30 Sep 23         - Started to add support for HP19C - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -426,7 +427,7 @@ static void v_fprint_flags(FILE *h_file, oprocessor *h_processor) /* Display the
    fprintf(h_file, "\tflags = 0x%04X%12c   ", i_temp, ' ');
 }
 
-#if defined(HP10)
+#if defined(HP10) || defined(HP19c)
 static void v_fprint_buffer(FILE *h_file, oprocessor *h_processor) /* Display the current processor flags */
 {
    static const unsigned char c_charmap[0x40] = {
@@ -858,7 +859,7 @@ void v_processor_reset(oprocessor *h_processor) /* Reset processor */
       h_processor->crc[i_count] = False;
    h_processor->crc[READY] = -4;
 #endif
-#if defined(HP10)
+#if defined(HP10) || defined(HP19c)
    h_processor->position = BUFSIZE;
    for (i_count = 0; i_count < BUFSIZE; i_count++) /* Reset the character buffer contents */
       h_processor->buffer[i_count] = 0x3f;
@@ -888,7 +889,7 @@ oprocessor *h_processor_create(int *h_rom) /* Create a new processor 'object' */
    h_processor->trace = False;
    h_processor->step = False;
    v_processor_reset(h_processor);
-#if defined(HP10)
+#if defined(HP10) || defined(HP19c)
    h_processor->print = False;
 #endif
    return(h_processor);
@@ -1002,7 +1003,12 @@ static void v_delayed_rom(oprocessor *h_processor) /* Delayed ROM select */
       h_processor->pc = (h_processor->rom_number << 8 | (h_processor->pc & 0xf0ff));
       h_processor->flags[DELAYED_ROM] = False; /* Clear flag */
    }
-   if (h_processor->pc < 0x1400) h_processor->pc &= 0xfff; /* The first ROM chip is mapped to all ROM banks, access implies a switch to bank 0 */
+   /* The first ROM chip is mapped to all ROM banks, access to ROM 0 implies a switch to bank 0. */
+#if defined(HP19c)
+   if (h_processor->pc < 0x1100) h_processor->pc &= 0xfff; /* ROM size appears to be reduced to 64 bytes for HP19C - don't know why. */
+#else
+   if (h_processor->pc < 0x1400) h_processor->pc &= 0xfff;
+#endif
 }
 
 void op_jsb(oprocessor *h_processor, int i_address) /* Jump to subroutine */
@@ -1039,7 +1045,7 @@ void v_op_goto(oprocessor *h_processor) /* Conditional go to */
 
 void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single instruction */
 {
-#if defined(HP10) || defined(WOODSTOCK) || defined(SPICE) || defined(HP67)
+#if defined(WOODSTOCK) || defined(SPICE) || defined(HP10) || defined(HP67)
    static const int i_set_p[16] = { 14,  4,  7,  8, 11,  2, 10, 12,  1,  3, 13,  6,  0,  9,  5, 14 };
    static const int i_tst_p[16] = { 4 ,  8, 12,  2,  9,  1,  6,  3,  1, 13,  5,  0, 11, 10,  7,  4 };
 #endif
@@ -1065,9 +1071,20 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
       if (h_processor->timer) h_processor->status[11] = True;
 #endif
 
-#if defined(HP21) || defined(HP22) || defined(HP25) || defined(HP25c) || defined(HP27) || defined(HP29c)
+#if defined(HP21) || defined(HP22) || defined(HP25) || defined(HP25c) || defined(HP27) || defined(HP29c) /* Not all WOODSTOCKs !! */
       if (h_processor->keypressed) h_processor->status[15] = True; /* Set status bit if key pressed */
       if (h_processor->mode) h_processor->status[3] = True; /* Set status bits based on switch position */
+      h_processor->status[5] = True; /* Low Power */
+#endif
+
+#if defined(HP19c)
+      if (h_processor->status[0])
+      {
+         if (h_processor->mode) h_processor->status[3] = True; /* Get the state of the PRGM/RUN switch */
+         h_processor->status[15] = !(h_processor->keypressed); /* Clear status bit if key pressed */
+      }
+      #else
+      /** h_processor->status[15] = h_processor->keypressed; /* Set status bit if key pressed */
       h_processor->status[5] = True; /* Low Power */
 #endif
 
@@ -1474,7 +1491,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                case 00120: /* keys -> a[2:1] (0 001 010 000) */
                   if (h_processor->trace) fprintf(stdout, "keys -> a\t\t");
                   /* The HP10 and HP19C use this to get the state of the printer mode switch */
-#if defined(HP10)
+#if defined(HP10) || defined(HP19c)
                   if (h_processor->print)
                      h_processor->reg[A_REG]->nibble[1] = 0x1; /* HP10 - All = 1, Print = 2 (print with display off), Display = 4 */
                   else
@@ -1534,7 +1551,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   h_processor->sp = (h_processor->sp - 1) & (STACK_SIZE - 1); /* Update stack pointer */
                   h_processor->pc = h_processor->stack[h_processor->sp]; /* Pop program counter from the stack */
                   break;
-#if defined(HP10)
+#if defined(HP10) || defined(HP19c)
                case 01120: /* pik1120 */
                   if (h_processor->trace) fprintf(stdout, "pik1120\t\t");
                   v_fprint_buffer (stdout, h_processor);
@@ -1625,7 +1642,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                      int i_addr;
                      if (h_processor->trace) fprintf(stdout, "c -> data address\t");
                      i_addr = (h_processor->reg[C_REG]->nibble[1] << 4) + h_processor->reg[C_REG]->nibble[0];
-#if defined(HP10)
+#if defined(HP10) || defined(HP19c)
                      if ((i_addr < MEMORY_SIZE) || (i_addr == 0xFF)) /* Address 0xFF tells the PIK chip to put the key code on the data bus */
                         h_processor->addr = i_addr;
                      else
@@ -1675,7 +1692,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   if (h_processor->trace)
                      v_fprint_register(stdout, h_processor->mem[h_processor->addr]);
                   break;
-#if defined(HP10)
+#if defined(HP10) || defined(HP19c)
                case 01660: /* pik1660 print alpha (6 bit data)*/
                   if (h_processor->trace) fprintf(stdout, "pik1660");
                   {
@@ -1922,7 +1939,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   if (h_processor->trace) fprintf(stdout, "data -> c\t\t");
                   v_reg_copy(h_processor, h_processor->reg[C_REG], h_processor->mem[h_processor->addr]);
                }
-#if defined(HP10)
+#if defined(HP10) || defined(HP19c)
                else if (((i_opcode >> 6) == 0xf) && (h_processor->addr == 0xff))
                {
                   if (h_processor->trace) fprintf(stdout, "data -> c\t\t");
@@ -3349,6 +3366,12 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             {
                h_processor->pc = (h_processor->pc & 0xff00) | i_opcode >> 2;
                v_delayed_rom(h_processor);
+#if defined(HP19c)
+               /* If status bit zero is set and the least significant 12 bits of the program counter are greater than 05777 then add 02000 to the address
+                * My thanks to Tony NIXON for his help here */
+               if (h_processor->status[0])
+                  if ((h_processor->pc & 0x0fff) > 0x0bff) h_processor->pc = h_processor->pc + 0x0400; /* Modify program counter so it is in in the range 010000 to 011777 */
+#endif
             }
             break;
 #endif

@@ -55,6 +55,7 @@
  * 28 Dec 22         - Changed the name of printer mode status from mode to
  *                     print - MT
  * 06 Jun 23         - Removed unused references to HP91c and HP97 - MT
+ * 30 Sep 23         - Started to add support for HP19C - MT
  *
  */
 
@@ -105,7 +106,7 @@
 #define STATES          8
 #endif
 
-#if defined(HP10)
+#if defined(HP10) || defined(HP19c) || defined(HP97)
 #define BUFSIZE         20             /* Output buffer size */
 #endif
 
@@ -141,7 +142,7 @@ typedef struct {
    unsigned char step;                 /* Step flag */
    unsigned char sleep;                /* Sleep */
    unsigned char enabled;              /* Enabled */
-#if defined(HP10)
+#if defined(HP10) || defined(HP19c)
    unsigned char print;                /* Save print mode */
    unsigned int position;              /* Position of next char in buffer */
    unsigned char buffer[BUFSIZE];      /* Printer output buffer */

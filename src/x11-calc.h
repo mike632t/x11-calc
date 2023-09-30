@@ -55,6 +55,7 @@
  * 11 Dec 22         - Renamed models with continious memory and added HP25
  *                     HP33e, and HP38e - MT
  * 24 Dec 22         - Modified scale width for HP10 - MT
+ * 30 Sep 23         - Started to add support for HP19C - MT
  *
  * TO DO :           -
  */
@@ -136,6 +137,12 @@
 #define TITLE        "RPN calc 29C"
 #define WOODSTOCK
 #include "x11-calc-29c.h"
+
+#elif defined(HP19c)
+#define FILENAME     "x11-calc-19c"
+#define TITLE        "RPN calc 19C"
+#define WOODSTOCK
+#include "x11-calc-19c.h"
 
 #elif defined(HP67)
 #define FILENAME     "x11-calc-67"
