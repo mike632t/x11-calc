@@ -633,6 +633,7 @@ int main(int argc, char *argv[])
    if (h_switch[0] != NULL) h_processor->enabled = h_switch[0]->state; /* Allow switches to be undefined if not used */
 #if defined(HP10) || defined(HP19c)
    if (h_switch[1] != NULL) h_processor->print = h_switch[1]->state;
+   h_processor->mode = True; /** Dummy assignment to set mode until switch is defined **/
 #else
    if (h_switch[1] != NULL) h_processor->mode = h_switch[1]->state;
 #endif
