@@ -357,6 +357,7 @@
  * 12 Jan 23         - Tidied up some of the processor trace output - MT
  * 06 Jun 23         - Removed unused references to HP91c and HP97 - MT
  * 30 Sep 23         - Started to add support for HP19C - MT
+ *  5 Oct 23         - Fixed silly error in HP19C code - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -1083,7 +1084,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
          if (h_processor->mode) h_processor->status[3] = True; /* Get the state of the PRGM/RUN switch */
          h_processor->status[15] = !(h_processor->keypressed); /* Clear status bit if key pressed */
       }
-      #else
+      else
       /** h_processor->status[15] = h_processor->keypressed; /* Set status bit if key pressed */
       h_processor->status[5] = True; /* Low Power */
 #endif
