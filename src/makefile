@@ -22,6 +22,8 @@
 #
 #  https://stackoverflow.com/questions/50941196/
 #
+#  https://www.gnu.org/software/make/manual/html_node/Prerequisite-Types.html
+#
 #  01 May 13   0.1   - Initial version - MT
 #  02 Jul 13         - Separated  code  and headers for button  and  colour
 #                      manipulation into separate files - MT
@@ -53,6 +55,9 @@
 #  26 Mar 23         - Set compiler specific flags for gcc - MT
 #  01 May 23         - Fixed ordering of compiler options - MT
 #  22 Sep 23         - Added build options for MacOS - MT
+#   5 Oct 23         - Creates target folder if required - MT
+#                    - Lists the execuitable files instead of just the file
+#                      names - MT
 #
 
 MODEL	= 21
@@ -66,6 +71,7 @@ OBJECTS	= $(SOURCES:.c=.o)
 OUTPUT	= $(PROGRAM).out
 LANG	= LANG_$(shell (echo $$LANG | cut -f 1 -d '_'))
 UNAME	=  $(shell uname)
+TARGET	=  ../bin
 
 LIBS	= -lX11 -lm
 FLAGS	= -fcommon -Wall -pedantic -std=gnu99
@@ -91,27 +97,33 @@ ifdef DEBUG
 FLAGS	+=  -g
 endif
 
-all: clean ../bin/$(PROGRAM)-$(MODEL) $(OBJECTS)
+all: clean $(TARGET)/$(PROGRAM)-$(MODEL) $(OBJECTS)
 FLAGS	+= -D HP$(MODEL) -D $(LANG)
 SOURCES += x11-calc-$(MODEL).c
 
-../bin/$(PROGRAM)-$(MODEL): $(OBJECTS)
+$(TARGET)/$(PROGRAM)-$(MODEL): $(OBJECTS)
 ifdef VERBOSE
 	@echo
-	@echo $(CC) $(OBJECTS) $(LIBS) -o ../bin/$@
+	@echo $(CC) $(OBJECTS) $(LIBS) -o $@
 	@echo
 endif
-	@$(CC) $(FLAGS) $(OBJECTS) -o ../bin/$@ $(LIBS)
+	@$(CC) $(FLAGS) $(OBJECTS) -o $@ $(LIBS) && (cd $(TARGET) && ls --color $$(echo $@ | sed "s:$(TARGET)/::g") ) # Escape $ using $$...
+
+$(OBJECTS): | $(TARGET)
+
+$(TARGET):
+	@mkdir $(TARGET)
 
 $(OBJECTS) : $(SOURCES)
-	@echo $(PROGRAM)-$(MODEL)
 ifdef VERBOSE
+	@echo
+	@echo "***" $(PROGRAM)-$(MODEL)
 	@echo
 	@echo $(CC) $(FLAGS) -c $(SOURCES)
 endif
-	@rm -f ../bin/$(PROGRAM)-$(MODEL)
+	@rm -f $(TARGET)/$(PROGRAM)-$(MODEL)
 	@$(CC) $(FLAGS) -c $(SOURCES)
 
 clean:
 #	@rm -f $(PROGRAM)-$(MODEL).o
-	@rm -f ../bin/$(OBJECTS) # -v
+	@rm -f $(TARGET)/$(OBJECTS) # -v
