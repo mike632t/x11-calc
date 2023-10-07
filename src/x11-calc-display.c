@@ -70,6 +70,7 @@
  *                     number digits to determine the size and position  of
  *                     each digit in the display - MT
  *                   - Added dummy digit to the HP10 display - MT
+ * 07 Oct 23         - Modified display routines to handle the HP19C - MT
  *
  */
 
@@ -240,7 +241,7 @@ int i_display_draw(Display* x_display, int x_application_window, int i_screen, o
  */
 
 int i_display_update(Display* x_display, int x_application_window, int i_screen, odisplay *h_display, oprocessor *h_processor){
-#if defined(HP67) || defined(HP19c)
+#if defined(HP67)
    int i_count;
    static int c_digits [] =
    {
@@ -534,6 +535,8 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
                else
                   h_display->segment[i_count]->mask = DISPLAY_SPACE;
                break;
+            case 0x03: /* Decimal point (for HP19C) */
+               h_display->segment[i_count]->mask = DISPLAY_DECIMAL;
             case 0x01: /* Number and decimal point */
                h_display->segment[i_count]->mask = h_display->segment[i_count]->mask | DISPLAY_DECIMAL;
             }

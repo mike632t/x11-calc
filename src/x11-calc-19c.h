@@ -27,7 +27,7 @@
 #define BUTTONS            31
 #define SWITCHES           2
 
-#define DIGITS             15
+#define DIGITS             13
 
 #define DIGIT_COLOUR       RED
 #define DIGIT_BACKGROUND   DARK_RED
