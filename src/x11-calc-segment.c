@@ -115,7 +115,6 @@ int i_segment_draw(Display *h_display, int x_application_window, int i_screen, o
 #if defined(HP10) || defined(HP67) || defined(HP35) || defined(HP80) || defined(HP45) || defined(HP70) || defined(HP55)
    int i_middle;
 #endif
-Don't draw display segment background on ARM
    i_upper = h_segment->height / 4;
    i_lower = h_segment->top +  h_segment->height - i_upper;
    i_upper = h_segment->top + i_upper;
@@ -135,7 +134,7 @@ Don't draw display segment background on ARM
       h_segment->mask & SEG_D && 1, h_segment->mask & SEG_C && 1, \
       h_segment->mask & SEG_B && 1, h_segment->mask & SEG_A && 1));
 
-#if !defined(__ARM_ARCH) || defined(__APPLE__)
+#if (!defined(__ARM_ARCH)) || defined(__APPLE__)
    /* Draw the display segment background */
    XSetForeground(h_display, DefaultGC(h_display, i_screen), h_segment->background);
    XFillRectangle(h_display, x_application_window, DefaultGC(h_display, i_screen), h_segment->left, h_segment->top, h_segment->width, h_segment->height);
@@ -198,6 +197,7 @@ Don't draw display segment background on ARM
       XFillRectangle(h_display, x_application_window, DefaultGC(h_display, i_screen), i_right + 3, i_offset + 2, 3, 3);
    }
 #endif
+
 #endif
 
    /* Draw the in the foreground elements */
