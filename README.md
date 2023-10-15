@@ -83,7 +83,7 @@ $ make CC=tcc VERBOSE=1 all
 
 - Debian 12 (Bookworm), tcc 0.9.27, x64 + arm64
 
-- Debian 11 (Bookworm), gcc 12.2.0, x64 + arm64
+- Debian 12 (Bookworm), gcc 12.2.0, x64 + arm64
 
 - Debian 11 (Bullseye), clang 11.0.1-2, x64
 
@@ -224,24 +224,32 @@ This allows you to use your own ROM images with any of the simulators.
 ### Known Issues
 
 * Keyboard shortcuts only work on Linux.
-
 * A 24 bit colour display is required.
 
-* Uses  a  simplified display on Arm based systems (except Apple) to  avoid
-the display refresh issues seen on the Raspberry Pi if either FKMS  or  KMS
-overlays are enabled. (Note - Do not disable KMS on the latest Raspberry Pi
-OS release).
-
 ##### HP 37E
+
 * Fails self test.
 
 ##### HP 67
+
 * Cannot read or write to magnetic cards.
 * Has continuous memory.
 
-#### VMS Specific Issues
+### Raspberry Pi Specific Issues
 
-Colour palette assumes a black and white display (if your system has 24-bit
+* The code uses a simplified display on Arm based systems (except Apple) to
+avoid the display refresh issues seen on the Raspberry Pi if either FKMS or
+KMS overlays are enabled. (Note- Do not disable KMS on the latest Raspberry
+Pi OS release).
+* The window manager on recent Raspberry Pi OS releases doesn't disable the
+ability  to resize or maximize a window if the maximum and  minimum  window
+sizes are the same. The application will resize the window automatically it
+the  user attempts to change the size but if it is maximized then the title
+bar will be hidden (by the window manager) until the window is unmaximized.
+
+### VMS Specific Issues
+
+* Colour palette assumes a black and white display (if your system has 24-bit
 colour you can modify the definition of COLOUR_DEPTH in x11-calc.h to build
 the simulators with support for colour display).
 
