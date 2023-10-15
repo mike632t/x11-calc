@@ -252,8 +252,7 @@ bar will be hidden (by the window manager) until the window is unmaximized.
 * Colour palette assumes a black and white display (if your system has 24-bit
 colour you can modify the definition of COLOUR_DEPTH in x11-calc.h to build
 the simulators with support for colour display).
-
-Not all text is visible due to the limited colour palette and the DEC fonts
+* Not all text is visible due to the limited colour palette and the DEC fonts
 are missing some characters (for example the Pi symbol).
 
 
