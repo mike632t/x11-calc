@@ -220,6 +220,9 @@
  * 02 Feb 23         - Changed 'linux' to '__linux__' to fix a problem with
  *                     conditional compilation that stopped keypress events
  *                     from being processed - MT
+ * 15 Oct 22         - Checks  the window size and resizes it if  necessary
+ *                     if the Windows Manager doesn't act on  WM_SIZE_HINTS
+ *                     (WSL2, Raspberry Pi OS) - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Add verbose option.
@@ -339,9 +342,9 @@ int main(int argc, char *argv[])
    unsigned int i_screen_height; /* Screen height */
    unsigned int i_window_width = WIDTH; /* Window width in pixels */
    unsigned int i_window_height = HEIGHT; /* Window height in pixels */
+   unsigned int i_background_colour = BACKGROUND; /* Window's background colour */
    unsigned int i_window_border = 4; /* Window's border width */
    unsigned int i_colour_depth; /* Window's colour depth */
-   unsigned int i_background_colour; /* Window's background colour */
    int i_window_left, i_window_top; /* Window's top-left corner */
    int i_screen; /* Default screen number */
 
@@ -538,7 +541,6 @@ int main(int argc, char *argv[])
    i_screen = DefaultScreen(x_display); /* Get the default screen for our X server */
    i_screen_width = DisplayWidth(x_display, i_screen);
    i_screen_height = DisplayHeight(x_display, i_screen);
-   i_background_colour = BACKGROUND;
 
    x_application_window = XCreateSimpleWindow(x_display, /* Create the application window, as a child of the root window */
       RootWindow(x_display, i_screen),
@@ -551,11 +553,14 @@ int main(int argc, char *argv[])
 
    h_size_hint = XAllocSizeHints(); /* Set application window size */
    h_size_hint->flags = PMinSize | PMaxSize;
+   h_size_hint->height = i_window_height; /* Obsolete but used by some older windows managers */
+   h_size_hint->width = i_window_width; /* Obsolete but used by some older windows managers */
    h_size_hint->min_height = i_window_height;
    h_size_hint->min_width = i_window_width;
    h_size_hint->max_height = i_window_height;
    h_size_hint->max_width = i_window_width;
    XSetWMNormalHints(x_display, x_application_window, h_size_hint);
+
    XStoreName(x_display, x_application_window, s_title); /* Set the window title */
 
    if (XGetGeometry(x_display, x_application_window,    /* Get window geometry */
@@ -814,6 +819,32 @@ int main(int argc, char *argv[])
          case Expose : /* Draw or redraw the window */
             {
                int i_count;
+
+               if (XGetGeometry(x_display, x_application_window,    /* Get window geometry */
+                  &RootWindow(x_display, i_screen),
+                  &i_window_left, &i_window_top,
+                  &i_window_width,
+                  &i_window_height,
+                  &i_window_border,
+                  &i_colour_depth) == False)
+               v_error(h_err_display_properties);
+
+               if ((i_window_width != WIDTH) || (i_window_height != HEIGHT)) /* Check window is the right size */
+               {
+                  i_window_width = WIDTH;  /* Resize if necessary */
+                  i_window_height = HEIGHT;
+                  h_size_hint = XAllocSizeHints(); /* Set application window size */
+                  h_size_hint->flags = PMinSize | PMaxSize;
+                  h_size_hint->height = i_window_height; /* Obsolete but used by some older windows managers */
+                  h_size_hint->width = i_window_width; /* Obsolete but used by some older windows managers */
+                  h_size_hint->min_height = i_window_height;
+                  h_size_hint->min_width = i_window_width;
+                  h_size_hint->max_height = i_window_height;
+                  h_size_hint->max_width = i_window_width;
+                  XSetWMNormalHints(x_display, x_application_window, h_size_hint);
+                  XResizeWindow(x_display, x_application_window, WIDTH, HEIGHT); /* If size hint is ignored! */
+               }
+
                i_display_draw(x_display, x_application_window, i_screen, h_display);/* Draw display */
 #if defined(LABELS)
                for (i_count = 0; i_count < LABELS; i_count++) /* Draw labels */
