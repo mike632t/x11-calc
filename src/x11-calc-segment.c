@@ -136,7 +136,7 @@ int i_segment_draw(Display *h_display, int x_application_window, int i_screen, o
       h_segment->mask & SEG_D && 1, h_segment->mask & SEG_C && 1, \
       h_segment->mask & SEG_B && 1, h_segment->mask & SEG_A && 1));
 
-#if !(defined(__aarch64__) || defined(__aarch__)) || defined(__APPLE__)
+#if !(defined(__aarch64__) || defined(__aarch__) || defined(__arm__)  || defined(__arm64__)) || defined(__APPLE__)
    /* Draw the display segment background */
    XSetForeground(h_display, DefaultGC(h_display, i_screen), h_segment->background);
    XFillRectangle(h_display, x_application_window, DefaultGC(h_display, i_screen), h_segment->left, h_segment->top, h_segment->width, h_segment->height);
