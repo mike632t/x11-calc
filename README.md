@@ -23,13 +23,16 @@ More [screenshots](./img/)
 
 ### Latest News
 
-22 Sep 23
+14 Oct 23
    - Updated build instructions.
+   - Uses a simpler display on ARM (excluding Apple).
+
+22 Sep 23
    - Added ability to build using make on MacOS.
 
 03 Jun 23
-   - Fixed compiler directive so keyboard works again on linux.
-   - Fixed a problem in the make file.
+   - Fixed keyboard on linux.
+   - Fixed make file.
 
 01 May 23
    - Fixed ordering of compiler options (affecting recent versions of gcc).
@@ -56,38 +59,41 @@ folder  will  be created to automatically).  Then change directory  to  the
 new  folder run 'make all' build all the simulators.
 
 e.g:
+```
+$ wget https://github.com/mike632t/x11-calc/archive/refs/heads/stable.zip
+$ unzip stable.zip
+$ cd x11-calc-stable
+$ make all
 
-    $ wget https://github.com/mike632t/x11-calc/archive/refs/heads/stable.zip
-    $ unzip stable.zip
-    $ cd x11-calc-stable
-    $ mkdir bin
-    $ make all
-
-    $ ./bin/x11-calc-29
-    x11-calc-29: Version 0.4 [Commit ID: 81c55be] 16 Oct 21 21:15:00 (Build: 0067)
-    ROM Size : 4096 words
-
+$ ./bin/x11-calc-29
+x11-calc-29: Version 0.4 [Commit ID: 81c55be] 16 Oct 21 21:15:00 (Build: 0067)
+ROM Size : 4096 words
+```
 If more than one C compiler is installed or if gcc is not available you can
 specify which one to use from the command line.
+```
+$ make CC=clang VERBOSE=1 all
 
-    $ make CC=clang VERBOSE=1 all
-
-    $ make CC=tcc VERBOSE=1 all
-
+$ make CC=tcc VERBOSE=1 all
+```
 
 ### Tested
 
-- Debian 11 (Bullseye, gcc 10.2.1, x64
+- Debian 12 (Bookworm), clang 14.0.6, x64 + arm64
 
-- Debian 11 (Bullseye, tcc 0.9.27, x64
+- Debian 12 (Bookworm), tcc 0.9.27, x64 + arm64
 
-- Debian 11 (Bullseye, clang 11.0.1-2, x64
+- Debian 11 (Bookworm), gcc 12.2.0, x64 + arm64
 
-- Debian 10 (Buster), gcc 8.3.0, x64
+- Debian 11 (Bullseye), clang 11.0.1-2, x64
+
+- Debian 11 (Bullseye), gcc 10.2.1, x64
+
+- Debian 11 (Bullseye), tcc 0.9.27, x64
+
+- Debian 10 (Buster), gcc 8.3.0, x64 + arm
 
 - Debian 10 (Buster), clang 7.0.1, x64
-
-- Debian 10 (Buster), gcc 8.3.0, arm
 
 - Debian 9 (Stretch), gcc 6.3.0, arm
 
@@ -144,7 +150,7 @@ The following keyboard shortcuts should work on Linux:
 financial models 'n' and 'i' correspond to 'n' and 'i' if not shifted.
 
 On programmable models 'A' - 'E' correspond to the function keys where they
-exist and 'Space' to 'SST' if not shifted
+exist and 'Space' maps to 'SST' if not shifted.
 
 'Ctrl-Z'  Quits,  and  'Ctrl-C' does a reset.  For models  with  continuous
 memory 'Ctrl-Z' saves the current register contents, and 'Ctrl-C'  restores
@@ -157,9 +163,9 @@ For  models with continuous memory the contents of program memory and  data
 registers are saved in a hidden file in the users' HOME directory when  the
 program  exits  or the calculator is switched off, and restored  from  this
 hidden file when the simulator is loaded or reset using 'Ctrl-C'
-
-    ~/.x11-calc-nn.dat
-
+```
+~/.x11-calc-nn.dat
+```
 When  starting the simulator the name of the data file used to restore  the
 saved state can be specified on the command line allowing previously  saved
 copies of programs to be loaded automatically when the simulator starts  or
@@ -194,24 +200,24 @@ contents held in an separate file.
 
 For the HP10C, HP11C, HP12C, HP15C, and HP16C the ROM comprised of pairs of
 hexadecimal values as address:opcode.
-
-    0000:107
-    0001:04e
-    0002:270
-    0003:238
-    0004:2ee
-    0005:13f
-
+```
+0000:107
+0001:04e
+0002:270
+0003:238
+0004:2ee
+0005:13f
+```
 Other models include the ROM as part of the program, but you can specify an
 alternate ROM comprising of pairs of octal values.
-
-    00000:00255
-    00001:01420
-    00002:00451
-    00003:01456
-    00004:01746
-    00005:00472
-
+```
+00000:00255
+00001:01420
+00002:00451
+00003:01456
+00004:01746
+00005:00472
+```
 This allows you to use your own ROM images with any of the simulators.
 
 
@@ -221,20 +227,17 @@ This allows you to use your own ROM images with any of the simulators.
 
 * A 24 bit colour display is required.
 
-* On a Raspberry Pi the display is not updated properly if either FKMS or KMS
-graphics overlays are enabled.  The following entries in '/boot/config.txt'
-should be commented out as shown.
+* Uses  a  simplified display on Arm based systems (except Apple) to  avoid
+the display refresh issues seen on the Raspberry Pi if either FKMS  or  KMS
+overlays are enabled. (Note - Do not disable KMS on the latest Raspberry Pi
+OS release).
 
-    #dtoverlay=vc4-fkms-v3d
-    #dtoverlay=vc4-kms-v3d
-
-##### HP 37E - Completed
+##### HP 37E
 * Fails self test.
 
-##### HP 67  - Working
+##### HP 67
 * Cannot read or write to magnetic cards.
 * Has continuous memory.
-
 
 #### VMS Specific Issues
 
