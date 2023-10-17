@@ -107,6 +107,9 @@ ifdef VERBOSE
 	@echo $(CC) $(OBJECTS) $(LIBS) -o $@
 	@echo
 endif
+ifeq ($(wildcard $(TARGET)/.),)
+	@mkdir -p -v $(TARGET)
+endif
 	@$(CC) $(FLAGS) $(OBJECTS) -o $@ $(LIBS) && (cd $(TARGET) && ls --color $$(echo $@ | sed "s:$(TARGET)/::g") ) # Escape $ using $$...
 
 $(OBJECTS): | $(TARGET)

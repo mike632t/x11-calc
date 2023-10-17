@@ -47,6 +47,12 @@
  *                     when DEBUG is defined (doesn't need to be true) - MT
  * 08 Feb 22         - Include header for labels - MT
  * 30 Sep 23         - Started to add support for HP19C - MT
+ * 14 Oct 23         - Don't draw display segment background on ARM (unless
+ *                     it is an Apple) as X11 performance on a Raspberry Pi
+ *                     isn't up to it (even if a Pi 4) - MT
+ *                   - Changed the way the code tests to see if it is being
+ *                     built on an ARM processor to make it compatible with
+ *                     both tcc and clang - MT
  *
  * TO DO :           - Optimize drawing of display segment by drawing in
  ^                     all the darker background regions before the foreground.
@@ -133,6 +139,7 @@ int i_segment_draw(Display *h_display, int x_application_window, int i_screen, o
       h_segment->mask & SEG_D && 1, h_segment->mask & SEG_C && 1, \
       h_segment->mask & SEG_B && 1, h_segment->mask & SEG_A && 1));
 
+#if !(defined(__aarch64__) || defined(__aarch__) || defined(__arm__)  || defined(__arm64__)) || defined(__APPLE__)
    /* Draw the display segment background */
    XSetForeground(h_display, DefaultGC(h_display, i_screen), h_segment->background);
    XFillRectangle(h_display, x_application_window, DefaultGC(h_display, i_screen), h_segment->left, h_segment->top, h_segment->width, h_segment->height);
@@ -194,6 +201,8 @@ int i_segment_draw(Display *h_display, int x_application_window, int i_screen, o
       XFillRectangle(h_display, x_application_window, DefaultGC(h_display, i_screen), i_right + 3, i_offset - 4, 3, 3);
       XFillRectangle(h_display, x_application_window, DefaultGC(h_display, i_screen), i_right + 3, i_offset + 2, 3, 3);
    }
+#endif
+
 #endif
 
    /* Draw the in the foreground elements */
