@@ -1,9 +1,9 @@
 /*
- * gcc-wait.c - RPN (Reverse Polish) calculator simulator.
+ * gcc-wait.c
  *
  * Copyright(C) 2019 - MT
  *
- * Cross platform delay.
+ * Cross platform delay function.
  *
  * Waits for the specified number of milliseconds.
  *

@@ -1,9 +1,9 @@
 /*
- * gcc-debug.h - RPN (Reverse Polish) calculator simulator.
+ * gcc-debug.h
  *
  * Copyright(C) 2013   MT
  *
- * Debug macro.
+ * Define debug macro.
  *
  * This  program is free software: you can redistribute it and/or modify it
  * under  the terms of the GNU General Public License as published  by  the
