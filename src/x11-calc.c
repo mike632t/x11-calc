@@ -224,6 +224,10 @@
  * 15 Oct 22         - Checks  the window size and resizes it if  necessary
  *                     if the Windows Manager doesn't act on  WM_SIZE_HINTS
  *                     (WSL2, Raspberry Pi OS) - MT
+ * 16 Oct 23         - Decided not to include any code to work around a bug
+ *                     in the Wayfire Window Manager that means it does not
+ *                     respond properly to WM_SIZE_HINTS, hopefully it will
+ *                     be fixed upsteam - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Add verbose option.
@@ -821,32 +825,6 @@ int main(int argc, char *argv[])
          case Expose : /* Draw or redraw the window */
             {
                int i_count;
-
-               if (XGetGeometry(x_display, x_application_window,    /* Get window geometry */
-                  &RootWindow(x_display, i_screen),
-                  &i_window_left, &i_window_top,
-                  &i_window_width,
-                  &i_window_height,
-                  &i_window_border,
-                  &i_colour_depth) == False)
-               v_error(h_err_display_properties);
-
-               if ((i_window_width != WIDTH) || (i_window_height != HEIGHT)) /* Check window is the right size */
-               {
-                  i_window_width = WIDTH;  /* Resize if necessary */
-                  i_window_height = HEIGHT;
-                  h_size_hint = XAllocSizeHints(); /* Set application window size */
-                  h_size_hint->flags = PMinSize | PMaxSize;
-                  h_size_hint->height = i_window_height; /* Obsolete but used by some older windows managers */
-                  h_size_hint->width = i_window_width; /* Obsolete but used by some older windows managers */
-                  h_size_hint->min_height = i_window_height;
-                  h_size_hint->min_width = i_window_width;
-                  h_size_hint->max_height = i_window_height;
-                  h_size_hint->max_width = i_window_width;
-                  XSetWMNormalHints(x_display, x_application_window, h_size_hint);
-                  XResizeWindow(x_display, x_application_window, WIDTH, HEIGHT); /* If size hint is ignored! */
-               }
-
                i_display_draw(x_display, x_application_window, i_screen, h_display);/* Draw display */
 #if defined(LABELS)
                for (i_count = 0; i_count < LABELS; i_count++) /* Draw labels */
