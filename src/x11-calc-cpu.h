@@ -56,6 +56,7 @@
  *                     print - MT
  * 06 Jun 23         - Removed unused references to HP91c and HP97 - MT
  * 30 Sep 23         - Started to add support for HP19C - MT
+ * 21 Oct 23         - Defined MANUAL, NORMAL, and TRACE print modes - MT
  *
  */
 
@@ -107,6 +108,10 @@
 #endif
 
 #if defined(HP10) || defined(HP19c) || defined(HP97)
+#define TRACE           1              /* Trace = 1, Normal = 2 (print with display off), Manual = 4 */
+#define NORMAL          2
+#define MANUAL          4
+
 #define BUFSIZE         20             /* Output buffer size */
 #endif
 
