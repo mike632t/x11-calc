@@ -22,6 +22,8 @@
  * 10 Oct 21         - Allow use of NULL pointers - MT
  * 03 Jan 21         - Changed debug() macro so that debug code is executed
  *                     when DEBUG is defined (doesn't need to be true) - MT
+ * 21 Oct 23         - Updated switch parameters to accomodate a 3 position
+ *                     switch - MT
  *
  */
 
@@ -69,7 +71,7 @@ oswitch *h_switch_pressed(oswitch *h_switch, int i_xpos, int i_ypos){
 
 /* switch_create (index, text, font, left, top, width, height, colour) */
 
-oswitch *h_switch_create(int i_index, char* s_text, char* s_alternate,
+oswitch *h_switch_create(int i_index, char* s_on, char* s_mid, char* s_off,
    XFontStruct *h_normal_font,
    int i_left, int i_top, int i_width, int i_height, char b_state,
    unsigned int i_colour, unsigned int i_alternate_colour) {
@@ -80,8 +82,9 @@ oswitch *h_switch_create(int i_index, char* s_text, char* s_alternate,
    if ((h_switch = malloc (sizeof(*h_switch)))==NULL) v_error("Memory allocation failed!");
 
    h_switch->index = i_index;
-   h_switch->text = s_text;
-   h_switch->alternate = s_alternate;
+   h_switch->on = s_on;
+   h_switch->mid = s_mid;
+   h_switch->off = s_off;
    h_switch->text_font = h_normal_font;
 
    h_switch->left = i_left;
@@ -109,16 +112,16 @@ int i_switch_draw(Display *h_display, int x_application_window, int i_screen, os
 
       XSetFont(h_display, DefaultGC(h_display, i_screen), h_switch->text_font->fid); /* Set the text font. */
       i_upper = h_switch->top + (h_switch->text_font->ascent) + (h_switch->height - (h_switch->text_font->ascent + h_switch->text_font->descent)) / 2;
-      i_indent = 1 + h_switch->left + ((h_switch->width / 2) - XTextWidth(h_switch->text_font, h_switch->text, strlen(h_switch->text))) / 2; /* Find position of the text */
-      XDrawString(h_display, x_application_window, DefaultGC(h_display, i_screen), i_indent, i_upper, h_switch->text, strlen(h_switch->text)); /* Draw the main text */
+      i_indent = 1 + h_switch->left + ((h_switch->width / 2) - XTextWidth(h_switch->text_font, h_switch->on, strlen(h_switch->on))) / 2; /* Find position of the text */
+      XDrawString(h_display, x_application_window, DefaultGC(h_display, i_screen), i_indent, i_upper, h_switch->on, strlen(h_switch->on)); /* Draw the main text */
 
       if (h_switch->state) /* Select the alternate text colour */
          XSetForeground(h_display, DefaultGC(h_display, i_screen), h_switch->colour);
       else
          XSetForeground(h_display, DefaultGC(h_display, i_screen), h_switch->alternate_colour);
 
-      i_indent = 1 + h_switch->left + (h_switch->width / 2) + ((h_switch->width / 2) - XTextWidth(h_switch->text_font, h_switch->text, strlen(h_switch->text))) / 2; /* Find position of the text */
-      XDrawString(h_display, x_application_window, DefaultGC(h_display, i_screen), i_indent, i_upper, h_switch->alternate, strlen(h_switch->alternate)); /* Draw the main text */
+      i_indent = 1 + h_switch->left + (h_switch->width / 2) + ((h_switch->width / 2) - XTextWidth(h_switch->text_font, h_switch->on, strlen(h_switch->on))) / 2; /* Find position of the text */
+      XDrawString(h_display, x_application_window, DefaultGC(h_display, i_screen), i_indent, i_upper, h_switch->off, strlen(h_switch->off)); /* Draw the main text */
    }
    return(True);
 }
