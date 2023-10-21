@@ -228,6 +228,8 @@
  *                     in the Wayfire Window Manager that means it does not
  *                     respond properly to WM_SIZE_HINTS, hopefully it will
  *                     be fixed upsteam - MT
+ * 21 Oct 23         - HP10 and HP19C now use a three positon switch to set
+ *                     the printing mode to MANUAL, NORMAL, or TRACE - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Add verbose option.
@@ -641,7 +643,19 @@ int main(int argc, char *argv[])
 #if defined(SWITCHES)
    if (h_switch[0] != NULL) h_processor->enabled = h_switch[0]->state; /* Allow switches to be undefined if not used */
 #if defined(HP10) || defined(HP19c)
-   if (h_switch[1] != NULL) h_processor->print = h_switch[1]->state;
+   if (h_switch[1] != NULL)
+      switch(h_switch[1]->state)
+      {
+         case 0:
+            h_processor->print = MANUAL;
+            break;
+         case 1:
+            h_processor->print = NORMAL;
+            break;
+         case 2:
+            h_processor->print = TRACE;
+            break;
+      }
    h_processor->mode = True; /** Dummy assignment to set mode until switch is defined **/
 #else
    if (h_switch[1] != NULL) h_processor->mode = h_switch[1]->state;
@@ -794,11 +808,27 @@ int main(int argc, char *argv[])
                   }
                   if (!(h_switch_pressed(h_switch[1], x_event.xbutton.x, x_event.xbutton.y) == NULL))
                   {
-                     h_switch[1]->state = !(h_switch[1]->state); /* Toggle switch */
-                     i_switch_draw(x_display, x_application_window, i_screen, h_switch[1]);
 #if defined(HP10) || defined(HP19c)
-                     h_processor->print = h_switch[1]->state;
+                     h_switch[1]->state++; /* Update print switch state */
+                     if (h_switch[1]->state > 3)
+                        h_switch[1]->state = 0;
+                     i_switch_draw(x_display, x_application_window, i_screen, h_switch[1]);
+                     switch(h_switch[1]->state)
+                     {
+                        case 0:
+                           h_processor->print = MANUAL;
+                           break;
+                        case 1:
+                        case 3:
+                           h_processor->print = NORMAL;
+                           break;
+                        case 2:
+                           h_processor->print = TRACE;
+                           break;
+                     }
 #else
+                     h_switch[1]->state = !(h_switch[1]->state); /* Toggle prgm/run switch */
+                     i_switch_draw(x_display, x_application_window, i_screen, h_switch[1]);
                      h_processor->mode = h_switch[1]->state;
 #endif
                   }
