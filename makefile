@@ -30,14 +30,18 @@
 #                      HP33E, and HP38E - MT
 #  23 Dec 22			- Changed the order in which simulators are built - MT
 #  30 Sep 23         - Added HP19C - MT
+#  24 Oct 23			- Selects files using a wildcard, avoids any errors if
+#                      no files exist when using tar - MT
+#                    - Backs up backup files! (*.h.[0-9], *.h.[0-9]) - MT
 #
 
 PROGRAM	=  x11-calc
-FILES		=  ./src/*.c ./src/*.h ./prg/*.dat ./src/makefile
-FILES		+= ./bin/*.rom
-FILES		+= ./bin/x11-calc-*
-FILES		+= *.md LICENSE makefile .gitignore .gitattributes
-FILES		+= ./img/x11-calc-*.png
+
+FILES		=  $(wildcard ./src/*.c) $(wildcard ./src/*.c.[0-9]) $(wildcard ./src/*.h) $(wildcard ./src/*.h.[0-9]) ./src/makefile
+FILES		+= $(wildcard ./bin/x11-calc-*) $(wildcard *.md) LICENSE makefile
+FILES		+= $(wildcard ./rom/*) $(wildcard ./prg/*.dat) $(wildcard ./img/x11-calc-*.png)
+FILES		+= .gitignore .gitattributes
+
 MAKE		=  make
 
 all: clean hp35 hp45 hp70 hp80 hp10 hp21 hp22 hp25 hp25c hp27 hp29c hp19c hp67 hp31e hp32e hp33e hp33c hp34c hp37e hp38e hp38c hp10c hp11c hp12c hp15c hp16c
