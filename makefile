@@ -32,6 +32,7 @@
 #  24 Oct 23         - Selects files using a wildcard, avoids any errors if
 #                      no files exist when using tar - MT
 #                    - Backs up backup files! (*.h.[0-9], *.h.[0-9]) - MT
+#                    - Clean removes execuitable files - MT
 #
 
 PROGRAM	=  x11-calc
@@ -131,6 +132,7 @@ hp16c:
 
 clean:
 	@rm  -f ./src/*.o
+	@find bin -type f  ! -name "*.*" -delete
 
 backup:
 	@echo "$(PROGRAM)-`date +'%Y%m%d%H%M'`.tar.gz"; tar -czpf ..\/$(PROGRAM)-`date +'%Y%m%d%H%M'`.tar.gz $(FILES)
