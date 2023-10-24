@@ -33,6 +33,8 @@
 #                      no files exist when using tar - MT
 #                    - Backs up backup files! (*.h.[0-9], *.h.[0-9]) - MT
 #                    - Clean removes execuitable files - MT
+#                    - Checks that the bin directory exists before deleting
+#                      files - MT
 #
 
 PROGRAM	=  x11-calc
@@ -132,7 +134,7 @@ hp16c:
 
 clean:
 	@rm  -f ./src/*.o
-	@find bin -type f  ! -name "*.*" -delete
+	@test -d ./bin && find ./bin -type f  ! -name "*.*" -delete || true
 
 backup:
 	@echo "$(PROGRAM)-`date +'%Y%m%d%H%M'`.tar.gz"; tar -czpf ..\/$(PROGRAM)-`date +'%Y%m%d%H%M'`.tar.gz $(FILES)
