@@ -187,7 +187,7 @@
  * 12 Jan 22         - Only sets mode switch state at start up - MT
  *                   - Checks  for breakpoints and instruction traps at the
  *                     same time - MT
- * 21 Jan 22   0.1   - Moved text messages to a separate file  - MT
+ * 21 Jan 22   0.9   - Moved text messages to a separate file  - MT
  * 23 Jan 22         - Removed unwanted debug code - MT
  * 29 Jan 22         - Added an optional bezel to the display, not that you
  *                     will see it yet - MT
@@ -228,8 +228,11 @@
  *                     in the Wayfire Window Manager that means it does not
  *                     respond properly to WM_SIZE_HINTS, hopefully it will
  *                     be fixed upsteam - MT
- * 21 Oct 23         - HP10 and HP19C now use a three positon switch to set
+ * 21 Oct 23   0.10  - HP10 and HP19C now use a three positon switch to set
  *                     the printing mode to MANUAL, NORMAL, or TRACE - MT
+ * 22 Oct 23         - Switch state now updated via a method - MT
+ * 24 Oct 23   0.10  - Added  a three positon switch to the HP19C to select
+ *                     OFF, PRGM, or RUN mode - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Add verbose option.
@@ -240,9 +243,9 @@
  */
 
 #define NAME           "x11-calc"
-#define VERSION        "0.8"
-#define BUILD          "0092"
-#define DATE           "29 Jan 22"
+#define VERSION        "0.10"
+#define BUILD          "0115"
+#define DATE           "22 Oct 23"
 #define AUTHOR         "MT"
 
 #define INTERVAL 25    /* Number of ticks to execute before updating the display */
@@ -641,7 +644,29 @@ int main(int argc, char *argv[])
    i_count = 0;
 
 #if defined(SWITCHES)
+#if defined(HP19c)
+   if (h_switch[0] != NULL) /* Allow switches to be undefined if not used */
+   {
+      switch(h_switch[0]->state)
+      {
+      case 0:
+         h_processor->enabled = False; /* Disable the processor */
+         h_processor->mode = False; /* Update prgm/run switch */
+         break;
+      case 1:
+      case 3:
+         h_processor->enabled = True;
+         h_processor->mode = False; /* Update prgm/run switch */
+         break;
+      case 2:
+         h_processor->enabled = True;
+         h_processor->mode = True; /* Update prgm/run switch */
+         break;
+      }
+   }
+#else
    if (h_switch[0] != NULL) h_processor->enabled = h_switch[0]->state; /* Allow switches to be undefined if not used */
+#endif
 #if defined(HP10) || defined(HP19c)
    if (h_switch[1] != NULL)
       switch(h_switch[1]->state)
@@ -649,19 +674,18 @@ int main(int argc, char *argv[])
          case 0:
             h_processor->print = MANUAL;
             break;
+         case 3:
          case 1:
-            h_processor->print = NORMAL;
-            break;
-         case 2:
             h_processor->print = TRACE;
             break;
+         case 2:
+            h_processor->print = NORMAL;
+            break;
       }
-   h_processor->mode = True; /** Dummy assignment to set mode until switch is defined **/
 #else
    if (h_switch[1] != NULL) h_processor->mode = h_switch[1]->state;
 #endif
 #endif
-
    while (!b_abort) /* Main program event loop */
    {
       i_count--;
@@ -707,7 +731,7 @@ int main(int argc, char *argv[])
          case KeyPress :
             h_key_pressed(h_keyboard, x_display, x_event.xkey.keycode, x_event.xkey.state); /* Attempts to translate a key code into a character */
             if (h_keyboard->key == (XK_BackSpace & 0x1f)) h_keyboard->key = XK_Escape & 0x1f; /* Map backspace to escape */
-            if (h_keyboard->key == (XK_Z & 0x1f)) /* Ctrl-z to exit */
+            if (h_keyboard->key == (XK_Z & 0x1f)) /* Ctrl-Z to exit */
                b_abort = True;
             else if (h_keyboard->key == (XK_Q & 0x1f)) /* Ctrl-Q to resume */
                h_processor->step = !(b_run  = True);
@@ -781,12 +805,36 @@ int main(int argc, char *argv[])
                   }
                }
 #if defined(SWITCHES)
-               if (h_pressed == NULL) { /* It wasn't a button that was pressed check the switches */
-                  if (!(h_switch_pressed(h_switch[0], x_event.xbutton.x, x_event.xbutton.y) == NULL))
+               if (h_pressed == NULL)  /* It wasn't a button that was pressed check the switches */
+               {
+#if defined(HP19c)
+                  if (h_switch_pressed(h_switch[0], x_event.xbutton.x, x_event.xbutton.y) != NULL)
                   {
-                     h_switch[0]->state = !(h_switch[0]->state); /* Toggle switch */
+                     switch(i_switch_click(h_switch[0]))
+                     {
+                        case 0:
+                           v_save_state(h_processor); /* Save current settings */
+                           h_processor->enabled = False; /* Disable the processor */
+                           i_ticks = DELAY * 2;
+                           break;
+                        case 1:
+                           v_processor_reset(h_processor); /* Reset the processor */
+                           v_restore_state(h_processor); /* Restore saved settings */
+                        case 3:
+                           h_processor->enabled = True;
+                           h_processor->mode = False; /* Update prgm/run switch */
+                           break;
+                        case 2:
+                           h_processor->enabled = True;
+                           h_processor->mode = True; /* Update prgm/run switch */
+                           break;
+                     }
                      i_switch_draw(x_display, x_application_window, i_screen, h_switch[0]);
-                     if (h_switch[0]->state)
+                  }
+#else
+                  if (h_switch_pressed(h_switch[0], x_event.xbutton.x, x_event.xbutton.y) != NULL)
+                  {
+                     if (i_switch_click(h_switch[0]))
                      {
                         v_processor_reset(h_processor); /* Reset the processor */
                         v_restore_state(h_processor); /* Restore saved settings */
@@ -796,7 +844,7 @@ int main(int argc, char *argv[])
                         v_save_state(h_processor); /* Save current settings */
                         h_processor->enabled = False; /* Disable the processor */
 #if defined(HP67)
-                        i_ticks = DELAY * 4; /* Set count down */
+                        i_ticks = DELAY * 4;
 #elif defined(VOYAGER)
                         i_ticks = DELAY * 3;
 #elif defined(SPICE)
@@ -804,34 +852,36 @@ int main(int argc, char *argv[])
 #else
                         i_ticks = DELAY * 2;
 #endif
+
                      }
+                     i_switch_draw(x_display, x_application_window, i_screen, h_switch[0]);
                   }
-                  if (!(h_switch_pressed(h_switch[1], x_event.xbutton.x, x_event.xbutton.y) == NULL))
-                  {
+#endif
 #if defined(HP10) || defined(HP19c)
-                     h_switch[1]->state++; /* Update print switch state */
-                     if (h_switch[1]->state > 3)
-                        h_switch[1]->state = 0;
-                     i_switch_draw(x_display, x_application_window, i_screen, h_switch[1]);
-                     switch(h_switch[1]->state)
+                  if (h_switch_pressed(h_switch[1], x_event.xbutton.x, x_event.xbutton.y) != NULL)
+                  {
+                     switch(i_switch_click(h_switch[1]))
                      {
                         case 0:
                            h_processor->print = MANUAL;
                            break;
-                        case 1:
                         case 3:
+                        case 1:
                            h_processor->print = NORMAL;
                            break;
                         case 2:
                            h_processor->print = TRACE;
                            break;
                      }
-#else
-                     h_switch[1]->state = !(h_switch[1]->state); /* Toggle prgm/run switch */
                      i_switch_draw(x_display, x_application_window, i_screen, h_switch[1]);
-                     h_processor->mode = h_switch[1]->state;
-#endif
                   }
+#else
+                  if (h_switch_pressed(h_switch[1], x_event.xbutton.x, x_event.xbutton.y) != NULL)
+                  {
+                     h_processor->mode = i_switch_click(h_switch[1]); /* Update prgm/run switch */
+                     i_switch_draw(x_display, x_application_window, i_screen, h_switch[1]);
+                  }
+#endif
                }
 #endif
             }

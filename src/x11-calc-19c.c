@@ -29,7 +29,9 @@
  *
  * 24 Dec 22   0.1   - Initial version derived from HP29C- MT
  * 21 Oct 23         - Updated switch parameters to accomodate a 3 position
- *                     switch - MT *
+ *                     switch - MT
+ * 23 Oct 23         - Increased height of three position switches - MT
+ *
  */
 
 #define VERSION        "0.1"
@@ -58,8 +60,8 @@
 
 void v_init_switches(oswitch *h_switch[]) /* Define the switches. */
 {
-   h_switch[0] = h_switch_create(00000, "OFF", "PRGM", "RUN", h_alternate_font, KBD_LEFT, KBD_TOP, 2 * KEY_WIDTH + KEY_GAP, SWITCH_HEIGHT, True, MID_GREY, DARK_GREY);
-   h_switch[1] = h_switch_create(00000, " MAN", "TRACE", "NORM", h_alternate_font, KBD_LEFT + 4 * KEY_WIDTH + 3 * KEY_GAP, KBD_TOP, 2 * KEY_WIDTH + KEY_GAP, SWITCH_HEIGHT, False, MID_GREY, DARK_GREY);
+   h_switch[0] = h_switch_create(00000, "OFF", "PRGM", "RUN", h_alternate_font, KBD_LEFT, KBD_TOP, 2 * KEY_WIDTH + KEY_GAP, SWITCH_HEIGHT * 2, 2, MID_GREY, DARK_GREY);
+   h_switch[1] = h_switch_create(00000, " MAN", "TRACE", "NORM", h_alternate_font, KBD_LEFT + 4 * KEY_WIDTH + 3 * KEY_GAP, KBD_TOP, 2 * KEY_WIDTH + KEY_GAP, SWITCH_HEIGHT * 2, 0, MID_GREY, DARK_GREY);
 }
 
 void v_init_buttons(obutton *h_button[]) {

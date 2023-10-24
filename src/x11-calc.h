@@ -69,8 +69,6 @@
 #define SCALE_HEIGHT    1
 #endif
 
-/** #define __TIME__     "00:00:00" /* Release only */
-
 #if defined(vms)
 #define COLOUR_DEPTH 1
 #else
