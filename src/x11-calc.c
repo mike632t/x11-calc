@@ -230,7 +230,7 @@
  * 21 Oct 23   0.10  - HP10 now uses a three positon switch to select print
  *                     mode - MT
  * 22 Oct 23         - Switch state now updated via a method - MT
- * 26 Oct 23         - HP10 disables the display in PRINT mode - MT
+ * 26 Oct 23         - Make the HP10 disable the display in PRINT mode - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Add verbose option.
