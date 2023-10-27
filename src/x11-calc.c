@@ -230,6 +230,7 @@
  * 21 Oct 23   0.10  - HP10 now uses a three positon switch to select print
  *                     mode - MT
  * 22 Oct 23         - Switch state now updated via a method - MT
+ * 26 Oct 23         - HP10 disables the display in PRINT mode - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Add verbose option.
@@ -652,9 +653,11 @@ int main(int argc, char *argv[])
          case 3:
          case 1:
             h_processor->print = TRACE;
+            h_display->enabled = True;
             break;
          case 2:
             h_processor->print = NORMAL;
+            h_display->enabled = False;
             break;
       }
 #else
@@ -811,16 +814,18 @@ int main(int argc, char *argv[])
                   {
                      switch(i_switch_click(h_switch[1]))
                      {
-                        case 0:
-                           h_processor->print = MANUAL;
-                           break;
-                        case 3:
-                        case 1:
-                           h_processor->print = NORMAL;
-                           break;
-                        case 2:
-                           h_processor->print = TRACE;
-                           break;
+                     case 0:
+                        h_processor->print = MANUAL;
+                        break;
+                     case 3:
+                     case 1:
+                        h_processor->print = TRACE;
+                        h_display->enabled = True;
+                        break;
+                     case 2:
+                        h_processor->print = NORMAL;
+                        h_display->enabled = False;
+                        break;
                      }
                      i_switch_draw(x_display, x_application_window, i_screen, h_switch[1]);
                   }
