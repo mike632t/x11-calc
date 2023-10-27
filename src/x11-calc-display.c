@@ -70,6 +70,8 @@
  *                     number digits to determine the size and position  of
  *                     each digit in the display - MT
  *                   - Added dummy digit to the HP10 display - MT
+ * 26 Oct 23         - Use the display enabled property to hide the display
+ *                     if it should be blank, eg when in print mode - MT
  *
  */
 
@@ -128,6 +130,7 @@ odisplay *h_display_create(int i_index, int i_left, int i_top, int i_width, int 
    h_display->display_top = i_display_top;
    h_display->display_width = i_display_width;
    h_display->display_height = i_display_height;
+   h_display->enabled = True;
 
    i_size = ((i_display_width - 1)/ DIGITS);
    i_offset = (i_display_width - (i_size * DIGITS)) / 2;
@@ -409,7 +412,7 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
    for (i_count = 0; i_count < DIGITS - 1; i_count++) {
       if (h_display->segment[i_count] != NULL)
       {
-         if (h_processor->flags[DISPLAY_ENABLE] && h_processor->enabled)
+         if (h_processor->flags[DISPLAY_ENABLE] && h_processor->enabled && h_display->enabled) /* Allows print mode to disable display */
          {
             if (h_display->segment[i_count] != NULL)
                h_display->segment[i_count]->mask = c_digits[h_processor->reg[A_REG]->nibble[REG_SIZE - i_offset - i_count - 1]];
@@ -525,7 +528,8 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
 
    for (i_count = 0; i_count < DIGITS; i_count++) {
       if (h_display->segment[i_count] != NULL) {
-         if (h_processor->flags[DISPLAY_ENABLE] && h_processor->enabled) {
+         if (h_processor->flags[DISPLAY_ENABLE] && h_processor->enabled)
+         {
             h_display->segment[i_count]->mask = c_digits[h_processor->reg[A_REG]->nibble[REG_SIZE - 1 - i_count]];
             switch (h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x07) {
             case 0x02: /* Sign */
