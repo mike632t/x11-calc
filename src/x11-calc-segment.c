@@ -119,7 +119,6 @@ int i_segment_draw(Display *h_display, int x_application_window, int i_screen, o
 #if defined(HP10) || defined(HP67) || defined(HP35) || defined(HP80) || defined(HP45) || defined(HP70) || defined(HP55) || defined(HP19c)
    int i_middle;
 #endif
-
    i_upper = h_segment->height / 4;
    i_lower = h_segment->top +  h_segment->height - i_upper;
    i_upper = h_segment->top + i_upper;
