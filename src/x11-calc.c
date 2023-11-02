@@ -231,6 +231,7 @@
  *                     mode - MT
  * 22 Oct 23         - Switch state now updated via a method - MT
  * 26 Oct 23         - Make the HP10 disable the display in PRINT mode - MT
+ * 01 Nov 23         - Added /ROM qualifier for non Unix like plaforms - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Add verbose option.
@@ -513,6 +514,19 @@ int main(int argc, char *argv[])
             b_trace = False; /* Enable tracing */
          else if (!strncmp(argv[i_count], "/TRACE", i_index))
             b_trace = True; /* Enable tracing */
+         else if (!strncmp(argv[i_count], "/ROM", i_index))
+         {
+            if (i_count + 1 < argc)
+            {
+               v_read_rom(h_processor, argv[i_count + 1]); /* Load user specified settings */
+               if (i_count + 2 < argc) /* Remove the parameter from the arguments */
+                  for (i_offset = i_count + 1; i_offset < argc - 1; i_offset++)
+                     argv[i_offset] = argv[i_offset + 1];
+               argc--;
+            }
+            else
+              v_error(h_err_missing_argument, argv[i_count]);
+         }
          else if (!strncmp(argv[i_count], "/VERSION", i_index))
          {
             v_version; /* Display version information */
