@@ -26,6 +26,8 @@
  *                     for buttons and switches into two functions - MT
  * 27 Nov 22         - Specify button style when creating buttons (the code
  *                     to handle a 'flat' button was there all along!) - MT
+ * 21 Oct 23         - Updated switch parameters to accomodate a 3 position
+ *                     switch - MT
  *
  */
 
