@@ -18,23 +18,24 @@
 #
 #	Note separator (tab) at the beginning of the line CANNOT be a space..!
 #
-#	09 Oct 21   0.1   - Initial version - MT
+#  09 Oct 21   0.1   - Initial version - MT
 #  22 Nov 21   0.2   - Added data files to backups - MT
 #  04 Jan 22         - Added HP35 - MT
 #  07 Jan 22         - Added HP80 - MT
 #  07 Jan 22         - Added HP70 - MT
 #  31 jan 22         - Added support for the HP10C, HP11C, HP12C, HP15C and
 #                      HP16C - MT
-#	31 Mar 22			- Moved ROMs into target folder - MT
+#  31 Mar 22         - Moved ROMs into target folder - MT
 #  11 Dec 22         - Renamed models with continious memory and added HP25
 #                      HP33E, and HP38E - MT
-#  23 Dec 22			- Changed the order in which simulators are built - MT
+#  23 Dec 22         - Changed the order in which simulators are built - MT
 #  24 Oct 23         - Selects files using a wildcard, avoids any errors if
 #                      no files exist when using tar - MT
 #                    - Backs up backup files! (*.h.[0-9], *.h.[0-9]) - MT
 #                    - Clean removes execuitable files - MT
 #                    - Checks that the bin directory exists before deleting
 #                      files - MT
+#  01 Nov 23         - Tidied up tabs in comments - MT
 #
 
 PROGRAM	=  x11-calc
@@ -138,4 +139,3 @@ clean:
 
 backup:
 	@echo "$(PROGRAM)-`date +'%Y%m%d%H%M'`.tar.gz"; tar -czpf ..\/$(PROGRAM)-`date +'%Y%m%d%H%M'`.tar.gz $(FILES)
-
