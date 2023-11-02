@@ -1,9 +1,10 @@
 /*
- * gcc-wait.c
+ * gcc-platform.h
  *
- * Copyright(C) 2019 - MT
+ * Copyright(C) 2013   MT
  *
- * Cross platform delay function definition.
+ * Attempts to define macros that define the compiler, operating system and
+ * processor type.
  *
  * This  program is free software: you can redistribute it and/or modify it
  * under  the terms of the GNU General Public License as published  by  the
@@ -18,10 +19,6 @@
  * You  should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * 16 Aug 20         - Initial version - MT
+ * 16 Oct 23         - Initial version - MT
  *
  */
-
-int i_wait(long l_delay);
-
-

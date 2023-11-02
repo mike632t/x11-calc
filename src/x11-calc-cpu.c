@@ -364,6 +364,7 @@
  * 01 May 23         - Corrected default mode setting -
  * 12 Jan 23         - Tidied up some of the processor trace output - MT
  * 06 Jun 23         - Removed unused references to HP91c and HP97 - MT
+ * 21 Oct 23         - Define MANUAL, NORMAL, and TRACE print modes - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -897,7 +898,7 @@ oprocessor *h_processor_create(int *h_rom) /* Create a new processor 'object' */
    h_processor->step = False;
    v_processor_reset(h_processor);
 #if defined(HP10)
-   h_processor->print = False;
+   h_processor->print = MANUAL;
 #endif
    return(h_processor);
 }
@@ -1047,7 +1048,7 @@ void v_op_goto(oprocessor *h_processor) /* Conditional go to */
 
 void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single instruction */
 {
-#if defined(HP10) || defined(WOODSTOCK) || defined(SPICE) || defined(HP67)
+#if defined(WOODSTOCK) || defined(SPICE) || defined(HP10) || defined(HP67)
    static const int i_set_p[16] = { 14,  4,  7,  8, 11,  2, 10, 12,  1,  3, 13,  6,  0,  9,  5, 14 };
    static const int i_tst_p[16] = { 4 ,  8, 12,  2,  9,  1,  6,  3,  1, 13,  5,  0, 11, 10,  7,  4 };
 #endif
@@ -1483,10 +1484,9 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   if (h_processor->trace) fprintf(stdout, "keys -> a\t\t");
                   /* The HP10 and HP19C use this to get the state of the printer mode switch */
 #if defined(HP10)
-                  if (h_processor->print)
-                     h_processor->reg[A_REG]->nibble[1] = 0x1; /* HP10 - All = 1, Print = 2 (print with display off), Display = 4 */
-                  else
-                     h_processor->reg[A_REG]->nibble[1] = 0x4; /* HP19C/97 - Trace = 1, Normal = 2 (print with display off), Manual = 4 */
+                  /* HP10 - All = 1, Print = 2 (print with display off), Display = 4 */
+                  /* HP19C/97 - Trace = 1, Normal = 2 (print with display off), Manual = 4 */
+                  h_processor->reg[A_REG]->nibble[1] = h_processor->print;
 #else
                   h_processor->reg[A_REG]->nibble[2] = (h_processor->code >> 4); /* Put keycode in A_REG */
                   h_processor->reg[A_REG]->nibble[1] = (h_processor->code & 0x0f);

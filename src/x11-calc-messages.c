@@ -42,6 +42,7 @@
  *                     unix like systems - MT
  * 18 Jan 23         - Shortened help message (max string length for C90 is
  *                     509 characters) - MT
+ * 01 Nov 23         - Made missing argument text common to all platforms - MT
  *
  */
 
@@ -94,6 +95,8 @@ const char * h_err_invalid_address = "Direccion (%02o) fuera de rango en %1o-%04
 const char * h_err_invalid_register = "Registro inválido (REG[%03d]) en %1o-%04o en %s en la línea : %d\n";
 #endif /* Hexadecimal */
 
+const char * h_err_missing_argument = "opcion requiere un argumento -- '%s'\n";
+
 #if defined(unix) || defined(__unix__) || defined(__APPLE__)
 const char * c_msg_usage = "Uso: %s [OPCION]... [ARCHIVO]\n\
 Simularor de calculadora RPN para X11.\n\n\
@@ -111,7 +114,6 @@ const char * h_err_invalid_option = "opcion invalida -- '%c'\n";
 const char * h_err_unrecognised_option = "opcion no reconocida '%s'\n";
 const char * h_err_invalid_number = "no es un numero octal -- '%s' \n";
 const char * h_err_address_range = "fuera del rango  -- '%s' \n";
-const char * h_err_missing_argument = "opcion requiere un argumento -- '%s'\n";
 const char * h_err_invalid_argument = "argumento esperado no es -- '%c' \n";
 #else
 const char * c_msg_usage = "Uso: %s [OPCION]... [ARCHIVO]\n\
@@ -152,6 +154,8 @@ const char * h_err_invalid_address = "Ungültige adresse (%02o) an %1o-%04o in %
 const char * h_err_invalid_register = "Ungultiges register (REG[%03d]) an %1o-%04o in %s zeile : %d\n";
 #endif /* Hexadecimal */
 
+const char * h_err_missing_argument = "option benoetigt ein argument -- '%s'\n";
+
 #if defined(unix) || defined(__unix__) || defined(__APPLE__)
 const char * c_msg_usage = "Verwendung: %s [OPTION]... [DATEI]\n\
 Eine RPN rechner-simulation fuer X11.\n\n\
@@ -169,7 +173,6 @@ const char * h_err_invalid_option = "ungueltige option -- '%c'\n";
 const char * h_err_unrecognised_option = "unbekannte option '%s'\n";
 const char * h_err_invalid_number = "keine gueltige oktalzahl -- '%s' \n";
 const char * h_err_address_range = "ausserhalb des adressbereichs -- '%s' \n";
-const char * h_err_missing_argument = "option benoetigt ein argument -- '%s'\n";
 const char * h_err_invalid_argument = "argument erwartet, nicht -- '%c' \n";
 #else
 const char * c_msg_usage = "Verwendung: %s [OPTION...] [DATEI]\n\
@@ -210,6 +213,8 @@ const char * h_err_invalid_address = "Adresse (%02o) hors plage à %1o-%04o dans
 const char * h_err_invalid_register = "Registre invalide (REG[%03d]) à %1o-%04o dans la ligne %s : %d\n";
 #endif /* Hexadecmal */
 
+const char * h_err_missing_argument = "l'option necessite un argument -- '%s'\n";
+
 #if defined(unix) || defined(__unix__) || defined(__APPLE__)
 const char * c_msg_usage = "Utilisation : %s [OPTION]... [FICHIER]\n\
 Une simulation RPN Calculator pour X11.\n\n\
@@ -227,7 +232,6 @@ const char * h_err_invalid_option = "option invalide -- '%c'\n";
 const char * h_err_unrecognised_option = "option non reconnue '%s'\n";
 const char * h_err_invalid_number = "pas un nombre octal -- '%s' \n";
 const char * h_err_address_range = "hors de portée -- '%s' \n";
-const char * h_err_missing_argument = "l'option necessite un argument -- '%s'\n";
 const char * h_err_invalid_argument = "argument attendu -- '%c' \n";
 #else
 const char * c_msg_usage = "Utilisation : %s [OPTION]... [FICHIER]\n\
@@ -269,6 +273,8 @@ const char * h_err_invalid_address = "Address (%06o) out of range at %1o-%04o in
 const char * h_err_invalid_register = "Invalid register (REG[%03d]) at %1o-%04o in %s line : %d\n";
 #endif /* Hexadecimal */
 
+const char * h_err_missing_argument = "option requires an argument -- '%s'\n";
+
 #if defined(unix) || defined(__unix__) || defined(__APPLE__)
 const char * c_msg_usage = "Usage: %s [OPTION]... [FILE]\n\
 An RPN Calculator simulation for X11.\n\n\
@@ -286,7 +292,6 @@ const char * h_err_invalid_option = "invalid option -- '%c'\n";
 const char * h_err_unrecognised_option = "unrecognised option '%s'\n";
 const char * h_err_invalid_number = "not an octal number -- '%s' \n";
 const char * h_err_address_range = "out of range -- '%s' \n";
-const char * h_err_missing_argument = "option requires an argument -- '%s'\n";
 const char * h_err_invalid_argument = "expected argument not -- '%c' \n";
 #else
 const char * c_msg_usage = "Usage: %s [OPTION...] [FILE]\n\

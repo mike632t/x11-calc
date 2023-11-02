@@ -50,12 +50,13 @@
  *                     and status bits back to unsigned char - MT
  * 18 May 22         - Added flag out and flag in registers for HP41 - MT
  * 11 Dec 22         - Renamed models with continious memory and added HP25
- *                     HP33e, and HP38e - MT
+ *                     HP33E, and HP38E - MT
  * 20 Dec 22         - Added a printer buffer to the CPU properties for the
  *                     HP10, HP19C and HP97 (if I ever get that far) - MT
  * 28 Dec 22         - Changed the name of printer mode status from mode to
  *                     print - MT
  * 06 Jun 23         - Removed unused references to HP91c and HP97 - MT
+ * 21 Oct 23         - Defined MANUAL, NORMAL, and TRACE print modes - MT
  *
  */
 
@@ -107,6 +108,10 @@
 #endif
 
 #if defined(HP10)
+#define TRACE           1              /* Trace = 1, Normal = 2 (print with display off), Manual = 4 */
+#define NORMAL          2
+#define MANUAL          4
+
 #define BUFSIZE         20             /* Output buffer size */
 #endif
 

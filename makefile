@@ -18,26 +18,34 @@
 #
 #	Note separator (tab) at the beginning of the line CANNOT be a space..!
 #
-#	09 Oct 21   0.1   - Initial version - MT
+#  09 Oct 21   0.1   - Initial version - MT
 #  22 Nov 21   0.2   - Added data files to backups - MT
-#  04 Jan 22			- Added HP model 35 - MT
-#  07 Jan 22         - Added HP model 80 - MT
-#  07 Jan 22         - Added HP model 70 - MT
+#  04 Jan 22         - Added HP35 - MT
+#  07 Jan 22         - Added HP80 - MT
+#  07 Jan 22         - Added HP70 - MT
 #  31 jan 22         - Added support for the HP10C, HP11C, HP12C, HP15C and
-#                      HP16C (all are currently work in progress) - MT
-#	31 Mar 22			- Moved ROMs into target folder - MT
-#  11 Dec 22			- Renamed models with continious memory and added hp25
-#                      hp33e, and hp38e - MT
-#  23 Dec 22			- Changed the order in which simulators are built - MT
+#                      HP16C - MT
+#  31 Mar 22         - Moved ROMs into target folder - MT
+#  11 Dec 22         - Renamed models with continious memory and added HP25
+#                      HP33E, and HP38E - MT
+#  23 Dec 22         - Changed the order in which simulators are built - MT
 #  06 Jun 23         - Added HP41C - MT
+#  24 Oct 23         - Selects files using a wildcard, avoids any errors if
+#                      no files exist when using tar - MT
+#                    - Backs up backup files! (*.h.[0-9], *.h.[0-9]) - MT
+#                    - Clean removes execuitable files - MT
+#                    - Checks that the bin directory exists before deleting
+#                      files - MT
+#  01 Nov 23         - Tidied up tabs in comments - MT
 #
 
 PROGRAM	=  x11-calc
-FILES		=  ./src/*.c ./src/*.h ./prg/*.dat ./src/makefile
-FILES		+= ./bin/*.rom
-FILES		+= ./bin/x11-calc-*
-FILES		+= *.md LICENSE makefile .gitignore .gitattributes
-FILES		+= ./img/x11-calc-*.png
+
+FILES		=  $(wildcard ./src/*.c) $(wildcard ./src/*.c.[0-9]) $(wildcard ./src/*.h) $(wildcard ./src/*.h.[0-9]) ./src/makefile
+FILES		+= $(wildcard ./bin/x11-calc-*) $(wildcard *.md) LICENSE makefile
+FILES		+= $(wildcard ./rom/*) $(wildcard ./prg/*.dat) $(wildcard ./img/x11-calc-*.png)
+FILES		+= .gitignore .gitattributes
+
 MAKE		=  make
 
 all: clean hp35 hp45 hp70 hp80 hp10 hp21 hp22 hp25 hp25c hp27 hp29c hp67 hp31e hp32e hp33e hp33c hp34c hp37e hp38e hp38c hp41c hp10c hp11c hp12c hp15c hp16c
@@ -131,7 +139,7 @@ hp16c:
 
 clean:
 	@rm  -f ./src/*.o
+	@test -d ./bin && find ./bin -type f  ! -name "*.*" -delete || true
 
 backup:
 	@echo "$(PROGRAM)-`date +'%Y%m%d%H%M'`.tar.gz"; tar -czpf ..\/$(PROGRAM)-`date +'%Y%m%d%H%M'`.tar.gz $(FILES)
-

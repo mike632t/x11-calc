@@ -23,9 +23,16 @@ More [screenshots](./img/)
 
 ### Latest News
 
+14 Oct 23
+   - Updated build instructions.
+   - Uses a simpler display on ARM (excluding Apple).
+
+22 Sep 23
+   - Added ability to build using make on MacOS.
+
 03 Jun 23
-   - Fixed compiler directive so keyboard works again on linux.
-   - Fixed a problem in the make file.
+   - Fixed keyboard on linux.
+   - Fixed make file.
 
 01 May 23
    - Fixed ordering of compiler options (affecting recent versions of gcc).
@@ -43,61 +50,6 @@ More [screenshots](./img/)
    - Renamed HP11 to HP11C, HP12 to HP12C, HP15 to HP15C, HP16 to HP16C.
    - Renamed HP10 to HP10C and added HP10.
 
-### Status
-
-##### HP 35  - Working
-
-##### HP 80  - Working
-
-##### HP 45  - Working
-
-##### HP 70  - Working
-
-##### HP 10  - Working
-
-##### HP 21  - Working
-
-##### HP 22  - Working
-
-##### HP 25  - Working
-
-##### HP 25C - Working
-
-##### HP 27  - Working
-
-##### HP 29C - Working
-
-##### HP 31E - Working
-
-##### HP 32E - Working
-
-##### HP 33E - Working
-
-##### HP 33C - Working
-
-##### HP 34C - Working
-
-##### HP 37E - Completed
-* Fails self test.
-
-##### HP 38E - Working
-
-##### HP 38C - Working
-
-##### HP 67  - Working
-* Cannot read or write to magnetic cards.
-* Has continuous memory.
-
-##### HP 10C - Working
-
-##### HP 11C - Working (More testing needed)
-
-##### HP 12C - Working (More testing needed)
-
-##### HP 15C - Working (More testing needed)
-
-##### HP 16C - Working (More testing needed)
-
 
 ### Compiling
 
@@ -107,29 +59,91 @@ folder  will  be created to automatically).  Then change directory  to  the
 new  folder run 'make all' build all the simulators.
 
 e.g:
+```
+$ wget https://github.com/mike632t/x11-calc/archive/refs/heads/stable.zip
+$ unzip stable.zip
+$ cd x11-calc-stable
+$ make all
 
-    $ wget https://github.com/mike632t/x11-calc/archive/refs/heads/stable.zip
-    $ unzip stable.zip
-    $ cd x11&#8209calc&#8209stable
-    $ make all
+$ ./bin/x11-calc-29
+x11-calc-29: Version 0.4 [Commit ID: 81c55be] 16 Oct 21 21:15:00 (Build: 0067)
+ROM Size : 4096 words
+```
+If more than one C compiler is installed or if gcc is not available you can
+specify which one to use from the command line.
+```
+$ make CC=clang VERBOSE=1 all
 
-    $ ./bin/x11&#8209calc&#820929
-    x11&#8209calc&#820929: Version 0.4 [Commit ID: 81c55be] 16 Oct 21 21:15:00 (Build: 0067)
-    ROM Size : 4096 words
+$ make CC=tcc VERBOSE=1 all
+```
 
-If more than one C compiler is installed then you can specify which one to use  on
-the command line.
+### Tested
 
-    $ make CC=tcc VERBOSE=1 all
+- Debian 12 (Bookworm), clang 14.0.6, x64 + arm64
 
-    $ make CC=clang VERBOSE=1 all
+- Debian 12 (Bookworm), tcc 0.9.27, x64 + arm64
+
+- Debian 12 (Bookworm), gcc 12.2.0, x64 + arm64
+
+- Debian 11 (Bullseye), clang 11.0.1-2, x64
+
+- Debian 11 (Bullseye), gcc 10.2.1, x64
+
+- Debian 11 (Bullseye), tcc 0.9.27, x64
+
+- Debian 10 (Buster), gcc 8.3.0, x64 + arm
+
+- Debian 10 (Buster), clang 7.0.1, x64
+
+- Debian 9 (Stretch), gcc 6.3.0, arm
+
+- Debian 5 (Lenny), gcc 4.2.4, alpha
+
+- Fedora 34, gcc 11.2.1, x64
+
+- Gentoo, gcc 11.2.0, x64
+
+- MacOS 10 (Catalina), clang 12.0.0, x64
+
+- MacOS 13.4.1 (Venture), clang 14.0.3, arm64
+
+- SUSE 15.4, clang 13. 0.1, x64
+
+- SUSE 15.4, gcc 7.5.0, x64
+
+- Ubuntu 20.04, gcc 9.4.0, x64
+
+- Ubuntu 20.04, clang 10.0.0, x64
+
+- Ubuntu 20.04, tcc 0.9.27, x64
+
+- VAX/VMS 5.4-3, VAX C 3.2, VAX (simh)
+
+- OpenVMS 9.2-1, VSI C 7.4-726, x64
+
+
+### Prerequisites
+
+The following packages are required to build and/or run the simulator.
+
+- Debian : gcc | clang | tcc, make, libx11-dev, libc6-dev, xfonts-base
+
+- Fedora : gcc, make, libx11-dev, libc6-dev, xorg-x11-xfonts-base
+
+- Gentoo : gcc, make, libx11-dev, libc6-dev, font-misc-misc
+
+- MacOS  : clang, make, [xquartz](https://www.xquartz.org/)
+
+- SUSE   : gcc | clang, make, libX11-devel
+
+- Ubuntu : gcc, make, libx11-dev, libc6-dev, xfonts-base
 
 
 ### Keyboard Shortcuts
 
 The following keyboard shortcuts should work on Linux:
 
-'0' &#8209 '9', '+'. '&#8209'. '*'. '/' and 'Enter' should do what you expect them to
+'0' - '9', '+'. '-'. '*'. '/' and 'Enter' should do what you expect them to
 (when using numeric key pad you need to use numlock as usual).
 
 'f' and where applicable 'g' and 'h' correspond to the shift keys.
@@ -137,11 +151,11 @@ The following keyboard shortcuts should work on Linux:
 'Esc' or 'Backspace' corresponds to 'Clx', 'c' to CHS, 'e' to 'EEX', and on
 financial models 'n' and 'i' correspond to 'n' and 'i' if not shifted.
 
-On programmable models 'A' &#8209 'E' correspond to the function keys where they
-exist and 'Space' to 'SST' if not shifted
+On programmable models 'A' - 'E' correspond to the function keys where they
+exist and 'Space' maps to 'SST' if not shifted.
 
-'Ctrl&#8209Z'  Quits,  and  'Ctrl&#8209C' does a reset.  For models  with  continuous
-memory 'Ctrl&#8209Z' saves the current register contents, and 'Ctrl&#8209C'  restores
+'Ctrl-Z'  Quits,  and  'Ctrl-C' does a reset.  For models  with  continuous
+memory 'Ctrl-Z' saves the current register contents, and 'Ctrl-C'  restores
 them to the original saved state.
 
 
@@ -150,14 +164,14 @@ them to the original saved state.
 For  models with continuous memory the contents of program memory and  data
 registers are saved in a hidden file in the users' HOME directory when  the
 program  exits  or the calculator is switched off, and restored  from  this
-hidden file when the simulator is loaded or reset using 'Ctrl&#8209;C'
-
-    ~/.x11&#8209calc&#8209nn.dat
-
+hidden file when the simulator is loaded or reset using 'Ctrl-C'
+```
+~/.x11-calc-nn.dat
+```
 When  starting the simulator the name of the data file used to restore  the
 saved state can be specified on the command line allowing previously  saved
 copies of programs to be loaded automatically when the simulator starts  or
-the  simulator is reset using 'Ctrl&#8209;C'.  However, any changes will be
+the  simulator is reset using 'Ctrl-C'.  However, any changes will be
 saved in the hidden data file.
 
 
@@ -169,11 +183,11 @@ you hold down the off switch down for two seconds the program will exit.
 
 ### Debugging
 
-You  can  start the simulation in trace mode using '&#8209;t', or in single  step
-mode using '&#8209;s', and set a breakpoint using '&#8209;b &lt;octal address&gt;'.
+You  can  start the simulation in trace mode using '-t', or in single  step
+mode using '-s', and set a breakpoint using '-b &lt;octal address&gt;'.
 
-'Ctrl&#8209;T'  also toggles trace mode when running, 'Ctrl&#8209;S' executes the  next
-instruction, 'Ctrl&#8209;Q' resumes execution, and 'Ctrl&#8209;R' displays the contents
+'Ctrl-T'  also toggles trace mode when running, 'Ctrl-S' executes the  next
+instruction, 'Ctrl-Q' resumes execution, and 'Ctrl-R' displays the contents
 of the CPU registers.
 
 When in trace mode a jump to the same instruction produces no output.
@@ -183,100 +197,65 @@ When in trace mode a jump to the same instruction produces no output.
 
 No ROM images are included for the HP10C, HP11C, HP12C, HP15C, and HP16C.
 
-The '&#8209r <filename>' command line option provides the ability to use the ROM
+The '-r <filename>' command line option provides the ability to use the ROM
 contents held in an separate file.
 
 For the HP10C, HP11C, HP12C, HP15C, and HP16C the ROM comprised of pairs of
 hexadecimal values as address:opcode.
-
-    0000:107
-    0001:04e
-    0002:270
-    0003:238
-    0004:2ee
-    0005:13f
-
+```
+0000:107
+0001:04e
+0002:270
+0003:238
+0004:2ee
+0005:13f
+```
 Other models include the ROM as part of the program, but you can specify an
 alternate ROM comprising of pairs of octal values.
-
-    00000:00255
-    00001:01420
-    00002:00451
-    00003:01456
-    00004:01746
-    00005:00472
-
+```
+00000:00255
+00001:01420
+00002:00451
+00003:01456
+00004:01746
+00005:00472
+```
 This allows you to use your own ROM images with any of the simulators.
 
 
 ### Known Issues
 
-On UNIX/Linux a 24 bit colour display is required.
+* Keyboard shortcuts only work on Linux.
+* A 24 bit colour display is required.
 
-Keyboard shortcuts only work on Linux.
+##### HP 37E
 
-On a Raspberry Pi the display is not updated properly if either FKMS or KMS
-graphics overlays are enabled.  The following entries in '/boot/config.txt'
-should be commented out as shown.
+* Fails self test.
 
-    #dtoverlay=vc4&#8209fkms&#8209v3d
-    #dtoverlay=vc4&#8209kms&#8209v3d
+##### HP 67
 
-HP 67 is unable to read or write to magnetic cards.
+* Cannot read or write to magnetic cards.
+* Has continuous memory.
 
-HP 37E fails self test.
+### Raspberry Pi Specific Issues
 
+* The code uses a simplified display on Arm based systems (except Apple) to
+avoid the display refresh issues seen on the Raspberry Pi if either FKMS or
+KMS overlays are enabled. (Note- Do not disable KMS on the latest Raspberry
+Pi OS release).
+* The window manager on recent Raspberry Pi OS releases doesn't disable the
+ability  to resize or maximize a window if the maximum and  minimum  window
+sizes are the same. The application will resize the window automatically it
+the  user attempts to change the size but if it is maximized then the title
+bar will be hidden (by the window manager) until the window is unmaximized.
 
-#### VMS Specific Issues
+### VMS Specific Issues
 
-Colour palette assumes a black and white display (if your system has 24&#8209bit
-colour you can modify the definition of COLOUR_DEPTH in x11&#8209calc.h to build
+* Colour palette assumes a black and white display (if your system has 24-bit
+colour you can modify the definition of COLOUR_DEPTH in x11-calc.h to build
 the simulators with support for colour display).
-
-Not all text is visible due to the limited colour palette and the DEC fonts
+* Not all text is visible due to the limited colour palette and the DEC fonts
 are missing some characters (for example the Pi symbol).
-
-
-### Tested
-
-- Fedora 34, gcc 11.2.1, x64
-
-- Gentoo, gcc 11.2.0, x64
-
-- Debian 11 (Bullseye, gcc 10.2.1, x64
-
-- Debian 11 (Bullseye, tcc 0.9.27, x64
-
-- Debian 11 (Bullseye, clang 11.0.1-2, x64
-
-- Ubuntu 20.04, gcc 9.3.0, x64
-
-- Debian 10 (Buster), gcc 8.3.0, x64
-
-- Debian 10 (Buster), clang 7.0.1, x64
-
-- Debian 10 (Buster), gcc 8.3.0, arm
-
-- Debian 9 (Stretch), gcc 6.3.0, arm
-
-- Debian 5 (Lenny), gcc 4.2.4, alpha
-
-- MacOS 10 (Catalina), clang 12.0.0, x64
-
-- VAX/VMS 5.4&#82093, VAXC 3.2, VAX (simh)
-
-
-### Prerequisites
-
-The following packages are required to build and/or run the simulator.
-
-- Fedora : gcc, make, libx11&#8209;dev, libc6&#8209;dev, xorg&#8209;x11&#8209;xfonts&#8209;base
-
-- Gentoo : gcc, make, libx11&#8209;dev, libc6&#8209;dev, font&#8209;misc&#8209;misc
-
-- Debian : gcc (tcc or clang), make, libx11&#8209;dev, libc6&#8209;dev, xfonts&#8209;base
-
-- Ubuntu : gcc, make, libx11&#8209;dev, libc6&#8209;dev, xfonts&#8209;base
 
 
 ### Problem Reports
