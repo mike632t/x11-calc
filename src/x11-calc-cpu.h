@@ -55,6 +55,7 @@
  * 28 Dec 22         - Changed the name of printer mode status from mode to
  *                     print - MT
  * 06 Jun 23         - Removed unused references to HP91c and HP97 - MT
+ * 21 Oct 23         - Defined MANUAL, NORMAL, and TRACE print modes - MT
  *
  */
 
@@ -106,6 +107,10 @@
 #endif
 
 #if defined(HP10)
+#define TRACE           1              /* Trace = 1, Normal = 2 (print with display off), Manual = 4 */
+#define NORMAL          2
+#define MANUAL          4
+
 #define BUFSIZE         20             /* Output buffer size */
 #endif
 

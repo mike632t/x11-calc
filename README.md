@@ -117,7 +117,9 @@ $ make CC=tcc VERBOSE=1 all
 
 - Ubuntu 20.04, tcc 0.9.27, x64
 
-- VAX/VMS 5.4-3, VAXC 3.2, VAX (simh)
+- VAX/VMS 5.4-3, VAX C 3.2, VAX (simh)
+
+- OpenVMS 9.2-1, VSI C 7.4-726, x64
 
 
 ### Prerequisites

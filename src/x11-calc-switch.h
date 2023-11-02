@@ -20,13 +20,17 @@
  *
  * 29 Jul 13         - Initial version - MT
  * 08 Aug 21         - Tidied up spelling errors in the comments - MT
+ * 21 Oct 23         - Updated switch parameters to accomodate a 3 position
+ *                     switch - MT
+ * 22 Oct 23         - Added method to update state when clicked - MT
  *
  */
 
 typedef struct { /* Calculator switch structure */
    int index;
-   char* text; /* Text */ 
-   char* alternate; /* Alternate text */
+   char* on; /* On */
+   char* mid; /* Alternate text */
+   char* off; /* Off */
    XFontStruct* text_font; /* Pointer to font */
    int left;
    int top;
@@ -40,9 +44,11 @@ typedef struct { /* Calculator switch structure */
 
 oswitch *h_switch_pressed(oswitch *h_switch, int i_xpos, int i_ypos);
 
-oswitch *h_switch_create(int i_index, char* s_text, char* s_alternate_text,
+oswitch *h_switch_create(int i_index, char* s_on, char* s_mid, char* s_off,
    XFontStruct *h_normal_font,
    int i_left, int i_top, int i_width, int i_height, char b_state,
    unsigned int i_colour, unsigned int i_alternate_colour);
 
 int i_switch_draw(Display *h_display, int x_application_window, int i_screen, oswitch *h_switch);
+
+int i_switch_click(oswitch *h_switch);

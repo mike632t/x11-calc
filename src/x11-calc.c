@@ -187,7 +187,7 @@
  * 12 Jan 22         - Only sets mode switch state at start up - MT
  *                   - Checks  for breakpoints and instruction traps at the
  *                     same time - MT
- * 21 Jan 22   0.1   - Moved text messages to a separate file  - MT
+ * 21 Jan 22   0.9   - Moved text messages to a separate file  - MT
  * 23 Jan 22         - Removed unwanted debug code - MT
  * 29 Jan 22         - Added an optional bezel to the display, not that you
  *                     will see it yet - MT
@@ -227,6 +227,11 @@
  *                     in the Wayfire Window Manager that means it does not
  *                     respond properly to WM_SIZE_HINTS, hopefully it will
  *                     be fixed upsteam - MT
+ * 21 Oct 23   0.10  - HP10 now uses a three positon switch to select print
+ *                     mode - MT
+ * 22 Oct 23         - Switch state now updated via a method - MT
+ * 26 Oct 23         - Make the HP10 disable the display in PRINT mode - MT
+ * 01 Nov 23         - Added /ROM qualifier for non Unix like plaforms - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Add verbose option.
@@ -237,9 +242,9 @@
  */
 
 #define NAME           "x11-calc"
-#define VERSION        "0.8"
-#define BUILD          "0092"
-#define DATE           "29 Jan 22"
+#define VERSION        "0.10"
+#define BUILD          "0114"
+#define DATE           "22 Oct 23"
 #define AUTHOR         "MT"
 
 #define INTERVAL 25    /* Number of ticks to execute before updating the display */
@@ -509,6 +514,19 @@ int main(int argc, char *argv[])
             b_trace = False; /* Enable tracing */
          else if (!strncmp(argv[i_count], "/TRACE", i_index))
             b_trace = True; /* Enable tracing */
+         else if (!strncmp(argv[i_count], "/ROM", i_index))
+         {
+            if (i_count + 1 < argc)
+            {
+               v_read_rom(h_processor, argv[i_count + 1]); /* Load user specified settings */
+               if (i_count + 2 < argc) /* Remove the parameter from the arguments */
+                  for (i_offset = i_count + 1; i_offset < argc - 1; i_offset++)
+                     argv[i_offset] = argv[i_offset + 1];
+               argc--;
+            }
+            else
+              v_error(h_err_missing_argument, argv[i_count]);
+         }
          else if (!strncmp(argv[i_count], "/VERSION", i_index))
          {
             v_version; /* Display version information */
@@ -640,7 +658,22 @@ int main(int argc, char *argv[])
 #if defined(SWITCHES)
    if (h_switch[0] != NULL) h_processor->enabled = h_switch[0]->state; /* Allow switches to be undefined if not used */
 #if defined(HP10)
-   if (h_switch[1] != NULL) h_processor->print = h_switch[1]->state;
+   if (h_switch[1] != NULL)
+      switch(h_switch[1]->state)
+      {
+         case 0:
+            h_processor->print = MANUAL;
+            break;
+         case 3:
+         case 1:
+            h_processor->print = TRACE;
+            h_display->enabled = True;
+            break;
+         case 2:
+            h_processor->print = NORMAL;
+            h_display->enabled = False;
+            break;
+      }
 #else
    if (h_switch[1] != NULL) h_processor->mode = h_switch[1]->state;
 #endif
@@ -691,7 +724,7 @@ int main(int argc, char *argv[])
          case KeyPress :
             h_key_pressed(h_keyboard, x_display, x_event.xkey.keycode, x_event.xkey.state); /* Attempts to translate a key code into a character */
             if (h_keyboard->key == (XK_BackSpace & 0x1f)) h_keyboard->key = XK_Escape & 0x1f; /* Map backspace to escape */
-            if (h_keyboard->key == (XK_Z & 0x1f)) /* Ctrl-z to exit */
+            if (h_keyboard->key == (XK_Z & 0x1f)) /* Ctrl-Z to exit */
                b_abort = True;
             else if (h_keyboard->key == (XK_Q & 0x1f)) /* Ctrl-Q to resume */
                h_processor->step = !(b_run  = True);
@@ -790,16 +823,33 @@ int main(int argc, char *argv[])
 #endif
                      }
                   }
-                  if (!(h_switch_pressed(h_switch[1], x_event.xbutton.x, x_event.xbutton.y) == NULL))
-                  {
-                     h_switch[1]->state = !(h_switch[1]->state); /* Toggle switch */
-                     i_switch_draw(x_display, x_application_window, i_screen, h_switch[1]);
 #if defined(HP10)
-                     h_processor->print = h_switch[1]->state;
-#else
-                     h_processor->mode = h_switch[1]->state;
-#endif
+                  if (h_switch_pressed(h_switch[1], x_event.xbutton.x, x_event.xbutton.y) != NULL)
+                  {
+                     switch(i_switch_click(h_switch[1]))
+                     {
+                     case 0:
+                        h_processor->print = MANUAL;
+                        break;
+                     case 3:
+                     case 1:
+                        h_processor->print = TRACE;
+                        h_display->enabled = True;
+                        break;
+                     case 2:
+                        h_processor->print = NORMAL;
+                        h_display->enabled = False;
+                        break;
+                     }
+                     i_switch_draw(x_display, x_application_window, i_screen, h_switch[1]);
                   }
+#else
+                  if (h_switch_pressed(h_switch[1], x_event.xbutton.x, x_event.xbutton.y) != NULL)
+                  {
+                     h_processor->mode = i_switch_click(h_switch[1]); /* Update prgm/run switch */
+                     i_switch_draw(x_display, x_application_window, i_screen, h_switch[1]);
+                  }
+#endif
                }
 #endif
             }

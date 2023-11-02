@@ -34,6 +34,7 @@
  * 12 Mar 22         - Added display annunciators - MT
  * 11 Dec 22         - Renamed models with continious memory and added HP25
  *                     HP33E, and HP38E - MT
+ * 26 Oct 23         - Added an enabled property to the display - MT
  *
  */
 
@@ -79,6 +80,7 @@ typedef struct { /* Calculator display structure. */
    int display_top;
    int display_width;
    int display_height;
+   char enabled;
    unsigned int foreground;
    unsigned int background;
    unsigned int fill;
