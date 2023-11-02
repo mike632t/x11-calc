@@ -221,7 +221,7 @@
  *                     conditional compilation that stopped keypress events
  *                     from being processed - MT
  * 30 Sep 23         - Started to add support for HP19C - MT
- * 15 Oct 22         - Checks  the window size and resizes it if  necessary
+ * 15 Oct 23         - Checks  the window size and resizes it if  necessary
  *                     if the Windows Manager doesn't act on  WM_SIZE_HINTS
  *                     (WSL2, Raspberry Pi OS) - MT
  * 16 Oct 23         - Decided not to include any code to work around a bug
@@ -233,6 +233,8 @@
  * 22 Oct 23         - Switch state now updated via a method - MT
  * 24 Oct 23   0.10  - Added  a three positon switch to the HP19C to select
  *                     OFF, PRGM, or RUN mode - MT
+ * 26 Oct 23         - Make the HP10 disable the display in PRINT mode - MT
+ * 01 Nov 23         - Added /ROM qualifier for non Unix like plaforms - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Add verbose option.
@@ -515,6 +517,19 @@ int main(int argc, char *argv[])
             b_trace = False; /* Enable tracing */
          else if (!strncmp(argv[i_count], "/TRACE", i_index))
             b_trace = True; /* Enable tracing */
+         else if (!strncmp(argv[i_count], "/ROM", i_index))
+         {
+            if (i_count + 1 < argc)
+            {
+               v_read_rom(h_processor, argv[i_count + 1]); /* Load user specified settings */
+               if (i_count + 2 < argc) /* Remove the parameter from the arguments */
+                  for (i_offset = i_count + 1; i_offset < argc - 1; i_offset++)
+                     argv[i_offset] = argv[i_offset + 1];
+               argc--;
+            }
+            else
+              v_error(h_err_missing_argument, argv[i_count]);
+         }
          else if (!strncmp(argv[i_count], "/VERSION", i_index))
          {
             v_version; /* Display version information */
@@ -677,9 +692,11 @@ int main(int argc, char *argv[])
          case 3:
          case 1:
             h_processor->print = TRACE;
+            h_display->enabled = True;
             break;
          case 2:
             h_processor->print = NORMAL;
+            h_display->enabled = False;
             break;
       }
 #else
@@ -844,7 +861,7 @@ int main(int argc, char *argv[])
                         v_save_state(h_processor); /* Save current settings */
                         h_processor->enabled = False; /* Disable the processor */
 #if defined(HP67)
-                        i_ticks = DELAY * 4;
+                        i_ticks = DELAY * 4; /* Set count down */
 #elif defined(VOYAGER)
                         i_ticks = DELAY * 3;
 #elif defined(SPICE)
@@ -852,9 +869,7 @@ int main(int argc, char *argv[])
 #else
                         i_ticks = DELAY * 2;
 #endif
-
                      }
-                     i_switch_draw(x_display, x_application_window, i_screen, h_switch[0]);
                   }
 #endif
 #if defined(HP10) || defined(HP19c)

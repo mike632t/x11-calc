@@ -1493,10 +1493,15 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                case 00120: /* keys -> a[2:1] (0 001 010 000) */
                   if (h_processor->trace) fprintf(stdout, "keys -> a\t\t");
                   /* The HP10 and HP19C use this to get the state of the printer mode switch */
-#if defined(HP10) || defined(HP19c)
+#if defined(HP19c)
                   /* HP10 - All = 1, Print = 2 (print with display off), Display = 4 */
                   /* HP19C/97 - Trace = 1, Normal = 2 (print with display off), Manual = 4 */
                   h_processor->reg[A_REG]->nibble[1] = h_processor->print;
+#elif defined(HP10)
+                  if (h_processor->print)
+                     h_processor->reg[A_REG]->nibble[1] = 0x1; /* HP10 - All = 1, Print = 2 (print with display off), Display = 4 */
+                  else
+                     h_processor->reg[A_REG]->nibble[1] = 0x4; /* HP19C/97 - Trace = 1, Normal = 2 (print with display off), Manual = 4 */
 #else
                   h_processor->reg[A_REG]->nibble[2] = (h_processor->code >> 4); /* Put keycode in A_REG */
                   h_processor->reg[A_REG]->nibble[1] = (h_processor->code & 0x0f);

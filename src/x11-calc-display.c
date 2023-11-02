@@ -413,7 +413,7 @@ int i_display_update(Display* x_display, int x_application_window, int i_screen,
    for (i_count = 0; i_count < DIGITS - 1; i_count++) {
       if (h_display->segment[i_count] != NULL)
       {
-         if (h_processor->flags[DISPLAY_ENABLE] && h_processor->enabled)
+         if (h_processor->flags[DISPLAY_ENABLE] && h_processor->enabled && h_display->enabled) /* Allows print mode to disable display */
          {
             if (h_display->segment[i_count] != NULL)
                h_display->segment[i_count]->mask = c_digits[h_processor->reg[A_REG]->nibble[REG_SIZE - i_offset - i_count - 1]];
