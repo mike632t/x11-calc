@@ -228,8 +228,8 @@
  *                     in the Wayfire Window Manager that means it does not
  *                     respond properly to WM_SIZE_HINTS, hopefully it will
  *                     be fixed upsteam - MT
- * 21 Oct 23   0.10  - HP10 and HP19C now use a three positon switch to set
- *                     the printing mode to MANUAL, NORMAL, or TRACE - MT
+ * 21 Oct 23   0.10  - HP10 now uses a three positon switch to select print
+ *                     mode - MT
  * 22 Oct 23         - Switch state now updated via a method - MT
  * 24 Oct 23   0.10  - Added  a three positon switch to the HP19C to select
  *                     OFF, PRGM, or RUN mode - MT
@@ -246,7 +246,7 @@
 
 #define NAME           "x11-calc"
 #define VERSION        "0.10"
-#define BUILD          "0115"
+#define BUILD          "0116"
 #define DATE           "22 Oct 23"
 #define AUTHOR         "MT"
 
