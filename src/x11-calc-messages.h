@@ -24,6 +24,7 @@
  * 24 Dec 22         - Added and explicit check for '__APPLE__' in order to
  *                     allow Mac OS  to be handled in the same way as other
  *                     unix like systems - MT
+ * 01 Nov 23         - Made missing argument text common to all platforms - MT
  *
  */
 
@@ -46,11 +47,11 @@ const char * h_msg_rom;
 extern char * c_msg_usage;
 extern char * h_err_invalid_operand;
 extern char * h_err_invalid_option;
+extern char * h_err_missing_argument;
 #if defined(unix) || defined(__unix__) || defined(__APPLE__)
 extern char * h_err_unrecognised_option;
 extern char * h_err_invalid_number;
 extern char * h_err_address_range;
-extern char * h_err_missing_argument;
 extern char * h_err_invalid_argument;
 #endif
 
