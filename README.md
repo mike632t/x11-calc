@@ -23,33 +23,16 @@ More [screenshots](./img/)
 
 ### Latest News
 
+01 Nov 23
+   - Added the HP10 to my collection!
+   - Updated DCL make script.
+
 14 Oct 23
    - Updated build instructions.
    - Uses a simpler display on ARM (excluding Apple).
 
 22 Sep 23
    - Added ability to build using make on MacOS.
-
-03 Jun 23
-   - Fixed keyboard on linux.
-   - Fixed make file.
-
-01 May 23
-   - Fixed ordering of compiler options (affecting recent versions of gcc).
-
-23 Mar 23
-   - Set compiler specific flags for gcc.
-
-21 Dec 22
-   - HP10 now prints to the console.
-
-11 Dec 22
-   - Added HP25, HP33E and HP38E models.
-   - Renamed HP33 to HP33C, HP34 to HP34C, HP37 to HP37E, HP38 to HP38C.
-   - Renamed HP25 to HP25C, HP29 to HP29C, HP31 to HP31E, HP32 to HP32E.
-   - Renamed HP11 to HP11C, HP12 to HP12C, HP15 to HP15C, HP16 to HP16C.
-   - Renamed HP10 to HP10C and added HP10.
-
 
 ### Compiling
 
@@ -61,12 +44,12 @@ new  folder run 'make all' build all the simulators.
 e.g:
 ```
 $ wget https://github.com/mike632t/x11-calc/archive/refs/heads/stable.zip
-$ unzip stable.zip
+$ unzip x11-calc-stable.zip
 $ cd x11-calc-stable
 $ make all
 
-$ ./bin/x11-calc-29
-x11-calc-29: Version 0.4 [Commit ID: 81c55be] 16 Oct 21 21:15:00 (Build: 0067)
+$ ./bin/x11-calc-29c
+x11-calc-29c: Version 0.10 [Commit ID: 399d546] 01 Nov 23 23:53:00 (Build: 0114)
 ROM Size : 4096 words
 ```
 If more than one C compiler is installed or if gcc is not available you can
@@ -75,6 +58,19 @@ specify which one to use from the command line.
 $ make CC=clang VERBOSE=1 all
 
 $ make CC=tcc VERBOSE=1 all
+```
+
+On VMS unzip the source code archive, then run the DCL `make` script.
+
+e.g:
+```
+$ unzip x11-calc-stable.zip
+$ set def [.x11-calc-stable.src]
+$ @make all
+
+$ mc [-.bin]x11-calc-29c
+x11-calc-29c: Version 0.10 [Commit ID: 399d546] 02 Nov 23 23:52:11 (Build: 0114)
+ROM Size : 4096 words
 ```
 
 ### Tested
@@ -251,9 +247,7 @@ bar will be hidden (by the window manager) until the window is unmaximized.
 
 ### VMS Specific Issues
 
-* Colour palette assumes a black and white display (if your system has 24-bit
-colour you can modify the definition of COLOUR_DEPTH in x11-calc.h to build
-the simulators with support for colour display).
+* Colour palette assumes a black and white display.
 * Not all text is visible due to the limited colour palette and the DEC fonts
 are missing some characters (for example the Pi symbol).
 
