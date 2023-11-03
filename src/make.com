@@ -24,18 +24,21 @@ $! 21 Jan 22         - Moved text messages to a separate file  - MT
 $! 22 Dec 22         - The model number defined on the command line must be
 $!                     enclosed in quotes - MT
 $! 01 Nov 23         - Executable files created in [-.BIN] - MT
+$!                   - Create [-.BIN] folder if it doesn't exist - MT
 $!
 $  _message_status = f$environment("MESSAGE")
 $  on error then goto _done
 $  on control_Y then goto _done
 $  _list = "10,35,45,70,80,21,22,25,25c,27,29c,31e,32e,33e,33c,34c,37e,38c,67,10c,11c,12c,15c,16c"
 $  _count = 0
-$  if "''P1'" .eqs "" then goto _next
-$  if "''P1'" .eqs "ALL" then goto _next
+$  if "''P1'" .eqs "" then goto _check_folder
+$  if "''P1'" .eqs "ALL" then goto _check_folder
 $  if f$extract(0, 2, "''P1'") .nes. "HP" then goto _invalid
 $  _model = f$edit(f$extract(2, f$length("''P1'") - 2,"''P1'"),"lowercase")
 $  if f$locate(_model, _list) .eqs. f$length(_list) then goto _invalid
 $  _list = _model
+$_check_folder:
+$  if f$search("[-]bin.dir") .eqs. "" then create/dir [-.bin]
 $_next:
 $  _model = f$element(_count, ",", _list)
 $  if _model .eqs. "," then goto _done
