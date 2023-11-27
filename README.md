@@ -60,6 +60,20 @@ $ make CC=clang VERBOSE=1 all
 $ make CC=tcc VERBOSE=1 all
 ```
 
+On  Tru64 UNIX a specific make file is used, and the execuitable files  are
+saved in the same folder as the source.
+
+e.g:
+```
+$ unzip x11-calc-stable.zip
+$ cd x11-calc-stable
+$ make -f makefile.tru64 all
+
+$ ./src/x11-calc-29c
+x11-calc-29c: Version 0.10 [Commit ID: 399d546] 01 Nov 23 23:53:00 (Build: 0114)
+ROM Size : 4096 words
+```
+
 On VMS unzip the source code archive, then run the DCL `make` script.
 
 e.g:
@@ -254,7 +268,6 @@ bar will be hidden (by the window manager) until the window is unmaximized.
 * Colour palette assumes a black and white display.
 * Not all text is visible due to the limited colour palette and the DEC fonts
 are missing some characters (for example the Pi symbol).
-
 
 ### Problem Reports
 
