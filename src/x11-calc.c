@@ -629,7 +629,7 @@ int main(int argc, char *argv[])
       DISPLAY_LEFT, DISPLAY_TOP, DISPLAY_WIDTH, DISPLAY_HEIGHT, DIGIT_COLOUR, DIGIT_BACKGROUND,
       DISPLAY_BACKGROUND, BEZEL_COLOUR); /* Create display */
 
-#if defined(__linux__) || defined(__NetBSD__) || defined(OSF1)
+#if defined(__linux__) || defined(__NetBSD__)
    h_keyboard = h_keyboard_create(x_display); /* Only works with Linux */
 #endif
 

@@ -3,7 +3,7 @@
 #
 #	Copyright (C) 2013  MT
 #
-#  A simplified makefile for Digital Tru64 UNIX.
+#	A simplified makefile for Digital Tru64 UNIX.
 #
 #	This program is free software: you can redistribute it and/or modify
 #	it under the terms of the GNU General Public License as published by
@@ -28,11 +28,13 @@
 MODEL	= 21
 PROGRAM	= x11-calc
 OUTPUT	= x11-calc-$(MODEL)
-SOURCES	= x11-calc.c x11-calc-$(MODEL).c x11-calc-cpu.c x11-calc-display.c x11-calc-messages.c x11-calc-segment.c x11-calc-button.c x11-calc-switch.c  x11-calc-label.c x11-keyboard.c x11-calc-colour.c gcc-wait.c
+SOURCES	= x11-calc.c x11-calc-$(MODEL).c x11-calc-cpu.c x11-calc-display.c x11-calc-messages.c x11-calc-segment.c x11-calc-button.c x11-calc-switch.c  x11-calc-label.c x11-calc-colour.c gcc-wait.c
 FILES	= *.c *.h makefile README LICENSE
 OBJECTS	= $(SOURCES:.c=.o)
-LANG	= LANG_$(shell (echo $$LANG | cut -f 1 -d '_'))
-UNAME	=  $(shell uname)
+#LANG	= LANG_$(shell (echo $$LANG | cut -f 1 -d '_'))
+#UNAME	=  $(shell uname)
+LANG	= LANG_en
+UNAME	=  OSF1
 CC	= cc
 
 $(OUTPUT): $(OBJECTS)
@@ -41,6 +43,6 @@ $(OUTPUT): $(OBJECTS)
 
 $(OBJECTS) : $(SOURCES)
 #	@echo '*** Compiling $(SOURCES)'
-	@$(CC) -c $(SOURCES)  -DHP$(MODEL) -D$(UNAME)
+	@$(CC) -c $(SOURCES)  -DHP$(MODEL) -D$(UNAME) -D $(LANG)
 
 #
