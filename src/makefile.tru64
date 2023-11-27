@@ -1,29 +1,29 @@
 #
-#	x11-calc makefile
+#  makefile.tru64
 #
-#	Copyright (C) 2013  MT
+#  Copyright (C) 2013  MT
 #
-#	A simplified makefile for Digital Tru64 UNIX.
+#  A simplified makefile for Digital Tru64 UNIX.
 #
-#	This program is free software: you can redistribute it and/or modify
-#	it under the terms of the GNU General Public License as published by
-#	the Free Software Foundation, either version 3 of the License, or
-#	(at your option) any later version.
+#  This  program is free software: you can redistribute it and/or modify it
+#  under  the terms of the GNU General Public License as published  by  the
+#  Free  Software Foundation, either version 3 of the License, or (at  your
+#  option) any later version.
 #
-#	This program is distributed in the hope that it will be useful,
-#	but WITHOUT ANY WARRANTY; without even the implied warranty of
-#	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#	GNU General Public License for more details.
+#  This  program  is distributed in the hope that it will  be  useful,  but
+#  WITHOUT   ANY   WARRANTY;   without even   the   implied   warranty   of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+#  Public License for more details.
 #
-#	You should have received a copy of the GNU General Public License
-#	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#  You  should have received a copy of the GNU General Public License along
+#  with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-#	Note seperator (tab) at the beginning of the line CANNOT be a space..!
+#  Note seperator (tab) at the beginning of the line CANNOT be a space..!
 #
 #  26 Nov 23   0.1   - Initial version - MT
-#                    - Define  UNAME so we can conditionaly compile any  OS
-#                      specific  code properly even if the compiler doesn't
-#                      define Linux/OSF1/NetBSD automatically - MT
+#                    - Define OSF1 so conditional compilation works even if
+#                      the compiler doesn't define it automatically - MT
+#                    - Tidied up comments - MT
 #
 MODEL	= 21
 PROGRAM	= x11-calc
@@ -32,9 +32,9 @@ SOURCES	= x11-calc.c x11-calc-$(MODEL).c x11-calc-cpu.c x11-calc-display.c x11-c
 FILES	= *.c *.h makefile README LICENSE
 OBJECTS	= $(SOURCES:.c=.o)
 #LANG	= LANG_$(shell (echo $$LANG | cut -f 1 -d '_'))
-#UNAME	=  $(shell uname)
+#OS	= $(shell uname)
 LANG	= LANG_en
-UNAME	=  OSF1
+OS	= OSF1
 CC	= cc
 
 $(OUTPUT): $(OBJECTS)
@@ -43,6 +43,6 @@ $(OUTPUT): $(OBJECTS)
 
 $(OBJECTS) : $(SOURCES)
 #	@echo '*** Compiling $(SOURCES)'
-	@$(CC) -c $(SOURCES)  -DHP$(MODEL) -D$(UNAME) -D $(LANG)
+	@$(CC) -c $(SOURCES)  -DHP$(MODEL) -D$(OS) -D $(LANG)
 
 #
