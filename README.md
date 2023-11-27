@@ -117,6 +117,8 @@ ROM Size : 4096 words
 
 - OpenVMS 9.2-1, VSI C 7.4-726, x64
 
+- Windows 11 + WSL2, gcc 12.2.0, x64 + arm64
+
 
 ### Prerequisites
 
@@ -133,6 +135,8 @@ The following packages are required to build and/or run the simulator.
 - SUSE   : gcc | clang, make, libX11-devel
 
 - Ubuntu : gcc, make, libx11-dev, libc6-dev, xfonts-base
+
+- Windows 11 + WSL2 : gcc, make, libx11-dev, libc6-dev, xfonts-base
 
 
 ### Keyboard Shortcuts
