@@ -1,0 +1,137 @@
+#
+#  makefile - RPN (Reverse Polish) calculator simulator.
+#
+#  Copyright(C) 2019 - MT
+#
+#  This  program is free software: you can redistribute it and/or modify it
+#  under  the terms of the GNU General Public License as published  by  the
+#  Free  Software Foundation, either version 3 of the License, or (at  your
+#  option) any later version.
+#
+#  This  program  is distributed in the hope that it will  be  useful,  but
+#  WITHOUT   ANY   WARRANTY;   without even   the   implied   warranty   of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+#  Public License for more details.
+#
+#  You  should have received a copy of the GNU General Public License along
+#  with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+#	Note separator (tab) at the beginning of the line CANNOT be a space..!
+#
+#  09 Oct 21   0.1   - Initial version - MT
+#  22 Nov 21   0.2   - Added data files to backups - MT
+#  04 Jan 22         - Added HP35 - MT
+#  07 Jan 22         - Added HP80 - MT
+#  07 Jan 22         - Added HP70 - MT
+#  31 jan 22         - Added support for the HP10C, HP11C, HP12C, HP15C and
+#                      HP16C - MT
+#  31 Mar 22         - Moved ROMs into target folder - MT
+#  11 Dec 22         - Renamed models with continious memory and added HP25
+#                      HP33E, and HP38E - MT
+#  23 Dec 22         - Changed the order in which simulators are built - MT
+#  24 Oct 23         - Selects files using a wildcard, avoids any errors if
+#                      no files exist when using tar - MT
+#                    - Backs up backup files! (*.h.[0-9], *.h.[0-9]) - MT
+#                    - Clean removes execuitable files - MT
+#                    - Checks that the bin directory exists before deleting
+#                      files - MT
+#  01 Nov 23         - Tidied up tabs in comments - MT
+#
+
+PROGRAM	=  x11-calc
+
+FILES		=  $(wildcard ./src/*.c) $(wildcard ./src/*.c.[0-9]) $(wildcard ./src/*.h) $(wildcard ./src/*.h.[0-9]) ./src/makefile
+FILES		+= $(wildcard ./bin/x11-calc-*) $(wildcard *.md) LICENSE makefile
+FILES		+= $(wildcard ./rom/*) $(wildcard ./prg/*.dat) $(wildcard ./img/x11-calc-*.png)
+FILES		+= .gitignore .gitattributes
+
+MAKE		=  make
+
+all: clean hp35 hp45 hp70 hp80 hp10 hp21 hp22 hp25 hp25c hp27 hp29c hp67 hp31e hp32e hp33e hp33c hp34c hp37e hp38e hp38c hp10c hp11c hp12c hp15c hp16c
+
+classic: clean hp35 hp80 hp45 hp70
+
+woodstock: clean hp21 hp22 hp25 hp25c hp27 hp29c
+
+spice: clean hp31e hp32e hp33e hp33c hp34c hp37e hp38e hp38c
+
+voyager: clean hp10c hp11c hp12c hp15c hp16c
+
+
+hp35:
+	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=35; cd ..
+
+hp80:
+	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=80; cd ..
+
+hp45:
+	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=45; cd ..
+
+hp70:
+	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=70; cd ..
+
+hp10:
+	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=10; cd ..
+
+hp21:
+	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=21; cd ..
+
+hp22:
+	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=22; cd ..
+
+hp25:
+	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=25; cd ..
+
+hp25c:
+	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=25c; cd ..
+
+hp27:
+	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=27; cd ..
+
+hp29c:
+	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=29c; cd ..
+
+hp67:
+	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=67; cd ..
+
+hp31e:
+	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=31e; cd ..
+
+hp32e:
+	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=32e; cd ..
+
+hp33e:
+	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=33e; cd ..
+
+hp33c:
+	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=33c; cd ..
+
+hp34c:
+	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=34c; cd ..
+
+hp37e:
+	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=37e; cd ..
+
+hp38e:
+	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=38e; cd ..
+
+hp38c:
+	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=38c; cd ..
+
+hp10c:
+	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=10c; cd ..
+
+hp11c:
+	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=11c; cd ..
+
+hp12c:
+	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=12c; cd ..
+
+hp15c:
+	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=15c; cd ..
+
+hp16c:
+	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=16c; cd ..
+
+clean:
+	@rm  -f ./src/*.o
