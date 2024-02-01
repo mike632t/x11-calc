@@ -250,10 +250,10 @@
 #define INTERVAL 25    /* Number of ticks to execute before updating the display */
 #define DELAY 50       /* Number of intervals to wait before exiting */
 
-#include <stdarg.h>    /* strlen(), etc */
+#include <stdarg.h>    /* vargs(), etc */
 #include <string.h>    /* strlen(), etc */
-#include <stdio.h>     /* fprintf(), etc */
 #include <stdlib.h>    /* getenv(), etc */
+#include <stdio.h>     /* fprintf(), etc */
 
 #include <ctype.h>     /* isprint(), etc */
 
