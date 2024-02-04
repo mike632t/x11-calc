@@ -359,6 +359,8 @@
  * 21 Oct 23         - Define MANUAL, NORMAL, and TRACE print modes - MT
  * 04 Feb 24         - Found  and  fixed a memory leak in save_state()  and
  *                     restore_state() - MT
+ *                   - Added a seperate function to return the patch to the
+ *                     data file used to store the processor state - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -369,7 +371,7 @@
 
 #define NAME           "x11-calc-cpu"
 #define VERSION        "0.10"
-#define BUILD          "0159"
+#define BUILD          "0160"
 #define DATE           "04 Feb 24"
 #define AUTHOR         "MT"
 
@@ -776,57 +778,44 @@ void v_write_state(oprocessor *h_processor, char *s_pathname) /* Write processor
 #endif
 }
 
-void v_save_state(oprocessor *h_processor) /* Restore saved processor state */
-{
 #if defined(CONTINIOUS)
+char *v_get_datafile_path(oprocessor *h_processor) /* Returns path the the data file */
+{
    char *s_home = getenv("HOME");
    char s_filename[] = FILENAME;
    char s_filetype[] = ".dat";
    char *s_pathname;
 
-   if (h_processor != NULL) /* Check processor defined */
-   {
-      if (s_home == NULL) s_home = ""; /* Use current folder if HOME not defined */
+   if (s_home == NULL) s_home = ""; /* Use current folder if HOME not defined */
 #if defined(unix) || defined(__unix__) || defined(__APPLE__)
-      s_pathname = malloc((strlen(s_home) + strlen(s_filename) + strlen(s_filetype) + 2) * sizeof(char*));
-      strcpy(s_pathname, s_home);
-      strcat(s_pathname, "/.");
+   s_pathname = malloc((strlen(s_home) + strlen(s_filename) + strlen(s_filetype) + 2) * sizeof(char*));
+   strcpy(s_pathname, s_home);
+   strcat(s_pathname, "/.");
 #else
-      s_pathname = malloc((strlen(s_home) + strlen(s_filename) + strlen(s_filetype)) * sizeof(char*));
-      strcpy(s_pathname, s_home);
+   s_pathname = malloc((strlen(s_home) + strlen(s_filename) + strlen(s_filetype)) * sizeof(char*));
+   strcpy(s_pathname, s_home);
 #endif
-      strcat(s_pathname, s_filename);
-      strcat(s_pathname, s_filetype);
-      v_write_state(h_processor, s_pathname); /* Load settings */
-      free(s_pathname); /* Free up pathname */
-   }
+   strcat(s_pathname, s_filename);
+   strcat(s_pathname, s_filetype);
+   return s_pathname;
+}
+#endif
+
+void v_save_state(oprocessor *h_processor) /* Restore saved processor state */
+{
+#if defined(CONTINIOUS)
+   char *s_pathname = v_get_datafile_path(h_processor);
+   v_write_state(h_processor, s_pathname); /* Load settings */
+   free(s_pathname); /* Free up pathname */
 #endif
 }
 
 void v_restore_state(oprocessor *h_processor) /* Restore saved processor state */
 {
 #if defined(CONTINIOUS)
-   char *s_home = getenv("HOME");
-   char s_filename[] = FILENAME;
-   char s_filetype[] = ".dat";
-   char *s_pathname;
-
-   if (h_processor != NULL) /* Check processor defined */
-   {
-      if (s_home == NULL) s_home = ""; /* Use current folder if HOME not defined */
-#if defined(unix) || defined(__unix__) || defined(__APPLE__)
-      s_pathname = malloc((strlen(s_home) + strlen(s_filename) + strlen(s_filetype) + 2) * sizeof(char*));
-      strcpy(s_pathname, s_home);
-      strcat(s_pathname, "/.");
-#else
-      s_pathname = malloc((strlen(s_home) + strlen(s_filename) + strlen(s_filetype)) * sizeof(char*));
-      strcpy(s_pathname, s_home);
-#endif
-      strcat(s_pathname, s_filename);
-      strcat(s_pathname, s_filetype);
-      v_read_state(h_processor, s_pathname); /* Load settings */
-      free(s_pathname); /* Free up pathname */
-   }
+   char *s_pathname = v_get_datafile_path(h_processor);
+   v_read_state(h_processor, s_pathname); /* Load settings */
+   free(s_pathname); /* Free up pathname */
 #endif
 }
 
