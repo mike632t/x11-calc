@@ -357,6 +357,8 @@
  * 12 Jan 23         - Tidied up some of the processor trace output - MT
  * 06 Jun 23         - Removed unused references to HP91c and HP97 - MT
  * 21 Oct 23         - Define MANUAL, NORMAL, and TRACE print modes - MT
+ * 04 Feb 24         - Found  and  fixed a memory leak in save_state()  and
+ *                     restore_state() - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -367,8 +369,8 @@
 
 #define NAME           "x11-calc-cpu"
 #define VERSION        "0.10"
-#define BUILD          "0158"
-#define DATE           "24 May 22"
+#define BUILD          "0159"
+#define DATE           "04 Feb 24"
 #define AUTHOR         "MT"
 
 #include <string.h>
@@ -647,20 +649,20 @@ static void v_reg_shl(oprocessor *h_processor, oregister *h_register) /* Logical
 
 void v_read_rom(oprocessor *h_processor, char *s_pathname) /* Load rom from 'object' file */
 {
-   FILE *h_datafile;
+   FILE *h_file;
    unsigned int i_addr, i_opcode;
    int i_count, i_counter;
    char c_char;
 
-   h_datafile = fopen(s_pathname, "r");
-   if (h_datafile != NULL)
+   h_file = fopen(s_pathname, "r");
+   if (h_file != NULL)
    {
       i_count = 0;
-      while ((!feof(h_datafile)) && (i_count < ROM_SIZE))
+      while ((!feof(h_file)) && (i_count < ROM_SIZE))
       {
-         i_counter = fscanf(h_datafile, h_msg_rom, &i_addr, &i_opcode);
+         i_counter = fscanf(h_file, h_msg_rom, &i_addr, &i_opcode);
          if (i_counter < 2)
-            while (((c_char = fgetc(h_datafile)) != '\n') && (!feof(h_datafile)));
+            while (((c_char = fgetc(h_file)) != '\n') && (!feof(h_file)));
          else
          {
             while ((i_count < i_addr) && (i_count < ROM_SIZE))
@@ -676,49 +678,49 @@ void v_read_rom(oprocessor *h_processor, char *s_pathname) /* Load rom from 'obj
 void v_read_state(oprocessor *h_processor, char *s_pathname) /* Read processor state from file */
 {
 #if defined(CONTINIOUS)
-   FILE *h_datafile;
+   FILE *h_file;
    unsigned int i_temp;
    int i_count, i_counter;
 
    if ((h_processor != NULL) && (s_pathname != NULL)) { /* Check processor and pathname are defined */
-      h_datafile = fopen(s_pathname, "r");
-      if (h_datafile !=NULL) { /* If file exists and can be opened restore state */
-         debug(fprintf(stderr,h_msg_loading, s_pathname));
+      h_file = fopen(s_pathname, "r");
+      if (h_file !=NULL) { /* If file exists and can be opened restore state */
+         fprintf(stderr,h_msg_loading, s_pathname);
 #if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c)
          for (i_count = 0; i_count < FLAGS; i_count++)
          {
-            fscanf(h_datafile, "%x,", &i_temp);
+            fscanf(h_file, "%x,", &i_temp);
             h_processor->flags[i_count] = i_temp;
          }
          for (i_count = 0; i_count < STATUS_BITS; i_count++)
          {
-            fscanf(h_datafile, "%x,", &i_temp);
+            fscanf(h_file, "%x,", &i_temp);
             h_processor->status[i_count] = i_temp;
          }
          for (i_count = 0; i_count < REGISTERS; i_count++)
             for (i_counter = REG_SIZE - 1; i_counter >= 0 ; i_counter--)
             {
-               fscanf(h_datafile, "%x,", &i_temp);
+               fscanf(h_file, "%x,", &i_temp);
                h_processor->reg[i_count]->nibble[i_counter] = i_temp;
             }
-         fscanf(h_datafile, "%x,", &i_temp);
+         fscanf(h_file, "%x,", &i_temp);
          h_processor->p = i_temp;
-         fscanf(h_datafile, "%x,", &i_temp);
+         fscanf(h_file, "%x,", &i_temp);
          h_processor->q = i_temp;
-         fscanf(h_datafile, "%x,", &i_temp);
+         fscanf(h_file, "%x,", &i_temp);
          h_processor->f = i_temp;
-         fscanf(h_datafile, "%x,", &i_temp);
+         fscanf(h_file, "%x,", &i_temp);
          h_processor->g[0] = i_temp;
-         fscanf(h_datafile, "%x,", &i_temp);
+         fscanf(h_file, "%x,", &i_temp);
          h_processor->g[1] = i_temp;
 #endif
          for (i_count = 0; i_count < MEMORY_SIZE; i_count++)
             for (i_counter = REG_SIZE - 1; i_counter >= 0 ; i_counter--)
             {
-               fscanf(h_datafile, "%x,", &i_temp);
+               fscanf(h_file, "%x,", &i_temp);
                h_processor->mem[i_count]->nibble[i_counter] = i_temp;
             }
-         fclose(h_datafile);
+         fclose(h_file);
       }
       else
          v_warning(h_err_opening_file, s_pathname); /* Can't open data file */
@@ -729,44 +731,44 @@ void v_read_state(oprocessor *h_processor, char *s_pathname) /* Read processor s
 void v_write_state(oprocessor *h_processor, char *s_pathname) /* Write processor state to file */
 {
 #if defined(CONTINIOUS)
-   FILE *h_datafile;
+   FILE *h_file;
    int i_count, i_counter;
 
    if ((h_processor != NULL) && (s_pathname != NULL)) { /* Check processor and path name are defined */
-      h_datafile = fopen(s_pathname, "w");
-      if (h_datafile !=NULL) { /* If file exists and can be opened save state */
-         debug(fprintf(stderr,h_msg_saving, s_pathname));
+      h_file = fopen(s_pathname, "w");
+      if (h_file !=NULL) { /* If file exists and can be opened save state */
+         fprintf(stderr,h_msg_saving, s_pathname);
 #if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c)
          for (i_count = 0; i_count < FLAGS; i_count++)
          {
-            fprintf(h_datafile, "%02x,", h_processor->flags[i_count]);
+            fprintf(h_file, "%02x,", h_processor->flags[i_count]);
          }
-         fprintf(h_datafile,"\n");
+         fprintf(h_file,"\n");
          for (i_count = 0; i_count < STATUS_BITS; i_count++)
          {
-            fprintf(h_datafile, "%02x,", h_processor->status[i_count]);
+            fprintf(h_file, "%02x,", h_processor->status[i_count]);
          }
-         fprintf(h_datafile,"\n");
+         fprintf(h_file,"\n");
          for (i_count = 0; i_count < REGISTERS; i_count++)
          {
             for (i_counter = REG_SIZE - 1; i_counter >= 0 ; i_counter--)
-               fprintf(h_datafile, "%02x,", h_processor->reg[i_count]->nibble[i_counter]);
-            fprintf(h_datafile,"\n");
+               fprintf(h_file, "%02x,", h_processor->reg[i_count]->nibble[i_counter]);
+            fprintf(h_file,"\n");
          }
-         fprintf(h_datafile, "%02x,", h_processor->p);
-         fprintf(h_datafile, "%02x,", h_processor->q);
-         fprintf(h_datafile, "%02x,", h_processor->f);
-         fprintf(h_datafile, "%02x,", h_processor->g[0]);
-         fprintf(h_datafile, "%02x,", h_processor->g[1]);
-         fprintf(h_datafile,"\n");
+         fprintf(h_file, "%02x,", h_processor->p);
+         fprintf(h_file, "%02x,", h_processor->q);
+         fprintf(h_file, "%02x,", h_processor->f);
+         fprintf(h_file, "%02x,", h_processor->g[0]);
+         fprintf(h_file, "%02x,", h_processor->g[1]);
+         fprintf(h_file,"\n");
 #endif
          for (i_count = 0; i_count < MEMORY_SIZE; i_count++)
          {
             for (i_counter = REG_SIZE - 1; i_counter >= 0 ; i_counter--)
-               fprintf(h_datafile, "%02x,", h_processor->mem[i_count]->nibble[i_counter]);
-            fprintf(h_datafile,"\n");
+               fprintf(h_file, "%02x,", h_processor->mem[i_count]->nibble[i_counter]);
+            fprintf(h_file,"\n");
          }
-         fclose(h_datafile);
+         fclose(h_file);
       }
       else
          v_warning(h_err_opening_file, s_pathname); /* Can't open data file */
@@ -777,25 +779,26 @@ void v_write_state(oprocessor *h_processor, char *s_pathname) /* Write processor
 void v_save_state(oprocessor *h_processor) /* Restore saved processor state */
 {
 #if defined(CONTINIOUS)
-   char *s_dir = getenv("HOME");
+   char *s_home = getenv("HOME");
    char s_filename[] = FILENAME;
    char s_filetype[] = ".dat";
    char *s_pathname;
 
    if (h_processor != NULL) /* Check processor defined */
    {
-      if (s_dir == NULL) s_dir = ""; /* Use current folder if HOME not defined */
+      if (s_home == NULL) s_home = ""; /* Use current folder if HOME not defined */
 #if defined(unix) || defined(__unix__) || defined(__APPLE__)
-      s_pathname = malloc((strlen(s_dir) + strlen(s_filename) + strlen(s_filetype) + 2) * sizeof(char*));
-      strcpy(s_pathname, s_dir);
+      s_pathname = malloc((strlen(s_home) + strlen(s_filename) + strlen(s_filetype) + 2) * sizeof(char*));
+      strcpy(s_pathname, s_home);
       strcat(s_pathname, "/.");
 #else
-      s_pathname = malloc((strlen(s_dir) + strlen(s_filename) + strlen(s_filetype)) * sizeof(char*));
-      strcpy(s_pathname, s_dir);
+      s_pathname = malloc((strlen(s_home) + strlen(s_filename) + strlen(s_filetype)) * sizeof(char*));
+      strcpy(s_pathname, s_home);
 #endif
       strcat(s_pathname, s_filename);
       strcat(s_pathname, s_filetype);
       v_write_state(h_processor, s_pathname); /* Load settings */
+      free(s_pathname); /* Free up pathname */
    }
 #endif
 }
@@ -803,25 +806,26 @@ void v_save_state(oprocessor *h_processor) /* Restore saved processor state */
 void v_restore_state(oprocessor *h_processor) /* Restore saved processor state */
 {
 #if defined(CONTINIOUS)
-   char *s_dir = getenv("HOME");
+   char *s_home = getenv("HOME");
    char s_filename[] = FILENAME;
    char s_filetype[] = ".dat";
    char *s_pathname;
 
    if (h_processor != NULL) /* Check processor defined */
    {
-      if (s_dir == NULL) s_dir = ""; /* Use current folder if HOME not defined */
+      if (s_home == NULL) s_home = ""; /* Use current folder if HOME not defined */
 #if defined(unix) || defined(__unix__) || defined(__APPLE__)
-      s_pathname = malloc((strlen(s_dir) + strlen(s_filename) + strlen(s_filetype) + 2) * sizeof(char*));
-      strcpy(s_pathname, s_dir);
+      s_pathname = malloc((strlen(s_home) + strlen(s_filename) + strlen(s_filetype) + 2) * sizeof(char*));
+      strcpy(s_pathname, s_home);
       strcat(s_pathname, "/.");
 #else
-      s_pathname = malloc((strlen(s_dir) + strlen(s_filename) + strlen(s_filetype)) * sizeof(char*));
-      strcpy(s_pathname, s_dir);
+      s_pathname = malloc((strlen(s_home) + strlen(s_filename) + strlen(s_filetype)) * sizeof(char*));
+      strcpy(s_pathname, s_home);
 #endif
       strcat(s_pathname, s_filename);
       strcat(s_pathname, s_filetype);
       v_read_state(h_processor, s_pathname); /* Load settings */
+      free(s_pathname); /* Free up pathname */
    }
 #endif
 }
