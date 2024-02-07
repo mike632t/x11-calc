@@ -1,5 +1,5 @@
 /*
- * gcc-wait.c
+ * gcc-wait.h
  *
  * Copyright(C) 2019 - MT
  *
