@@ -359,8 +359,12 @@
  * 21 Oct 23         - Define MANUAL, NORMAL, and TRACE print modes - MT
  * 04 Feb 24         - Found  and  fixed a memory leak in save_state()  and
  *                     restore_state() - MT
- *                   - Added a seperate function to return the patch to the
- *                     data file used to store the processor state - MT
+ *                   - Added a seperate function to return the path to  the
+ *                     data  file that is used to store the processor state
+ *                     and modified the code to store the data file in  the
+ *                     $HOME/.local/share directory  if it doesn't  already
+ *                     exist in the $HOME directory, or the use the current
+ *                     directory if $HOME is not defined as before - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -392,8 +396,9 @@
 
 #include "x11-calc-messages.h"
 
-#include "gcc-debug.h" /* print() */
-#include "gcc-wait.h"  /* i_wait() */
+#include "gcc-debug.h"  /* print() */
+#include "gcc-exists.h" /* i_isfile(), i_isdir(), i_exists() */
+#include "gcc-wait.h"   /* i_wait() */
 
 static void v_fprint_register(FILE *h_file, oregister *h_register) /* Print the contents of a register */
 {
@@ -780,23 +785,57 @@ void v_write_state(oprocessor *h_processor, char *s_pathname) /* Write processor
 
 #if defined(CONTINIOUS)
 char *v_get_datafile_path(oprocessor *h_processor) /* Returns path the the data file */
+/*
+ * Returns the path to the data file use to store the machine state when it
+ * is 'powered off'.
+ *
+ *  - If $HOME is defined and the data file already exists in there  return
+ *    the pathname of the data file in $HOME to maintain compatibility with
+ *    earlier releases.
+ *
+ *  - If the directory $HOME/.local/share/ exists and the data file doesn't
+ *    exist in $HOME it will return the pathname for the data file  located
+ *    in this directory.
+ *
+ *  - Otherwise  if $HOME is not defined return the pathname to a data file
+ *    in the current directory.
+ *
+ * the the state file will be saved in the same default
+ * directoy.
+ *
+ */
 {
-   char *s_home = getenv("HOME");
+   char *s_directory = getenv("HOME");
    char s_filename[] = FILENAME;
    char s_filetype[] = ".dat";
    char *s_pathname;
 
-   if (s_home == NULL) s_home = ""; /* Use current folder if HOME not defined */
+   if (s_directory == NULL) s_directory = ""; /* Use current folder if HOME not defined */
+
 #if defined(unix) || defined(__unix__) || defined(__APPLE__)
-   s_pathname = malloc((strlen(s_home) + strlen(s_filename) + strlen(s_filetype) + 2) * sizeof(char*));
-   strcpy(s_pathname, s_home);
+   s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 2) * sizeof(char*));
+   strcpy(s_pathname, s_directory);
    strcat(s_pathname, "/.");
+   strcat(s_pathname, s_filename);
+   strcat(s_pathname, s_filetype);
+   if (i_isfile(s_pathname)) return s_pathname; /* File exists in home or current directory - don't move it... */
+   s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 15) * sizeof(char*));
+   strcpy(s_pathname, s_directory);
+   strcat(s_pathname, "/.local/share/.");
+   if (!i_isdir(s_pathname))
+   {
+      free(s_pathname);
+      s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 2) * sizeof(char*));
+      strcpy(s_pathname, s_directory);
+      strcat(s_pathname, "/.");
+   }
 #else
-   s_pathname = malloc((strlen(s_home) + strlen(s_filename) + strlen(s_filetype)) * sizeof(char*));
-   strcpy(s_pathname, s_home);
+   s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype)) * sizeof(char*));
+   strcpy(s_pathname, s_directory);
 #endif
    strcat(s_pathname, s_filename);
    strcat(s_pathname, s_filetype);
+   debug(printf("%s/n", s_pathname));
    return s_pathname;
 }
 #endif
@@ -805,7 +844,7 @@ void v_save_state(oprocessor *h_processor) /* Restore saved processor state */
 {
 #if defined(CONTINIOUS)
    char *s_pathname = v_get_datafile_path(h_processor);
-   v_write_state(h_processor, s_pathname); /* Load settings */
+   v_write_state(h_processor, s_pathname); /* Save settings */
    free(s_pathname); /* Free up pathname */
 #endif
 }
