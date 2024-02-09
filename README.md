@@ -1,6 +1,6 @@
 ## x11-calc - Another RPN (Reverse Polish) calculator.
 
-Simulators  for the HP 35, HP 80, HP 45, HP 70, HP 10, HP 21, HP 22,  HP25,
+Emulators  for  the HP 35, HP 80, HP 45, HP 70, HP 10, HP 21, HP 22,  HP25,
 HP 25C,  HP 27,  HP 29C,  HP 31E, HP 32E, HP 33E, HP 33C,  HP 34C,  HP 37E,
 HP 38C,  HP 38E, HP 67, HP 10C, HP 11C, HP 12C, HP 15 C, and HP 16C.
 
@@ -12,7 +12,7 @@ avoided in order to try to make the code as portable as possible.
 The  aim  is to have the same source code compile without  modification  on
 Linux, VAX/VMS, and Tru64 Unix.
 
-Unlike all the other simulators the ROM images for the HP10C, HP11C, HP12C,
+Unlike  all the other emulators the ROM images for the HP10C, HP11C, HP12C,
 HP15C, HP16C are not defined in the the source code and must be loaded from
 a separate ROM file.
 
@@ -23,6 +23,14 @@ More [screenshots](./img/)
 
 ### Latest News
 
+08 Feb 24
+   - The default location used to store the state of the machine when it is
+     powered off has changed from $HOME to $HOME/.local/share/. To maintain
+     backwards  compatibility, if the state of the machine has already been
+     saved in $HOME then the existing file will be used, but if it does not
+     exist then the machine state will be saved to a file in the new folder
+     if it exists.  On systems where $HOME is not defined the file will  be
+     created in the current directory.
 01 Nov 23
    - Added the HP10 to my collection!
    - Updated DCL make script.
