@@ -365,6 +365,8 @@
  *                     $HOME/.local/share directory  if it doesn't  already
  *                     exist in the $HOME directory, or the use the current
  *                     directory if $HOME is not defined as before - MT
+ * 10 Feb 24         - Clears  the ROM before reading the new ROM  contents
+ *                     from the specified file - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -665,6 +667,10 @@ void v_read_rom(oprocessor *h_processor, char *s_pathname) /* Load rom from 'obj
    if (h_file != NULL)
    {
       i_count = 0;
+      while (i_count < ROM_SIZE) /* Zero contents of the ROM */
+         i_rom[i_count++] = 0;
+
+      i_count = 0;
       while ((!feof(h_file)) && (i_count < ROM_SIZE))
       {
          i_counter = fscanf(h_file, h_msg_rom, &i_addr, &i_opcode);
@@ -672,8 +678,7 @@ void v_read_rom(oprocessor *h_processor, char *s_pathname) /* Load rom from 'obj
             while (((c_char = fgetc(h_file)) != '\n') && (!feof(h_file)));
          else
          {
-            while ((i_count < i_addr) && (i_count < ROM_SIZE))
-               i_rom[i_count++] = 0;
+            if (i_count < i_addr) i_count = i_addr - 1;
             if (i_count < ROM_SIZE) i_rom[i_count++] = i_opcode;
          }
       }
