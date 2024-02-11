@@ -25,6 +25,8 @@
  *                     allow Mac OS  to be handled in the same way as other
  *                     unix like systems - MT
  * 01 Nov 23         - Made missing argument text common to all platforms - MT
+ * 10 Feb 24         - Added an error message to warn the user that the ROM
+ *                     contents are empty - MT
  *
  */
 
@@ -56,6 +58,7 @@ extern char * h_err_invalid_argument;
 #endif
 
 extern char * h_msg_licence;
+extern const char * h_err_ROM;
 extern char * h_err_display;
 extern char * h_err_display_properties;
 extern char * h_err_display_colour;

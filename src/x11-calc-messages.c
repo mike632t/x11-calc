@@ -42,7 +42,10 @@
  *                     unix like systems - MT
  * 18 Jan 23         - Shortened help message (max string length for C90 is
  *                     509 characters) - MT
- * 01 Nov 23         - Made missing argument text common to all platforms - MT
+ * 01 Nov 23         - Changed the missing argument text so it is common to
+ *                     all platforms - MT
+ * 10 Feb 24         - Added an error message to warn the user that the ROM
+ *                     contents are empty - MT
  *
  */
 
@@ -56,6 +59,8 @@ const char * h_msg_licence = "Copyright(C) %s %s\n\
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\n\
 This is free software: you are free to change and redistribute it.\n\
 There is NO WARRANTY, to the extent permitted by law.\n";
+
+const char * h_err_ROM = "Empty ROM - check command.\n";
 
 #if defined(HEXADECIMAL)
 const char * h_msg_opcode = "%1x-%03x  %03x   ";
