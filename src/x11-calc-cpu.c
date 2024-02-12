@@ -367,6 +367,12 @@
  *                     directory if $HOME is not defined as before - MT
  * 10 Feb 24         - Clears  the ROM before reading the new ROM  contents
  *                     from the specified file - MT
+ * 12 Feb 24         - Will  use XDG_DATA_HOME if the it is defined and the
+ *                     directory exists - MT
+ *                   - Do NOT clear the ROM before loading a new ROM from a
+ *                     file as this allows a ROM file to be used to apply a
+ *                     patch to an existing ROM (it seemed like a good idea
+ *                     at the time) - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -377,8 +383,8 @@
 
 #define NAME           "x11-calc-cpu"
 #define VERSION        "0.10"
-#define BUILD          "0160"
-#define DATE           "04 Feb 24"
+#define BUILD          "0163"
+#define DATE           "12 Feb 24"
 #define AUTHOR         "MT"
 
 #include <string.h>
@@ -667,10 +673,6 @@ void v_read_rom(oprocessor *h_processor, char *s_pathname) /* Load rom from 'obj
    if (h_file != NULL)
    {
       i_count = 0;
-      while (i_count < ROM_SIZE) /* Zero contents of the ROM */
-         i_rom[i_count++] = 0;
-
-      i_count = 0;
       while ((!feof(h_file)) && (i_count < ROM_SIZE))
       {
          i_counter = fscanf(h_file, h_msg_rom, &i_addr, &i_opcode);
@@ -823,24 +825,39 @@ char *v_get_datafile_path(oprocessor *h_processor) /* Returns path the the data 
    strcat(s_pathname, "/.");
    strcat(s_pathname, s_filename);
    strcat(s_pathname, s_filetype);
-   if (i_isfile(s_pathname)) return s_pathname; /* File exists in home or current directory - don't move it... */
-   s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 15) * sizeof(char*));
-   strcpy(s_pathname, s_directory);
-   strcat(s_pathname, "/.local/share/.");
-   if (!i_isdir(s_pathname))
+   if (!(i_isfile(s_pathname))) /* File does not exists in home or current directory continue searching... */
    {
       free(s_pathname);
-      s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 2) * sizeof(char*));
-      strcpy(s_pathname, s_directory);
-      strcat(s_pathname, "/.");
+      s_directory = getenv("XDG_DATA_HOME");
+      if (s_directory && i_isdir(s_directory)) /* XDG_DATA_HOME is defined and it exists so use it */
+      {
+         s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 2) * sizeof(char*));
+         strcpy(s_pathname, s_directory);
+         strcat(s_pathname, "/.");
+      }
+      else /* Otherwise try $HOME/.local/share */
+      {
+         s_directory = getenv("HOME");
+         s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 15) * sizeof(char*));
+         strcpy(s_pathname, s_directory);
+         strcat(s_pathname, "/.local/share/.");
+      }
+      if (!i_isdir(s_pathname)) /* If neither of these above locations exist use $HOME */
+      {
+         free(s_pathname);
+         s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 2) * sizeof(char*));
+         strcpy(s_pathname, s_directory);
+         strcat(s_pathname, "/.");
+      }
+      strcat(s_pathname, s_filename);
+      strcat(s_pathname, s_filetype);
    }
 #else
    s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype)) * sizeof(char*));
    strcpy(s_pathname, s_directory);
-#endif
    strcat(s_pathname, s_filename);
    strcat(s_pathname, s_filetype);
-   debug(printf("%s/n", s_pathname));
+#endif
    return s_pathname;
 }
 #endif
