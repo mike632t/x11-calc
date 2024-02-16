@@ -46,8 +46,15 @@
  *                     all platforms - MT
  * 10 Feb 24         - Added an error message to warn the user that the ROM
  *                     contents are empty - MT
+ * 16 Feb 24         - Added 'Can't create' error message - MT
  *
  */
+
+#define NAME           "x11-calc-messages"
+#define VERSION        "0.10"
+#define BUILD          "0018"
+#define DATE           "16 Feb 24"
+#define AUTHOR         "MT"
 
 #if defined(HP10c) || defined(HP11c) || defined(HP12c)|| defined(HP15c) || defined(HP16c)
 #define HEXADECIMAL
@@ -60,7 +67,8 @@ License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\n
 This is free software: you are free to change and redistribute it.\n\
 There is NO WARRANTY, to the extent permitted by law.\n";
 
-const char * h_err_ROM = "Empty ROM - check command.\n";
+const char * h_err_creating_file = "Can't create '%s'.\n";
+const char * h_err_ROM = "Empty ROM - no firmware loaded.\n";
 
 #if defined(HEXADECIMAL)
 const char * h_msg_opcode = "%1x-%03x  %03x   ";
