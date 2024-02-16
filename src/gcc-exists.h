@@ -1,9 +1,9 @@
 /*
- * gcc-wait.h
+ * gcc-exists.h
  *
- * Copyright(C) 2019 - MT
+ * Copyright(C) 2020 - MT
  *
- * Cross platform delay function definition.
+ * Cross platform functions to check if a file (or directory) exists.
  *
  * This  program is free software: you can redistribute it and/or modify it
  * under  the terms of the GNU General Public License as published  by  the
@@ -18,10 +18,13 @@
  * You  should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * 16 Aug 20         - Initial version - MT
+ * 06 Jul 20   0.1   - Initial version - MT
+ *             0.2   - Added exists() - MT
  *
  */
 
-int i_wait(long l_delay);
+int i_isfile(char *_name);
 
+int i_isdir(char *_name);
 
+int i_exists(char *_name);

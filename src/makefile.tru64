@@ -1,0 +1,48 @@
+#
+#  makefile.tru64
+#
+#  Copyright (C) 2013  MT
+#
+#  A simplified makefile for Digital Tru64 UNIX.
+#
+#  This  program is free software: you can redistribute it and/or modify it
+#  under  the terms of the GNU General Public License as published  by  the
+#  Free  Software Foundation, either version 3 of the License, or (at  your
+#  option) any later version.
+#
+#  This  program  is distributed in the hope that it will  be  useful,  but
+#  WITHOUT   ANY   WARRANTY;   without even   the   implied   warranty   of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+#  Public License for more details.
+#
+#  You  should have received a copy of the GNU General Public License along
+#  with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+#  Note seperator (tab) at the beginning of the line CANNOT be a space..!
+#
+#  26 Nov 23   0.1   - Initial version - MT
+#                    - Define OSF1 so conditional compilation works even if
+#                      the compiler doesn't define it automatically - MT
+#                    - Tidied up comments - MT
+#
+MODEL	= 21
+PROGRAM	= x11-calc
+OUTPUT	= x11-calc-$(MODEL)
+SOURCES	= x11-calc.c x11-calc-$(MODEL).c x11-calc-cpu.c x11-calc-display.c x11-calc-messages.c x11-calc-segment.c x11-calc-button.c x11-calc-switch.c x11-calc-label.c x11-calc-colour.c gcc-wait.c
+FILES	= *.c *.h makefile README LICENSE
+OBJECTS	= $(SOURCES:.c=.o)
+#LANG	= LANG_$(shell (echo $$LANG | cut -f 1 -d '_'))
+#OS	= $(shell uname)
+LANG	= LANG_en
+OS	= OSF1
+CC	= cc
+
+$(OUTPUT): $(OBJECTS)
+#	@echo '*** Linking $(OBJECTS)'
+	@$(CC) $(OBJECTS) -o $@ -lX11 -lm
+
+$(OBJECTS) : $(SOURCES)
+#	@echo '*** Compiling $(SOURCES)'
+	@$(CC) -c $(SOURCES)  -DHP$(MODEL) -D$(OS) -D $(LANG)
+
+#

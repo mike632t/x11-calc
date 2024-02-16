@@ -232,6 +232,15 @@
  * 22 Oct 23         - Switch state now updated via a method - MT
  * 26 Oct 23         - Make the HP10 disable the display in PRINT mode - MT
  * 01 Nov 23         - Added /ROM qualifier for non Unix like plaforms - MT
+ * 10 Feb 24         - Check that the ROM contents are not empty, and print
+ *                     an error if they are.  Hopefully this will serve  as
+ *                     a reminder to specify the ROM file when using any of
+ *                     the Voyager emulators - MT
+ *                   - Use ROM_SIZE instead of calculating the size of  the
+ *                     ROM - MT
+ *                   - Display  the version information just before the ROM
+ *                     size when starting so any error messages are printed
+ *                     before the version number is shown - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Add verbose option.
@@ -243,8 +252,8 @@
 
 #define NAME           "x11-calc"
 #define VERSION        "0.10"
-#define BUILD          "0114"
-#define DATE           "22 Oct 23"
+#define BUILD          "0118"
+#define DATE           "10 Feb 24"
 #define AUTHOR         "MT"
 
 #define INTERVAL 25    /* Number of ticks to execute before updating the display */
@@ -394,9 +403,7 @@ int main(int argc, char *argv[])
                         else
                            i_breakpoint = i_breakpoint * 8 + argv[i_count + 1][i_offset] - '0';
                      }
-                     if ((i_breakpoint < 0)  ||
-                        (i_breakpoint > (unsigned)(sizeof(i_rom) / sizeof i_rom[0])) ||
-                        (i_breakpoint > 07777)) /* Check address range */
+                     if ((i_breakpoint < 0)  || (i_breakpoint > ROM_SIZE) || (i_breakpoint > 07777)) /* Check address range */
                      {
                         v_error(h_err_address_range, argv[i_count + 1]);
                      }
@@ -557,7 +564,12 @@ int main(int argc, char *argv[])
    if (argc > 1) v_error(h_err_invalid_operand); /* There shouldn't any command line parameters */
 #endif
    i_wait(200); /* Sleep for 200 milliseconds to 'debounce' keyboard! */
-   v_version();
+
+   i_count = ROM_SIZE;
+
+   while ((i_count > 0) && (i_rom[--i_count] == 0)); /* Check that the ROM isn't empty */
+   if (i_count == 0) v_error (h_err_ROM);
+
    if (!(x_display = XOpenDisplay(s_display_name))) v_error (h_err_display, s_display_name); /* Open the display and create a new window */
 
    i_screen = DefaultScreen(x_display); /* Get the default screen for our X server */
@@ -643,7 +655,9 @@ int main(int argc, char *argv[])
    XMapWindow(x_display, x_application_window);    /* Show window on display */
    XRaiseWindow(x_display, x_application_window); /* Raise window - ensures expose event is raised? */
 
-   fprintf(stdout, "ROM Size : %4u words \n", (unsigned)(sizeof(i_rom) / sizeof i_rom[0]));
+   v_version();
+   fprintf(stdout, "ROM Size : %4u words \n", ROM_SIZE);
+
    h_processor->trace = b_trace;
    h_processor->step = b_step;
 

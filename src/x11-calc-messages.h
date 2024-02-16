@@ -25,6 +25,9 @@
  *                     allow Mac OS  to be handled in the same way as other
  *                     unix like systems - MT
  * 01 Nov 23         - Made missing argument text common to all platforms - MT
+ * 10 Feb 24         - Added an error message to warn the user that the ROM
+ *                     contents are empty - MT
+ * 16 Feb 24         - Added 'Can't create' error message - MT
  *
  */
 
@@ -60,3 +63,6 @@ extern char * h_err_display;
 extern char * h_err_display_properties;
 extern char * h_err_display_colour;
 extern char * h_err_font;
+
+extern char * h_err_creating_file;
+extern const char * h_err_ROM;

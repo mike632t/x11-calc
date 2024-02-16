@@ -26,7 +26,9 @@
  *                     in the debug output (fixed warning) - MT
  * 03 Jan 21         - Changed debug() macro so that debug code is executed
  *                     when DEBUG is defined (doesn't need to be true) - MT
- * 31 mar 22         - Modified to use usleep() on NetBSD - MT
+ * 31 Mar 22         - Modified to use usleep() on NetBSD - MT
+ * 07 Feb 24         - Removed any windows specific or debug code, so don't
+ *                     need to include stdio.h - MT
  *
  */
 
@@ -34,12 +36,9 @@
 #define BUILD          "0001"
 #define DATE           "16 Aug 20"
 
-#include <stdio.h>
 #if defined(linux) || defined(__NetBSD__)
 #include <unistd.h>
 #include <sys/types.h>
-#elif defined(WIN32)
-#include <windows.h>
 #elif defined(VMS)
 #include <timeb.h>
 #include <lib$routines.h>
@@ -48,33 +47,25 @@
 #include <sys/timeb.h>
 #endif
 
-#include "gcc-debug.h"
-
 /*
  * wait (milliseconds)
  *
  * Waits for the specified number of milliseconds
  *
  * 16 Aug 20         - Initial version taken from gcc-cat.c - MT
- *  4 Sep 21         - Fixed formatting in debug code - MT
+ * 04 Sep 21         - Fixed formatting in debug code - MT
+ * 07 Feb 24         - Removed any windows specific or debug code - MT
  *
  */
 int i_wait(long l_delay) { /* wait for milliseconds */
 #if defined(linux) || defined(__NetBSD__) /* Use usleep() function */
-debug(fprintf(stderr, "Pausing using usleep() for  %ld ms.\n", l_delay));
 return (usleep(l_delay * 1000));
-#elif defined(WIN32) /* Use usleep() function */
-debug(fprintf(stderr, "Pausing using sleep() for %d ms.\n", l_delay));
-Sleep(l_delay);
-return (0);
 #elif defined(VMS) /* Use VMS LIB$WAIT */
 float f_seconds;
-debug(fprintf(stderr, "Pausing using LIB$WAIT for %ld ms.\n", l_delay));
 f_seconds = l_delay / 1000.0;
 return (lib$wait(&f_seconds));
 #else /* Use a portable but very inefficent busy loop */
 struct timeb o_start, o_end;
-debug(fprintf(stderr, "Pausing for %ld ms.\n", l_delay));
 ftime(&o_start);
 ftime(&o_end);
 while ((1000 * (o_end.time - o_start.time) + o_end.millitm - o_start.millitm) < l_delay) {
