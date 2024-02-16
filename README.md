@@ -34,7 +34,6 @@ More [screenshots](./img/)
      will use `$HOME` as before.
 
 01 Nov 23
-   - Added the HP10 to my collection!
    - Updated DCL make script.
 
 14 Oct 23
