@@ -367,12 +367,15 @@
  *                     directory if $HOME is not defined as before - MT
  * 10 Feb 24         - Clears  the ROM before reading the new ROM  contents
  *                     from the specified file - MT
- * 12 Feb 24         - Will  use XDG_DATA_HOME if the it is defined and the
+ * 12 Feb 24         - Will use $XDG_DATA_HOME if the it is defined and the
  *                     directory exists - MT
  *                   - Do NOT clear the ROM before loading a new ROM from a
  *                     file as this allows a ROM file to be used to apply a
  *                     patch to an existing ROM (it seemed like a good idea
  *                     at the time) - MT
+ * 16 Feb 24         - Creates a seperate application folder (if it doesn't
+ *                     exist) if using $XDG_DATA_HOME or $HOME/.local/share
+ *                     to store the data files - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -407,6 +410,11 @@
 #include "gcc-debug.h"  /* print() */
 #include "gcc-exists.h" /* i_isfile(), i_isdir(), i_exists() */
 #include "gcc-wait.h"   /* i_wait() */
+
+
+#if defined(unix) || defined(__unix__) || defined(__APPLE__)
+#include <sys/stat.h>
+#endif
 
 static void v_fprint_register(FILE *h_file, oregister *h_register) /* Print the contents of a register */
 {
@@ -800,15 +808,14 @@ char *v_get_datafile_path(oprocessor *h_processor) /* Returns path the the data 
  *    the pathname of the data file in $HOME to maintain compatibility with
  *    earlier releases.
  *
- *  - If the directory $HOME/.local/share/ exists and the data file doesn't
- *    exist in $HOME it will return the pathname for the data file  located
- *    in this directory.
+ *  - If the data file in not in the $HOME folder then if $XDG_DATA_HOME is
+ *    defined or $HOME/.local/share/ exists this routine will search for an
+ *    application specific subdirectory in the first of these two locations
+ *    if finds (creating it if necessary) and will use this to generate the
+ *    pathname of the data file.
  *
- *  - Otherwise  if $HOME is not defined return the pathname to a data file
- *    in the current directory.
- *
- * the the state file will be saved in the same default
- * directoy.
+ *  - Otherwise it will use the current directory path to generate the data
+ *    file's pathname.
  *
  */
 {
@@ -818,7 +825,6 @@ char *v_get_datafile_path(oprocessor *h_processor) /* Returns path the the data 
    char *s_pathname;
 
    if (s_directory == NULL) s_directory = ""; /* Use current folder if HOME not defined */
-
 #if defined(unix) || defined(__unix__) || defined(__APPLE__)
    s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 2) * sizeof(char*));
    strcpy(s_pathname, s_directory);
@@ -829,26 +835,37 @@ char *v_get_datafile_path(oprocessor *h_processor) /* Returns path the the data 
    {
       free(s_pathname);
       s_directory = getenv("XDG_DATA_HOME");
-      if (s_directory && i_isdir(s_directory)) /* XDG_DATA_HOME is defined and it exists so use it */
+      if (s_directory && (i_exists(s_directory) == 0) && (i_isdir(s_directory) == 0)) /* XDG_DATA_HOME is defined and it is a directory so use it */
       {
-         s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 2) * sizeof(char*));
+         s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 11) * sizeof(char*));
          strcpy(s_pathname, s_directory);
-         strcat(s_pathname, "/.");
       }
       else /* Otherwise try $HOME/.local/share */
       {
          s_directory = getenv("HOME");
-         s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 15) * sizeof(char*));
+         s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 24) * sizeof(char*));
          strcpy(s_pathname, s_directory);
-         strcat(s_pathname, "/.local/share/.");
+         strcat(s_pathname, "/.local/share");
       }
-      if (!i_isdir(s_pathname)) /* If neither of these above locations exist use $HOME */
+      if ((i_exists(s_directory) == 0) || (i_isdir(s_directory) == 0)) /* If neither of these above locations exist or they are not a directoy use $HOME */
       {
          free(s_pathname);
          s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 2) * sizeof(char*));
          strcpy(s_pathname, s_directory);
-         strcat(s_pathname, "/.");
       }
+      else
+      {
+         strcat(s_pathname, "/x11-calc");
+         if (i_exists(s_pathname) == 0) mkdir(s_pathname, (S_IRWXU|S_IRGRP|S_IXGRP)); /* If the application data folder does not exist attempt to create it (no need to check status here as we check the directory exists below) */
+         if (i_isdir(s_pathname) == 0) /* Check the directory exists and if it doesn't just use $HOME */
+         {
+            v_warning(h_err_creating_file, s_pathname); /* Can't create directory */
+            free(s_pathname);
+            s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 2) * sizeof(char*));
+            strcpy(s_pathname, s_directory);
+         }
+      }
+      strcat(s_pathname, "/.");
       strcat(s_pathname, s_filename);
       strcat(s_pathname, s_filetype);
    }
