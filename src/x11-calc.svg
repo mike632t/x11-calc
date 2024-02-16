@@ -19,7 +19,7 @@
     <rect width= "28" height= "8" x="12" y="56" style="fill:lightgrey"/>
     <rect width="12" height="12" x="52" y="56" style="fill:black"/>
     <rect width= "8" height= "8" x="52" y="56" style="fill:lightgrey"/>
-    <rect width="12" height="12" x="72" y="56" style="fill:goldenrod"/>
+    <rect width="12" height="12" x="72" y="56" style="fill:none"/>
     <rect width= "8" height= "8" x="72" y="56" style="fill:yellow"/>
 
     <rect width="12" height="12" x="12" y="72" style="fill:black"/>
