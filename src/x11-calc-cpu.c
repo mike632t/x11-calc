@@ -387,10 +387,10 @@
 
 #define NAME           "x11-calc-cpu"
 #define VERSION        "0.10"
-#define BUILD          "0163"
-#define DATE           "12 Feb 24"
+#define BUILD          "0165"
+#define DATE           "16 Feb 24"
 #define AUTHOR         "MT"
-#define DEBUG
+
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
