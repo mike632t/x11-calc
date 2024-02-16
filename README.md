@@ -23,14 +23,16 @@ More [screenshots](./img/)
 
 ### Latest News
 
-08 Feb 24
-   - The default location used to store the state of the machine when it is
-     powered off has changed from $HOME to $HOME/.local/share/. To maintain
-     backwards  compatibility, if the state of the machine has already been
-     saved in $HOME then the existing file will be used, but if it does not
-     exist then the machine state will be saved to a file in the new folder
-     if it exists.  On systems where $HOME is not defined the file will  be
-     created in the current directory.
+16 Feb 24
+   - For UNIX based systems the default location used to store the state of
+     the machine when it is powered off has changed.
+     If the data file already exists in `$HOME` then this will always be used
+     by default, but if it does not exist then if `$XDG_DATA_HOME` is defined
+     the program will create a sub directory in this location for the  data
+     files or in or `$HOME/.local/share/` if `$XDG_DATA_HOME` is not defined or
+     does not exist. If `$HOME/.local/share/` does not exist then the program
+     will use `$HOME` as before.
+
 01 Nov 23
    - Added the HP10 to my collection!
    - Updated DCL make script.
