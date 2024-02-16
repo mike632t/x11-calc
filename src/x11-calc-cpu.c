@@ -376,6 +376,7 @@
  * 16 Feb 24         - Creates a seperate application folder (if it doesn't
  *                     exist) if using $XDG_DATA_HOME or $HOME/.local/share
  *                     to store the data files - MT
+ *                   - Fixed bug in $XDG_DATA_HOME checking code - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -389,7 +390,7 @@
 #define BUILD          "0163"
 #define DATE           "12 Feb 24"
 #define AUTHOR         "MT"
-
+#define DEBUG
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -465,13 +466,6 @@ static void v_fprint_buffer(FILE *h_file, oprocessor *h_processor) /* Display th
    if (h_processor->position < BUFSIZE) /* Are there any characters in the buffer? */
    {
       int i_count;
-      debug(
-         for (i_count = 0; (i_count < BUFSIZE - 1); i_count++)
-            fprintf(stdout, "0x%03x, ", h_processor->buffer[i_count]);
-         fprintf(stdout, "pointer = %-3d ",  h_processor->position);
-         fprintf(stdout, "(pointer) = 0x%03x",  h_processor->buffer[h_processor->position]);
-         fprintf(stdout, "\n");
-      );
       for (i_count = 0; (i_count < BUFSIZE); i_count++) /* Print the contents of the buffer */
          fprintf(h_file, "%c", c_charmap[h_processor->buffer[i_count]]);
       fprintf(h_file, "\n");
@@ -835,7 +829,7 @@ char *v_get_datafile_path(oprocessor *h_processor) /* Returns path the the data 
    {
       free(s_pathname);
       s_directory = getenv("XDG_DATA_HOME");
-      if (s_directory && (i_exists(s_directory) == 0) && (i_isdir(s_directory) == 0)) /* XDG_DATA_HOME is defined and it is a directory so use it */
+      if (s_directory && (i_exists(s_directory) != 0) && (i_isdir(s_directory) != 0)) /* XDG_DATA_HOME is defined and it is a directory so use it */
       {
          s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 11) * sizeof(char*));
          strcpy(s_pathname, s_directory);
@@ -2264,7 +2258,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                break;
             default:
                if (h_processor->trace) fprintf(stdout, "\n");
-               debug(fprintf(stderr,"%02x\n", (i_opcode >> 6) & 0xf));
+               /** debug(fprintf(stderr,"%02x\n", (i_opcode >> 6) & 0xf)); */
                v_error(h_err_unexpected_opcode, i_opcode, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
             }
             break;
@@ -2384,7 +2378,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                break;
             default:
                if (h_processor->trace) fprintf(stdout, "\n");
-               debug(fprintf(stderr,"%02x\n", (i_opcode >> 6) & 0xf));
+               /** debug(fprintf(stderr,"%02x\n", (i_opcode >> 6) & 0xf)); */
                v_error(h_err_unexpected_opcode, i_opcode, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
             }
             break;
@@ -2521,7 +2515,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
 
             default:
                if (h_processor->trace) fprintf(stdout, "\n");
-               debug(fprintf(stderr,"%02x\n", (i_opcode >> 6) & 0xf));
+               /** debug(fprintf(stderr,"%02x\n", (i_opcode >> 6) & 0xf)); */
                v_error(h_err_unexpected_opcode, i_opcode, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
             }
             break;
@@ -2564,7 +2558,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
 
          default:
             if (h_processor->trace) fprintf(stdout, "\n");
-            debug(fprintf(stderr,"%02x\n", (i_opcode >> 2) & 0xf));
+            /** debug(fprintf(stderr,"%02x\n", (i_opcode >> 2) & 0xf)); */
             v_error(h_err_unexpected_opcode, i_opcode, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
          }
          break;
