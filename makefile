@@ -36,6 +36,7 @@
 #                    - Checks that the bin directory exists before deleting
 #                      files - MT
 #  01 Nov 23         - Tidied up tabs in comments - MT
+#  16 Feb 24			- Removed HP10 - MT
 #
 
 PROGRAM	=  x11-calc
@@ -47,7 +48,7 @@ FILES		+= .gitignore .gitattributes
 
 MAKE		=  make
 
-all: clean hp35 hp45 hp70 hp80 hp10 hp21 hp22 hp25 hp25c hp27 hp29c hp67 hp31e hp32e hp33e hp33c hp34c hp37e hp38e hp38c hp10c hp11c hp12c hp15c hp16c
+all: clean hp35 hp45 hp70 hp80 hp21 hp22 hp25 hp25c hp27 hp29c hp67 hp31e hp32e hp33e hp33c hp34c hp37e hp38e hp38c hp10c hp11c hp12c hp15c hp16c
 
 classic: clean hp35 hp80 hp45 hp70
 
