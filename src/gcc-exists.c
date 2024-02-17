@@ -21,6 +21,7 @@
  * 06 Jul 20   0.1   - Initial version - MT
  *             0.2   - Added exists() - MT
  * 07 Feb 24   0.3   - Rewrote to work with ANSI C - MT
+ * 17 Feb 24         - Updated comments - MT
  *
  */
 
@@ -39,19 +40,22 @@
 #include <sys/stat.h>   /* stat */
 #endif
 
-int i_isfile(const char *s_name) {
+int i_isfile(const char *s_name) /* Returns 'True' if the argument is a regular file */
+{
    struct stat o_file;
    stat(s_name, &o_file);
    return (S_ISREG(o_file.st_mode));
 }
 
-int i_isdir(const char *s_name) {
+int i_isdir(const char *s_name) /* Returns 'True' if the argument is a directory file */
+{
    struct stat o_file;
    stat(s_name, &o_file);
    return (S_ISDIR(o_file.st_mode));
 }
 
-int i_exists(const char *s_name) {
+int i_exists(const char *s_name) /* Returns 'True' if the argument exists */
+{
    struct stat o_file;
    return (stat(s_name, &o_file) == 0);
 }
