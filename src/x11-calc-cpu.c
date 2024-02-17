@@ -378,6 +378,8 @@
  *                     to store the data files - MT
  *                   - Fixed bug in $XDG_DATA_HOME checking code - MT
  * 17 Feb 24         - Only uses hidden data files in the $HOME folder - MT
+ *                   - Fixed get_datafile_path() - again. Hopefully it will
+ *                     work properly now - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -830,26 +832,20 @@ char *v_get_datafile_path(oprocessor *h_processor) /* Returns path the the data 
    {
       free(s_pathname);
       s_directory = getenv("XDG_DATA_HOME");
-      if (s_directory && (i_exists(s_directory) != 0) && (i_isdir(s_directory) != 0)) /* XDG_DATA_HOME is defined and it is a directory so use it */
+      if (s_directory) /* XDG_DATA_HOME is defined so atempt to use it */
       {
          s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 10) * sizeof(char*));
          strcpy(s_pathname, s_directory);
       }
-      else /* Otherwise try $HOME/.local/share */
+      else /* Otherwise try to use $HOME/.local/share */
       {
          s_directory = getenv("HOME");
          s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 23) * sizeof(char*));
          strcpy(s_pathname, s_directory);
          strcat(s_pathname, "/.local/share");
       }
-      if ((i_exists(s_directory) == 0) || (i_isdir(s_directory) == 0)) /* If neither of these above locations exist or they are not a directoy use $HOME */
-      {
-         free(s_pathname);
-         s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 2) * sizeof(char*));
-         strcpy(s_pathname, s_directory);
-         strcat(s_pathname, "/.");
-      }
-      else
+      debug(printf("Searching for '%s'\n", s_pathname));
+      if (i_exists(s_pathname) && i_isdir(s_pathname)) /* Check that the selected directory exists, and if it doesn't use  $HOME */
       {
          strcat(s_pathname, "/x11-calc");
          if (i_exists(s_pathname) == 0) mkdir(s_pathname, (S_IRWXU|S_IRGRP|S_IXGRP)); /* If the application data folder does not exist attempt to create it (no need to check status here as we check the directory exists below) */
@@ -863,6 +859,13 @@ char *v_get_datafile_path(oprocessor *h_processor) /* Returns path the the data 
          }
          else
             strcat(s_pathname, "/");
+      }
+      else
+      {
+         free(s_pathname);
+         s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 2) * sizeof(char*));
+         strcpy(s_pathname, s_directory);
+         strcat(s_pathname, "/.");
       }
       strcat(s_pathname, s_filename);
       strcat(s_pathname, s_filetype);
