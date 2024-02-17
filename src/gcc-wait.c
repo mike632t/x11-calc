@@ -32,9 +32,10 @@
  *
  */
 
-#define VERSION        "0.1"
-#define BUILD          "0001"
-#define DATE           "16 Aug 20"
+#define NAME           "gcc-wait"
+#define BUILD          "0005"
+#define DATE           "07 Feb 24"
+#define AUTHOR         "MT"
 
 #if defined(linux) || defined(__NetBSD__)
 #include <unistd.h>

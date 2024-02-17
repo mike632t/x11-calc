@@ -18,16 +18,17 @@
  * You  should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * 06 Jul 20   0.1   - Initial version - MT
- *             0.2   - Added exists() - MT
- * 07 Feb 24   0.3   - Rewrote to work with ANSI C - MT
+ * 06 Jul 20         - Initial version - MT
+ *                   - Added exists() - MT
+ * 07 Feb 24         - Rewrote to work with ANSI C - MT
  * 17 Feb 24         - Updated comments - MT
  *
  */
 
-#define VERSION        "0.3"
-#define BUILD          "0003"
-#define DATE           "07 Feb 24"
+#define NAME           "gcc-exists"
+#define BUILD          "0004"
+#define DATE           "17 Feb 24"
+#define AUTHOR         "MT"
 
 #include <stdio.h>
 #include <stdlib.h>

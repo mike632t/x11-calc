@@ -1,5 +1,5 @@
 /*
- * x11-calc-31.c - RPN (Reverse Polish) calculator simulator.
+ * x11-calc-31e.c - RPN (Reverse Polish) calculator simulator.
  *
  * Copyright(C) 2018   MT
  *
@@ -18,7 +18,7 @@
  * You  should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * 21 Sep 21   0.1   - Initial version - MT
+ * 21 Sep 21         - Initial version - MT
  * 04 Nov 21         - Allows size of the window to be changed by modifying
  *                     the value of SCALE at compile time - MT
  * 23 Nov 21         - Added the alternate function text - MT
@@ -33,9 +33,9 @@
  *
  */
 
-#define VERSION        "0.1"
-#define BUILD          "0006"
-#define DATE           "12 Feb 22"
+#define NAME           "x11-calc-31e"
+#define BUILD          "0008"
+#define DATE           "21 Oct 23"
 #define AUTHOR         "MT"
 
 #include <stdarg.h>    /* strlen(), etc. */

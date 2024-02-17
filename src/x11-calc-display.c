@@ -75,9 +75,9 @@
  *
  */
 
-#define VERSION        "0.1"
-#define BUILD          "0020"
-#define DATE           "29 Jan 22"
+#define NAME           "x11-calc-display"
+#define BUILD          "0030"
+#define DATE           "26 Oct 23"
 #define AUTHOR         "MT"
 
 #include <stdlib.h>    /* malloc(), etc. */

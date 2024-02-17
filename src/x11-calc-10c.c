@@ -18,7 +18,7 @@
  * You  should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * 10 Oct 21   0.1   - Initial version - MT
+ * 10 Oct 21         - Initial version - MT
  * 03 Jan 21         - Changed debug() macro so that debug code is executed
  *                     when DEBUG is defined (doesn't need to be true) - MT
  * 31 Jan 22         - Added ROM - MT
@@ -28,9 +28,9 @@
  * TO DO :           -
  */
 
-#define VERSION        "0.1"
-#define BUILD          "0002"
-#define DATE           "10 Oct 21"
+#define NAME           "x11-calc-10c"
+#define BUILD          "0005"
+#define DATE           "22 May 22"
 #define AUTHOR         "MT"
 
 #include <stdarg.h>    /* strlen(), etc. */

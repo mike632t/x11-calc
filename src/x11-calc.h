@@ -18,7 +18,7 @@
  * You  should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * 31 Aug 20   0.1   - Initial version - MT
+ * 31 Aug 20         - Initial version - MT
  * 31 Aug 20         - Resolved dependencies between header files by moving
  *                     common function definitions to a separate file - MT
  * 08 Aug 21         - Tidied up spelling errors in the comments - MT

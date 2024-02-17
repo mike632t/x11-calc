@@ -18,7 +18,7 @@
  * You  should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * 10 Oct 21   0.1   - Initial version - MT
+ * 10 Oct 21         - Initial version - MT
  * 12 Oct 21         - Removed Title and replaced with model number - MT
  * 02 Mar 22         - Modified memory size (still too big) - MT
  * 04 Mar 22         - Enabled continuous memory - MT

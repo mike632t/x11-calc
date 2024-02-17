@@ -18,7 +18,7 @@
  * You  should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * 29 Sep 20   0.1   - Initial version - MT
+ * 29 Sep 20         - Initial version - MT
  * 03 Jan 21         - Changed debug() macro so that debug code is executed
  *                     when DEBUG is defined (doesn't need to be true) - MT
  * 10 Feb 22         - Added background shading and horizontal line - MT
@@ -31,9 +31,9 @@
  *
  */
 
-#define VERSION        "0.1"
-#define BUILD          "0001"
-#define DATE           "29 Sep 21"
+#define NAME           "x11-calc-label"
+#define BUILD          "0004"
+#define DATE           "12 Mar 22"
 #define AUTHOR         "MT"
 
 #include <string.h>    /* strlen(), etc. */

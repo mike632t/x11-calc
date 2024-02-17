@@ -29,9 +29,10 @@
  *
  */
 
-#define VERSION        "0.1"
+#define NAME           "x11-calc-colour"
 #define BUILD          "0003"
 #define DATE           "06 Dec 21"
+#define AUTHOR         "MT"
 
 #include "gcc-debug.h"
 

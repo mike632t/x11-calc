@@ -25,9 +25,9 @@
  *
  */
 
-#define VERSION        "0.1"
-#define BUILD          "0001"
-#define DATE           "19 Sep 21"
+#define NAME           "x11-calc-keyboard"
+#define BUILD          "0002"
+#define DATE           "03 Jan 21"
 #define AUTHOR         "MT"
 
 #include <ctype.h>     /* is alpha(), etc. */

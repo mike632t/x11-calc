@@ -18,15 +18,15 @@
  * You  should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * 30 Jan 22   0.1   - Initial version (derived from x11-calc-10.c) - MT
+ * 30 Jan 22         - Initial version (derived from x11-calc-10.c) - MT
  * 12 Mar 22         - Added the label state property - MT
  *
  * TO DO :           -
  */
 
-#define VERSION        "0.1"
-#define BUILD          "0001"
-#define DATE           "30 Jan 22"
+#define NAME           "x11-calc-11c"
+#define BUILD          "0002"
+#define DATE           "12 Mar 22"
 #define AUTHOR         "MT"
 
 #include <stdarg.h>    /* strlen(), etc. */

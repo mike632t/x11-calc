@@ -18,7 +18,7 @@
  * You  should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * 29 Sep 20   0.1   - Initial version - MT
+ * 29 Sep 20         - Initial version - MT
  * 10 Oct 21         - Allow use of NULL pointers - MT
  * 03 Jan 21         - Changed debug() macro so that debug code is executed
  *                     when DEBUG is defined (doesn't need to be true) - MT
@@ -29,9 +29,9 @@
  *
  */
 
-#define VERSION        "0.1"
-#define BUILD          "0001"
-#define DATE           "29 Sep 21"
+#define NAME           "x11-calc-switch"
+#define BUILD          "0006"
+#define DATE           "23 Oct 23"
 #define AUTHOR         "MT"
 
 #include <string.h>    /* strlen(), etc. */

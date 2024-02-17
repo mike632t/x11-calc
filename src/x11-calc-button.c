@@ -55,9 +55,9 @@
  *                     the classic series.
  */
 
-#define VERSION        "0.1"
-#define BUILD          "0011"
-#define DATE           "06 Dec 21"
+#define NAME           "x11-calc-button"
+#define BUILD          "0016"
+#define DATE           "26 Nov 22"
 #define AUTHOR         "MT"
 
 #include <string.h>    /* strlen(), etc. */

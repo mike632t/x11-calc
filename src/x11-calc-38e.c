@@ -1,5 +1,5 @@
 /*
- * x11-calc-38.c - RPN (Reverse Polish) calculator simulator.
+ * x11-calc-38e.c - RPN (Reverse Polish) calculator simulator.
  *
  * Copyright(C) 2018   MT
  *
@@ -18,15 +18,15 @@
  * You  should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * 11 Dec 22   0.1   - Initial version derived from hp38c - MT
+ * 11 Dec 22         - Initial version derived from hp38c - MT
  * 21 Oct 23         - Updated switch parameters to accomodate a 3 position
  *                     switch - MT
  *
  */
 
-#define VERSION        "0.1"
-#define BUILD          "0006"
-#define DATE           "12 Feb 22"
+#define NAME           "x11-calc-38e"
+#define BUILD          "0002"
+#define DATE           "21 Oct 23"
 #define AUTHOR         "MT"
 
 #include <stdarg.h>    /* strlen(), etc. */

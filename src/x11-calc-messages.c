@@ -21,7 +21,7 @@
  * You  should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * 21 Jan 22   0.1   - Initial version - MT
+ * 21 Jan 22         - Initial version - MT
  * 23 Jan 22         - Added a French language translation - MT
  * 24 Jan 22         - Added my first attempt at translating text  messages
  *                     into German and Spanish - MT
@@ -51,8 +51,7 @@
  */
 
 #define NAME           "x11-calc-messages"
-#define VERSION        "0.10"
-#define BUILD          "0018"
+#define BUILD          "0019"
 #define DATE           "16 Feb 24"
 #define AUTHOR         "MT"
 

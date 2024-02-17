@@ -238,7 +238,7 @@
  *                     the Voyager emulators - MT
  *                   - Use ROM_SIZE instead of calculating the size of  the
  *                     ROM - MT
- *                   - Display  the version information just before the ROM
+ *             0.11  - Display  the version information just before the ROM
  *                     size when starting so any error messages are printed
  *                     before the version number is shown - MT
  *
@@ -251,8 +251,8 @@
  */
 
 #define NAME           "x11-calc"
-#define VERSION        "0.10"
-#define BUILD          "0118"
+#define VERSION        "0.11"
+#define BUILD          "0119"
 #define DATE           "10 Feb 24"
 #define AUTHOR         "MT"
 

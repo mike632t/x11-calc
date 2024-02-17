@@ -26,7 +26,7 @@
  * You  should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * 10 Sep 20   0.1   - Initial version - MT
+ * 10 Sep 20         - Initial version - MT
  * 08 Aug 21         - Tidied up spelling errors in the comments and  added
  *                     a section describing the processor registers - MT
  *                   - Changed the status word into an integer - MT
@@ -127,7 +127,7 @@
  *                     just once) - MT
  *                   - Modified some error messages - MT
  *                   - Tidied up extra spaces - MT
- *             0.2   - HP model 21 simulator works !!
+ *                   - HP model 21 simulator works !!
  * 15 Sep 21         - Added 'clear data registers', and delayed ROM select
  *                     handling to 'jsb' and 'goto' - MT
  *                   - Moved  the processor initialisation into a  separate
@@ -154,7 +154,7 @@
  *  6 Oct 21         - Dumps all registers when displaying status - MT
  *  7 Oct 21         - Fixed bug in 'data register(n)-> c' - MT
  *                   - Fixed bug in 'clear registers' - MT
- *             0.3   - HP model 25 simulator now working..
+ *                   - HP model 25 simulator now working..
  * 10 Oct 21         - Fixed bug in code to check the ROM size - MT
  *                   - Added 'keys -> a' and 'keys -> a' - MT
  *                   - Fixed bug in 'c -> data register(n)' - MT
@@ -168,25 +168,25 @@
  *                   - Fixed bug with program counter (do not decrement the
  *                     program  counter  before checking for a delayed  ROM
  *                     select) - MT
- *             0.4   - HP model 29 simulator works..!
+ *                   - HP model 29 simulator works..!
  *                   - Fixed bug in 'keys -> rom address' - MT
- *             0.5   - HP model 27 simulator works (requires testing).
+ *                   - HP model 27 simulator works (requires testing).
  * 17 Oct 21         - Renamed init() to reset() and fixed bug in init() by
  *                     consolidating  the code used to clear the  registers
  *                     into reset() - MT
  *                   - Modified  'p = p + 1' as woodstock and spice  series
  *                     machines behave differently - MT
- *             0.6   - HP  model 31E and 32E simulators work (more testing
+ *                   - HP  model 31E and 32E simulators work (more testing
  *                     required).
  *                   - Added dummy 'rom checksum' instruction - MT
  * 20 Oct 21         - Modified 'rom checksum' to set status bit and return
  *                     and ignores invalid memory addresses (prints warning
  *                     message) - MT
- * 26 Oct 21   0.7   - Added processor_load() to load saved registers  from
+ * 26 Oct 21         - Added processor_load() to load saved registers  from
  *                     a file - MT
- * 17 Nov 21   0.8   - Fixed pathname on VMS - MT
+ * 17 Nov 21         - Fixed pathname on VMS - MT
  * 22 Nov 21         - Only saves the state of continuous registers - MT
- * 25 Nov 21   0.9   - Removed current rom property as this is not used and
+ * 25 Nov 21         - Removed current rom property as this is not used and
  *                     added the rom bank property, since this is needed by
  *                     the HP model 34C - MT
  *                   - Implemented bank switching - MT
@@ -318,7 +318,7 @@
  *                     be used to read the saved values) - MT
  * 06 Mar 22         - Fixed the issue with the relative jump offset - MT
  *                   - Added 'cstex' instruction (exchange c and st)- MT
- *             0.10  - Added 'c =st', 'c = stk', 'c = c and a', and fixed a
+ *                   - Added 'c =st', 'c = stk', 'c = c and a', and fixed a
  *                     bug in 'cstex' - MT
  * 07 Mar 22         - Removed unused debug code - MT
  * 31 Mar 22         - Modified to compile on NetBSD - MT
@@ -389,7 +389,6 @@
  */
 
 #define NAME           "x11-calc-cpu"
-#define VERSION        "0.10"
 #define BUILD          "0166"
 #define DATE           "17 Feb 24"
 #define AUTHOR         "MT"

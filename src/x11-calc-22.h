@@ -18,7 +18,7 @@
  * You  should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * 21 Sep 21   0.1   - Initial version - MT
+ * 21 Sep 21         - Initial version - MT
  * 12 Oct 21         - Removed Title and replaced with model number - MT
  *                   - Added macro definition for continuous memory - MT
  * 04 Nov 21         - Allows size of the window to be changed by modifying

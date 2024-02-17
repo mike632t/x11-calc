@@ -57,9 +57,9 @@
  ^
  */
 
-#define VERSION        "0.0"
-#define BUILD          "0006"
-#define DATE           "19 Jul 13"
+#define NAME           "x11-calc-segment"
+#define BUILD          "0011"
+#define DATE           "14 Oct 23"
 #define AUTHOR         "MT"
 
 #include <stdio.h>     /* fprintf(), etc */

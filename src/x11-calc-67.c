@@ -18,7 +18,7 @@
  * You  should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * 06 Dec 21   0.1   - Initial version - MT
+ * 06 Dec 21         - Initial version - MT
  *                   - Simplified keyboard constants - MT
  * 10 Dec 21         - Keyboard shortcuts for labels now uppercase to avoid
  *                     conflicting with existing shortcuts - MT
@@ -37,9 +37,9 @@
  *
  */
 
-#define VERSION        "0.1"
-#define BUILD          "0009"
-#define DATE           "12 Feb 22"
+#define NAME           "x11-calc-67"
+#define BUILD          "0012"
+#define DATE           "21 Oct 23"
 #define AUTHOR         "MT"
 
 #include <stdarg.h>    /* strlen(), etc. */

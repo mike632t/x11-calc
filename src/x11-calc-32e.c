@@ -1,7 +1,7 @@
 /*
- * x11-calc-32.c - RPN (Reverse Polish) calculator simulator.
+ * x11-calc-32e.c - RPN (Reverse Polish) calculator simulator.
  *
- * Copyright(C) 2018   MT
+ * Copyright(C) 2013   MT
  *
  * Model specific functions.
  *
@@ -18,7 +18,7 @@
  * You  should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * 13 Jun 13   0.1   - Initial version - MT
+ * 13 Jun 13         - Initial version - MT
  * 10 Mar 14         - Changed indexes to BCD hex values - MT
  * 10 Dec 18         - Alternate  function key now LIGHT_BLUE, allowing  it
  *                     to be a different color to the alternate text - MT
@@ -43,9 +43,9 @@
  *
  */
 
-#define VERSION        "0.1"
-#define BUILD          "0014"
-#define DATE           "12 Feb 22"
+#define NAME           "x11-calc-32e"
+#define BUILD          "0015"
+#define DATE           "21 Oct 23"
 #define AUTHOR         "MT"
 
 #include <stdarg.h>    /* strlen(), etc. */

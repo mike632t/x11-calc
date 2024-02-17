@@ -18,7 +18,7 @@
  * You  should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * 30 Jan 22   0.1   - Initial version (derived from x11-calc-10.c) - MT
+ * 30 Jan 22         - Initial version (derived from x11-calc-10.c) - MT
  * 02 Mar 22         - Fixed ROM size - MT
  * 09 Mar 22         - Fixed width and height (when scaled) - MT
  *

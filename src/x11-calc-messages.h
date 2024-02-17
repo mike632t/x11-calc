@@ -18,7 +18,7 @@
  * You  should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * 13 Jun 13   0.1   - Initial version - MT
+ * 13 Jun 13         - Initial version - MT
  * 02 Feb 22         - Added formatting strings for relative jumps - MT
  * 31 Mar 22         - Modified to compile on NetBSD - MT
  * 24 Dec 22         - Added and explicit check for '__APPLE__' in order to

@@ -1,5 +1,5 @@
 /*
- * x11-calc-38.c - RPN (Reverse Polish) calculator simulator.
+ * x11-calc-38c.c - RPN (Reverse Polish) calculator simulator.
  *
  * Copyright(C) 2018   MT
  *
@@ -18,7 +18,7 @@
  * You  should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * 04 Dec 21   0.1   - Initial version - MT
+ * 04 Dec 21         - Initial version - MT
  * 06 Dec 21         - Label text colour now explicitly defined - MT
  * 03 Jan 21         - Changed debug() macro so that debug code is executed
  *                     when DEBUG is defined (doesn't need to be true) - MT
@@ -31,9 +31,9 @@
  *
  */
 
-#define VERSION        "0.1"
-#define BUILD          "0006"
-#define DATE           "12 Feb 22"
+#define NAME           "x11-calc-38c"
+#define BUILD          "0007"
+#define DATE           "21 Oct 23"
 #define AUTHOR         "MT"
 
 #include <stdarg.h>    /* strlen(), etc. */

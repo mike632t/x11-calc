@@ -1,5 +1,5 @@
 /*
- * x11-calc-33.h - RPN (Reverse Polish) calculator simulator.
+ * x11-calc-33e.h - RPN (Reverse Polish) calculator simulator.
  *
  * Copyright(C) 2018   MT
  *
@@ -18,7 +18,7 @@
  * You  should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * 13 Jun 13   0.1   - Initial version - MT
+ * 13 Jun 13         - Initial version - MT
  * 30 Aug 20         - Moved functions to separate source file - MT
  * 12 Oct 21         - Removed Title and replaced with model number - MT
  *                   - Added macro definition for continuous memory - MT

@@ -18,7 +18,7 @@
  * You  should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * 09 Mar 14   0.1   - Initial version - MT
+ * 09 Mar 14         - Initial version - MT
  * 30 Aug 20         - Moved functions to separate source file - MT
  * 08 Aug 21         - Tidied up spelling errors in the comments - MT
  * 30 Sep 21         - Added the additional properties for the label colour

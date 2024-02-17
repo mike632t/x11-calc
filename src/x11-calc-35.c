@@ -32,9 +32,9 @@
  *
  */
 
-#define VERSION        "0.1"
-#define BUILD          "0005"
-#define DATE           "12 Feb 22"
+#define NAME           "x11-calc-35"
+#define BUILD          "0007"
+#define DATE           "21 Oct 23"
 #define AUTHOR         "MT"
 
 /* Define REDDOT to build a version with the original HP35 bugs */

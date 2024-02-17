@@ -25,9 +25,9 @@
  *
  */
 
-#define VERSION        "0.1"
-#define BUILD          "0001"
-#define DATE           "31 Jan 22"
+#define NAME           "x11-calc-12c"
+#define BUILD          "0004"
+#define DATE           "12 Mar 22"
 #define AUTHOR         "MT"
 
 #include <stdarg.h>    /* strlen(), etc. */

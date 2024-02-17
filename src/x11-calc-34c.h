@@ -1,5 +1,5 @@
 /*
- * x11-calc-33.h - RPN (Reverse Polish) calculator simulator.
+ * x11-calc-34c.h - RPN (Reverse Polish) calculator simulator.
  *
  * Copyright(C) 2018   MT
  *

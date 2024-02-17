@@ -18,7 +18,7 @@
  * You  should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * 09 Jun 14   0.1   - Initial version - MT
+ * 09 Jun 14         - Initial version - MT
  * 10 Mar 14         - Changed indexes to BCD hex values - MT
  * 10 Dec 18         - Alternate  function key now LIGHT_BLUE, allowing  it
  *                     to be a different colour to the alternate text - MT
@@ -45,9 +45,9 @@
  *
  */
 
-#define VERSION        "0.1"
-#define BUILD          "0015"
-#define DATE           "12 Feb 22"
+#define NAME           "x11-calc-21"
+#define BUILD          "0016"
+#define DATE           "21 Oct 23"
 #define AUTHOR         "MT"
 
 #include <stdarg.h>    /* strlen(), etc. */

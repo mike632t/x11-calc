@@ -1,5 +1,5 @@
 /*
- * x11-calc-38.h - RPN (Reverse Polish) calculator simulator.
+ * x11-calc-38c.h - RPN (Reverse Polish) calculator simulator.
  *
  * Copyright(C) 2018   MT
  *
@@ -18,7 +18,7 @@
  * You  should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * 04 Dec 21   0.1   - Initial version - MT
+ * 04 Dec 21         - Initial version - MT
  * 22 Dec 21         - Removed SPICE symbol - MT
  * 11 Jan 22         - Removed ROM_BANKS - MT
  * 20 Jan 22         - Fixed compilation warnings on VAXC by defining i_rom
