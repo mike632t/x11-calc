@@ -28,7 +28,7 @@
 MODEL	= 21
 PROGRAM	= x11-calc
 OUTPUT	= x11-calc-$(MODEL)
-SOURCES	= x11-calc.c x11-calc-$(MODEL).c x11-calc-cpu.c x11-calc-display.c x11-calc-messages.c x11-calc-segment.c x11-calc-button.c x11-calc-switch.c x11-calc-label.c x11-calc-colour.c gcc-wait.c
+SOURCES	= x11-calc.c x11-calc-$(MODEL).c x11-calc-cpu.c x11-calc-display.c x11-calc-messages.c x11-calc-segment.c x11-calc-button.c x11-calc-switch.c x11-calc-label.c x11-calc-colour.c gcc-exists.c gcc-wait.c
 FILES	= *.c *.h makefile README LICENSE
 OBJECTS	= $(SOURCES:.c=.o)
 #LANG	= LANG_$(shell (echo $$LANG | cut -f 1 -d '_'))
