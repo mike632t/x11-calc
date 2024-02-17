@@ -253,7 +253,7 @@
 #define NAME           "x11-calc"
 #define VERSION        "0.11"
 #define BUILD          "0119"
-#define DATE           "10 Feb 24"
+#define DATE           "17 Feb 24"
 #define AUTHOR         "MT"
 
 #define INTERVAL 25    /* Number of ticks to execute before updating the display */
