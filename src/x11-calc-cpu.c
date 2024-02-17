@@ -377,6 +377,7 @@
  *                     exist) if using $XDG_DATA_HOME or $HOME/.local/share
  *                     to store the data files - MT
  *                   - Fixed bug in $XDG_DATA_HOME checking code - MT
+ * 17 Feb 24         - Only uses hidden data files in the $HOME folder - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -387,8 +388,8 @@
 
 #define NAME           "x11-calc-cpu"
 #define VERSION        "0.10"
-#define BUILD          "0165"
-#define DATE           "16 Feb 24"
+#define BUILD          "0166"
+#define DATE           "17 Feb 24"
 #define AUTHOR         "MT"
 
 #include <string.h>
@@ -831,13 +832,13 @@ char *v_get_datafile_path(oprocessor *h_processor) /* Returns path the the data 
       s_directory = getenv("XDG_DATA_HOME");
       if (s_directory && (i_exists(s_directory) != 0) && (i_isdir(s_directory) != 0)) /* XDG_DATA_HOME is defined and it is a directory so use it */
       {
-         s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 11) * sizeof(char*));
+         s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 10) * sizeof(char*));
          strcpy(s_pathname, s_directory);
       }
       else /* Otherwise try $HOME/.local/share */
       {
          s_directory = getenv("HOME");
-         s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 24) * sizeof(char*));
+         s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 23) * sizeof(char*));
          strcpy(s_pathname, s_directory);
          strcat(s_pathname, "/.local/share");
       }
@@ -846,6 +847,7 @@ char *v_get_datafile_path(oprocessor *h_processor) /* Returns path the the data 
          free(s_pathname);
          s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 2) * sizeof(char*));
          strcpy(s_pathname, s_directory);
+         strcat(s_pathname, "/.");
       }
       else
       {
@@ -857,9 +859,11 @@ char *v_get_datafile_path(oprocessor *h_processor) /* Returns path the the data 
             free(s_pathname);
             s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 2) * sizeof(char*));
             strcpy(s_pathname, s_directory);
+            strcat(s_pathname, "/.");
          }
+         else
+            strcat(s_pathname, "/");
       }
-      strcat(s_pathname, "/.");
       strcat(s_pathname, s_filename);
       strcat(s_pathname, s_filetype);
    }
