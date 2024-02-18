@@ -59,7 +59,10 @@
 #                    - Lists the execuitable files instead of just the file
 #                      names - MT
 #   7 Feb 24         - Added new functions to check if a file or  directory
-# 							  exists - MT
+#                      exists - MT
+#  18 Feb 24         - Attempts to redefine the COMMIT_ID based on the last
+#                      commit using git - MT
+#
 #
 
 MODEL	= 21

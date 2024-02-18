@@ -55,6 +55,7 @@
  * 11 Dec 22         - Renamed models with continious memory and added HP25
  *                     HP33E, and HP38E - MT
  * 24 Dec 22         - Modified scale width for HP10 - MT
+ * 18 Feb 24         - Don't redefine COMMIT_ID if already defined - MT
  *
  * TO DO :           -
  */

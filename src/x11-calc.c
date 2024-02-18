@@ -241,6 +241,8 @@
  *             0.11  - Display  the version information just before the ROM
  *                     size when starting so any error messages are printed
  *                     before the version number is shown - MT
+ *                   - Updated  version number format to include the  build
+ *                     number - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Add verbose option.
@@ -252,7 +254,7 @@
 
 #define NAME           "x11-calc"
 #define VERSION        "0.11"
-#define BUILD          "0119"
+#define BUILD          "0120"
 #define DATE           "17 Feb 24"
 #define AUTHOR         "MT"
 
@@ -291,11 +293,10 @@
 
 void v_version() /* Display version information */
 {
-   fprintf(stdout, "%s: Version %s %s", FILENAME, VERSION, COMMIT_ID);
+   fprintf(stdout, "%s: Version %s.%s %s", FILENAME, VERSION, BUILD, COMMIT_ID);
    if (__DATE__[4] == ' ') fprintf(stdout, " 0"); else fprintf(stdout, " %c", __DATE__[4]);
-   fprintf(stdout, "%c %c%c%c %s %s", __DATE__[5],
+   fprintf(stdout, "%c %c%c%c %s %s\n", __DATE__[5],
       __DATE__[0], __DATE__[1], __DATE__[2], &__DATE__[9], __TIME__ );
-   fprintf(stdout, " (Build: %s)\n", BUILD );
 }
 
 void v_warning(const char *s_format, ...) /* Print formatted warning message and exit */
