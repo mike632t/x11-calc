@@ -74,6 +74,7 @@ OUTPUT	= $(PROGRAM).out
 LANG	= LANG_$(shell (echo $$LANG | cut -f 1 -d '_'))
 UNAME	=  $(shell uname)
 TARGET	=  ../bin
+COMMIT	= $(shell git log -1 HEAD --format=%h 2> /dev/null)
 
 LIBS	= -lX11 -lm
 FLAGS	= -fcommon -Wall -pedantic -std=gnu99
@@ -101,6 +102,10 @@ endif
 
 all: clean $(TARGET)/$(PROGRAM)-$(MODEL) $(OBJECTS)
 FLAGS	+= -D HP$(MODEL) -D $(LANG)
+ifneq ($(COMMIT),)
+FLAGS	+= -D COMMIT_ID='"[Commit Id : $(COMMIT)]"'
+endif
+
 SOURCES += x11-calc-$(MODEL).c
 
 $(TARGET)/$(PROGRAM)-$(MODEL): $(OBJECTS)

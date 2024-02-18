@@ -58,7 +58,9 @@
  *
  * TO DO :           -
  */
+#if !defined(COMMIT_ID)
 #define COMMIT_ID "[Commit ID: $Format:%h$]"
+#endif
 
 #if defined(HP35) || defined(HP80) || defined(HP45) || defined(HP70) || defined(HP55) || defined(HP10) || defined(HP67)
 #define SCALE_WIDTH     1.15
