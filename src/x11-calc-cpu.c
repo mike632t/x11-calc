@@ -380,6 +380,7 @@
  * 17 Feb 24         - Only uses hidden data files in the $HOME folder - MT
  *                   - Fixed get_datafile_path() - again. Hopefully it will
  *                     work properly now - MT
+ * 19 Feb 24         - Closes ROM file after reading - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -688,6 +689,7 @@ void v_read_rom(oprocessor *h_processor, char *s_pathname) /* Load rom from 'obj
             if (i_count < ROM_SIZE) i_rom[i_count++] = i_opcode;
          }
       }
+      fclose(h_file);
    }
    else
       v_error(h_err_opening_file, s_pathname); /* Can't open data file */
