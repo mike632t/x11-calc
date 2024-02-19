@@ -241,8 +241,12 @@
  *             0.11  - Display  the version information just before the ROM
  *                     size when starting so any error messages are printed
  *                     before the version number is shown - MT
- *                   - Updated  version number format to include the  build
+ * 18 Feb 24         - Updated  version number format to include the  build
  *                     number - MT
+ *
+ * 19 Feb 24         - Check that stat() was successful before checking the
+ *                     if the file is a directory or a file! - MT
+ *                   - Closes ROM file after reading - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Add verbose option.
@@ -254,8 +258,8 @@
 
 #define NAME           "x11-calc"
 #define VERSION        "0.11"
-#define BUILD          "0120"
-#define DATE           "18 Feb 24"
+#define BUILD          "0122"
+#define DATE           "19 Feb 24"
 #define AUTHOR         "MT"
 
 #define INTERVAL 25    /* Number of ticks to execute before updating the display */
