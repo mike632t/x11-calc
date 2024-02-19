@@ -22,16 +22,24 @@
  *                   - Added exists() - MT
  * 07 Feb 24         - Rewrote to work with ANSI C - MT
  * 17 Feb 24         - Updated comments - MT
+ * 19 Feb 24         - Check that stat() was successful before checking the
+ *                     if the file is a directory or a file! - MT
+ *                   - Clear the file structure before calling stat(), this
+ *                     is proabably overkill but guards against  accidental
+ *                     reuse - MT
  *
  */
 
 #define NAME           "gcc-exists"
-#define BUILD          "0004"
-#define DATE           "17 Feb 24"
+#define BUILD          "0006"
+#define DATE           "19 Feb 24"
 #define AUTHOR         "MT"
+
+#define DEBUG
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #if defined(VMS)
 #include <types.h>
@@ -41,23 +49,36 @@
 #include <sys/stat.h>   /* stat */
 #endif
 
+#include "gcc-debug.h"
+
 int i_isfile(const char *s_name) /* Returns 'True' if the argument is a regular file */
 {
    struct stat o_file;
-   stat(s_name, &o_file);
-   return (S_ISREG(o_file.st_mode));
+   int i_status;
+   memset(&o_file, 0, sizeof o_file);
+   if (stat(s_name, &o_file) == -1)
+      i_status = 0;
+   else
+      i_status = S_ISREG(o_file.st_mode);
+   return (i_status);
 }
 
 int i_isdir(const char *s_name) /* Returns 'True' if the argument is a directory file */
 {
    struct stat o_file;
-   stat(s_name, &o_file);
-   return (S_ISDIR(o_file.st_mode));
+   int i_status;
+   memset(&o_file, 0, sizeof o_file);
+   if (stat(s_name, &o_file) == -1)
+      i_status = 0;
+   else
+      i_status = S_ISDIR(o_file.st_mode);
+   return (i_status);
 }
 
 int i_exists(const char *s_name) /* Returns 'True' if the argument exists */
 {
    struct stat o_file;
+   memset(&o_file, 0, sizeof o_file);
    return (stat(s_name, &o_file) == 0);
 }
 
