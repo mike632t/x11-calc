@@ -149,7 +149,7 @@ The following packages are required to build and/or run the simulator.
 
 - Debian : gcc | clang | tcc, make, libx11-dev, libc6-dev, xfonts-base
 
-- Fedora : gcc, make, libx11-dev, libc6-dev, xorg-x11-xfonts-base
+- Fedora : gcc, make, libx11-dev, libc6-dev, xorg-x11-xfonts-base or xorg-x11-xfonts-misc
 
 - Gentoo : gcc, make, libx11-dev, libc6-dev, font-misc-misc
 
@@ -200,8 +200,9 @@ saved in the hidden data file.
 
 ### Exiting
 
-Clicking  on the On/Off switch will turn the simulator on and off,  but  if
-you hold down the off switch down for two seconds the program will exit.
+For  models with a 'sliding' On/Off switch clicking on the switch will turn
+the simulator on or off, but if when switching off you hold down the switch
+down for two seconds the program will exit.
 
 
 ### Debugging
