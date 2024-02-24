@@ -247,6 +247,7 @@
  * 19 Feb 24         - Check that stat() was successful before checking the
  *                     if the file is a directory or a file! - MT
  *                   - Closes ROM file after reading - MT
+ * 23 Feb 24         - Fixed bug in read_rom() - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Add verbose option.
@@ -257,9 +258,9 @@
  */
 
 #define NAME           "x11-calc"
-#define VERSION        "0.11"
-#define BUILD          "0122"
-#define DATE           "19 Feb 24"
+#define VERSION        "0.12"
+#define BUILD          "0123"
+#define DATE           "23 Feb 24"
 #define AUTHOR         "MT"
 
 #define INTERVAL 25    /* Number of ticks to execute before updating the display */
@@ -622,13 +623,10 @@ int main(int argc, char *argv[])
 
    s_font = NORMAL_TEXT; /* Normal text font */
    if (!(h_normal_font = XLoadQueryFont(x_display, s_font))) v_error(h_err_font, s_font);
-
    s_font = SMALL_TEXT; /* Small text font */
    if (!(h_small_font = XLoadQueryFont(x_display, s_font))) v_error(h_err_font, s_font);
-
    s_font = ALTERNATE_TEXT; /* Alternate text font */
    if (!(h_alternate_font = XLoadQueryFont(x_display, s_font))) v_error(h_err_font, s_font);
-
    s_font = LARGE_TEXT; /* Large text font */
    if (!(h_large_font = XLoadQueryFont(x_display, s_font))) v_error(h_err_font, s_font);
 
