@@ -2,7 +2,7 @@
 
 Emulators  for  the HP 35, HP 80, HP 45, HP 70, HP 21, HP 22, HP25, HP 25C,
 HP 27,  HP 29C,  HP 31E, HP 32E, HP 33E, HP 33C,  HP 34C,  HP 37E,  HP 38C,
-HP 38E, HP 67, HP 10C, HP 11C, HP 12C, HP 15 C, and HP 16C.
+HP 38E, HP 67, HP 10C, HP 11C, HP 12C, HP 15C, and HP 16C.
 
 All written in C using X11.
 
@@ -22,6 +22,14 @@ More [screenshots](./img/#top)
 
 
 ### Latest News
+
+24 Feb 24
+   - By default the application will attempt to use the X11 base fonts. But
+     if these are not available it will try to select an suitable alternate
+     font instead from a predefined list.
+
+     For all the fonts to be rendered as intended users should ensure  that
+     the X11 base fonts are installed (see prerequsites).
 
 16 Feb 24
    - For UNIX based systems the default location used to store the state of
