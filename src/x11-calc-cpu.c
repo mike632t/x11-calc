@@ -403,7 +403,7 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
-#include "x11-calc-font.h"
+/** #include "x11-calc-font.h" /* Delete */
 #include "x11-calc-label.h"
 #include "x11-calc-switch.h"
 #include "x11-calc-button.h"

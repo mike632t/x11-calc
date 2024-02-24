@@ -69,7 +69,7 @@ MODEL	= 21
 PROGRAM	= x11-calc
 SOURCES = x11-calc.c x11-calc-cpu.c x11-calc-display.c x11-calc-segment.c
 SOURCES += x11-calc-button.c x11-calc-switch.c x11-calc-label.c x11-calc-colour.c
-SOURCES += x11-keyboard.c x11-calc-messages.c gcc-wait.c gcc-exists.c
+SOURCES += x11-calc-font.c x11-calc-messages.c x11-keyboard.c gcc-wait.c gcc-exists.c
 FILES	= *.c *.h LICENSE README.md makefile x11-calc-*.md .gitignore .gitattributes
 FILES	+= x11-calc-*.png
 OBJECTS	= $(SOURCES:.c=.o)
