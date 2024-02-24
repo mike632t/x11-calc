@@ -49,7 +49,8 @@
  *                     between rows is increased) - MT
  * 12 Feb 22         - Added a style property, currently used to allow flat
  *                     buttons to be drawn - MT
- * 26 Nov 22         - Added support for the original HP10.
+ * 26 Nov 22         - Added support for the original HP10 - MT
+ * 24 Feb 24         - Do not need to include "x11-font.h" - MT
  *
  * To Do             - Add a new style to handle the type of button used by
  *                     the classic series.
@@ -67,7 +68,6 @@
 #include <X11/Xlib.h>  /* XOpenDisplay(), etc. */
 #include <X11/Xutil.h> /* XSizeHints etc. */
 
-#include "x11-calc-font.h"
 #include "x11-calc-switch.h"
 #include "x11-calc-label.h"
 #include "x11-calc-button.h"
