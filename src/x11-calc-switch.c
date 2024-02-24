@@ -26,7 +26,8 @@
  *                     switch - MT
  * 22 Oct 23         - Added method to update state when clicked - MT
  * 23 Oct 23         - Added code to draw three position switches - MT
- *
+ * 24 Feb 24         - Do not need to include "x11-font.h" - MT
+  *
  */
 
 #define NAME           "x11-calc-switch"
@@ -41,7 +42,6 @@
 #include <X11/Xlib.h>  /* XOpenDisplay(), etc. */
 #include <X11/Xutil.h> /* XSizeHints etc. */
 
-#include "x11-calc-font.h"
 #include "x11-calc-label.h"
 #include "x11-calc-switch.h"
 #include "x11-calc-button.h"

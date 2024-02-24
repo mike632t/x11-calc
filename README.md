@@ -2,7 +2,7 @@
 
 Emulators  for  the HP 35, HP 80, HP 45, HP 70, HP 21, HP 22, HP25, HP 25C,
 HP 27,  HP 29C,  HP 31E, HP 32E, HP 33E, HP 33C,  HP 34C,  HP 37E,  HP 38C,
-HP 38E, HP 67, HP 10C, HP 11C, HP 12C, HP 15 C, and HP 16C.
+HP 38E, HP 67, HP 10C, HP 11C, HP 12C, HP 15C, and HP 16C.
 
 All written in C using X11.
 
@@ -22,6 +22,14 @@ More [screenshots](./img/#top)
 
 
 ### Latest News
+
+24 Feb 24
+   - By default the application will attempt to use the X11 base fonts. But
+     if these are not available it will try to select an suitable alternate
+     font instead from a predefined list.
+
+     For all the fonts to be rendered as intended users should ensure  that
+     the X11 base fonts are installed (see prerequsites).
 
 16 Feb 24
    - For UNIX based systems the default location used to store the state of
@@ -149,7 +157,7 @@ The following packages are required to build and/or run the simulator.
 
 - Debian : gcc | clang | tcc, make, libx11-dev, libc6-dev, xfonts-base
 
-- Fedora : gcc, make, libx11-dev, libc6-dev, xorg-x11-xfonts-base
+- Fedora : gcc, make, libx11-dev, libc6-dev, xorg-x11-xfonts-base or xorg-x11-xfonts-misc
 
 - Gentoo : gcc, make, libx11-dev, libc6-dev, font-misc-misc
 
@@ -200,8 +208,9 @@ saved in the hidden data file.
 
 ### Exiting
 
-Clicking  on the On/Off switch will turn the simulator on and off,  but  if
-you hold down the off switch down for two seconds the program will exit.
+For  models with a 'sliding' On/Off switch clicking on the switch will turn
+the simulator on or off, but if when switching off you hold down the switch
+down for two seconds the program will exit.
 
 
 ### Debugging

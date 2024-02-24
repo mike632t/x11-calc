@@ -247,6 +247,11 @@
  * 19 Feb 24         - Check that stat() was successful before checking the
  *                     if the file is a directory or a file! - MT
  *                   - Closes ROM file after reading - MT
+ * 23 Feb 24         - Fixed bug in read_rom() - MT
+ * 24 Feb 24         - Defined an array of alternative fonts for each style
+ *                     of  text required and select the most suitable fonts
+ *                     from these alternatives to reduce the dependancy  on
+ *                     a single set of fonts - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Add verbose option.
@@ -257,9 +262,9 @@
  */
 
 #define NAME           "x11-calc"
-#define VERSION        "0.11"
-#define BUILD          "0122"
-#define DATE           "19 Feb 24"
+#define VERSION        "0.12"
+#define BUILD          "0124"
+#define DATE           "23 Feb 24"
 #define AUTHOR         "MT"
 
 #define INTERVAL 25    /* Number of ticks to execute before updating the display */
@@ -356,8 +361,6 @@ int main(int argc, char *argv[])
    oprocessor *h_processor;
 
    char *s_display_name = ""; /* Just use the default display */
-   char *s_font; /* Font description */
-
    char *s_title = TITLE; /* Windows title */
    char *s_pathname = NULL;
 
@@ -620,17 +623,10 @@ int main(int argc, char *argv[])
 
    XDefineCursor(x_display, x_application_window, x_cursor); /* Define the desired X cursor */
 
-   s_font = NORMAL_TEXT; /* Normal text font */
-   if (!(h_normal_font = XLoadQueryFont(x_display, s_font))) v_error(h_err_font, s_font);
-
-   s_font = SMALL_TEXT; /* Small text font */
-   if (!(h_small_font = XLoadQueryFont(x_display, s_font))) v_error(h_err_font, s_font);
-
-   s_font = ALTERNATE_TEXT; /* Alternate text font */
-   if (!(h_alternate_font = XLoadQueryFont(x_display, s_font))) v_error(h_err_font, s_font);
-
-   s_font = LARGE_TEXT; /* Large text font */
-   if (!(h_large_font = XLoadQueryFont(x_display, s_font))) v_error(h_err_font, s_font);
+   if (!(h_normal_font = h_get_font(x_display, s_normal_fonts))) v_error(h_err_font, s_normal_fonts[0]);
+   if (!(h_small_font = h_get_font(x_display, s_small_fonts))) v_error(h_err_font, s_small_fonts[0]);
+   if (!(h_alternate_font = h_get_font(x_display, s_alternate_fonts))) v_error(h_err_font, s_alternate_fonts[0]);
+   if (!(h_large_font = h_get_font(x_display, s_large_fonts))) v_error(h_err_font, s_large_fonts[0]);
 
    v_init_buttons(h_button); /* Create buttons */
 

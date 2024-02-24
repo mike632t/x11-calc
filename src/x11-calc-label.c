@@ -24,6 +24,7 @@
  * 10 Feb 22         - Added background shading and horizontal line - MT
  * 12 Mar 22         - Implemented a state property allowing the appearance
  *                     of the label to be changed (hidden, or no line) - MT
+ * 24 Feb 24         - Do not need to include "x11-font.h" - MT
  *
  * TO DO:            - Implement ability to align text in a label using the
  *                     style property to modify the position and appearance
@@ -43,7 +44,6 @@
 #include <X11/Xlib.h>  /* XOpenDisplay(), etc. */
 #include <X11/Xutil.h> /* XSizeHints etc. */
 
-#include "x11-calc-font.h"
 #include "x11-calc-label.h"
 #include "x11-calc-switch.h"
 #include "x11-calc-button.h"

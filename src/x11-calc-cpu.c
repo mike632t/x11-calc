@@ -381,6 +381,7 @@
  *                   - Fixed get_datafile_path() - again. Hopefully it will
  *                     work properly now - MT
  * 19 Feb 24         - Closes ROM file after reading - MT
+ * 23 Feb 24         - Fixed bug in read_rom() - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -390,8 +391,8 @@
  */
 
 #define NAME           "x11-calc-cpu"
-#define BUILD          "0166"
-#define DATE           "17 Feb 24"
+#define BUILD          "0168"
+#define DATE           "23 Feb 24"
 #define AUTHOR         "MT"
 
 #include <string.h>
@@ -402,7 +403,7 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
-#include "x11-calc-font.h"
+/** #include "x11-calc-font.h" /* Delete */
 #include "x11-calc-label.h"
 #include "x11-calc-switch.h"
 #include "x11-calc-button.h"
@@ -685,7 +686,9 @@ void v_read_rom(oprocessor *h_processor, char *s_pathname) /* Load rom from 'obj
             while (((c_char = fgetc(h_file)) != '\n') && (!feof(h_file)));
          else
          {
-            if (i_count < i_addr) i_count = i_addr - 1;
+            while ((i_count < i_addr) && (i_count < ROM_SIZE))
+               /** i_rom[i_count++] = 0; */
+               i_count++; /* Don't clear ROM */
             if (i_count < ROM_SIZE) i_rom[i_count++] = i_opcode;
          }
       }
@@ -2004,7 +2007,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   h_processor->reg[C_REG]->nibble[0] = 0;
                   h_processor->code = 0; /* Clear the key code (so it isn't read twice if the key is held down) */
                }
-#endif
+#else
                else
                {
                   h_processor->addr &= 0xfff0;
@@ -2018,6 +2021,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                      v_error(h_err_invalid_address, h_processor->addr, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
                   }
                }
+#endif
                if (h_processor->trace)
                   v_fprint_register(stdout,h_processor->reg[C_REG]);
                break;

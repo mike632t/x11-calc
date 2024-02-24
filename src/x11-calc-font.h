@@ -21,28 +21,25 @@
  *
  * 09 Mar 14         - Initial version - MT
  * 10 Dec 18         - Defined DEC fonts if compiling on VMS - MT
+ * 24 Feb 24         - Defined an array of alternative fonts for each style
+ *                     of text required - MT
+ * 24 Feb 24         - Moved font definations to "x11-calc-fonts.c" - MT
+ *                   - Defined an array of alternative fonts for each style
+ *                     of  text required and select the most suitable fonts
+ *                     from these alternatives to reduce the dependancy  on
+ *                     a single set of fonts - MT
+ *
  *
  */
-
-#if defined(vms)
-
-#define NORMAL_TEXT    "*helvetica-medium-r-*-10-*" /* 12 Font to use for function keys. */
-#define SMALL_TEXT     "*helvetica-medium-r-*-8-*" /* 10 Font to use for shifted functions. */
-#define LARGE_TEXT     "*helvetica-medium-r-*-12-*" /* 13 Font to use for numeric keys. */
-#define ALTERNATE_TEXT "*helvetica-medium-r-*-8-*"  /*  8 Font to use for alternate functions. */
-
-#else
-
-#define NORMAL_TEXT    "6x12" /* Font to use for function keys. */
-#define SMALL_TEXT     "6x10" /* Font to use for shifted functions. */
-#define LARGE_TEXT     "6x13" /* Font to use for numeric keys. */
-#define ALTERNATE_TEXT "5x8" /* Font to use for alternate functions. */
-
-#endif
 
 XFontStruct *h_normal_font; /* Font for function keys. */
 XFontStruct *h_small_font; /* Font for shifted function labels. */
 XFontStruct *h_alternate_font; /* Font for alternate function labels. */
 XFontStruct *h_large_font; /* Font for numeric keys. */
 
+extern const char *s_normal_fonts[];
+extern const char *s_small_fonts[];
+extern const char *s_alternate_fonts[];
+extern const char *s_large_fonts[];
 
+XFontStruct *h_get_font(Display *x_display, const char* s_fonts[]);
