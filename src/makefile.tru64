@@ -20,15 +20,17 @@
 #
 #  Note seperator (tab) at the beginning of the line CANNOT be a space..!
 #
-#  26 Nov 23   0.1   - Initial version - MT
+#  26 Nov 23         - Initial version - MT
 #                    - Define OSF1 so conditional compilation works even if
 #                      the compiler doesn't define it automatically - MT
 #                    - Tidied up comments - MT
+#  25 Feb 24         - Added font module - MT
+#
 #
 MODEL	= 21
 PROGRAM	= x11-calc
 OUTPUT	= x11-calc-$(MODEL)
-SOURCES	= x11-calc.c x11-calc-$(MODEL).c x11-calc-cpu.c x11-calc-display.c x11-calc-messages.c x11-calc-segment.c x11-calc-button.c x11-calc-switch.c x11-calc-label.c x11-calc-colour.c gcc-exists.c gcc-wait.c
+SOURCES	= x11-calc.c x11-calc-$(MODEL).c x11-calc-cpu.c x11-calc-display.c x11-calc-messages.c x11-calc-segment.c x11-calc-button.c x11-calc-switch.c x11-calc-label.c x11-calc-colour.c x11-calc-font.c gcc-exists.c gcc-wait.c
 FILES	= *.c *.h makefile README LICENSE
 OBJECTS	= $(SOURCES:.c=.o)
 #LANG	= LANG_$(shell (echo $$LANG | cut -f 1 -d '_'))
