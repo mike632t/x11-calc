@@ -37,12 +37,13 @@
 #                      files - MT
 #  01 Nov 23         - Tidied up tabs in comments - MT
 #  16 Feb 24			- Removed HP10 - MT
+#  25 Feb 24         - Backup all makefiles - MT
 #
 
 PROGRAM	=  x11-calc
 
-FILES		=  $(wildcard ./src/*.c) $(wildcard ./src/*.c.[0-9]) $(wildcard ./src/*.h) $(wildcard ./src/*.h.[0-9]) ./src/makefile
-FILES		+= $(wildcard ./bin/x11-calc-*) $(wildcard *.md) LICENSE makefile
+FILES		=  $(wildcard ./src/*.c) $(wildcard ./src/*.c.[0-9]) $(wildcard ./src/*.h) $(wildcard ./src/*.h.[0-9])
+FILES		+= $(wildcard ./bin/x11-calc-*) $(wildcard *.md) LICENSE makefile* ./src/makefile*
 FILES		+= $(wildcard ./rom/*) $(wildcard ./prg/*.dat) $(wildcard ./img/x11-calc-*.png)
 FILES		+= .gitignore .gitattributes
 
