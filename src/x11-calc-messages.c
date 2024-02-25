@@ -47,6 +47,7 @@
  * 10 Feb 24         - Added an error message to warn the user that the ROM
  *                     contents are empty - MT
  * 16 Feb 24         - Added 'Can't create' error message - MT
+ * 25 Feb 24         - Expanded 'Cannot load font' error message - MT
  *
  */
 
@@ -93,7 +94,7 @@ const char * h_err_opening_file = "No se puede abrir '%s'.\n";
 const char * h_err_display = "No se pudo conectar al servidor X '%s'.\n";
 const char * h_err_display_properties = "No se pudo obtener las propiedades del monitor.\n";
 const char * h_err_display_colour = "Requiere un monitor de %d bits de color.\n";
-const char * h_err_font = "No se pudo cargar la fuente '%s'.\n";
+const char * h_err_font = "No se pudo cargar la fuente '%s' (x11 base bitmap fonts required).\n";
 
 #if defined(HEXADECIMAL)
 const char * h_err_unexpected_opcode = "Codigo de operación inesperado (%03x) en %1x-%03x en %s en la línea : %d\n";
@@ -152,7 +153,7 @@ const char * h_err_opening_file = "Kann '%s' nicht oeffnen.\n";
 const char * h_err_display = "Kann keine verbindung zum X Server '%s' herstellen..\n";
 const char * h_err_display_properties = "Kann eigenschaften des displays nicht abfragen..\n";
 const char * h_err_display_colour = "Ein %d-bit farbdisplay wird benoetigt.\n";
-const char * h_err_font = "Kann schrift '%s' nicht laden.\n";
+const char * h_err_font = "Kann schrift '%s' nicht laden (x11 base bitmap fonts required).\n";
 
 #if defined(HEXADECIMAL)
 const char * h_err_unexpected_opcode = "Unerwarteter opcode (%03x) an %1x-%03x in %s zeile: %d\n";
@@ -211,7 +212,7 @@ const char * h_err_opening_file = "Impossible d'ouvrir '%s'.\n";
 const char * h_err_display = "Impossible de se connecter au serveur X '%s'.\n";
 const char * h_err_display_properties = "Impossible d'obtenir les proprietes d'affichage.\n";
 const char * h_err_display_colour = "Nécessite un affichage couleur %d bits.\n";
-const char * h_err_font = "Impossible de charger la police '%s'.\n";
+const char * h_err_font = "Impossible de charger la police '%s' (x11 base bitmap fonts required).\n";
 
 #if defined(HEXADECIMAL)
 const char * h_err_unexpected_opcode = "Code opération inattendu (%03x) à %1x-%03x dans la ligne %s : %d\n";
@@ -271,7 +272,7 @@ const char * h_err_opening_file = "Unable to open '%s'.\n";
 const char * h_err_display = "Cannot connect to X server '%s'.\n";
 const char * h_err_display_properties = "Unable to get display properties.\n";
 const char * h_err_display_colour = "Requires a %d-bit colour display.\n";
-const char * h_err_font = "Cannot load font '%s'.\n";
+const char * h_err_font = "Cannot load font '%s' (x11 base bitmap fonts required).\n";
 
 #if defined(HEXADECIMAL)
 const char * h_err_unexpected_opcode = "Unexpected opcode (%03x) at %1x-%03x in %s line : %d\n";
