@@ -248,7 +248,7 @@
  *                     if the file is a directory or a file! - MT
  *                   - Closes ROM file after reading - MT
  * 23 Feb 24         - Fixed bug in read_rom() - MT
- * 24 Feb 24         - Defined an array of alternative fonts for each style
+ * 24 Feb 24   0.12  - Defined an array of alternative fonts for each style
  *                     of  text required and select the most suitable fonts
  *                     from these alternatives to reduce the dependancy  on
  *                     a single set of fonts - MT
