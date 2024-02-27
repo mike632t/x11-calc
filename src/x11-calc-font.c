@@ -36,7 +36,7 @@
 #define DATE           "26 Nov 22"
 #define AUTHOR         "MT"
 
-#define NODEBUG
+#define DEBUG
 
 #include <errno.h>
 
