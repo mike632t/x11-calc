@@ -257,6 +257,8 @@
  * 27 Feb 24         - Set errno to EBFONT if an error occours loading when
  *                     loading a font - MT
  *                   - If the ROM is empty set errno to ENODATA - MT
+ *                   - Fixed busy loop 'bug' on newer compilers that do not
+ *                     set 'linux' when compiling on Linux - MT
  *
  *
  * To Do             - Parse command line in a separate routine.
@@ -269,8 +271,8 @@
 
 #define NAME           "x11-calc"
 #define VERSION        "0.12"
-#define BUILD          "0125"
-#define DATE           "23 Feb 24"
+#define BUILD          "0128"
+#define DATE           "27 Feb 24"
 #define AUTHOR         "MT"
 
 #define INTERVAL 25    /* Number of ticks to execute before updating the display */
