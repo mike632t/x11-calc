@@ -24,6 +24,8 @@
  *                     of  text required and select the most suitable fonts
  *                     from these alternatives to reduce the dependancy  on
  *                     a single set of fonts - MT
+ * 25 Feb 24         - Reformatted arrays of font names in order to make it
+ *                     easier to comment out unwanted fonts - MT
  *
  */
 
@@ -32,15 +34,45 @@
 #define DATE           "26 Nov 22"
 #define AUTHOR         "MT"
 
+#define NODEBUG
+
 #include <stdio.h>
 #include <X11/Xlib.h>
 
 #include "gcc-debug.h"
 
-const char* s_normal_fonts[]    = {"6x12", "*helvetica-medium-r-*-10-*", "-*-courier-medium-r-*-*-11-*-*-*-*-*-*-*", NULL};
-const char* s_small_fonts[]     = {"6x10", "*helvetica-medium-r-*-8-*" , "-*-courier-medium-r-*-*-11-*-*-*-*-*-*-*", NULL};
-const char* s_alternate_fonts[] = {"5x8" , "*helvetica-medium-r-*-8-*" , "-*-courier-medium-r-*-*-11-*-*-*-*-*-*-*", NULL};
-const char* s_large_fonts[]     = {"6x13", "*helvetica-medium-r-*-12-*", "-*-courier-medium-r-*-*-14-*-*-*-*-*-*-*", NULL};
+const char* s_normal_fonts[] =
+{
+   "6x12", /* X11 base font */
+   "*helvetica-medium-r-*-10-*", /* VMS */
+   "-*-courier-medium-r-*-*-11-*-*-*-*-*-*-*", /* Fallback */
+/* "-*-fixed-medium-r-normal-*-10-*-*-*-*-*-iso8859-*", /* Alternative */
+   NULL
+};
+const char* s_small_fonts[] =
+{
+   "6x10", /* X11 base font */
+   "*helvetica-medium-r-*-8-*", /* VMS */
+   "-*-courier-medium-r-*-*-11-*-*-*-*-*-*-*", /* Fallback */
+/* "-*-fixed-medium-r-normal-*-10-*-*-*-*-*-iso8859-*", /* Alternative */
+   NULL
+};
+const char* s_alternate_fonts[] =
+{
+   "5x8", /* X11 base font */
+   "*helvetica-medium-r-*-8-*", /* VMS */
+   "-*-courier-medium-r-*-*-11-*-*-*-*-*-*-*", /* Fallback */
+/* "-*-fixed-medium-r-normal-*-8-*-*-*-*-*-iso8859-*", /* Alternative */
+   NULL
+};
+const char* s_large_fonts[] =
+{
+   "6x13", /* X11 base font */
+   "*helvetica-medium-r-*-12-*", /* VMS */
+   "-*-courier-medium-r-*-*-14-*-*-*-*-*-*-*", /* Fallback */
+/* "-*-fixed-medium-r-normal-*-13-*-*-*-*-*-iso8859-*", /* Alternative */
+   NULL
+};
 
 XFontStruct *h_get_font(Display *x_display, const char** s_fonts)
 /*
@@ -55,8 +87,12 @@ XFontStruct *h_get_font(Display *x_display, const char** s_fonts)
 
    for (i_count = 0; s_fonts[i_count] != NULL; i_count++)
    {
-      debug(printf("Attempting to load font '%s'\n", s_fonts[i_count]));
-      if ((h_font = XLoadQueryFont(x_display, s_fonts[i_count]))) break;
+      if ((h_font = XLoadQueryFont(x_display, s_fonts[i_count])))
+      {
+         debug(printf("Successfully loaded font '%s'\n", s_fonts[i_count]));
+         break;
+      }
+      debug(printf("Unable to load font '%s'\n", s_fonts[i_count]));
       h_font = NULL;
    }
    return(h_font);
