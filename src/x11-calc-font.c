@@ -26,6 +26,8 @@
  *                     a single set of fonts - MT
  * 25 Feb 24         - Reformatted arrays of font names in order to make it
  *                     easier to comment out unwanted fonts - MT
+ * 27 Feb 24         - Set errno to EBFONT if an error occours loading when
+ *                     loading a font - MT
  *
  */
 
@@ -35,6 +37,8 @@
 #define AUTHOR         "MT"
 
 #define NODEBUG
+
+#include <errno.h>
 
 #include <stdio.h>
 #include <X11/Xlib.h>
@@ -93,6 +97,7 @@ XFontStruct *h_get_font(Display *x_display, const char** s_fonts)
          break;
       }
       debug(printf("Unable to load font '%s'\n", s_fonts[i_count]));
+      errno = EBFONT;
       h_font = NULL;
    }
    return(h_font);

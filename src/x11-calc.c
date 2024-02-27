@@ -254,6 +254,10 @@
  *                     a single set of fonts - MT
  * 26 Feb 24         - Errors will print a formatted error message and exit
  *                     returning the errno - MT
+ * 27 Feb 24         - Set errno to EBFONT if an error occours loading when
+ *                     loading a font - MT
+ *                   - If the ROM is empty set errno to ENODATA - MT
+ *
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Add verbose option.
@@ -582,7 +586,11 @@ int main(int argc, char *argv[])
    i_count = ROM_SIZE;
 
    while ((i_count > 0) && (i_rom[--i_count] == 0)); /* Check that the ROM isn't empty */
-   if (i_count == 0) v_error (h_err_ROM);
+   if (i_count == 0)
+   {
+      errno = ENODATA; /* Set an approprite error number */
+      v_error (h_err_ROM);
+   }
 
    if (!(x_display = XOpenDisplay(s_display_name))) v_error (h_err_display, s_display_name); /* Open the display and create a new window */
 
