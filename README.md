@@ -128,6 +128,10 @@ ROM Size : 4096 words
 
 - Fedora 34, gcc 11.2.1, x64
 
+- Fedora 35, gcc 11.3.1, x64
+
+- Fedora 39, gcc 13.2.1, x64
+
 - Gentoo, gcc 11.2.0, x64
 
 - MacOS 10 (Catalina), clang 12.0.0, x64
@@ -155,19 +159,19 @@ ROM Size : 4096 words
 
 The following packages are required to build and/or run the simulator.
 
-- Debian : gcc | clang | tcc, make, libx11-dev, libc6-dev, xfonts-base
+- Debian : gcc | clang | tcc  make libc6-dev libx11-dev xfonts-base
 
-- Fedora : gcc, make, libx11-dev, libc6-dev, xorg-x11-xfonts-base or xorg-x11-xfonts-misc
+- Fedora : gcc make glibc-devel libX11-devel xorg-x11-xfonts-base | xorg-x11-xfonts-misc
 
-- Gentoo : gcc, make, libx11-dev, libc6-dev, font-misc-misc
+- Gentoo : gcc  make libc6-dev libx11-dev font-misc-misc
 
-- MacOS  : clang, make, [xquartz](https://www.xquartz.org/)
+- MacOS  : clang make [xquartz](https://www.xquartz.org/)
 
-- SUSE   : gcc | clang, make, libX11-devel
+- SUSE   : gcc | clang make libX11-devel
 
-- Ubuntu : gcc, make, libx11-dev, libc6-dev, xfonts-base
+- Ubuntu : gcc make libc6-dev libx11-dev xfonts-base
 
-- Windows 11 + WSL2 : gcc, make, libx11-dev, libc6-dev, xfonts-base
+- Windows 11 + WSL2 : gcc make libc6-dev libx11-dev xfonts-base
 
 
 ### Keyboard Shortcuts
