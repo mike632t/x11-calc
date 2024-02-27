@@ -161,7 +161,7 @@ The following packages are required to build and/or run the simulator.
 
 - Debian : gcc | clang | tcc  make libc6-dev libx11-dev xfonts-base
 
-- Fedora : gcc make glibc-devel libX11-devel xorg-x11-xfonts-base | xorg-x11-xfonts-misc
+- Fedora : gcc make glibc-devel libX11-devel xorg-x11-fonts-base | xorg-x11-fonts-misc
 
 - Gentoo : gcc  make libc6-dev libx11-dev font-misc-misc
 
@@ -273,7 +273,7 @@ This allows you to use your own ROM images with any of the simulators.
 * Cannot read or write to magnetic cards.
 * Has continuous memory.
 
-### Raspberry Pi Specific Issues
+### Raspberry Pi Specific IssuesGentoo
 
 * The code uses a simplified display on Arm based systems (except Apple) to
 avoid the display refresh issues seen on the Raspberry Pi if either FKMS or
