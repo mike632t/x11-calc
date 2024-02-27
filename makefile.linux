@@ -38,6 +38,9 @@
 #  01 Nov 23         - Tidied up tabs in comments - MT
 #  16 Feb 24			- Removed HP10 - MT
 #  25 Feb 24         - Backup all makefiles - MT
+#  26 Feb 24			- Defined common options in make comand - MT
+#                    - Renamed makefiles to make it harder to use the wrong
+#                      makefile on different operating systems - MT
 #
 
 PROGRAM	=  x11-calc
@@ -47,7 +50,7 @@ FILES		+= $(wildcard ./bin/x11-calc-*) $(wildcard *.md) LICENSE makefile* ./src/
 FILES		+= $(wildcard ./rom/*) $(wildcard ./prg/*.dat) $(wildcard ./img/x11-calc-*.png)
 FILES		+= .gitignore .gitattributes
 
-MAKE		=  make
+MAKE		=  make --no-print-directory -C ./src -f makefile.linux
 
 all: clean hp35 hp45 hp70 hp80 hp21 hp22 hp25 hp25c hp27 hp29c hp67 hp31e hp32e hp33e hp33c hp34c hp37e hp38e hp38c hp10c hp11c hp12c hp15c hp16c
 
@@ -61,79 +64,79 @@ voyager: clean hp10c hp11c hp12c hp15c hp16c
 
 
 hp35:
-	@$(MAKE) --no-print-directory -C ./src MODEL=35
+	@$(MAKE) MODEL=35
 
 hp80:
-	@$(MAKE) --no-print-directory -C ./src MODEL=80
+	@$(MAKE) MODEL=80
 
 hp45:
-	@$(MAKE) --no-print-directory -C ./src MODEL=45
+	@$(MAKE) MODEL=45
 
 hp70:
-	@$(MAKE) --no-print-directory -C ./src MODEL=70
+	@$(MAKE) MODEL=70
 
 hp10:
-	@$(MAKE) --no-print-directory -C ./src MODEL=10
+	@$(MAKE) MODEL=10
 
 hp21:
-	@$(MAKE) --no-print-directory -C ./src MODEL=21
+	@$(MAKE) MODEL=21
 
 hp22:
-	@$(MAKE) --no-print-directory -C ./src MODEL=22
+	@$(MAKE) MODEL=22
 
 hp25:
-	@$(MAKE) --no-print-directory -C ./src MODEL=25
+	@$(MAKE) MODEL=25
 
 hp25c:
-	@$(MAKE) --no-print-directory -C ./src MODEL=25c
+	@$(MAKE) MODEL=25c
 
 hp27:
-	@$(MAKE) --no-print-directory -C ./src MODEL=27
+	@$(MAKE) MODEL=27
 
 hp29c:
-	@$(MAKE) --no-print-directory -C ./src MODEL=29c
+	@$(MAKE) MODEL=29c
 
 hp67:
-	@$(MAKE) --no-print-directory -C ./src MODEL=67
+	@$(MAKE) MODEL=67
 
 hp31e:
-	@$(MAKE) --no-print-directory -C ./src MODEL=31e
+	@$(MAKE) MODEL=31e
 
 hp32e:
-	@$(MAKE) --no-print-directory -C ./src MODEL=32e
+	@$(MAKE) MODEL=32e
 
 hp33e:
-	@$(MAKE) --no-print-directory -C ./src MODEL=33e
+	@$(MAKE) MODEL=33e
 
 hp33c:
-	@$(MAKE) --no-print-directory -C ./src MODEL=33c
+	@$(MAKE) MODEL=33c
 
 hp34c:
-	@$(MAKE) --no-print-directory -C ./src MODEL=34c
+	@$(MAKE) MODEL=34c
 
 hp37e:
-	@$(MAKE) --no-print-directory -C ./src MODEL=37e
+	@$(MAKE) MODEL=37e
 
 hp38e:
-	@$(MAKE) --no-print-directory -C ./src MODEL=38e
+	@$(MAKE) MODEL=38e
 
 hp38c:
-	@$(MAKE) --no-print-directory -C ./src MODEL=38c
+	@$(MAKE) MODEL=38c
 
 hp10c:
-	@$(MAKE) --no-print-directory -C ./src MODEL=10c
+	@$(MAKE) MODEL=10c
 
 hp11c:
-	@$(MAKE) --no-print-directory -C ./src MODEL=11c
+	@$(MAKE) MODEL=11c
 
 hp12c:
-	@$(MAKE) --no-print-directory -C ./src MODEL=12c
+	@$(MAKE) MODEL=12c
 
 hp15c:
-	@$(MAKE) --no-print-directory -C ./src MODEL=15c
+	@$(MAKE) MODEL=15c
 
 hp16c:
-	@$(MAKE) --no-print-directory -C ./src MODEL=16c
+	@$(MAKE) MODEL=16c
 
 clean:
 	@rm  -f ./src/*.o
