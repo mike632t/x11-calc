@@ -252,6 +252,8 @@
  *                     of  text required and select the most suitable fonts
  *                     from these alternatives to reduce the dependancy  on
  *                     a single set of fonts - MT
+ * 26 Feb 24         - Errors will print a formatted error message and exit
+ *                     returning the errno - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Add verbose option.
@@ -269,6 +271,8 @@
 
 #define INTERVAL 25    /* Number of ticks to execute before updating the display */
 #define DELAY 50       /* Number of intervals to wait before exiting */
+
+#include <errno.h>     /* errno */
 
 #include <stdarg.h>    /* strlen(), etc */
 #include <string.h>    /* strlen(), etc */
@@ -317,14 +321,16 @@ void v_warning(const char *s_format, ...) /* Print formatted warning message and
    va_end(t_args);
 }
 
-void v_error(const char *s_format, ...) /* Print formatted error message and exit */
+void v_error(const char *s_format, ...) /* Print formatted error message and exit returning errno */
 {
    va_list t_args;
+   int i_status = errno; /* Save errno */
+   /** if (!(i_status)) i_status = -1; /* If errno not set return -1 */
    va_start(t_args, s_format);
    fprintf(stderr, "%s : ", FILENAME);
    vfprintf(stderr, s_format, t_args);
    va_end(t_args);
-   exit(-1);
+   exit(i_status);
 }
 
 void v_set_blank_cursor(Display *x_display, Window x_application_window, Cursor *x_cursor)
