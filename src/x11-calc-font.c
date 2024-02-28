@@ -18,6 +18,7 @@
  * You  should have received a copy of the GNU General Public License  along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
+ * https://stackoverflow.com/questions/27765649
  *
  * 24 Feb 24         - Initial version - MT
  *                   - Defined an array of alternative fonts for each style
@@ -49,7 +50,8 @@ const char* s_normal_fonts[] =
 {
    "6x12", /* X11 base font */
    "*helvetica-medium-r-*-10-*", /* VMS */
-   "-*-courier-medium-r-*-*-11-*-*-*-*-*-*-*", /* Fallback */
+   "-*-courier-medium-r-*-*-11-*-*-*-*-*-*-*",
+   "-*-fixed-medium-r-semicondensed-*-13-*-*-*-*-*-*-*", /*
 /* "-*-fixed-medium-r-normal-*-10-*-*-*-*-*-iso8859-*", /* Alternative */
    NULL
 };
@@ -57,7 +59,8 @@ const char* s_small_fonts[] =
 {
    "6x10", /* X11 base font */
    "*helvetica-medium-r-*-8-*", /* VMS */
-   "-*-courier-medium-r-*-*-11-*-*-*-*-*-*-*", /* Fallback */
+   "-*-courier-medium-r-*-*-11-*-*-*-*-*-*-*",
+   "-*-fixed-medium-r-semicondensed-*-13-*-*-*-*-*-*-*", /*
 /* "-*-fixed-medium-r-normal-*-10-*-*-*-*-*-iso8859-*", /* Alternative */
    NULL
 };
@@ -65,7 +68,8 @@ const char* s_alternate_fonts[] =
 {
    "5x8", /* X11 base font */
    "*helvetica-medium-r-*-8-*", /* VMS */
-   "-*-courier-medium-r-*-*-11-*-*-*-*-*-*-*", /* Fallback */
+   "-*-courier-medium-r-*-*-11-*-*-*-*-*-*-*",
+   "-*-fixed-medium-r-semicondensed-*-13-*-*-*-*-*-*-*", /*
 /* "-*-fixed-medium-r-normal-*-8-*-*-*-*-*-iso8859-*", /* Alternative */
    NULL
 };
@@ -73,7 +77,8 @@ const char* s_large_fonts[] =
 {
    "6x13", /* X11 base font */
    "*helvetica-medium-r-*-12-*", /* VMS */
-   "-*-courier-medium-r-*-*-14-*-*-*-*-*-*-*", /* Fallback */
+   "-*-courier-medium-r-*-*-11-*-*-*-*-*-*-*",
+   "-*-fixed-medium-r-semicondensed-*-13-*-*-*-*-*-*-*", /*
 /* "-*-fixed-medium-r-normal-*-13-*-*-*-*-*-iso8859-*", /* Alternative */
    NULL
 };
@@ -102,3 +107,6 @@ XFontStruct *h_get_font(Display *x_display, const char** s_fonts)
    }
    return(h_font);
 }
+
+/** Get name of font https://stackoverflow.com/questions/27765649 */
+
