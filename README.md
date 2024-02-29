@@ -63,7 +63,7 @@ e.g:
 $ wget https://github.com/mike632t/x11-calc/archive/refs/heads/stable.zip
 $ unzip x11-calc-stable.zip
 $ cd x11-calc-stable
-$ make all
+$ make -f makefile.linux all
 
 $ ./bin/x11-calc-29c
 x11-calc-29c: Version 0.10 [Commit ID: 399d546] 01 Nov 23 23:53:00 (Build: 0114)
@@ -72,9 +72,9 @@ ROM Size : 4096 words
 If more than one C compiler is installed or if gcc is not available you can
 specify which one to use from the command line.
 ```
-$ make CC=clang VERBOSE=1 all
+$ make -f makefile.linux CC=clang VERBOSE=1 all
 
-$ make CC=tcc VERBOSE=1 all
+$ make -f makefile.linux  CC=tcc VERBOSE=1 all
 ```
 
 On  Tru64 UNIX a specific make file is used, and the execuitable files  are
