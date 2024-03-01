@@ -36,6 +36,9 @@ ENODATA=61
 ENOACC=126 # Permission denied (not official)
 ENOCMD=127 # Executable file not found (not official)
 
+_models="35|45|70|80|21|22|25|25c|27|29c|31e|32e|33e|33c|34c|37e|38e|38c|67|10c|11c|12c|15c|16c"
+
+
 _launch() {
    local _fonts _errmsg _f_os_release
 
@@ -48,6 +51,8 @@ _launch() {
          [ -n "${OPTIONS##*.rom*}" ] || [ -z "$OPTIONS" ] && OPTIONS="-r ${XDG_DATA_HOME}/x11-calc/x11-calc-${MODEL}.rom"
       ;;
    esac
+   # eventual command-line options take precedence
+   [ -n "$CMD_OPTS" ] && OPTIONS="$CMD_OPTS"
 
    "$(dirname "$0")"/x11-calc-$MODEL $OPTIONS # Assume script is in the same directory as the executable files
 
@@ -84,7 +89,6 @@ _launch() {
 
 _config (){
    local _selection
-   local _models="35|45|70|80|21|22|25|25c|27|29c|31e|32e|33e|33c|34c|37e|38e|38c|67|10c|11c|12c|15c|16c"
 
    _selection=$(zenity --forms --title="x11-calc Setup" \
       --text="Select model number" \
@@ -147,8 +151,7 @@ then
 # Select which emulator to run by setting the MODEL to one
 # of the following:
 #
-# 35, 80, 45, 70, 21, 22, 25, 25c, 27, 29c, 31e, 32e, 33e, 33c, 34c, 37e,
-# 38e, 38c, 67, 10c, 11c, 12c, 15c, or 16c
+# $_models
 #
 # OPTIONS may contain options as one-liner string to specify:
 # preferred non-default save-state file path to be loaded
@@ -172,25 +175,32 @@ fi
 
 . "$_f_conf"
 
-case $* in
-   "--setup")
+eval "
+case \$1 in
+   --setup)
       _setup
       _launch
       ;;
-   "--help")
-      OPTIONS="--help"
-      if command -v zenity >/dev/null 2>&1
+   --help)
+      [ -z \"\$MODEL\" ] && _setup
+      CMD_OPTS=\"--help\"
+      if command -v zenity >/dev/null 2>\&1
       then
-         _launch | zenity --title="x11-calc Help" --text-info --font="courier" --height=320 --width=512
+         _launch | zenity --title=\"x11-calc Help\" --text-info --font=\"courier\" --height=320 --width=512
       else
          _launch
       fi
       ;;
-   "")
-      [ -z "$MODEL" ] && _setup
+   $_models)
+      MODEL=\"\$1\"
+      shift
+      CMD_OPTS=\"\$*\"
       _launch
       ;;
    *)
-      zenity --height=100 --width=200 --info --text="Invalid option !"
+      [ -z \"\$MODEL\" ] && _setup
+      CMD_OPTS=\"\$*\"
+      _launch
       ;;
 esac
+"
