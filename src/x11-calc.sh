@@ -94,8 +94,8 @@ _config (){
 
    case $? in
       0)
-         sed -i "s|^MODEL=.*|MODEL=\"${_selection%,|*}\"|" "$_filename"
-         sed -i "s|^OPTIONS=.*|OPTIONS=\"${_selection#*,|}\"|" "$_filename"
+         sed -i "s|^MODEL=.*|MODEL=\"${_selection%,|*}\"|" "$_f_conf"
+         sed -i "s|^OPTIONS=.*|OPTIONS=\"${_selection#*,|}\"|" "$_f_conf"
          ;;
       1)
          exit 0 # User pressed cancel so just quit - don't attempt to launch the emulator
@@ -113,10 +113,10 @@ _setup() {
    then
       _config
    else
-      nano "$_filename"
+      nano "$_f_conf"
    fi
 
-   . "$_filename" # Reload modified settings from config file
+   . "$_f_conf" # Reload modified settings from config file
 }
 
 
@@ -134,17 +134,15 @@ fi
 if [ -d "$XDG_CONFIG_HOME" ] # Does XDG_CONFIG_HOME exist
 then
    mkdir -p "${XDG_CONFIG_HOME}/x11-calc" # If it does create the application directory
-   _filename="${XDG_CONFIG_HOME}/x11-calc/x11-calc.conf" # If it does use it
+   _f_conf="${XDG_CONFIG_HOME}/x11-calc/x11-calc.conf" # If it does use it
 else
-   _filename="${HOME}/.x11-calc.conf" # Otherwise use a hiddent file in the home folder
+   _f_conf="${HOME}/.x11-calc.conf" # Otherwise use a hiddent file in the home folder
 fi
 
-echo "$_filename"
-
-if ! [ -f "$_filename" ]
+if ! [ -f "$_f_conf" ]
 then
-   mkdir -p "$(dirname "${_filename}")"
-   cat <<-EOF >"$_filename"
+   mkdir -p "$(dirname "${_f_conf}")"
+   cat <<-EOF >"$_f_conf"
 #
 # Select which emulator to run by setting the MODEL to one
 # of the following:
@@ -172,7 +170,7 @@ OPTIONS=""
 EOF
 fi
 
-. "$_filename"
+. "$_f_conf"
 
 case $* in
    "--setup")
