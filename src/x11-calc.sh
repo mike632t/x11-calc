@@ -20,13 +20,16 @@
 #  You  should have received a copy of the GNU General Public License along
 #  with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-#  28 Feb 24         - Initial version - MT
+#  28 Feb 24         - Initial version - macmpi / MT
 #  29 Feb 24         - Updated  config()  to use a form allowing the  model
 #                      number and command line options to be entered at the
 #                      same time...
 #                    - If no model is defined run setup(), this way if  the
 #                      doesn't select a model they will be asked again next
 #                      time the launcher runs - MT
+#  01 Mar 24         - Allow passing model name as first command-line
+#                      parameter. Catch all other parameters and pass them
+#......................to core-app (allows testing parameters). - macmpi
 #
 
 SUCCESS=0
