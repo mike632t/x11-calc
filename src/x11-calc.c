@@ -259,6 +259,8 @@
  *                   - If the ROM is empty set errno to ENODATA - MT
  *                   - Fixed busy loop 'bug' on newer compilers that do not
  *                     set 'linux' when compiling on Linux - MT
+ * 01 Mar 24         - Return the correct error status if an invalid option
+ *                     or parameter is passed on the command line - MT
  *
  *
  * To Do             - Parse command line in a separate routine.
@@ -271,8 +273,8 @@
 
 #define NAME           "x11-calc"
 #define VERSION        "0.12"
-#define BUILD          "0128"
-#define DATE           "27 Feb 24"
+#define BUILD          "0129"
+#define DATE           "01 Mar 24"
 #define AUTHOR         "MT"
 
 #define INTERVAL 25    /* Number of ticks to execute before updating the display */
@@ -331,7 +333,7 @@ void v_error(const char *s_format, ...) /* Print formatted error message and exi
 {
    va_list t_args;
    int i_status = errno; /* Save errno */
-   /** if (!(i_status)) i_status = -1; /* If errno not set return -1 */
+   if (!(i_status)) i_status = -1; /* If errno not set return -1 */
    va_start(t_args, s_format);
    fprintf(stderr, "%s : ", FILENAME);
    vfprintf(stderr, s_format, t_args);
@@ -411,7 +413,10 @@ int main(int argc, char *argv[])
             {
             case 'b': /* Breakpoint */
                if (argv[i_count][i_index + 1] != 0)
+               {
+                  errno = EINVAL;
                   v_error(h_err_invalid_argument, argv[i_count][i_index + 1]);
+               }
                else
                   if (i_count + 1 < argc)
                   {
@@ -419,12 +424,16 @@ int main(int argc, char *argv[])
                      for (i_offset = 0; i_offset < strlen(argv[i_count + 1]); i_offset++) /* Parse octal number */
                      {
                         if ((argv[i_count + 1][i_offset] < '0') || (argv[i_count + 1][i_offset] > '7'))
+                        {
+                           errno = EINVAL;
                            v_error(h_err_invalid_number, argv[i_count + 1]);
+                        }
                         else
                            i_breakpoint = i_breakpoint * 8 + argv[i_count + 1][i_offset] - '0';
                      }
                      if ((i_breakpoint < 0)  || (i_breakpoint > ROM_SIZE) || (i_breakpoint > 07777)) /* Check address range */
                      {
+                        errno = EINVAL;
                         v_error(h_err_address_range, argv[i_count + 1]);
                      }
                      else {
@@ -435,12 +444,18 @@ int main(int argc, char *argv[])
                      }
                   }
                   else
+                  {
+                     errno = EINVAL;
                      v_error(h_err_missing_argument, argv[i_count]);
+                  }
                i_index = strlen(argv[i_count]) - 1;
                break;
             case 'i': /* Trap Instruction */
                if (argv[i_count][i_index + 1] != 0)
+               {
+                  errno = EINVAL;
                   v_error(h_err_invalid_argument, argv[i_count][i_index + 1]);
+               }
                else
                   if (i_count + 1 < argc)
                   {
@@ -448,12 +463,18 @@ int main(int argc, char *argv[])
                      for (i_offset = 0; i_offset < strlen(argv[i_count + 1]); i_offset++) /* Parse octal number */
                      {
                         if ((argv[i_count + 1][i_offset] < '0') || (argv[i_count + 1][i_offset] > '7'))
+                        {
+                           errno = EINVAL;
                            v_error(h_err_invalid_number, argv[i_count + 1]);
+                        }
                         else
                            i_trap = i_trap * 8 + argv[i_count + 1][i_offset] - '0';
                      }
                      if ((i_trap < 0) || (i_trap > 01777)) /* Check range */
+                     {
+                        errno = EINVAL;
                         v_error(h_err_address_range, argv[i_count + 1]);
+                     }
                      else
                      {
                         if (i_count + 2 < argc) /* Remove the parameter from the arguments */
@@ -463,12 +484,18 @@ int main(int argc, char *argv[])
                      }
                   }
                   else
+                  {
+                     errno = EINVAL;
                      v_error(h_err_missing_argument, argv[i_count]);
+                  }
                i_index = strlen(argv[i_count]) - 1;
                break;
             case 'r': /* Read ROM contents  */
                if (argv[i_count][i_index + 1] != 0)
+               {
+                  errno = EINVAL;
                   v_error(h_err_invalid_argument, argv[i_count][i_index + 1]);
+               }
                else
                   if (i_count + 1 < argc)
                   {
@@ -479,7 +506,10 @@ int main(int argc, char *argv[])
                      argc--;
                   }
                   else
+                  {
+                     errno = EINVAL;
                      v_error(h_err_missing_argument, argv[i_count]);
+                  }
                i_index = strlen(argv[i_count]) - 1;
                break;
             case 's': /* Start in single step mode */
@@ -509,11 +539,17 @@ int main(int argc, char *argv[])
                      exit(0);
                   }
                   else  /* If we get here then the we have an invalid long option */
+                  {
+                     errno = EINVAL;
                      v_error(h_err_unrecognised_option, argv[i_count]);
+                  }
                i_index--; /* Leave index pointing at end of string (so argv[i_count][i_index] = 0) */
                break;
             default: /* If we get here the single letter option is unknown */
-               v_error(h_err_invalid_option, argv[i_count][i_index]);
+               {
+                  errno = EINVAL;
+                  v_error(h_err_invalid_option, argv[i_count][i_index]);
+               }
             }
             i_index++; /* Parse next letter in option */
          }
@@ -552,7 +588,10 @@ int main(int argc, char *argv[])
                argc--;
             }
             else
-              v_error(h_err_missing_argument, argv[i_count]);
+            {
+               errno = EINVAL;
+               v_error(h_err_missing_argument, argv[i_count]);
+            }
          }
          else if (!strncmp(argv[i_count], "/VERSION", i_index))
          {
@@ -566,7 +605,10 @@ int main(int argc, char *argv[])
             exit(0);
          }
          else /* If we get here then the we have an invalid option */
+         {
+            errno = EINVAL;
             v_error(h_err_invalid_option, argv[i_count]);
+         }
          if (argv[i_count][1] != 0)
          {
             for (i_index = i_count; i_index < argc - 1; i_index++)
@@ -578,10 +620,18 @@ int main(int argc, char *argv[])
 #endif
 
 #if defined(CONTINIOUS)
-   if (argc > 2) v_error(h_err_invalid_operand); /* There should never be more than one command lime parameter */
+   if (argc > 2)
+   {
+      errno = EINVAL;
+      v_error(h_err_invalid_operand); /* There should never be more than one command lime parameter */
+   }
    if (argc > 1) s_pathname = argv[1]; /* Set path name if a parameter was passed and continuous memory is enabled */
 #else
-   if (argc > 1) v_error(h_err_invalid_operand); /* There shouldn't any command line parameters */
+   if (argc > 1)
+   {
+      errno = EINVAL;
+      v_error(h_err_invalid_operand); /* There shouldn't any command line parameters */
+   }
 #endif
    i_wait(200); /* Sleep for 200 milliseconds to 'debounce' keyboard! */
 
