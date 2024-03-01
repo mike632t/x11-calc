@@ -37,7 +37,7 @@ ENOACC=126 # Permission denied (not official)
 ENOCMD=127 # Executable file not found (not official)
 
 _launch() {
-   local _fonts _errmsg
+   local _fonts _errmsg _f_os_release
 
    [ -z "$MODEL" ] && exit 0
 
@@ -56,12 +56,11 @@ _launch() {
          ;;
       $EBFONT)
          _fonts="<i>xfonts-base</i> or equivalent for this distribution."
-         if [ -f /run/host/os-release ] # Check os-release exists
-         then
-            grep -qE "ubuntu|debian" /run/host/os-release && _fonts="<i>xfonts-base</i>"
-            grep -qE "fedora" /run/host/os-release && _fonts="<i>xorg-x11-fonts-base</i> or <i>xorg-x11-fonts-misc</i>"
-            grep -qE "gentoo" /run/host/os-release && _fonts="<i>font-misc-misc</i>"
-         fi
+         _f_os_release="/etc/os-release"
+         grep -sq "freedesktop" "${_f_os_release}" && _f_os_release="/run/host/os-release" # we are in flatpak
+         grep -sqE "ubuntu|debian" "${_f_os_release}" && _fonts="<i>xfonts-base</i>"
+         grep -sq "fedora" "${_f_os_release}" && _fonts="<i>xorg-x11-fonts-base</i> or <i>xorg-x11-fonts-misc</i>"
+         grep -sq "gentoo" "${_f_os_release}" && _fonts="<i>font-misc-misc</i>"
          _errmsg="Please install the following font package:\\n\\n$_fonts"
          ;;
       $ENOENT)
