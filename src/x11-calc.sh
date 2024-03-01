@@ -84,24 +84,22 @@ _launch() {
 }
 
 _config (){
-   local _selection _options
+   local _selection
    local _models="35|45|70|80|21|22|25|25c|27|29c|31e|32e|33e|33c|34c|37e|38e|38c|67|10c|11c|12c|15c|16c"
 
    _selection=$(zenity --forms --title="x11-calc Setup" \
       --text="Select model number" \
-      --add-combo="Model:" --combo-values=${_models} \
-      --add-entry="Options:" --ok-label="OK" \
-      --height=96 --width=256 2>/dev/null)
+      --add-list="Model:" --list-values=${_models} \
+      --add-entry="Options:" --ok-label="OK" 2>/dev/null)
+
 
    case $? in
       0)
-         _options=$(echo "$_selection" | cut -d "|" -f2)
-         _selection=$(echo "$_selection" | cut -d "|" -f1)
-         sed -i 's/^MODEL=.*/MODEL="'"$_selection"'"/' "$_filename"
-         sed -i 's/^OPTIONS=.*/OPTIONS=\"'"$_options"'\"/' "$_filename"
+         sed -i "s|^MODEL=.*|MODEL=\"${_selection%,|*}\"|" "$_filename"
+         sed -i "s|^OPTIONS=.*|OPTIONS=\"${_selection#*,|}\"|" "$_filename"
          ;;
       1)
-         exit 0 # User pressed cancel so just quit - don't attempt to launch the enulator
+         exit 0 # User pressed cancel so just quit - don't attempt to launch the emulator
          ;;
       -1)
          echo "An unexpected error has occurred."
