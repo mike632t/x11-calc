@@ -27,13 +27,16 @@
 #                    - If no model is defined run setup(), this way if  the
 #                      doesn't select a model they will be asked again next
 #                      time the launcher runs - MT
-#  01 Mar 24         - Allow passing model name as first command-line
-#                      parameter. Catch all other parameters and pass them
-#......................to core-app (allows testing parameters). - macmpi
+#  01 Mar 24         - Allow the model model name to be passed as the first
+#                      command-line parameter. Any other parameters will be
+#                      passed through to the application - macmpi
+#                    - Handle any errors that occour when an invalid option
+#                      or parameter is passed on the command line - MT
 #
 
 SUCCESS=0
 ENOENT=2
+EINVAL=22
 EBFONT=59
 ENODATA=61
 ENOACC=126 # Permission denied (not official)
@@ -61,6 +64,9 @@ _launch() {
 
    case $? in
       $SUCCESS)
+         ;;
+      $EINVAL)
+         _errmsg="Invalid operand or parameter:\\n\\n$OPTIONS"
          ;;
       $EBFONT)
          _fonts="<i>xfonts-base</i> or equivalent for this distribution."
@@ -92,6 +98,12 @@ _launch() {
 
 _config (){
    local _selection
+
+#  _selection=$(zenity --forms --title="x11-calc Setup" \
+#     --text="Select model number" \
+#     --add-combo="Model:" --combo-values=${_models} \
+#     --add-entry="Options:" --ok-label="OK" \
+#     --height=96 --width=256 2>/dev/null)
 
    _selection=$(zenity --forms --title="x11-calc Setup" \
       --text="Select model number" \
