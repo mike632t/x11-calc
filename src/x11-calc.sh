@@ -20,13 +20,16 @@
 #  You  should have received a copy of the GNU General Public License along
 #  with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-#  28 Feb 24         - Initial version - MT
+#  28 Feb 24         - Initial version - macmpi / MT
 #  29 Feb 24         - Updated  config()  to use a form allowing the  model
 #                      number and command line options to be entered at the
 #                      same time...
 #                    - If no model is defined run setup(), this way if  the
 #                      doesn't select a model they will be asked again next
 #                      time the launcher runs - MT
+#  01 Mar 24         - Allow passing model name as first command-line
+#                      parameter. Catch all other parameters and pass them
+#......................to core-app (allows testing parameters). - macmpi
 #
 
 SUCCESS=0
@@ -36,8 +39,11 @@ ENODATA=61
 ENOACC=126 # Permission denied (not official)
 ENOCMD=127 # Executable file not found (not official)
 
+_models="35|45|70|80|21|22|25|25c|27|29c|31e|32e|33e|33c|34c|37e|38e|38c|67|10c|11c|12c|15c|16c"
+
+
 _launch() {
-   local _fonts _errmsg
+   local _fonts _errmsg _f_os_release
 
    [ -z "$MODEL" ] && exit 0
 
@@ -45,9 +51,11 @@ _launch() {
       10c|11c|12c|15c|16c)
          # if OPTIONS does not point to a rom file, set expected option to default location
          # no need to check file existence: app will error-out with proper message if missing
-         [ -n "$OPTIONS##*.rom*" ] || [ -z "$OPTIONS" ] && OPTIONS="-r ${XDG_DATA_HOME}/x11-calc-${MODEL}.rom"
+         [ -n "${OPTIONS##*.rom*}" ] || [ -z "$OPTIONS" ] && OPTIONS="-r ${XDG_DATA_HOME}/x11-calc/x11-calc-${MODEL}.rom"
       ;;
    esac
+   # eventual command-line options take precedence
+   [ -n "$CMD_OPTS" ] && OPTIONS="$CMD_OPTS"
 
    "$(dirname "$0")"/x11-calc-$MODEL $OPTIONS # Assume script is in the same directory as the executable files
 
@@ -56,12 +64,11 @@ _launch() {
          ;;
       $EBFONT)
          _fonts="<i>xfonts-base</i> or equivalent for this distribution."
-         if [ -f /run/host/os-release ] # Check os-release exists
-         then
-            grep -qE "ubuntu|debian" /run/host/os-release && _fonts="<i>xfonts-base</i>"
-            grep -qE "fedora" /run/host/os-release && _fonts="<i>xorg-x11-fonts-base</i> or <i>xorg-x11-fonts-misc</i>"
-            grep -qE "gentoo" /run/host/os-release && _fonts="<i>font-misc-misc</i>"
-         fi
+         _f_os_release="/etc/os-release"
+         grep -sq "freedesktop" "${_f_os_release}" && _f_os_release="/run/host/os-release" # we are in flatpak
+         grep -sqE "ubuntu|debian" "${_f_os_release}" && _fonts="<i>xfonts-base</i>"
+         grep -sq "fedora" "${_f_os_release}" && _fonts="<i>xorg-x11-fonts-base</i> or <i>xorg-x11-fonts-misc</i>"
+         grep -sq "gentoo" "${_f_os_release}" && _fonts="<i>font-misc-misc</i>"
          _errmsg="Please install the following font package:\\n\\n$_fonts"
          ;;
       $ENOENT)
@@ -84,24 +91,21 @@ _launch() {
 }
 
 _config (){
-   local _selection _options
-   local _models="35|45|70|80|21|22|25|25c|27|29c|31e|32e|33e|33c|34c|37e|38e|38c|67|10c|11c|12c|15c|16c"
+   local _selection
 
    _selection=$(zenity --forms --title="x11-calc Setup" \
       --text="Select model number" \
-      --add-combo="Model:" --combo-values=${_models} \
-      --add-entry="Options:" --ok-label="OK" \
-      --height=96 --width=256 2>/dev/null)
+      --add-list="Model:" --list-values=${_models} \
+      --add-entry="Options:" --ok-label="OK" 2>/dev/null)
+
 
    case $? in
       0)
-         _options=$(echo "$_selection" | cut -d "|" -f2)
-         _selection=$(echo "$_selection" | cut -d "|" -f1)
-         sed -i 's/^MODEL=.*/MODEL="'"$_selection"'"/' "$_filename"
-         sed -i 's/^OPTIONS=.*/OPTIONS=\"'"$_options"'\"/' "$_filename"
+         sed -i "s|^MODEL=.*|MODEL=\"${_selection%,|*}\"|" "$_f_conf"
+         sed -i "s|^OPTIONS=.*|OPTIONS=\"${_selection#*,|}\"|" "$_f_conf"
          ;;
       1)
-         exit 0 # User pressed cancel so just quit - don't attempt to launch the enulator
+         exit 0 # User pressed cancel so just quit - don't attempt to launch the emulator
          ;;
       -1)
          echo "An unexpected error has occurred."
@@ -116,10 +120,10 @@ _setup() {
    then
       _config
    else
-      nano "$_filename"
+      nano "$_f_conf"
    fi
 
-   . "$_filename" # Reload modified settings from config file
+   . "$_f_conf" # Reload modified settings from config file
 }
 
 
@@ -137,23 +141,20 @@ fi
 if [ -d "$XDG_CONFIG_HOME" ] # Does XDG_CONFIG_HOME exist
 then
    mkdir -p "${XDG_CONFIG_HOME}/x11-calc" # If it does create the application directory
-   _filename="${XDG_CONFIG_HOME}/x11-calc/x11-calc.conf" # If it does use it
+   _f_conf="${XDG_CONFIG_HOME}/x11-calc/x11-calc.conf" # If it does use it
 else
-   _filename="${HOME}/.x11-calc.conf" # Otherwise use a hiddent file in the home folder
+   _f_conf="${HOME}/.x11-calc.conf" # Otherwise use a hiddent file in the home folder
 fi
 
-echo "$_filename"
-
-if ! [ -f "$_filename" ]
+if ! [ -f "$_f_conf" ]
 then
-   mkdir -p "$(dirname "${_filename}")"
-   cat <<-EOF >"$_filename"
+   mkdir -p "$(dirname "${_f_conf}")"
+   cat <<-EOF >"$_f_conf"
 #
 # Select which emulator to run by setting the MODEL to one
 # of the following:
 #
-# 35, 80, 45, 70, 21, 22, 25, 25c, 27, 29c, 31e, 32e, 33e, 33c, 34c, 37e,
-# 38e, 38c, 67, 10c, 11c, 12c, 15c, or 16c
+# $_models
 #
 # OPTIONS may contain options as one-liner string to specify:
 # preferred non-default save-state file path to be loaded
@@ -175,27 +176,34 @@ OPTIONS=""
 EOF
 fi
 
-. "$_filename"
+. "$_f_conf"
 
-case $* in
-   "--setup")
+eval "
+case \$1 in
+   --setup)
       _setup
       _launch
       ;;
-   "--help")
-      OPTIONS="--help"
-      if command -v zenity >/dev/null 2>&1
+   --help)
+      [ -z \"\$MODEL\" ] && _setup
+      CMD_OPTS=\"--help\"
+      if command -v zenity >/dev/null 2>\&1
       then
-         _launch | zenity --title="x11-calc Help" --text-info --font="courier" --height=320 --width=512
+         _launch | zenity --title=\"x11-calc Help\" --text-info --font=\"courier\" --height=320 --width=512
       else
          _launch
       fi
       ;;
-   "")
-      [ -z "$MODEL" ] && _setup
+   $_models)
+      MODEL=\"\$1\"
+      shift
+      CMD_OPTS=\"\$*\"
       _launch
       ;;
    *)
-      zenity --height=100 --width=200 --info --text="Invalid option !"
+      [ -z \"\$MODEL\" ] && _setup
+      CMD_OPTS=\"\$*\"
+      _launch
       ;;
 esac
+"
