@@ -39,10 +39,10 @@
 SUCCESS=0
 ENOENT=2
 EINVAL=22
-EBFONT=59
 ENODATA=61
 ENOACC=126 # Permission denied (not official)
 ENOCMD=127 # Executable file not found (not official)
+ENOFNT=192
 
 _models="35|45|70|80|21|22|25|25c|27|29c|31e|32e|33e|33c|34c|37e|38e|38c|67|10c|11c|12c|15c|16c"
 
@@ -122,8 +122,11 @@ _launch() {
    fi
 }
 
+
 _config (){
    local _selection
+
+# Note that the seperator used by different forms is different!
 
 #  _selection=$(zenity --forms --title="x11-calc Setup" \
 #     --text="Select model number" \
@@ -139,6 +142,7 @@ _config (){
 
    case $? in
       0)
+         #echo "$(basename $0): '$_selection'"
          sed -i "s|^MODEL=.*|MODEL=\"${_selection%,|*}\"|" "$_f_conf"
          sed -i "s|^OPTIONS=.*|OPTIONS=\"${_selection#*,|}\"|" "$_f_conf"
          ;;
@@ -152,12 +156,13 @@ _config (){
 
 }
 
+
 _setup() {
    if _has_zenity
    then
       _config
    else
-      nano "$_f_conf"
+      vi "$_f_conf"
    fi
 
    . "$_f_conf" # Reload modified settings from config file
@@ -218,6 +223,8 @@ EOF
 fi
 
 . "$_f_conf"
+
+# echo "$(basename $0): '$_f_conf'"
 
 eval "
 case \$1 in

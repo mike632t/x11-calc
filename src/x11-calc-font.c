@@ -29,6 +29,7 @@
  *                     easier to comment out unwanted fonts - MT
  * 27 Feb 24         - Set errno to EBFONT if an error occours loading when
  *                     loading a font - MT
+ * 02 Mar 24         - Changed EBFONT to locally defined ENOFNT - MT
  *
  */
 
@@ -38,6 +39,8 @@
 #define AUTHOR         "MT"
 
 #define NODEBUG
+
+#define ENOFNT          192
 
 #include <errno.h>
 
@@ -102,7 +105,7 @@ XFontStruct *h_get_font(Display *x_display, const char** s_fonts)
          break;
       }
       debug(printf("Unable to load font '%s'\n", s_fonts[i_count]));
-      errno = EBFONT;
+      errno = ENOFNT;
       h_font = NULL;
    }
    return(h_font);
