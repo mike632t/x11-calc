@@ -110,7 +110,7 @@ _launch() {
          _errmsg="Emulator not found.\\n"
          ;;
       *)
-         _errmsg="An unhandled error occoured !\\n"
+         _errmsg="An unhandled error occurred !\\n"
    esac
 
    if [ -n "$_errmsg" ]; then
