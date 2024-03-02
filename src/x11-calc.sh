@@ -32,6 +32,8 @@
 #                      passed through to the application - macmpi
 #                    - Handle any errors that occour when an invalid option
 #                      or parameter is passed on the command line - MT
+#  02 Mar 24         - Allow  OPTIONS  paths  expansion  and improve zenity
+#                      detection and fallback for error messages - macmpi
 #
 
 SUCCESS=0
