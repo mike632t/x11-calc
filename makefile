@@ -16,7 +16,7 @@
 #  You  should have received a copy of the GNU General Public License along
 #  with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-#	Note separator (tab) at the beginning of the line CANNOT be a space..!
+#  Note separator (tab) at the beginning of the line CANNOT be a space..!
 #
 #  09 Oct 21         - Initial version - MT
 #
