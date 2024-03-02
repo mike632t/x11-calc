@@ -111,7 +111,13 @@ _launch() {
          _errmsg="An unhandled error occoured !\\n"
    esac
 
-   [ -n "$_errmsg" ] && zenity --height=100 --width=300 --error --text="$_errmsg"
+   if [ -n "$_errmsg" ]; then
+      if _has_zenity; then
+         zenity --height=100 --width=300 --error --text="$_errmsg"
+      else
+         echo "$_errmsg"
+      fi
+   fi
 }
 
 _config (){
@@ -144,9 +150,8 @@ _config (){
 
 }
 
-
 _setup() {
-   if command -v zenity >/dev/null 2>&1
+   if _has_zenity
    then
       _config
    else
@@ -175,6 +180,10 @@ then
 else
    _f_conf="${HOME}/.x11-calc.conf" # Otherwise use a hiddent file in the home folder
 fi
+
+command -v zenity >/dev/null 2>&1
+has_zenity=$?
+_has_zenity() { return "$has_zenity"; }
 
 if ! [ -f "$_f_conf" ]
 then
@@ -217,7 +226,7 @@ case \$1 in
    --help)
       [ -z \"\$MODEL\" ] && _setup
       CMD_OPTS=\"--help\"
-      if command -v zenity >/dev/null 2>\&1
+      if _has_zenity
       then
          _launch | zenity --title=\"x11-calc Help\" --text-info --font=\"courier\" --height=320 --width=512
       else
