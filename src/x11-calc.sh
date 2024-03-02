@@ -32,6 +32,8 @@
 #                      passed through to the application - macmpi
 #                    - Handle any errors that occour when an invalid option
 #                      or parameter is passed on the command line - MT
+#  02 Mar 24         - Allow  OPTIONS  paths  expansion  and improve zenity
+#                      detection and fallback for error messages - macmpi
 #
 
 SUCCESS=0
@@ -44,6 +46,24 @@ ENOCMD=127 # Executable file not found (not official)
 
 _models="35|45|70|80|21|22|25|25c|27|29c|31e|32e|33e|33c|34c|37e|38e|38c|67|10c|11c|12c|15c|16c"
 
+
+_expand_paths() {
+   local _args _path
+   _args=""
+   while [ -n "$1" ]; do
+      case "$1" in
+         */*)
+            _path="$( echo "echo $1" | sh )"
+            _args="$_args $_path"
+         ;;
+         *)
+            _args="$_args $1"
+         ;;
+      esac
+      shift
+   done
+   printf '%s' "$_args"
+}
 
 _launch() {
    local _fonts _errmsg _f_os_release
@@ -60,7 +80,7 @@ _launch() {
    # eventual command-line options take precedence
    [ -n "$CMD_OPTS" ] && OPTIONS="$CMD_OPTS"
 
-   "$(dirname "$0")"/x11-calc-$MODEL $OPTIONS # Assume script is in the same directory as the executable files
+   "$(dirname "$0")"/x11-calc-$MODEL $( _expand_paths $OPTIONS ) # Assume script is in the same directory as the executable files
 
    case $? in
       $SUCCESS)
@@ -90,10 +110,16 @@ _launch() {
          _errmsg="Emulator not found.\\n"
          ;;
       *)
-         _errmsg="An unhandled error occoured !\\n"
+         _errmsg="An unhandled error occurred !\\n"
    esac
 
-   [ -n "$_errmsg" ] && zenity --height=100 --width=300 --error --text="$_errmsg"
+   if [ -n "$_errmsg" ]; then
+      if _has_zenity; then
+         zenity --height=100 --width=300 --error --text="$_errmsg"
+      else
+         echo "$_errmsg"
+      fi
+   fi
 }
 
 _config (){
@@ -126,9 +152,8 @@ _config (){
 
 }
 
-
 _setup() {
-   if command -v zenity >/dev/null 2>&1
+   if _has_zenity
    then
       _config
    else
@@ -157,6 +182,10 @@ then
 else
    _f_conf="${HOME}/.x11-calc.conf" # Otherwise use a hiddent file in the home folder
 fi
+
+command -v zenity >/dev/null 2>&1
+has_zenity=$?
+_has_zenity() { return "$has_zenity"; }
 
 if ! [ -f "$_f_conf" ]
 then
@@ -199,7 +228,7 @@ case \$1 in
    --help)
       [ -z \"\$MODEL\" ] && _setup
       CMD_OPTS=\"--help\"
-      if command -v zenity >/dev/null 2>\&1
+      if _has_zenity
       then
          _launch | zenity --title=\"x11-calc Help\" --text-info --font=\"courier\" --height=320 --width=512
       else
