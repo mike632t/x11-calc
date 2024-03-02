@@ -34,6 +34,7 @@
 #                      or parameter is passed on the command line - MT
 #  02 Mar 24         - Allow  OPTIONS  paths  expansion  and improve zenity
 #                      detection and fallback for error messages - macmpi
+#                    - Prefix model names with 'hp' - MT
 #
 
 SUCCESS=0
@@ -44,7 +45,7 @@ ENOACC=126 # Permission denied (not official)
 ENOCMD=127 # Executable file not found (not official)
 ENOFNT=192
 
-_models="35|45|70|80|21|22|25|25c|27|29c|31e|32e|33e|33c|34c|37e|38e|38c|67|10c|11c|12c|15c|16c"
+_models="hp35|hp45|hp70|hp80|hp21|hp22|hp25|hp25c|hp27|hp29c|hp31e|hp32e|hp33e|hp33c|hp34c|hp37e|hp38e|hp38c|hp67|hp10c|hp11c|hp12c|hp15c|hp16c"
 
 
 _expand_paths() {
@@ -66,21 +67,22 @@ _expand_paths() {
 }
 
 _launch() {
-   local _fonts _errmsg _f_os_release
+   local _fonts _errmsg _model _f_os_release
 
    [ -z "$MODEL" ] && exit 0
 
+   _model="${MODEL#hp}"
+
    case $MODEL in
-      10c|11c|12c|15c|16c)
+      hp10c|hp11c|hp12c|hp15c|hp16c)
          # if OPTIONS does not point to a rom file, set expected option to default location
          # no need to check file existence: app will error-out with proper message if missing
-         [ -n "${OPTIONS##*.rom*}" ] || [ -z "$OPTIONS" ] && OPTIONS="-r ${XDG_DATA_HOME}/x11-calc/x11-calc-${MODEL}.rom"
+         [ -n "${OPTIONS##*.rom*}" ] || [ -z "$OPTIONS" ] && OPTIONS="-r ${XDG_DATA_HOME}/x11-calc/x11-calc-${_model}.rom"
       ;;
    esac
-   # eventual command-line options take precedence
-   [ -n "$CMD_OPTS" ] && OPTIONS="$CMD_OPTS"
+   [ -n "$CMD_OPTS" ] && OPTIONS="$CMD_OPTS" # Allow command line to override options
 
-   "$(dirname "$0")"/x11-calc-$MODEL $( _expand_paths $OPTIONS ) # Assume script is in the same directory as the executable files
+   "$(dirname "$0")"/x11-calc-$_model $( _expand_paths $OPTIONS ) # Assume script is in the same directory as the executable files
 
    case $? in
       $SUCCESS)
@@ -224,7 +226,7 @@ fi
 
 . "$_f_conf"
 
-# echo "$(basename $0): '$_f_conf'"
+echo "$(basename $0): '$_f_conf'"
 
 eval "
 case \$1 in
