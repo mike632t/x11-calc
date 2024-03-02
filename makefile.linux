@@ -41,12 +41,15 @@
 #  26 Feb 24			- Defined common options in make comand - MT
 #                    - Renamed makefiles to make it harder to use the wrong
 #                      makefile on different operating systems - MT
+#  02 Mar 24         - Added scripts to FILES - MT
 #
 
 PROGRAM	=  x11-calc
 
 FILES		=  $(wildcard ./src/*.c) $(wildcard ./src/*.c.[0-9]) $(wildcard ./src/*.h) $(wildcard ./src/*.h.[0-9])
-FILES		+= $(wildcard ./bin/x11-calc-*) $(wildcard *.md) LICENSE makefile* ./src/makefile*
+FILES		+= $(wildcard ./src/*.sh) $(wildcard ./src/*.sh.[0-9])
+FILES		+= $(wildcard *.md) $(wildcard make.sh*) $(wildcard make.com*) $(wildcard makefile*) $(wildcard ./src/makefile*)
+FILES		+= $(wildcard ./bin/x11-calc-*) $(wildcard *.md) LICENSE
 FILES		+= $(wildcard ./rom/*) $(wildcard ./prg/*.dat) $(wildcard ./img/x11-calc-*.png)
 FILES		+= .gitignore .gitattributes
 
