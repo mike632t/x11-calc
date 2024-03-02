@@ -45,6 +45,24 @@ ENOCMD=127 # Executable file not found (not official)
 _models="35|45|70|80|21|22|25|25c|27|29c|31e|32e|33e|33c|34c|37e|38e|38c|67|10c|11c|12c|15c|16c"
 
 
+_expand_paths() {
+   local _args _path
+   _args=""
+   while [ -n "$1" ]; do
+      case "$1" in
+         */*)
+            _path="$( echo "echo $1" | sh )"
+            _args="$_args $_path"
+         ;;
+         *)
+            _args="$_args $1"
+         ;;
+      esac
+      shift
+   done
+   printf '%s' "$_args"
+}
+
 _launch() {
    local _fonts _errmsg _f_os_release
 
@@ -60,7 +78,7 @@ _launch() {
    # eventual command-line options take precedence
    [ -n "$CMD_OPTS" ] && OPTIONS="$CMD_OPTS"
 
-   "$(dirname "$0")"/x11-calc-$MODEL $OPTIONS # Assume script is in the same directory as the executable files
+   "$(dirname "$0")"/x11-calc-$MODEL $( _expand_paths $OPTIONS ) # Assume script is in the same directory as the executable files
 
    case $? in
       $SUCCESS)
