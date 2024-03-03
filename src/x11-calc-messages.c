@@ -48,6 +48,7 @@
  *                     contents are empty - MT
  * 16 Feb 24         - Added 'Can't create' error message - MT
  * 25 Feb 24         - Expanded 'Cannot load font' error message - MT
+ * 29 Feb 24         - Changed description from simulator to emulator - MT
  *
  */
 
@@ -112,7 +113,7 @@ const char * h_err_missing_argument = "opcion requiere un argumento -- '%s'\n";
 
 #if defined(unix) || defined(__unix__) || defined(__APPLE__)
 const char * c_msg_usage = "Uso: %s [OPCION]... [ARCHIVO]\n\
-Simularor de calculadora RPN para X11.\n\n\
+Una emulador de emulador RPN para X11.\n\n\
   -b  ADDR                 punto de interrupcion (octal)\n\
   -i  OPCODE               instruccion de trampa (octal)\n\
   -r  FILE                 leer el contenido de la ROM de FILE\n\
@@ -130,7 +131,7 @@ const char * h_err_address_range = "fuera del rango  -- '%s' \n";
 const char * h_err_invalid_argument = "argumento esperado no es -- '%c' \n";
 #else
 const char * c_msg_usage = "Uso: %s [OPCION]... [ARCHIVO]\n\
-Una simulación de calculadora RPN para X11.\n\n\
+Una emulador de calculadora RPN para X11.\n\n\
   /cursor                  mostrar cursor (default)\n\
   /nocursor                ocultar cursor\n\
   /step                    un paso\n\
@@ -171,7 +172,7 @@ const char * h_err_missing_argument = "option benoetigt ein argument -- '%s'\n";
 
 #if defined(unix) || defined(__unix__) || defined(__APPLE__)
 const char * c_msg_usage = "Verwendung: %s [OPTION]... [DATEI]\n\
-Eine RPN rechner-simulation fuer X11.\n\n\
+Eine RPN rechner-emulator fur X11.\n\n\
   -b  ADDR                 haltepunkt an adresse setzen (oktal)\n\
   -i, OPCODE               haltepunkt auf Opcode setzen  (oktal)\n\
   -r  FILE                 lesen sie den ROM inhalt von FILE\n\
@@ -189,7 +190,7 @@ const char * h_err_address_range = "ausserhalb des adressbereichs -- '%s' \n";
 const char * h_err_invalid_argument = "argument erwartet, nicht -- '%c' \n";
 #else
 const char * c_msg_usage = "Verwendung: %s [OPTION...] [DATEI]\n\
-Eine RPN rechner simulation fur X11.\n\n\
+Eine RPN rechner-emulator fur X11.\n\n\
   /cursor                  cursor anzeigen (default)\n\
   /nocursor                cursor verstecken\n\
   /step                    einzelschritt\n\
@@ -230,7 +231,7 @@ const char * h_err_missing_argument = "l'option necessite un argument -- '%s'\n"
 
 #if defined(unix) || defined(__unix__) || defined(__APPLE__)
 const char * c_msg_usage = "Utilisation : %s [OPTION]... [FICHIER]\n\
-Une simulation RPN Calculator pour X11.\n\n\
+Une émulateur RPN Calculator pour X11.\n\n\
   -b  ADDR                 définir un point d'arrêt (octal)\n\
   -i, OPCODE               définir un piège d'instruction (octal)\n\
   -r  FILE                 lire le contenu de la ROM de FILE\n\
@@ -248,7 +249,7 @@ const char * h_err_address_range = "hors de portée -- '%s' \n";
 const char * h_err_invalid_argument = "argument attendu -- '%c' \n";
 #else
 const char * c_msg_usage = "Utilisation : %s [OPTION]... [FICHIER]\n\
-Une simulation RPN Calculator pour X11.\n\n\
+Une émulateur RPN Calculator pour X11.\n\n\
   /cursor                  curseur d'affichage (par défaut)\n\
   /nocursor                masquer le curseur\n\
   /step                    trace execution\n\
@@ -290,7 +291,7 @@ const char * h_err_missing_argument = "option requires an argument -- '%s'\n";
 
 #if defined(unix) || defined(__unix__) || defined(__APPLE__)
 const char * c_msg_usage = "Usage: %s [OPTION]... [FILE]\n\
-An RPN Calculator simulation for X11.\n\n\
+An RPN Calculator emulator for X11.\n\n\
   -b  ADDR                 set break-point (octal)\n\
   -i, OPCODE               set instruction trap (octal)\n\
   -r  FILE                 read ROM from FILE\n\
@@ -308,7 +309,7 @@ const char * h_err_address_range = "out of range -- '%s' \n";
 const char * h_err_invalid_argument = "expected argument not -- '%c' \n";
 #else
 const char * c_msg_usage = "Usage: %s [OPTION...] [FILE]\n\
-An RPN Calculator simulation for X11.\n\n\
+An RPN Calculator emulator for X11.\n\n\
   /cursor                  display cursor (default)\n\
   /nocursor                hide cursor\n\
   /step                    single step\n\

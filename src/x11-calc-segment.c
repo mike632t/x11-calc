@@ -52,15 +52,23 @@
  *                   - Changed the way the code tests to see if it is being
  *                     built on an ARM processor to make it compatible with
  *                     both tcc and clang - MT
+ * 25 Feb 24         - Modified the display to show the background for each
+ *                     digit for all processor types - MT
+ *                   - Don't shade the background for each segment on alpha
+ *                     processors - MT
+ * 03 Mar 24         - Updated error handling (now passes the  error number
+ *                     to the error handler) - MT
  *
  * TO DO :           - Optimize drawing of display segments.
  ^
  */
 
 #define NAME           "x11-calc-segment"
-#define BUILD          "0011"
-#define DATE           "14 Oct 23"
+#define BUILD          "0012"
+#define DATE           "03 Mar 24"
 #define AUTHOR         "MT"
+
+#include <errno.h>     /* errno */
 
 #include <stdio.h>     /* fprintf(), etc */
 #include <stdlib.h>    /* malloc(), etc */
@@ -95,7 +103,7 @@ osegment *h_segment_create(int i_index, int i_mask, int i_left, int i_top,
    osegment *h_segment; /* Ponter to segment */
 
    /* Attempt to allocate memory for a segment */
-   if ((h_segment = malloc (sizeof(*h_segment)))==NULL) v_error("Memory allocation failed!");
+   if ((h_segment = malloc (sizeof(*h_segment)))==NULL) v_error(errno, "Memory allocation failed!");
 
    h_segment->index = i_index;
    h_segment->mask = i_mask;
@@ -136,12 +144,12 @@ int i_segment_draw(Display *h_display, int x_application_window, int i_screen, o
       h_segment->mask & SEG_D && 1, h_segment->mask & SEG_C && 1, \
       h_segment->mask & SEG_B && 1, h_segment->mask & SEG_A && 1));
 
-#if !(defined(__aarch64__) || defined(__aarch__) || defined(__arm__)  || defined(__arm64__)) || defined(__APPLE__)
    /* Draw the display segment background */
    XSetForeground(h_display, DefaultGC(h_display, i_screen), h_segment->background);
    XFillRectangle(h_display, x_application_window, DefaultGC(h_display, i_screen), h_segment->left, h_segment->top, h_segment->width, h_segment->height);
    XDrawRectangle(h_display, x_application_window, DefaultGC(h_display, i_screen), h_segment->left, h_segment->top, h_segment->width, h_segment->height);
 
+#if !(defined(__aarch64__) || defined(__aarch__) || defined(__arm__) || defined(__arm64__) || defined(__alpha)) || defined(__APPLE__)
    /* Fill in the background for each active display segment */
    XSetForeground(h_display, DefaultGC(h_display, i_screen), i_shade(h_segment->foreground));
 

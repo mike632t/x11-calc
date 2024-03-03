@@ -25,6 +25,8 @@
  * 12 Mar 22         - Implemented a state property allowing the appearance
  *                     of the label to be changed (hidden, or no line) - MT
  * 24 Feb 24         - Do not need to include "x11-font.h" - MT
+ * 03 Mar 24         - Updated error handling (now passes the  error number
+ *                     to the error handler) - MT
  *
  * TO DO:            - Implement ability to align text in a label using the
  *                     style property to modify the position and appearance
@@ -33,9 +35,11 @@
  */
 
 #define NAME           "x11-calc-label"
-#define BUILD          "0004"
-#define DATE           "12 Mar 22"
+#define BUILD          "0006"
+#define DATE           "03 Mar 24"
 #define AUTHOR         "MT"
+
+#include <errno.h>     /* errno */
 
 #include <string.h>    /* strlen(), etc. */
 #include <stdio.h>     /* fprintf(), etc. */
@@ -80,7 +84,7 @@ olabel *h_label_create(int i_index, char* s_text, XFontStruct *h_font,
    olabel *h_label; /* Ponter to label. */
 
    /* Attempt to allcoate memory for a label. */
-   if ((h_label = malloc (sizeof(*h_label)))==NULL) v_error("Memory allocation failed!");
+   if ((h_label = malloc (sizeof(*h_label)))==NULL) v_error(errno, "Memory allocation failed!");
 
    h_label->index = i_index;
    h_label->text = s_text;

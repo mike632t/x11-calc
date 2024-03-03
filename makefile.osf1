@@ -36,6 +36,8 @@
 #                    - Checks that the bin directory exists before deleting
 #                      files - MT
 #  01 Nov 23         - Tidied up tabs in comments - MT
+#  03 Mar 24         - Renamed makefile.tru64 to makefile.osf1 - MT
+#                    - Fixed make clean - MT
 #
 
 PROGRAM	=  x11-calc
@@ -59,79 +61,81 @@ voyager: clean hp10c hp11c hp12c hp15c hp16c
 
 
 hp35:
-	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=35; cd ..
+	@cd ./src;$(MAKE) -f makefile.osf1 MODEL=35; cd ..
 
 hp80:
-	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=80; cd ..
+	@cd ./src;$(MAKE) -f makefile.osf1 MODEL=80; cd ..
 
 hp45:
-	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=45; cd ..
+	@cd ./src;$(MAKE) -f makefile.osf1 MODEL=45; cd ..
 
 hp70:
-	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=70; cd ..
+	@cd ./src;$(MAKE) -f makefile.osf1 MODEL=70; cd ..
 
 hp10:
-	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=10; cd ..
+	@cd ./src;$(MAKE) -f makefile.osf1 MODEL=10; cd ..
 
 hp21:
-	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=21; cd ..
+	@cd ./src;$(MAKE) -f makefile.osf1 MODEL=21; cd ..
 
 hp22:
-	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=22; cd ..
+	@cd ./src;$(MAKE) -f makefile.osf1 MODEL=22; cd ..
 
 hp25:
-	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=25; cd ..
+	@cd ./src;$(MAKE) -f makefile.osf1 MODEL=25; cd ..
 
 hp25c:
-	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=25c; cd ..
+	@cd ./src;$(MAKE) -f makefile.osf1 MODEL=25c; cd ..
 
 hp27:
-	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=27; cd ..
+	@cd ./src;$(MAKE) -f makefile.osf1 MODEL=27; cd ..
 
 hp29c:
-	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=29c; cd ..
+	@cd ./src;$(MAKE) -f makefile.osf1 MODEL=29c; cd ..
 
 hp67:
-	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=67; cd ..
+	@cd ./src;$(MAKE) -f makefile.osf1 MODEL=67; cd ..
 
 hp31e:
-	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=31e; cd ..
+	@cd ./src;$(MAKE) -f makefile.osf1 MODEL=31e; cd ..
 
 hp32e:
-	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=32e; cd ..
+	@cd ./src;$(MAKE) -f makefile.osf1 MODEL=32e; cd ..
 
 hp33e:
-	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=33e; cd ..
+	@cd ./src;$(MAKE) -f makefile.osf1 MODEL=33e; cd ..
 
 hp33c:
-	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=33c; cd ..
+	@cd ./src;$(MAKE) -f makefile.osf1 MODEL=33c; cd ..
 
 hp34c:
-	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=34c; cd ..
+	@cd ./src;$(MAKE) -f makefile.osf1 MODEL=34c; cd ..
 
 hp37e:
-	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=37e; cd ..
+	@cd ./src;$(MAKE) -f makefile.osf1 MODEL=37e; cd ..
 
 hp38e:
-	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=38e; cd ..
+	@cd ./src;$(MAKE) -f makefile.osf1 MODEL=38e; cd ..
 
 hp38c:
-	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=38c; cd ..
+	@cd ./src;$(MAKE) -f makefile.osf1 MODEL=38c; cd ..
 
 hp10c:
-	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=10c; cd ..
+	@cd ./src;$(MAKE) -f makefile.osf1 MODEL=10c; cd ..
 
 hp11c:
-	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=11c; cd ..
+	@cd ./src;$(MAKE) -f makefile.osf1 MODEL=11c; cd ..
 
 hp12c:
-	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=12c; cd ..
+	@cd ./src;$(MAKE) -f makefile.osf1 MODEL=12c; cd ..
 
 hp15c:
-	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=15c; cd ..
+	@cd ./src;$(MAKE) -f makefile.osf1 MODEL=15c; cd ..
 
 hp16c:
-	@cd ./src;$(MAKE) -f makefile.tru64 MODEL=16c; cd ..
+	@cd ./src;$(MAKE) -f makefile.osf1 MODEL=16c; cd ..
 
 clean:
 	@rm  -f ./src/*.o
+	@test -d ./bin && rm ./bin/* || true
+

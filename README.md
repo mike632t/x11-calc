@@ -63,7 +63,7 @@ e.g:
 $ wget https://github.com/mike632t/x11-calc/archive/refs/heads/stable.zip
 $ unzip x11-calc-stable.zip
 $ cd x11-calc-stable
-$ make all
+$ make -f makefile.linux all
 
 $ ./bin/x11-calc-29c
 x11-calc-29c: Version 0.10 [Commit ID: 399d546] 01 Nov 23 23:53:00 (Build: 0114)
@@ -72,9 +72,9 @@ ROM Size : 4096 words
 If more than one C compiler is installed or if gcc is not available you can
 specify which one to use from the command line.
 ```
-$ make CC=clang VERBOSE=1 all
+$ make -f makefile.linux CC=clang VERBOSE=1 all
 
-$ make CC=tcc VERBOSE=1 all
+$ make -f makefile.linux  CC=tcc VERBOSE=1 all
 ```
 
 On  Tru64 UNIX a specific make file is used, and the execuitable files  are
@@ -128,6 +128,10 @@ ROM Size : 4096 words
 
 - Fedora 34, gcc 11.2.1, x64
 
+- Fedora 35, gcc 11.3.1, x64
+
+- Fedora 39, gcc 13.2.1, x64
+
 - Gentoo, gcc 11.2.0, x64
 
 - MacOS 10 (Catalina), clang 12.0.0, x64
@@ -155,19 +159,19 @@ ROM Size : 4096 words
 
 The following packages are required to build and/or run the simulator.
 
-- Debian : gcc | clang | tcc, make, libx11-dev, libc6-dev, xfonts-base
+- Debian : gcc | clang | tcc  make libc6-dev libx11-dev xfonts-base
 
-- Fedora : gcc, make, libx11-dev, libc6-dev, xorg-x11-xfonts-base or xorg-x11-xfonts-misc
+- Fedora : gcc make glibc-devel libX11-devel xorg-x11-fonts-base | xorg-x11-fonts-misc
 
-- Gentoo : gcc, make, libx11-dev, libc6-dev, font-misc-misc
+- Gentoo : gcc  make libc6-dev libx11-dev font-misc-misc
 
-- MacOS  : clang, make, [xquartz](https://www.xquartz.org/)
+- MacOS  : clang make [xquartz](https://www.xquartz.org/)
 
-- SUSE   : gcc | clang, make, libX11-devel
+- SUSE   : gcc | clang make libX11-devel
 
-- Ubuntu : gcc, make, libx11-dev, libc6-dev, xfonts-base
+- Ubuntu : gcc make libc6-dev libx11-dev xfonts-base
 
-- Windows 11 + WSL2 : gcc, make, libx11-dev, libc6-dev, xfonts-base
+- Windows 11 + WSL2 : gcc make libc6-dev libx11-dev xfonts-base
 
 
 ### Keyboard Shortcuts
@@ -269,7 +273,7 @@ This allows you to use your own ROM images with any of the simulators.
 * Cannot read or write to magnetic cards.
 * Has continuous memory.
 
-### Raspberry Pi Specific Issues
+### Raspberry Pi Specific IssuesGentoo
 
 * The code uses a simplified display on Arm based systems (except Apple) to
 avoid the display refresh issues seen on the Raspberry Pi if either FKMS or

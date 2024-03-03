@@ -72,13 +72,17 @@
  *                   - Added dummy digit to the HP10 display - MT
  * 26 Oct 23         - Use the display enabled property to hide the display
  *                     if it should be blank, eg when in print mode - MT
+ * 03 Mar 24         - Updated error handling (now passes the  error number
+ *                     to the error handler) - MT
  *
  */
 
 #define NAME           "x11-calc-display"
-#define BUILD          "0030"
-#define DATE           "26 Oct 23"
+#define BUILD          "0031"
+#define DATE           "03 Mar 24"
 #define AUTHOR         "MT"
+
+#include <errno.h>     /* errno */
 
 #include <stdlib.h>    /* malloc(), etc. */
 #include <stdio.h>     /* fprintf(), etc. */
@@ -120,7 +124,7 @@ odisplay *h_display_create(int i_index, int i_left, int i_top, int i_width, int 
 
 
    /* Attempt to allocate memory for a display. */
-   if ((h_display = malloc(sizeof(*h_display)))==NULL) v_error("Memory allocation failed!");
+   if ((h_display = malloc(sizeof(*h_display)))==NULL) v_error(errno, "Memory allocation failed!");
    h_display->index = i_index;
    h_display->left = i_left;
    h_display->top = i_top;

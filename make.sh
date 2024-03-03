@@ -1,5 +1,6 @@
+#! /bin/sh
 #
-#  makefile - RPN (Reverse Polish) calculator simulator.
+#  make
 #
 #  Copyright(C) 2019 - MT
 #
@@ -16,10 +17,14 @@
 #  You  should have received a copy of the GNU General Public License along
 #  with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-#  Note separator (tab) at the beginning of the line CANNOT be a space..!
+#  28 Feb 24         - Initial version - MT
+#  29 Feb 24         - If it exists copy ./src/x11-calc.sh to ./bin - MT
+#  03 Mar 24         - Copies x11-calc.sh after make has created the target
+#                      directory - macmpi
+#                    - Modified for Tru64 UNIX - MT
+#                    - Returns status of make command - MT
 #
-#  09 Oct 21         - Initial version - MT
-#
-
-%:
-	@./make.sh $@
+make -s -f makefile.`uname | tr '[:upper:]' '[:lower:]'` "$@"
+_status=$?
+[ -f ./src/x11-calc.sh ] && cp ./src/x11-calc.sh ./bin/ >/dev/null 2>&1
+exit $_status
