@@ -195,8 +195,7 @@ _setup() {
    then
       _config
    else
-      command -v nano >/dev/null 2>&1
-      if [ ?$ ]
+      if command -v nano >/dev/null 2>&1
       then
          nano "$_f_conf"
       else
