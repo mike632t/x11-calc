@@ -40,6 +40,8 @@
 #                      original list box - MT
 #                    - Changed  default back to a list box, due to an issue
 #                      with the way `zenity` displays dropdown dialogs - MT
+#                    - Model selection dialog box  style may be selected in
+#                      the configuration file - MT
 #
 
 SUCCESS=0
@@ -145,7 +147,7 @@ _config (){
       _selection=`zenity --forms --title="x11-calc Setup" \
          --text="Select model number" \
          --add-list="Model:" --list-values=${_models} \
-         --add-entry="Options:" --ok-label="OK"
+         --add-entry="Options:" --ok-label="OK" \
          --width=256 2>/dev/null`
    fi
 
@@ -163,7 +165,7 @@ _config (){
       1)
          exit 0 # User pressed cancel so just quit - don't attempt to launch the emulator
          ;;
-      -1)
+      *)
          echo "An unexpected error has occurred."
       ;;
    esac
