@@ -73,7 +73,7 @@ _launch() {
 
    if [ -z "$MODEL" ]; then exit 0; fi
 
-   _model="/x11-calc-`echo $MODEL | sed 's/^hp//'`"
+   _model="`echo $MODEL | sed 's/^hp//'`"
 
    case $MODEL in
       hp10c|hp11c|hp12c|hp15c|hp16c)
@@ -85,6 +85,7 @@ _launch() {
 
    [ -n "$CMD_OPTS" ] && OPTIONS="$CMD_OPTS" # Allow command line to override options
 
+   _model="/x11-calc-$_model"
    echo "`basename $0`: Executing '`dirname "$0"`"$_model `_expand_paths $OPTIONS`"'"
 
    "`dirname "$0"`"$_model `_expand_paths $OPTIONS` # Assume script is in the same directory as the executable files
