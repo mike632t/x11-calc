@@ -36,6 +36,8 @@
 #                      detection and fallback for error messages - macmpi
 #                    - Prefix model names with 'hp' - MT
 #                    - Updated to work on Tru64 UNIX - MT
+#  03 Mar 24         - Changed to use a drop down selection rather then the
+#                      original list box - MT
 #
 
 SUCCESS=0
@@ -132,23 +134,23 @@ _config (){
 
 # Note that the seperator used by different forms is different!
 
-#  _selection=$(zenity --forms --title="x11-calc Setup" \
-#     --text="Select model number" \
-#     --add-combo="Model:" --combo-values=${_models} \
-#     --add-entry="Options:" --ok-label="OK" \
-#     --height=96 --width=256 2>/dev/null)
-
    _selection=`zenity --forms --title="x11-calc Setup" \
       --text="Select model number" \
-      --add-list="Model:" --list-values=${_models} \
-      --add-entry="Options:" --ok-label="OK" 2>/dev/null`
+      --add-combo="Model:" --combo-values=${_models} \
+      --add-entry="Options:" --ok-label="OK" \
+      --height=96 --width=256 2>/dev/null`
+
+#  _selection=`zenity --forms --title="x11-calc Setup" \
+#     --text="Select model number" \
+#     --add-list="Model:" --list-values=${_models} \
+#     --add-entry="Options:" --ok-label="OK" 2>/dev/null`
 
 
    case $? in
       0)
-         #echo "$(basename $0): '$_selection'"
-         sed -i "s|^MODEL=.*|MODEL=\"${_selection%,|*}\"|" "$_f_conf"
-         sed -i "s|^OPTIONS=.*|OPTIONS=\"${_selection#*,|}\"|" "$_f_conf"
+         # echo "$(basename $0): '$_selection'"
+         sed -i "s|^MODEL=.*|MODEL=\"${_selection%|*}\"|" "$_f_conf"
+         sed -i "s|^OPTIONS=.*|OPTIONS=\"${_selection#*|}\"|" "$_f_conf"
          ;;
       1)
          exit 0 # User pressed cancel so just quit - don't attempt to launch the emulator
