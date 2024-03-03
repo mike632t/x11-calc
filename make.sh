@@ -22,6 +22,9 @@
 #  03 Mar 24         - Copies x11-calc.sh after make has created the target
 #                      directory - macmpi
 #                    - Modified for Tru64 UNIX - MT
+#                    - Returns status of make command - MT
 #
 make -s -f makefile.`uname | tr '[:upper:]' '[:lower:]'` "$@"
-[ -f ./src/x11-calc.sh ] && cp -v ./src/x11-calc.sh ./bin/ >/dev/null 2>&1
+_status=$?
+[ -f ./src/x11-calc.sh ] && cp ./src/x11-calc.sh ./bin/ >/dev/null 2>&1
+exit $_status
