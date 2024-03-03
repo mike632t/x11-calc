@@ -26,6 +26,7 @@
 #                    - Tidied up comments - MT
 #  25 Feb 24         - Added font module - MT
 #  02 Mar 24         - Fixed missing target - MT
+#                    - Create target if required - MT
 #
 #
 MODEL	= 21
@@ -42,6 +43,7 @@ OS	= OSF1
 CC	= cc
 
 $(OUTPUT): $(OBJECTS)
+	@mkdir -p $(TARGET)
 #	@echo '*** Linking $(OBJECTS)'
 	@$(CC) $(OBJECTS) -o $(TARGET)/$@ -lX11 -lm
 
