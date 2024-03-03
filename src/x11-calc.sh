@@ -197,6 +197,7 @@ fi
 command -v zenity >/dev/null 2>&1
 has_zenity=$?
 _has_zenity() { return "$has_zenity"; }
+if ! _has_zenity; then echo "\nYou may install zenity to leverage graphical interface.\n"; fi
 
 if [ ! -f "$_f_conf" ]
 then
