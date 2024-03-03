@@ -58,7 +58,12 @@ ENOACC=126 # Permission denied (not official)
 ENOCMD=127 # Executable file not found (not official)
 ENOFNT=192 # No font (not official)
 
-_models="hp35|hp45|hp70|hp80|hp21|hp22|hp25|hp25c|hp27|hp29c|hp31e|hp32e|hp33e|hp33c|hp34c|hp37e|hp38e|hp38c|hp67|hp10c|hp11c|hp12c|hp15c|hp16c"
+_classic="hp35|hp45|hp70|hp80"
+_woodstock="hp21|hp22|hp25|hp25c|hp27|hp29c"
+_topcat="hp67"
+_spice="hp31e|hp32e|hp33e|hp33c|hp34c|hp37e|hp38e|hp38c"
+_voyager="hp10c|hp11c|hp12c|hp15c|hp16c"
+_models="$_classic|$_woodstock|$_topcat|$_spice|$_voyager"
 
 
 _expand_paths() {
@@ -85,21 +90,23 @@ _launch() {
 
    _model="`echo $MODEL | sed 's/^hp//'`"
 
-   case $MODEL in
-      hp10c|hp11c|hp12c|hp15c|hp16c)
+eval "
+   case \$MODEL in
+      $_voyager)
          # if OPTIONS does not point to a rom file, set expected option to default location
          # no need to check file existence: app will error-out with proper message if missing
-         [ -n "${OPTIONS##*.rom*}" ] || [ -z "$OPTIONS" ] && OPTIONS="-r ${XDG_DATA_HOME}/x11-calc/x11-calc-${_model}.rom"
+         [ -n \"\${OPTIONS##*.rom*}\" ] || [ -z \"\$OPTIONS\" ] && OPTIONS=\"-r \${XDG_DATA_HOME}/x11-calc/x11-calc-\${_model}.rom\"
       ;;
    esac
+"
 
    [ -n "$CMD_OPTS" ] && OPTIONS="$CMD_OPTS" # Allow command line to override options
 
-   _model="/x11-calc-$_model"
-   echo "`basename $0`: Executing '`dirname "$0"`"$_model `_expand_paths $OPTIONS`"'."
+   _core_app="/x11-calc-$_model"
+   echo "`basename $0`: Executing '`dirname "$0"`"$_core_app `_expand_paths $OPTIONS`"'."
 
-   if [ -f "`dirname "$0"`"$_model ]; then
-      "`dirname "$0"`"$_model `_expand_paths $OPTIONS` # Assume script is in the same directory as the executable files
+   if [ -f "`dirname "$0"`"$_core_app ]; then
+      "`dirname "$0"`"$_core_app `_expand_paths $OPTIONS` # Assume script is in the same directory as the executable files
    else
       `exit $ENOCMD`
    fi
@@ -188,8 +195,7 @@ _setup() {
    then
       _config
    else
-      command -v nano >/dev/null 2>&1
-      if [ ?$ ]
+      if command -v nano >/dev/null 2>&1
       then
          nano "$_f_conf"
       else
@@ -233,7 +239,11 @@ then
 # Select which emulator to run by setting the MODEL to one
 # of the following:
 #
-# $_models
+# classic: $_classic
+# woodstock: $_woodstock
+# topcat: $_topcat
+# spice: $_spice
+# voyager: $_voyager
 #
 
 MODEL=""
