@@ -19,6 +19,9 @@
 #
 #  28 Feb 24         - Initial version - MT
 #  29 Feb 24         - If it exists copy ./src/x11-calc.sh to ./bin - MT
+#  03 Mar 24         - Copies x11-calc.sh after make has created the target
+#                      directory - macmpi
+#                    - Modified for Tru64 UNIX - MT
 #
-make -s -f makefile.$(uname | tr '[:upper:]' '[:lower:]') "$@"
-[ -f ./src/x11-calc.sh ] && cp -v ./src/x11-calc.sh ./bin/
+make -s -f makefile.`uname | tr '[:upper:]' '[:lower:]'` "$@"
+[ -f ./src/x11-calc.sh ] && cp -v ./src/x11-calc.sh ./bin/ >/dev/null 2>&1
