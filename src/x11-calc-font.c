@@ -30,12 +30,13 @@
  * 27 Feb 24         - Set errno to EBFONT if an error occours loading when
  *                     loading a font - MT
  * 02 Mar 24         - Changed EBFONT to locally defined ENOFNT - MT
+ * 03 Mar 24         - Updated default font names - MT
  *
  */
 
-#define NAME           "x11-calc-button"
-#define BUILD          "0016"
-#define DATE           "26 Nov 22"
+#define NAME           "x11-calc-font"
+#define BUILD          "0005"
+#define DATE           "03 Mar 24"
 #define AUTHOR         "MT"
 
 #define NODEBUG
@@ -51,37 +52,36 @@
 
 const char* s_normal_fonts[] =
 {
-   "6x12", /* X11 base font */
+   "-*-fixed-medium-r-semicondensed-*-12-*-*-*-*-*-*-*", /* X11 base font */
    "*helvetica-medium-r-*-10-*", /* VMS */
    "-*-courier-medium-r-*-*-11-*-*-*-*-*-*-*",
-   "-*-fixed-medium-r-semicondensed-*-13-*-*-*-*-*-*-*", /*
+   "-*-fixed-medium-r-semicondensed-*-13-*-*-*-*-*-*-*",
 /* "-*-fixed-medium-r-normal-*-10-*-*-*-*-*-iso8859-*", /* Alternative */
    NULL
 };
 const char* s_small_fonts[] =
 {
-   "6x10", /* X11 base font */
+   "-*-fixed-medium-r-normal-*-10-*-*-*-*-*-*-*", /* X11 base font */
    "*helvetica-medium-r-*-8-*", /* VMS */
    "-*-courier-medium-r-*-*-11-*-*-*-*-*-*-*",
-   "-*-fixed-medium-r-semicondensed-*-13-*-*-*-*-*-*-*", /*
+   "-*-fixed-medium-r-semicondensed-*-13-*-*-*-*-*-*-*",
 /* "-*-fixed-medium-r-normal-*-10-*-*-*-*-*-iso8859-*", /* Alternative */
    NULL
 };
 const char* s_alternate_fonts[] =
 {
-   "5x8", /* X11 base font */
+   "-*-fixed-medium-r-normal-*-8-*-*-*-*-*-*-*", /* X11 base font */
    "*helvetica-medium-r-*-8-*", /* VMS */
    "-*-courier-medium-r-*-*-11-*-*-*-*-*-*-*",
-   "-*-fixed-medium-r-semicondensed-*-13-*-*-*-*-*-*-*", /*
+   "-*-fixed-medium-r-semicondensed-*-13-*-*-*-*-*-*-*",
 /* "-*-fixed-medium-r-normal-*-8-*-*-*-*-*-iso8859-*", /* Alternative */
    NULL
 };
 const char* s_large_fonts[] =
 {
-   "6x13", /* X11 base font */
+   "-*-fixed-medium-r-semicondensed-*-13-*-*-*-*-*-*-*",  /* X11 base font */
    "*helvetica-medium-r-*-12-*", /* VMS */
    "-*-courier-medium-r-*-*-11-*-*-*-*-*-*-*",
-   "-*-fixed-medium-r-semicondensed-*-13-*-*-*-*-*-*-*", /*
 /* "-*-fixed-medium-r-normal-*-13-*-*-*-*-*-iso8859-*", /* Alternative */
    NULL
 };
