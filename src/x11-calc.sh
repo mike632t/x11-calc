@@ -35,6 +35,7 @@
 #  02 Mar 24         - Allow  OPTIONS  paths  expansion  and improve zenity
 #                      detection and fallback for error messages - macmpi
 #                    - Prefix model names with 'hp' - MT
+#                    - Updated to work on Tru64 UNIX - MT
 #
 
 SUCCESS=0
@@ -43,18 +44,18 @@ EINVAL=22
 ENODATA=61
 ENOACC=126 # Permission denied (not official)
 ENOCMD=127 # Executable file not found (not official)
-ENOFNT=192
+ENOFNT=192 # No font (not official)
 
 _models="hp35|hp45|hp70|hp80|hp21|hp22|hp25|hp25c|hp27|hp29c|hp31e|hp32e|hp33e|hp33c|hp34c|hp37e|hp38e|hp38c|hp67|hp10c|hp11c|hp12c|hp15c|hp16c"
 
 
 _expand_paths() {
-   local _args _path
+
    _args=""
    while [ -n "$1" ]; do
       case "$1" in
          */*)
-            _path="$( echo "echo $1" | sh )"
+            _path="` echo "echo $1" | sh `"
             _args="$_args $_path"
          ;;
          *)
@@ -67,11 +68,10 @@ _expand_paths() {
 }
 
 _launch() {
-   local _fonts _errmsg _model _f_os_release
 
-   [ -z "$MODEL" ] && exit 0
+   if [ -z "$MODEL" ]; then exit 0; fi
 
-   _model="${MODEL#hp}"
+   _model="/x11-calc-`echo $MODEL | sed 's/^hp//'`"
 
    case $MODEL in
       hp10c|hp11c|hp12c|hp15c|hp16c)
@@ -80,9 +80,12 @@ _launch() {
          [ -n "${OPTIONS##*.rom*}" ] || [ -z "$OPTIONS" ] && OPTIONS="-r ${XDG_DATA_HOME}/x11-calc/x11-calc-${_model}.rom"
       ;;
    esac
+
    [ -n "$CMD_OPTS" ] && OPTIONS="$CMD_OPTS" # Allow command line to override options
 
-   "$(dirname "$0")"/x11-calc-$_model $( _expand_paths $OPTIONS ) # Assume script is in the same directory as the executable files
+   echo "`basename $0`: Executing '`dirname "$0"`"$_model `_expand_paths $OPTIONS`"'"
+
+   "`dirname "$0"`"$_model `_expand_paths $OPTIONS` # Assume script is in the same directory as the executable files
 
    case $? in
       $SUCCESS)
@@ -90,7 +93,7 @@ _launch() {
       $EINVAL)
          _errmsg="Invalid operand or parameter:\\n\\n$OPTIONS"
          ;;
-      $EBFONT)
+      $ENOFNT)
          _fonts="<i>xfonts-base</i> or equivalent for this distribution."
          _f_os_release="/etc/os-release"
          grep -sq "freedesktop" "${_f_os_release}" && _f_os_release="/run/host/os-release" # we are in flatpak
@@ -126,7 +129,6 @@ _launch() {
 
 
 _config (){
-   local _selection
 
 # Note that the seperator used by different forms is different!
 
@@ -136,10 +138,10 @@ _config (){
 #     --add-entry="Options:" --ok-label="OK" \
 #     --height=96 --width=256 2>/dev/null)
 
-   _selection=$(zenity --forms --title="x11-calc Setup" \
+   _selection=`zenity --forms --title="x11-calc Setup" \
       --text="Select model number" \
       --add-list="Model:" --list-values=${_models} \
-      --add-entry="Options:" --ok-label="OK" 2>/dev/null)
+      --add-entry="Options:" --ok-label="OK" 2>/dev/null`
 
 
    case $? in
@@ -194,9 +196,9 @@ command -v zenity >/dev/null 2>&1
 has_zenity=$?
 _has_zenity() { return "$has_zenity"; }
 
-if ! [ -f "$_f_conf" ]
+if [ ! -f "$_f_conf" ]
 then
-   mkdir -p "$(dirname "${_f_conf}")"
+   mkdir -p "`dirname "${_f_conf}"`"
    cat <<-EOF >"$_f_conf"
 #
 # Select which emulator to run by setting the MODEL to one
@@ -224,9 +226,9 @@ OPTIONS=""
 EOF
 fi
 
-. "$_f_conf"
+echo "`basename $0`: Using '$_f_conf'"
 
-echo "$(basename $0): '$_f_conf'"
+. "$_f_conf"
 
 eval "
 case \$1 in
@@ -235,7 +237,7 @@ case \$1 in
       _launch
       ;;
    --help)
-      [ -z \"\$MODEL\" ] && _setup
+      if [ -z \"\$MODEL\" ]; then _setup; fi
       CMD_OPTS=\"--help\"
       if _has_zenity
       then
@@ -251,9 +253,10 @@ case \$1 in
       _launch
       ;;
    *)
-      [ -z \"\$MODEL\" ] && _setup
+      if [ -z \"\$MODEL\" ]; then _setup; fi
       CMD_OPTS=\"\$*\"
       _launch
       ;;
 esac
 "
+
