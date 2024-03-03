@@ -39,12 +39,15 @@
 #  03 Mar 24         - Changed to use a drop down selection rather then the
 #                      original list box - MT
 #                    - Changed  default back to a list box, due to an issue
-#                      with the way `zenity` displays dropdown dialogs - MT
+#                      with the way zenity displays dropdown dialogs - MT
 #                    - Model selection dialog box  style may be selected in
 #                      the configuration file - MT
 #                    - Tidied up default configuration file, and added  the
 #                      script name to all console messages, enabled the use
 #                      of 'nano' if it is installed - MT
+#                    - Reformatted error messages so they will work on both
+#                      the console and message box - MT
+#                    - Error messages always show on console - MT
 #
 
 SUCCESS=0
@@ -93,47 +96,50 @@ _launch() {
    [ -n "$CMD_OPTS" ] && OPTIONS="$CMD_OPTS" # Allow command line to override options
 
    _model="/x11-calc-$_model"
-   echo "`basename $0`: Executing '`dirname "$0"`"$_model `_expand_paths $OPTIONS`"'"
+   echo "`basename $0`: Executing '`dirname "$0"`"$_model `_expand_paths $OPTIONS`"'."
 
-   "`dirname "$0"`"$_model `_expand_paths $OPTIONS` # Assume script is in the same directory as the executable files
+   if [ -f "`dirname "$0"`"$_model ]; then
+      "`dirname "$0"`"$_model `_expand_paths $OPTIONS` # Assume script is in the same directory as the executable files
+   else
+      `exit $ENOCMD`
+   fi
 
    case $? in
       $SUCCESS)
          ;;
       $EINVAL)
-         _errmsg="Invalid operand or parameter:\\n\\n$OPTIONS"
+         _errmsg="Invalid operand or parameter '$OPTIONS'."
          ;;
       $ENOFNT)
-         _fonts="<i>xfonts-base</i> or equivalent for this distribution."
+         _fonts="'xfonts-base' or equivalent"
          _f_os_release="/etc/os-release"
          grep -sq "freedesktop" "${_f_os_release}" && _f_os_release="/run/host/os-release" # we are in flatpak
-         grep -sqE "ubuntu|debian" "${_f_os_release}" && _fonts="<i>xfonts-base</i>"
-         grep -sq "fedora" "${_f_os_release}" && _fonts="<i>xorg-x11-fonts-base</i> or <i>xorg-x11-fonts-misc</i>"
-         grep -sq "gentoo" "${_f_os_release}" && _fonts="<i>font-misc-misc</i>"
-         _errmsg="Please install the following font package:\\n\\n$_fonts"
+         grep -sqE "ubuntu|debian" "${_f_os_release}" && _fonts="'xfonts-base'"
+         grep -sq "fedora" "${_f_os_release}" && _fonts="'xorg-x11-fonts-base' or 'xorg-x11-fonts-misc'"
+         grep -sq "gentoo" "${_f_os_release}" && _fonts="'font-misc-misc'"
+         _errmsg="Please install missing fonts in $_fonts."
          ;;
       $ENOENT)
-         _errmsg="Missing ROM file !\\n\\nCorrect path in command line, or copy file to defined location:\\n\\n$OPTIONS"
+         _errmsg="Missing ROM file!"
          ;;
       $ENODATA)
-         _errmsg="Empty ROM file !\\n"
+         _errmsg="Empty ROM file!"
          ;;
       $ENOACC)
-         _errmsg="Access denied.\\n"
+         _errmsg="Access denied."
          ;;
       $ENOCMD)
-         _errmsg="Emulator not found.\\n"
+         _errmsg="Emulator not found."
          ;;
       *)
-         _errmsg="An unhandled error occurred !\\n"
+         _errmsg="An unhandled error occurred!"
    esac
 
    if [ -n "$_errmsg" ]; then
       if _has_zenity; then
          zenity --height=100 --width=300 --error --text="$_errmsg"
-      else
-         echo "`basename $0`: $_errmsg"
       fi
+      echo "`basename $0`: $_errmsg"
    fi
 }
 
