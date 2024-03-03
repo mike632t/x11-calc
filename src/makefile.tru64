@@ -25,14 +25,16 @@
 #                      the compiler doesn't define it automatically - MT
 #                    - Tidied up comments - MT
 #  25 Feb 24         - Added font module - MT
+#  02 Mar 24         - Fixed missing target - MT
 #
 #
 MODEL	= 21
 PROGRAM	= x11-calc
-#OUTPUT	= x11-calc-$(MODEL)
-SOURCES	= x11-calc.c x11-calc-$(MODEL).c x11-calc-cpu.c x11-calc-display.c x11-calc-messages.c x11-keyboard.c x11-calc-segment.c x11-calc-button.c x11-calc-switch.c x11-calc-label.c x11-calc-colour.c x11-calc-font.c gcc-exists.c gcc-wait.c
+OUTPUT	= x11-calc-$(MODEL)
+SOURCES	= x11-calc.c x11-calc-$(MODEL).c x11-calc-cpu.c x11-calc-display.c x11-calc-messages.c x11-calc-segment.c x11-calc-button.c x11-calc-switch.c x11-calc-label.c x11-calc-colour.c x11-calc-font.c gcc-wait.c gcc-exists.c
 FILES	= *.c *.h makefile README LICENSE
-OBJECTS	= $(SOURCES:.c=.o
+OBJECTS	= $(SOURCES:.c=.o)
+TARGET	= ../bin
 #LANG	= LANG_$(shell (echo $$LANG | cut -f 1 -d '_'))
 #OS	= $(shell uname)
 LANG	= LANG_en
@@ -41,7 +43,7 @@ CC	= cc
 
 $(OUTPUT): $(OBJECTS)
 #	@echo '*** Linking $(OBJECTS)'
-	@$(CC) $(OBJECTS) -o $@ -lX11 -lm
+	@$(CC) $(OBJECTS) -o $(TARGET)/$@ -lX11 -lm
 
 $(OBJECTS) : $(SOURCES)
 #	@echo '*** Compiling $(SOURCES)'
