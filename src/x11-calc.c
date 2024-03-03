@@ -263,6 +263,7 @@
  *                     or parameter is passed on the command line - MT
  * 03 Mar 24         - Updated error handling (now passes the  error number
  *                     to the error handler) - MT
+ *                   - Updated font sizes for new fonts - MT
  *
  *
  * To Do             - Parse command line in a separate routine.
@@ -275,7 +276,7 @@
 
 #define NAME           "x11-calc"
 #define VERSION        "0.12"
-#define BUILD          "0130"
+#define BUILD          "0131"
 #define DATE           "03 Mar 24"
 #define AUTHOR         "MT"
 
