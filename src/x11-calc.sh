@@ -42,6 +42,9 @@
 #                      with the way `zenity` displays dropdown dialogs - MT
 #                    - Model selection dialog box  style may be selected in
 #                      the configuration file - MT
+#                    - Tidied up default configuration file, and added  the
+#                      script name to all console messages, enabled the use
+#                      of 'nano' if it is installed - MT
 #
 
 SUCCESS=0
@@ -129,7 +132,7 @@ _launch() {
       if _has_zenity; then
          zenity --height=100 --width=300 --error --text="$_errmsg"
       else
-         echo "$_errmsg"
+         echo "`basename $0`: $_errmsg"
       fi
    fi
 }
@@ -167,7 +170,7 @@ _config (){
          exit 0 # User pressed cancel so just quit - don't attempt to launch the emulator
          ;;
       *)
-         echo "An unexpected error has occurred."
+         echo "`basename $0`: An unexpected error has occurred."
       ;;
    esac
 
@@ -179,7 +182,13 @@ _setup() {
    then
       _config
    else
-      vi "$_f_conf"
+      command -v nano >/dev/null 2>&1
+      if [ ?$ ]
+      then
+         nano "$_f_conf"
+      else
+         vi "$_f_conf"
+      fi
    fi
 
    . "$_f_conf" # Reload modified settings from config file
@@ -208,10 +217,10 @@ fi
 command -v zenity >/dev/null 2>&1
 has_zenity=$?
 _has_zenity() { return "$has_zenity"; }
-if ! _has_zenity; then echo "\nYou may install zenity to leverage graphical interface.\n"; fi
 
 if [ ! -f "$_f_conf" ]
 then
+   if ! _has_zenity; then echo "\n`basename $0`: Did you know that installing 'zenity' will give you a graphical setup interface.\n"; fi
    mkdir -p "`dirname "${_f_conf}"`"
    cat <<-EOF >"$_f_conf"
 #
@@ -220,22 +229,16 @@ then
 #
 # $_models
 #
-# OPTIONS may contain options as one-liner string to specify:
-# preferred non-default save-state file path to be loaded
-# (like sample prg presets from /app/share/x11-calc/prg/)
-# non-default .rom file path (-r prefix)
-# other debug options...
-#
-# For more complete list of options, run from command-line
-# with --help option
-# To test OPTIONS line and diagnose errors, run from command-line
-# with OPTIONS line
 
 MODEL=""
 OPTIONS=""
 
-# To call this setup again, run from command-line
-# with --setup option
+#
+# To see a list of possible options define the default model above
+# and use:
+#
+# '$0 --help'
+#
 
 EOF
 fi
@@ -243,6 +246,10 @@ fi
 echo "`basename $0`: Using '$_f_conf'"
 
 . "$_f_conf"
+
+if [ -z "$MODEL" ]; then
+   echo "`basename $0`: Model not defined - configure using '$0 --setup'"
+fi
 
 eval "
 case \$1 in
