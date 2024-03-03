@@ -102,11 +102,11 @@ eval "
 
    [ -n "$CMD_OPTS" ] && OPTIONS="$CMD_OPTS" # Allow command line to override options
 
-   _model="/x11-calc-$_model"
-   echo "`basename $0`: Executing '`dirname "$0"`"$_model `_expand_paths $OPTIONS`"'."
+   _core_app="/x11-calc-$_model"
+   echo "`basename $0`: Executing '`dirname "$0"`"$_core_app `_expand_paths $OPTIONS`"'."
 
-   if [ -f "`dirname "$0"`"$_model ]; then
-      "`dirname "$0"`"$_model `_expand_paths $OPTIONS` # Assume script is in the same directory as the executable files
+   if [ -f "`dirname "$0"`"$_core_app ]; then
+      "`dirname "$0"`"$_core_app `_expand_paths $OPTIONS` # Assume script is in the same directory as the executable files
    else
       `exit $ENOCMD`
    fi
