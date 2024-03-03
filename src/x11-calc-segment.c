@@ -56,15 +56,19 @@
  *                     digit for all processor types - MT
  *                   - Don't shade the background for each segment on alpha
  *                     processors - MT
+ * 03 Mar 24         - Updated error handling (now passes the  error number
+ *                     to the error handler) - MT
  *
  * TO DO :           - Optimize drawing of display segments.
  ^
  */
 
 #define NAME           "x11-calc-segment"
-#define BUILD          "0011"
-#define DATE           "14 Oct 23"
+#define BUILD          "0012"
+#define DATE           "03 Mar 24"
 #define AUTHOR         "MT"
+
+#include <errno.h>     /* errno */
 
 #include <stdio.h>     /* fprintf(), etc */
 #include <stdlib.h>    /* malloc(), etc */
@@ -99,7 +103,7 @@ osegment *h_segment_create(int i_index, int i_mask, int i_left, int i_top,
    osegment *h_segment; /* Ponter to segment */
 
    /* Attempt to allocate memory for a segment */
-   if ((h_segment = malloc (sizeof(*h_segment)))==NULL) v_error("Memory allocation failed!");
+   if ((h_segment = malloc (sizeof(*h_segment)))==NULL) v_error(errno, "Memory allocation failed!");
 
    h_segment->index = i_index;
    h_segment->mask = i_mask;

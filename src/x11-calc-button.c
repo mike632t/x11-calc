@@ -51,15 +51,19 @@
  *                     buttons to be drawn - MT
  * 26 Nov 22         - Added support for the original HP10 - MT
  * 24 Feb 24         - Do not need to include "x11-font.h" - MT
+ * 03 Mar 24         - Updated error handling (now passes the  error number
+ *                     to the error handler) - MT
  *
  * To Do             - Add a new style to handle the type of button used by
  *                     the classic series.
  */
 
 #define NAME           "x11-calc-button"
-#define BUILD          "0016"
-#define DATE           "26 Nov 22"
+#define BUILD          "0019"
+#define DATE           "03 Mar 24"
 #define AUTHOR         "MT"
+
+#include <errno.h>     /* errno */
 
 #include <string.h>    /* strlen(), etc. */
 #include <stdio.h>     /* fprintf(), etc. */
@@ -133,7 +137,7 @@ obutton *h_button_create(int i_index, char c_key,
    obutton *h_button; /* Ponter to button. */
 
    /* Attempt to allocate memory for a button. */
-   if ((h_button = malloc (sizeof(*h_button)))==NULL) v_error("Memory allocation failed in %s line : %d\n", __FILE__, __LINE__);
+   if ((h_button = malloc (sizeof(*h_button)))==NULL) v_error(errno, "Memory allocation failed in %s line : %d\n", __FILE__, __LINE__);
 
    h_button->index = i_index;
    h_button->key = c_key;

@@ -261,6 +261,8 @@
  *                     set 'linux' when compiling on Linux - MT
  * 01 Mar 24         - Return the correct error status if an invalid option
  *                     or parameter is passed on the command line - MT
+ * 03 Mar 24         - Updated error handling (now passes the  error number
+ *                     to the error handler) - MT
  *
  *
  * To Do             - Parse command line in a separate routine.
@@ -273,8 +275,8 @@
 
 #define NAME           "x11-calc"
 #define VERSION        "0.12"
-#define BUILD          "0129"
-#define DATE           "01 Mar 24"
+#define BUILD          "0130"
+#define DATE           "03 Mar 24"
 #define AUTHOR         "MT"
 
 #define INTERVAL 25    /* Number of ticks to execute before updating the display */
@@ -324,21 +326,20 @@ void v_warning(const char *s_format, ...) /* Print formatted warning message and
 {
    va_list t_args;
    va_start(t_args, s_format);
-   fprintf(stderr, "%s : ", FILENAME);
+   fprintf(stderr, "%s: ", FILENAME);
    vfprintf(stderr, s_format, t_args);
    va_end(t_args);
 }
 
-void v_error(const char *s_format, ...) /* Print formatted error message and exit returning errno */
+void v_error(int i_errno, const char *s_format, ...) /* Print formatted error message and exit returning errno */
 {
    va_list t_args;
-   int i_status = errno; /* Save errno */
-   if (!(i_status)) i_status = -1; /* If errno not set return -1 */
+   if (!(i_errno)) i_errno = -1; /* If errno not set return -1 */
    va_start(t_args, s_format);
-   fprintf(stderr, "%s : ", FILENAME);
+   fprintf(stderr, "%s: ", FILENAME);
    vfprintf(stderr, s_format, t_args);
    va_end(t_args);
-   exit(i_status);
+   exit(i_errno);
 }
 
 void v_set_blank_cursor(Display *x_display, Window x_application_window, Cursor *x_cursor)
@@ -413,10 +414,7 @@ int main(int argc, char *argv[])
             {
             case 'b': /* Breakpoint */
                if (argv[i_count][i_index + 1] != 0)
-               {
-                  errno = EINVAL;
-                  v_error(h_err_invalid_argument, argv[i_count][i_index + 1]);
-               }
+                  v_error(EINVAL, h_err_invalid_argument, argv[i_count][i_index + 1]);
                else
                   if (i_count + 1 < argc)
                   {
@@ -424,18 +422,12 @@ int main(int argc, char *argv[])
                      for (i_offset = 0; i_offset < strlen(argv[i_count + 1]); i_offset++) /* Parse octal number */
                      {
                         if ((argv[i_count + 1][i_offset] < '0') || (argv[i_count + 1][i_offset] > '7'))
-                        {
-                           errno = EINVAL;
-                           v_error(h_err_invalid_number, argv[i_count + 1]);
-                        }
+                           v_error(EINVAL, h_err_invalid_number, argv[i_count + 1]);
                         else
                            i_breakpoint = i_breakpoint * 8 + argv[i_count + 1][i_offset] - '0';
                      }
                      if ((i_breakpoint < 0)  || (i_breakpoint > ROM_SIZE) || (i_breakpoint > 07777)) /* Check address range */
-                     {
-                        errno = EINVAL;
-                        v_error(h_err_address_range, argv[i_count + 1]);
-                     }
+                        v_error(EINVAL, h_err_address_range, argv[i_count + 1]);
                      else {
                         if (i_count + 2 < argc) /* Remove the parameter from the arguments */
                            for (i_offset = i_count + 1; i_offset < argc - 1; i_offset++)
@@ -444,18 +436,12 @@ int main(int argc, char *argv[])
                      }
                   }
                   else
-                  {
-                     errno = EINVAL;
-                     v_error(h_err_missing_argument, argv[i_count]);
-                  }
+                     v_error(EINVAL, h_err_missing_argument, argv[i_count]);
                i_index = strlen(argv[i_count]) - 1;
                break;
             case 'i': /* Trap Instruction */
                if (argv[i_count][i_index + 1] != 0)
-               {
-                  errno = EINVAL;
-                  v_error(h_err_invalid_argument, argv[i_count][i_index + 1]);
-               }
+                  v_error(EINVAL, h_err_invalid_argument, argv[i_count][i_index + 1]);
                else
                   if (i_count + 1 < argc)
                   {
@@ -463,18 +449,12 @@ int main(int argc, char *argv[])
                      for (i_offset = 0; i_offset < strlen(argv[i_count + 1]); i_offset++) /* Parse octal number */
                      {
                         if ((argv[i_count + 1][i_offset] < '0') || (argv[i_count + 1][i_offset] > '7'))
-                        {
-                           errno = EINVAL;
-                           v_error(h_err_invalid_number, argv[i_count + 1]);
-                        }
+                           v_error(EINVAL, h_err_invalid_number, argv[i_count + 1]);
                         else
                            i_trap = i_trap * 8 + argv[i_count + 1][i_offset] - '0';
                      }
                      if ((i_trap < 0) || (i_trap > 01777)) /* Check range */
-                     {
-                        errno = EINVAL;
-                        v_error(h_err_address_range, argv[i_count + 1]);
-                     }
+                        v_error(EINVAL, h_err_address_range, argv[i_count + 1]);
                      else
                      {
                         if (i_count + 2 < argc) /* Remove the parameter from the arguments */
@@ -484,18 +464,12 @@ int main(int argc, char *argv[])
                      }
                   }
                   else
-                  {
-                     errno = EINVAL;
-                     v_error(h_err_missing_argument, argv[i_count]);
-                  }
+                     v_error(EINVAL, h_err_missing_argument, argv[i_count]);
                i_index = strlen(argv[i_count]) - 1;
                break;
             case 'r': /* Read ROM contents  */
                if (argv[i_count][i_index + 1] != 0)
-               {
-                  errno = EINVAL;
-                  v_error(h_err_invalid_argument, argv[i_count][i_index + 1]);
-               }
+                  v_error(EINVAL, h_err_invalid_argument, argv[i_count][i_index + 1]);
                else
                   if (i_count + 1 < argc)
                   {
@@ -506,10 +480,7 @@ int main(int argc, char *argv[])
                      argc--;
                   }
                   else
-                  {
-                     errno = EINVAL;
-                     v_error(h_err_missing_argument, argv[i_count]);
-                  }
+                     v_error(EINVAL, h_err_missing_argument, argv[i_count]);
                i_index = strlen(argv[i_count]) - 1;
                break;
             case 's': /* Start in single step mode */
@@ -539,17 +510,11 @@ int main(int argc, char *argv[])
                      exit(0);
                   }
                   else  /* If we get here then the we have an invalid long option */
-                  {
-                     errno = EINVAL;
-                     v_error(h_err_unrecognised_option, argv[i_count]);
-                  }
+                     v_error(EINVAL, h_err_unrecognised_option, argv[i_count]);
                i_index--; /* Leave index pointing at end of string (so argv[i_count][i_index] = 0) */
                break;
             default: /* If we get here the single letter option is unknown */
-               {
-                  errno = EINVAL;
-                  v_error(h_err_invalid_option, argv[i_count][i_index]);
-               }
+               v_error(EINVAL, h_err_invalid_option, argv[i_count][i_index]);
             }
             i_index++; /* Parse next letter in option */
          }
@@ -588,10 +553,7 @@ int main(int argc, char *argv[])
                argc--;
             }
             else
-            {
-               errno = EINVAL;
-               v_error(h_err_missing_argument, argv[i_count]);
-            }
+               v_error(EINVAL, h_err_missing_argument, argv[i_count]);
          }
          else if (!strncmp(argv[i_count], "/VERSION", i_index))
          {
@@ -605,10 +567,7 @@ int main(int argc, char *argv[])
             exit(0);
          }
          else /* If we get here then the we have an invalid option */
-         {
-            errno = EINVAL;
-            v_error(h_err_invalid_option, argv[i_count]);
-         }
+            v_error(EINVAL, h_err_invalid_option, argv[i_count]);
          if (argv[i_count][1] != 0)
          {
             for (i_index = i_count; i_index < argc - 1; i_index++)
@@ -620,31 +579,19 @@ int main(int argc, char *argv[])
 #endif
 
 #if defined(CONTINIOUS)
-   if (argc > 2)
-   {
-      errno = EINVAL;
-      v_error(h_err_invalid_operand); /* There should never be more than one command lime parameter */
-   }
+   if (argc > 2) v_error(EINVAL, h_err_invalid_operand); /* There should never be more than one command lime parameter */
    if (argc > 1) s_pathname = argv[1]; /* Set path name if a parameter was passed and continuous memory is enabled */
 #else
-   if (argc > 1)
-   {
-      errno = EINVAL;
-      v_error(h_err_invalid_operand); /* There shouldn't any command line parameters */
-   }
+   if (argc > 1) v_error(EINVAL, h_err_invalid_operand); /* There shouldn't any command line parameters */
 #endif
    i_wait(200); /* Sleep for 200 milliseconds to 'debounce' keyboard! */
 
    i_count = ROM_SIZE;
 
    while ((i_count > 0) && (i_rom[--i_count] == 0)); /* Check that the ROM isn't empty */
-   if (i_count == 0)
-   {
-      errno = ENODATA; /* Set an approprite error number */
-      v_error (h_err_ROM);
-   }
+   if (i_count == 0) v_error (ENODATA, h_err_ROM);
 
-   if (!(x_display = XOpenDisplay(s_display_name))) v_error (h_err_display, s_display_name); /* Open the display and create a new window */
+   if (!(x_display = XOpenDisplay(s_display_name))) v_error (errno, h_err_display, s_display_name); /* Open the display and create a new window */
 
    i_screen = DefaultScreen(x_display); /* Get the default screen for our X server */
    i_screen_width = DisplayWidth(x_display, i_screen);
@@ -678,9 +625,9 @@ int main(int argc, char *argv[])
          &i_window_height,
          &i_window_border,
          &i_colour_depth) == False)
-      v_error(h_err_display_properties);
+      v_error(errno, h_err_display_properties);
 
-   if (i_colour_depth != COLOUR_DEPTH) v_error(h_err_display_colour, COLOUR_DEPTH); /* Check colour depth */
+   if (i_colour_depth != COLOUR_DEPTH) v_error(errno, h_err_display_colour, COLOUR_DEPTH); /* Check colour depth */
 
    if (b_cursor)
       x_cursor = XCreateFontCursor(x_display, XC_arrow); /* Create a 'default' cursor */
@@ -689,10 +636,10 @@ int main(int argc, char *argv[])
 
    XDefineCursor(x_display, x_application_window, x_cursor); /* Define the desired X cursor */
 
-   if (!(h_normal_font = h_get_font(x_display, s_normal_fonts))) v_error(h_err_font, s_normal_fonts[0]);
-   if (!(h_small_font = h_get_font(x_display, s_small_fonts))) v_error(h_err_font, s_small_fonts[0]);
-   if (!(h_alternate_font = h_get_font(x_display, s_alternate_fonts))) v_error(h_err_font, s_alternate_fonts[0]);
-   if (!(h_large_font = h_get_font(x_display, s_large_fonts))) v_error(h_err_font, s_large_fonts[0]);
+   if (!(h_normal_font = h_get_font(x_display, s_normal_fonts))) v_error(errno, h_err_font, s_normal_fonts[0]);
+   if (!(h_small_font = h_get_font(x_display, s_small_fonts))) v_error(errno, h_err_font, s_small_fonts[0]);
+   if (!(h_alternate_font = h_get_font(x_display, s_alternate_fonts))) v_error(errno, h_err_font, s_alternate_fonts[0]);
+   if (!(h_large_font = h_get_font(x_display, s_large_fonts))) v_error(errno, h_err_font, s_large_fonts[0]);
 
    v_init_buttons(h_button); /* Create buttons */
 
@@ -723,7 +670,7 @@ int main(int argc, char *argv[])
    XRaiseWindow(x_display, x_application_window); /* Raise window - ensures expose event is raised? */
 
    v_version();
-   fprintf(stdout, "ROM Size : %4u words \n", ROM_SIZE);
+   fprintf(stdout, "ROM Size: %4u words \n", ROM_SIZE);
 
    h_processor->trace = b_trace;
    h_processor->step = b_step;

@@ -27,13 +27,17 @@
  * 22 Oct 23         - Added method to update state when clicked - MT
  * 23 Oct 23         - Added code to draw three position switches - MT
  * 24 Feb 24         - Do not need to include "x11-font.h" - MT
-  *
+ * 03 Mar 24         - Updated error handling (now passes the  error number
+ *                     to the error handler) - MT
+ *
  */
 
 #define NAME           "x11-calc-switch"
-#define BUILD          "0006"
-#define DATE           "23 Oct 23"
+#define BUILD          "0008"
+#define DATE           "03 Mar 24"
 #define AUTHOR         "MT"
+
+#include <errno.h>     /* errno */
 
 #include <string.h>    /* strlen(), etc. */
 #include <stdio.h>     /* fprintf(), etc. */
@@ -81,7 +85,7 @@ oswitch *h_switch_create(int i_index, char* s_on, char* s_mid, char* s_off,
    oswitch *h_switch; /* Ponter to switch. */
 
    /* Attempt to allcoate memory for a switch. */
-   if ((h_switch = malloc (sizeof(*h_switch)))==NULL) v_error("Memory allocation failed!");
+   if ((h_switch = malloc (sizeof(*h_switch)))==NULL) v_error(errno, "Memory allocation failed!");
 
    h_switch->index = i_index;
    h_switch->on = s_on;

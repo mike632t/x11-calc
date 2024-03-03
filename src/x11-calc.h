@@ -229,6 +229,6 @@ void v_version(); /* Display version information */
 
 void v_about(); /* Display help text */
 
-void v_error(const char *s_fmt, ...); /* Print formatted error message */
+void v_error(int i_errno, const char *s_fmt, ...); /* Print formatted error message */
 
 void v_warning(const char *s_fmt, ...); /* Print formatted warning message */
