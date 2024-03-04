@@ -48,6 +48,8 @@
 #                    - Reformatted error messages so they will work on both
 #                      the console and message box - MT
 #                    - Error messages always show on console - MT
+#  04 Mar 24         - Remove  OPTIONS  paths  expansion (requires absolute
+#                      paths) and simplify default .rom path logic - macmpi
 #
 
 SUCCESS=0
