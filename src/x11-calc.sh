@@ -66,24 +66,6 @@ _voyager="hp10c|hp11c|hp12c|hp15c|hp16c"
 _models="$_classic|$_woodstock|$_topcat|$_spice|$_voyager"
 
 
-_expand_paths() {
-
-   _args=""
-   while [ -n "$1" ]; do
-      case "$1" in
-         */*)
-            _path="` echo "echo $1" | sh `"
-            _args="$_args $_path"
-         ;;
-         *)
-            _args="$_args $1"
-         ;;
-      esac
-      shift
-   done
-   printf '%s' "$_args"
-}
-
 _launch() {
 
    if [ -z "$MODEL" ]; then exit 0; fi
@@ -103,10 +85,10 @@ eval "
    [ -n "$CMD_OPTS" ] && OPTIONS="$CMD_OPTS" # Allow command line to override options
 
    _core_app="/x11-calc-$_model"
-   echo "`basename $0`: Executing '`dirname "$0"`"$_core_app `_expand_paths $OPTIONS`"'."
+   echo "`basename $0`: Executing '`dirname "$0"`"$_core_app $OPTIONS"'."
 
    if [ -f "`dirname "$0"`"$_core_app ]; then
-      "`dirname "$0"`"$_core_app `_expand_paths $OPTIONS` # Assume script is in the same directory as the executable files
+      "`dirname "$0"`"$_core_app $OPTIONS # Assume script is in the same directory as the executable files
    else
       `exit $ENOCMD`
    fi
@@ -251,7 +233,7 @@ OPTIONS=""
 
 #
 # To see a list of possible options define the default model above
-# and use:
+# and use: (eventual paths must be absolute)
 #
 # '$0 --help'
 #
