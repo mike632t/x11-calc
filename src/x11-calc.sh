@@ -77,7 +77,10 @@ eval "
       $_voyager)
          # if OPTIONS does not point to a rom file, set expected option to default location
          # no need to check file existence: app will error-out with proper message if missing
-         [ -n \"\${OPTIONS##*.rom*}\" ] || [ -z \"\$OPTIONS\" ] && OPTIONS=\"-r \${XDG_DATA_HOME}/x11-calc/x11-calc-\${_model}.rom\"
+         if echo \"\$OPTIONS\" | grep -Fvq \".rom\"
+         then
+            OPTIONS=\"-r \${XDG_DATA_HOME}/x11-calc/x11-calc-\${_model}.rom\"
+         fi
       ;;
    esac
 "
