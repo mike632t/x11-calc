@@ -48,6 +48,10 @@
 #                    - Reformatted error messages so they will work on both
 #                      the console and message box - MT
 #                    - Error messages always show on console - MT
+#  04 Mar 24         - Remove  OPTIONS  paths  expansion (requires absolute
+#                      paths) and simplify default .rom path logic - macmpi
+#                    - Use hidden files in $HOME if $XDG_DATA_HOME does not
+#                      exist - MT
 #
 
 SUCCESS=0
@@ -66,24 +70,6 @@ _voyager="hp10c|hp11c|hp12c|hp15c|hp16c"
 _models="$_classic|$_woodstock|$_topcat|$_spice|$_voyager"
 
 
-_expand_paths() {
-
-   _args=""
-   while [ -n "$1" ]; do
-      case "$1" in
-         */*)
-            _path="` echo "echo $1" | sh `"
-            _args="$_args $_path"
-         ;;
-         *)
-            _args="$_args $1"
-         ;;
-      esac
-      shift
-   done
-   printf '%s' "$_args"
-}
-
 _launch() {
 
    if [ -z "$MODEL" ]; then exit 0; fi
@@ -95,7 +81,10 @@ eval "
       $_voyager)
          # if OPTIONS does not point to a rom file, set expected option to default location
          # no need to check file existence: app will error-out with proper message if missing
-         [ -n \"\${OPTIONS##*.rom*}\" ] || [ -z \"\$OPTIONS\" ] && OPTIONS=\"-r \${XDG_DATA_HOME}/x11-calc/x11-calc-\${_model}.rom\"
+         if echo \"\$OPTIONS\" | grep -Fvq \".rom\"
+         then
+            OPTIONS=\"-r \${_data_path}x11-calc-\${_model}.rom\"
+         fi
       ;;
    esac
 "
@@ -103,10 +92,10 @@ eval "
    [ -n "$CMD_OPTS" ] && OPTIONS="$CMD_OPTS" # Allow command line to override options
 
    _core_app="/x11-calc-$_model"
-   echo "`basename $0`: Executing '`dirname "$0"`"$_core_app `_expand_paths $OPTIONS`"'."
+   echo "`basename $0`: Executing '`dirname "$0"`"$_core_app $OPTIONS"'."
 
    if [ -f "`dirname "$0"`"$_core_app ]; then
-      "`dirname "$0"`"$_core_app `_expand_paths $OPTIONS` # Assume script is in the same directory as the executable files
+      "`dirname "$0"`"$_core_app $OPTIONS # Assume script is in the same directory as the executable files
    else
       `exit $ENOCMD`
    fi
@@ -216,6 +205,9 @@ _setup() {
 if [ -d "$XDG_DATA_HOME" ] # Does XDG_DATA_HOME exist
 then
    mkdir -p "${XDG_DATA_HOME}/x11-calc" # If it does create the application directory
+   _data_path="$XDG_DATA_HOME/x11-calc/"
+else
+   _data_path="$HOME/."
 fi
 
 if [ -d "$XDG_CONFIG_HOME" ] # Does XDG_CONFIG_HOME exist
@@ -251,7 +243,7 @@ OPTIONS=""
 
 #
 # To see a list of possible options define the default model above
-# and use:
+# and use: (eventual paths must be absolute)
 #
 # '$0 --help'
 #
