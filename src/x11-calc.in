@@ -52,6 +52,7 @@
 #                      paths) and simplify default .rom path logic - macmpi
 #                    - Use hidden files in $HOME if $XDG_DATA_HOME does not
 #                      exist - MT
+#                    - Renamed  x11-calc.in  (script source files) - macmpi
 #
 
 SUCCESS=0
