@@ -42,12 +42,13 @@
 #                    - Renamed makefiles to make it harder to use the wrong
 #                      makefile on different operating systems - MT
 #  02 Mar 24         - Added scripts to FILES - MT
+#  04 Mar 24         - Added launcher build - macmpi
 #
 
 PROGRAM	=  x11-calc
 
 FILES		=  $(wildcard ./src/*.c) $(wildcard ./src/*.c.[0-9]) $(wildcard ./src/*.h) $(wildcard ./src/*.h.[0-9])
-FILES		+= $(wildcard ./src/*.sh) $(wildcard ./src/*.sh.[0-9])
+FILES		+= $(wildcard ./src/*.in) $(wildcard ./src/*.in.[0-9])
 FILES		+= $(wildcard *.md) $(wildcard make.sh*) $(wildcard make.com*) $(wildcard makefile*) $(wildcard ./src/makefile*)
 FILES		+= $(wildcard ./bin/x11-calc-*) $(wildcard *.md) LICENSE
 FILES		+= $(wildcard ./rom/*) $(wildcard ./prg/*.dat) $(wildcard ./img/x11-calc-*.png)
@@ -55,15 +56,15 @@ FILES		+= .gitignore .gitattributes
 
 MAKE		=  make --no-print-directory -C ./src -f makefile.linux
 
-all: clean hp35 hp45 hp70 hp80 hp21 hp22 hp25 hp25c hp27 hp29c hp67 hp31e hp32e hp33e hp33c hp34c hp37e hp38e hp38c hp10c hp11c hp12c hp15c hp16c
+all: clean hp35 hp45 hp70 hp80 hp21 hp22 hp25 hp25c hp27 hp29c hp67 hp31e hp32e hp33e hp33c hp34c hp37e hp38e hp38c hp10c hp11c hp12c hp15c hp16c launcher
 
-classic: clean hp35 hp80 hp45 hp70
+classic: clean hp35 hp80 hp45 hp70 launcher
 
-woodstock: clean hp21 hp22 hp25 hp25c hp27 hp29c
+woodstock: clean hp21 hp22 hp25 hp25c hp27 hp29c launcher
 
-spice: clean hp31e hp32e hp33e hp33c hp34c hp37e hp38e hp38c
+spice: clean hp31e hp32e hp33e hp33c hp34c hp37e hp38e hp38c launcher
 
-voyager: clean hp10c hp11c hp12c hp15c hp16c
+voyager: clean hp10c hp11c hp12c hp15c hp16c launcher
 
 
 hp35:
@@ -140,6 +141,10 @@ hp15c:
 
 hp16c:
 	@$(MAKE) MODEL=16c
+
+launcher:
+	@install -m755 ./src/x11-calc.in ./bin/x11-calc.sh
+
 
 clean:
 	@rm  -f ./src/*.o
