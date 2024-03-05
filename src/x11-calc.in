@@ -203,7 +203,7 @@ _setup() {
 
 if [ -d "$XDG_DATA_HOME" ] # Does XDG_DATA_HOME exist
 then
-   mkdir -p "${XDG_DATA_HOME}/x11-calc" # If it does create the application directory
+   mkdir -p "${XDG_DATA_HOME}/x11-calc" # If it does create the application data directory
    _data_path="$XDG_DATA_HOME/x11-calc/"
 else
    _data_path="$HOME/."
@@ -211,10 +211,10 @@ fi
 
 if [ -d "$XDG_CONFIG_HOME" ] # Does XDG_CONFIG_HOME exist
 then
-   mkdir -p "${XDG_CONFIG_HOME}/x11-calc" # If it does create the application directory
+   mkdir -p "${XDG_CONFIG_HOME}/x11-calc" # If it does create the application conf directory
    _f_conf="${XDG_CONFIG_HOME}/x11-calc/x11-calc.conf" # If it does use it
 else
-   _f_conf="${HOME}/.x11-calc.conf" # Otherwise use a hiddent file in the home folder
+   _f_conf="${HOME}/.x11-calc.conf" # Otherwise use a hidden file in the home folder
 fi
 
 command -v zenity >/dev/null 2>&1
