@@ -39,6 +39,7 @@
 #  03 Mar 24         - Renamed makefile.tru64 to makefile.osf1 - MT
 #                    - Fixed make clean - MT
 #  04 Mar 24         - Added launcher build - macmpi
+#                    - Just copy launcher to target - MT
 #
 
 PROGRAM	=  x11-calc
@@ -138,7 +139,8 @@ hp16c:
 	@cd ./src;$(MAKE) -f makefile.osf1 MODEL=16c; cd ..
 
 launcher:
-	@install -m755 ./src/x11-calc.in ./bin/x11-calc.sh
+#	@install -m755 ./src/x11-calc.in ./bin/x11-calc.sh
+	@cp ./src/x11-calc.in ./bin/x11-calc.sh
 
 clean:
 	@rm  -f ./src/*.o
