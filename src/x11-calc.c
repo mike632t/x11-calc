@@ -264,6 +264,9 @@
  * 03 Mar 24         - Updated error handling (now passes the  error number
  *                     to the error handler) - MT
  *                   - Updated font sizes for new fonts - MT
+ * 04 mar 24         - Moved the initial window position to the lower left-
+ *                     hand side of the display (if the window manager will
+ *                     allow it!) - MT
  *
  *
  * To Do             - Parse command line in a separate routine.
@@ -600,7 +603,8 @@ int main(int argc, char *argv[])
 
    x_application_window = XCreateSimpleWindow(x_display, /* Create the application window, as a child of the root window */
       RootWindow(x_display, i_screen),
-      (i_screen_width - i_window_width) / 2 , (i_screen_height - i_window_height) / 2, /* Window position -ignored ? */
+   /**(i_screen_width - i_window_width) / 2 , (i_screen_height - i_window_height) / 2, /* Window position -ignored ? */
+      (i_screen_width - i_window_width) , (i_screen_height - i_window_height) , /* Window position -ignored ? */
       i_window_width, /* Window width */
       i_window_height, /* Window height */
       i_window_border, /* Border width - ignored ? */
