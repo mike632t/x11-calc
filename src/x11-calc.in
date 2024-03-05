@@ -53,6 +53,7 @@
 #                    - Use hidden files in $HOME if $XDG_DATA_HOME does not
 #                      exist - MT
 #                    - Renamed  x11-calc.in  (script source files) - macmpi
+#  05 Mar 24         - Avoid eval (risks on variables assignments) - macmpi
 #
 
 SUCCESS=0
@@ -77,18 +78,15 @@ _launch() {
 
    _model="`echo $MODEL | sed 's/^hp//'`"
 
-eval "
-   case \$MODEL in
-      $_voyager)
-         # if OPTIONS does not point to a rom file, set expected option to default location
-         # no need to check file existence: app will error-out with proper message if missing
-         if echo \"\$OPTIONS\" | grep -Fvq \".rom\"
-         then
-            OPTIONS=\"-r \${_data_path}x11-calc-\${_model}.rom\"
-         fi
-      ;;
-   esac
-"
+   if echo "$MODEL" | grep -qE "$_voyager"
+   then
+      # if OPTIONS does not point to a rom file, set expected option to default location
+      # no need to check file existence: app will error-out with proper message if missing
+      if echo "$OPTIONS" | grep -Fvq ".rom"
+      then
+         OPTIONS="-r ${_data_path}x11-calc-${_model}.rom"
+      fi
+   fi
 
    [ -n "$CMD_OPTS" ] && OPTIONS="$CMD_OPTS" # Allow command line to override options
 
@@ -260,33 +258,36 @@ if [ -z "$MODEL" ]; then
    echo "`basename $0`: Model not defined - configure using '$0 --setup'"
 fi
 
-eval "
-case \$1 in
+
+if echo "$1" | grep -qE "$_models"
+then
+   MODEL="$1"
+   shift
+   CMD_OPTS="$*"
+   _launch
+   exit
+fi
+
+case $1 in
    --setup)
       _setup
       _launch
       ;;
    --help)
-      if [ -z \"\$MODEL\" ]; then _setup; fi
-      CMD_OPTS=\"--help\"
+      if [ -z "$MODEL" ]; then _setup; fi
+      CMD_OPTS="--help"
       if _has_zenity
       then
-         _launch | zenity --title=\"x11-calc Help\" --text-info --font=\"courier\" --height=320 --width=512
+         _launch | zenity --title="x11-calc Help" --text-info --font="courier" --height=320 --width=512
       else
          _launch
       fi
       ;;
-   $_models)
-      MODEL=\"\$1\"
-      shift
-      CMD_OPTS=\"\$*\"
-      _launch
-      ;;
    *)
-      if [ -z \"\$MODEL\" ]; then _setup; fi
-      CMD_OPTS=\"\$*\"
+      if [ -z "$MODEL" ]; then _setup; fi
+      CMD_OPTS="$*"
       _launch
       ;;
 esac
-"
+
 
