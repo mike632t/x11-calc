@@ -25,6 +25,4 @@
 #                    - Returns status of make command - MT
 #
 make -s -f makefile.`uname | tr '[:upper:]' '[:lower:]'` "$@"
-_status=$?
-[ -f ./src/x11-calc.sh ] && cp ./src/x11-calc.sh ./bin/ >/dev/null 2>&1
-exit $_status
+

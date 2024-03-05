@@ -1,6 +1,6 @@
 *
 !*.c
 !*.h
-!*.sh
+!*.in
 !LICENSE
 !README.md

@@ -48,6 +48,12 @@
 #                    - Reformatted error messages so they will work on both
 #                      the console and message box - MT
 #                    - Error messages always show on console - MT
+#  04 Mar 24         - Remove  OPTIONS  paths  expansion (requires absolute
+#                      paths) and simplify default .rom path logic - macmpi
+#                    - Use hidden files in $HOME if $XDG_DATA_HOME does not
+#                      exist - MT
+#                    - Renamed  x11-calc.in  (script source files) - macmpi
+#  05 Mar 24         - Avoid eval (risks on variables assignments) - macmpi
 #
 
 SUCCESS=0
@@ -66,47 +72,29 @@ _voyager="hp10c|hp11c|hp12c|hp15c|hp16c"
 _models="$_classic|$_woodstock|$_topcat|$_spice|$_voyager"
 
 
-_expand_paths() {
-
-   _args=""
-   while [ -n "$1" ]; do
-      case "$1" in
-         */*)
-            _path="` echo "echo $1" | sh `"
-            _args="$_args $_path"
-         ;;
-         *)
-            _args="$_args $1"
-         ;;
-      esac
-      shift
-   done
-   printf '%s' "$_args"
-}
-
 _launch() {
 
    if [ -z "$MODEL" ]; then exit 0; fi
 
    _model="`echo $MODEL | sed 's/^hp//'`"
 
-eval "
-   case \$MODEL in
-      $_voyager)
-         # if OPTIONS does not point to a rom file, set expected option to default location
-         # no need to check file existence: app will error-out with proper message if missing
-         [ -n \"\${OPTIONS##*.rom*}\" ] || [ -z \"\$OPTIONS\" ] && OPTIONS=\"-r \${XDG_DATA_HOME}/x11-calc/x11-calc-\${_model}.rom\"
-      ;;
-   esac
-"
+   if echo "$MODEL" | grep -qE "$_voyager"
+   then
+      # if OPTIONS does not point to a rom file, set expected option to default location
+      # no need to check file existence: app will error-out with proper message if missing
+      if echo "$OPTIONS" | grep -Fvq ".rom"
+      then
+         OPTIONS="-r ${_data_path}x11-calc-${_model}.rom"
+      fi
+   fi
 
    [ -n "$CMD_OPTS" ] && OPTIONS="$CMD_OPTS" # Allow command line to override options
 
    _core_app="/x11-calc-$_model"
-   echo "`basename $0`: Executing '`dirname "$0"`"$_core_app `_expand_paths $OPTIONS`"'."
+   echo "`basename $0`: Executing '`dirname "$0"`"$_core_app $OPTIONS"'."
 
    if [ -f "`dirname "$0"`"$_core_app ]; then
-      "`dirname "$0"`"$_core_app `_expand_paths $OPTIONS` # Assume script is in the same directory as the executable files
+      "`dirname "$0"`"$_core_app $OPTIONS # Assume script is in the same directory as the executable files
    else
       `exit $ENOCMD`
    fi
@@ -215,15 +203,18 @@ _setup() {
 
 if [ -d "$XDG_DATA_HOME" ] # Does XDG_DATA_HOME exist
 then
-   mkdir -p "${XDG_DATA_HOME}/x11-calc" # If it does create the application directory
+   mkdir -p "${XDG_DATA_HOME}/x11-calc" # If it does create the application data directory
+   _data_path="$XDG_DATA_HOME/x11-calc/"
+else
+   _data_path="$HOME/."
 fi
 
 if [ -d "$XDG_CONFIG_HOME" ] # Does XDG_CONFIG_HOME exist
 then
-   mkdir -p "${XDG_CONFIG_HOME}/x11-calc" # If it does create the application directory
+   mkdir -p "${XDG_CONFIG_HOME}/x11-calc" # If it does create the application conf directory
    _f_conf="${XDG_CONFIG_HOME}/x11-calc/x11-calc.conf" # If it does use it
 else
-   _f_conf="${HOME}/.x11-calc.conf" # Otherwise use a hiddent file in the home folder
+   _f_conf="${HOME}/.x11-calc.conf" # Otherwise use a hidden file in the home folder
 fi
 
 command -v zenity >/dev/null 2>&1
@@ -251,7 +242,7 @@ OPTIONS=""
 
 #
 # To see a list of possible options define the default model above
-# and use:
+# and use: (eventual paths must be absolute)
 #
 # '$0 --help'
 #
@@ -267,33 +258,36 @@ if [ -z "$MODEL" ]; then
    echo "`basename $0`: Model not defined - configure using '$0 --setup'"
 fi
 
-eval "
-case \$1 in
+
+if echo "$1" | grep -qE "$_models"
+then
+   MODEL="$1"
+   shift
+   CMD_OPTS="$*"
+   _launch
+   exit
+fi
+
+case $1 in
    --setup)
       _setup
       _launch
       ;;
    --help)
-      if [ -z \"\$MODEL\" ]; then _setup; fi
-      CMD_OPTS=\"--help\"
+      if [ -z "$MODEL" ]; then _setup; fi
+      CMD_OPTS="--help"
       if _has_zenity
       then
-         _launch | zenity --title=\"x11-calc Help\" --text-info --font=\"courier\" --height=320 --width=512
+         _launch | zenity --title="x11-calc Help" --text-info --font="courier" --height=320 --width=512
       else
          _launch
       fi
       ;;
-   $_models)
-      MODEL=\"\$1\"
-      shift
-      CMD_OPTS=\"\$*\"
-      _launch
-      ;;
    *)
-      if [ -z \"\$MODEL\" ]; then _setup; fi
-      CMD_OPTS=\"\$*\"
+      if [ -z "$MODEL" ]; then _setup; fi
+      CMD_OPTS="$*"
       _launch
       ;;
 esac
-"
+
 

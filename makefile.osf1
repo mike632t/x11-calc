@@ -38,26 +38,29 @@
 #  01 Nov 23         - Tidied up tabs in comments - MT
 #  03 Mar 24         - Renamed makefile.tru64 to makefile.osf1 - MT
 #                    - Fixed make clean - MT
+#  04 Mar 24         - Added launcher build - macmpi
+#                    - Just copy launcher to target - MT
 #
 
 PROGRAM	=  x11-calc
 
 FILES		=  $(wildcard ./src/*.c) $(wildcard ./src/*.c.[0-9]) $(wildcard ./src/*.h) $(wildcard ./src/*.h.[0-9]) ./src/makefile
+FILES		+= $(wildcard ./src/*.in) $(wildcard ./src/*.in.[0-9])
 FILES		+= $(wildcard ./bin/x11-calc-*) $(wildcard *.md) LICENSE makefile
 FILES		+= $(wildcard ./rom/*) $(wildcard ./prg/*.dat) $(wildcard ./img/x11-calc-*.png)
 FILES		+= .gitignore .gitattributes
 
 MAKE		=  make
 
-all: clean hp35 hp45 hp70 hp80 hp21 hp22 hp25 hp25c hp27 hp29c hp67 hp31e hp32e hp33e hp33c hp34c hp37e hp38e hp38c hp10c hp11c hp12c hp15c hp16c
+all: clean hp35 hp45 hp70 hp80 hp21 hp22 hp25 hp25c hp27 hp29c hp67 hp31e hp32e hp33e hp33c hp34c hp37e hp38e hp38c hp10c hp11c hp12c hp15c hp16c launcher
 
-classic: clean hp35 hp80 hp45 hp70
+classic: clean hp35 hp80 hp45 hp70 launcher
 
-woodstock: clean hp21 hp22 hp25 hp25c hp27 hp29c
+woodstock: clean hp21 hp22 hp25 hp25c hp27 hp29c launcher
 
-spice: clean hp31e hp32e hp33e hp33c hp34c hp37e hp38e hp38c
+spice: clean hp31e hp32e hp33e hp33c hp34c hp37e hp38e hp38c launcher
 
-voyager: clean hp10c hp11c hp12c hp15c hp16c
+voyager: clean hp10c hp11c hp12c hp15c hp16c launcher
 
 
 hp35:
@@ -134,6 +137,10 @@ hp15c:
 
 hp16c:
 	@cd ./src;$(MAKE) -f makefile.osf1 MODEL=16c; cd ..
+
+launcher:
+#	@install -m755 ./src/x11-calc.in ./bin/x11-calc.sh
+	@cp ./src/x11-calc.in ./bin/x11-calc.sh
 
 clean:
 	@rm  -f ./src/*.o
