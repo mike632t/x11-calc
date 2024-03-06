@@ -56,6 +56,8 @@
  *                     HP33E, and HP38E - MT
  * 24 Dec 22         - Modified scale width for HP10 - MT
  * 18 Feb 24         - Don't redefine COMMIT_ID if already defined - MT
+ * 04 Mar 24         - Check  that  all error codes are defined and  define
+ *                     any that are not - MT
  *
  * TO DO :           -
  */
@@ -77,6 +79,36 @@
 #define COLOUR_DEPTH 1
 #else
 #define COLOUR_DEPTH 24
+#endif
+
+/* Check that all error codes are defined and define any that are not */
+
+#if !defined(SUCCESS)
+#define SUCCESS      0
+#endif
+
+#if !defined(ENOENT)
+#define ENOENT       2
+#endif
+
+#if !defined(EINVAL)
+#define EINVAL       22
+#endif
+
+#if !defined(ENODATA)
+#define ENODATA      61
+#endif
+
+#if !defined(ENOACC)
+#define ENOACC      126
+#endif
+
+#if !defined(ENOCMD)
+#define ENOCMD      127
+#endif
+
+#if !defined(ENOFNT)
+#define ENOFNT      192
 #endif
 
 #if defined(HP35)
