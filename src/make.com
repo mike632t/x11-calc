@@ -25,6 +25,7 @@ $! 22 Dec 22         - The model number defined on the command line must be
 $!                     enclosed in quotes - MT
 $! 01 Nov 23         - Executable files created in [-.BIN] - MT
 $!                   - Create [-.BIN] folder if it doesn't exist - MT
+$! 04 Mar 24         - Compile and link with x11-calc-font -MT
 $!
 $  _message_status = f$environment("MESSAGE")
 $  on error then goto _done
@@ -45,8 +46,8 @@ $  if _model .eqs. "," then goto _done
 $  write sys$output "x11-calc-''_model'"
 $  if f$search("x11-calc''_model'.exe") .nes. "" then delete "x11-calc''_model'.exe;*" /nolog /noconfirm
 $  if f$search("*.obj") .nes. "" then delete *.obj;* /nolog /noconfim
-$  cc /define="HP''_model'" x11-calc-'_model, x11-calc, x11-calc-cpu, x11-calc-segment, x11-calc-display, x11-calc-button, x11-calc-colour, x11-calc-switch, x11-calc-label, x11-calc-messages, gcc-wait
-$  link /exec=[-.bin]x11-calc-'_model x11-calc-'_model, x11-calc, x11-calc-cpu, x11-calc-segment, x11-calc-display, x11-calc-button, x11-calc-colour, x11-calc-switch, x11-calc-label, x11-calc-messages, gcc-wait, x11-lib.opt/opt
+$  cc /define="HP''_model'" x11-calc-'_model, x11-calc, x11-calc-cpu, x11-calc-segment, x11-calc-display, x11-calc-button, x11-calc-colour, x11-calc-switch, x11-calc-label, x11-calc-font, x11-calc-messages, gcc-wait
+$  link /exec=[-.bin]x11-calc-'_model x11-calc-'_model, x11-calc, x11-calc-cpu, x11-calc-segment, x11-calc-display, x11-calc-button, x11-calc-colour, x11-calc-switch, x11-calc-label, x11-calc-font, x11-calc-messages, gcc-wait, x11-lib.opt/opt
 $  if f$search("*.obj") .nes. "" then delete *.obj;* /nolog /noconfim
 $  _count = _count + 1
 $  goto _next
