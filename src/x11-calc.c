@@ -264,9 +264,11 @@
  * 03 Mar 24         - Updated error handling (now passes the  error number
  *                     to the error handler) - MT
  *                   - Updated font sizes for new fonts - MT
- * 04 mar 24         - Moved the initial window position to the lower left-
+ * 04 Mar 24         - Moved the initial window position to the lower left-
  *                     hand side of the display (if the window manager will
  *                     allow it!) - MT
+ *                   - Check  that  all error codes are defined and  define
+ *                     any that are not - MT
  *
  *
  * To Do             - Parse command line in a separate routine.
@@ -279,7 +281,7 @@
 
 #define NAME           "x11-calc"
 #define VERSION        "0.12"
-#define BUILD          "0131"
+#define BUILD          "0132"
 #define DATE           "03 Mar 24"
 #define AUTHOR         "MT"
 
