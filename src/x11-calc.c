@@ -270,6 +270,7 @@
  *                   - Check  that  all error codes are defined and  define
  *                     any that are not - MT
  *                   - Added desktop file - MT
+ * 09 Mar 24         - Updated makefile and screenshots - MT
  *
  *
  * To Do             - Parse command line in a separate routine.
@@ -282,7 +283,7 @@
 
 #define NAME           "x11-calc"
 #define VERSION        "0.12"
-#define BUILD          "0133"
+#define BUILD          "0134"
 #define DATE           "04 Mar 24"
 #define AUTHOR         "MT"
 
