@@ -1,7 +1,7 @@
 *
-!*.c
-!*.h
-!*.in
-!*.desktop.*
+!src/*.c
+!src/*.h
+!src/*.in
+!src/*.desktop.*
 !LICENSE
 !README.md

@@ -36,119 +36,76 @@
 #                    - Checks that the bin directory exists before deleting
 #                      files - MT
 #  01 Nov 23         - Tidied up tabs in comments - MT
-#  16 Feb 24			- Removed HP10 - MT
+#  16 Feb 24         - Removed HP10 - MT
 #  25 Feb 24         - Backup all makefiles - MT
-#  26 Feb 24			- Defined common options in make comand - MT
+#  26 Feb 24         - Defined common options in make comand - MT
 #                    - Renamed makefiles to make it harder to use the wrong
 #                      makefile on different operating systems - MT
 #  02 Mar 24         - Added scripts to FILES - MT
 #  04 Mar 24         - Added launcher build - macmpi
+#  09 Mar 24         - Individual  calc  recipes  are  dynamically generated
+#                      and.desktop file has built models shortcuts - macmpi
 #
 
 PROGRAM	=  x11-calc
 
-FILES		=  $(wildcard ./src/*.c) $(wildcard ./src/*.c.[0-9]) $(wildcard ./src/*.h) $(wildcard ./src/*.h.[0-9])
-FILES		+= $(wildcard ./src/*.in) $(wildcard ./src/*.in.[0-9])
-FILES		+= $(wildcard *.md) $(wildcard make.sh*) $(wildcard make.com*) $(wildcard makefile*) $(wildcard ./src/makefile*)
+SOURCES		= $(wildcard ./src/*.c) $(wildcard ./src/*.h)
+SOURCES		+= $(wildcard make.sh*) $(wildcard make.com*) $(wildcard makefile*) $(wildcard ./src/makefile*)
+FILES		= $(SOURCES) $(wildcard ./src/*.c.[0-9]) $(wildcard ./src/*.h.[0-9])
+FILES		+= $(wildcard ./src/*.in) $(wildcard ./src/*.desktop.*)
+FILES		+= $(wildcard *.md)
 FILES		+= $(wildcard ./bin/x11-calc-*) $(wildcard *.md) LICENSE
 FILES		+= $(wildcard ./rom/*) $(wildcard ./prg/*.dat) $(wildcard ./img/x11-calc-*.png)
 FILES		+= .gitignore .gitattributes
+TARGETDIR	:= ./bin
+SOURCEDIR	:= ./src
 
 MAKE		=  make --no-print-directory -C ./src -f makefile.linux
 
-all: clean hp35 hp45 hp70 hp80 hp21 hp22 hp25 hp25c hp27 hp29c hp67 hp31e hp32e hp33e hp33c hp34c hp37e hp38e hp38c hp10c hp11c hp12c hp15c hp16c launcher
+CLASSIC		= 35 45 70 80
+WOODSTOCK	= 21 22 25 25c 27 29c
+TOPCAT		= 67
+SPICE		= 31e 32e 33e 33c 34c 37e 38e 38c
+VOYAGER		= 10c 11c 12c 15c 16c
+ALL			= $(CLASSIC) $(WOODSTOCK) $(TOPCAT) $(SPICE) $(VOYAGER)
+MENU_LIST	= 35 21 25c 29c 31e 32e 33c 34c 10c 11c 12c 15c 16c
+OTHERS		= launcher desktop
 
-classic: clean hp35 hp80 hp45 hp70 launcher
+.PHONY: all classic woodstock topcat spice voyager clean
 
-woodstock: clean hp21 hp22 hp25 hp25c hp27 hp29c launcher
+classic: clean $(CLASSIC) $(OTHERS)
+woodstock: clean $(WOODSTOCK) $(OTHERS)
+topcat: clean $(TOPCAT) $(OTHERS)
+spice: clean $(SPICE) $(OTHERS)
+voyager: clean $(VOYAGER) $(OTHERS)
+all: clean $(ALL) $(OTHERS)
 
-spice: clean hp31e hp32e hp33e hp33c hp34c hp37e hp38e hp38c launcher
+define prog_template =
+hp$(1): $(1)
+$(1): $(SOURCES)
+	@$$(MAKE) MODEL=$(1)
+endef
 
-voyager: clean hp10c hp11c hp12c hp15c hp16c launcher
+$(foreach calc,$(ALL),$(eval $(call prog_template,$(calc))))
 
+launcher: $(TARGETDIR) $(SOURCEDIR)/x11-calc.in
+	@install -m755 $(SOURCEDIR)/x11-calc.in $(TARGETDIR)/x11-calc.sh
+	( cd $(TARGETDIR) && ls --color x11-calc.sh )
 
-hp35:
-	@$(MAKE) MODEL=35
-
-hp80:
-	@$(MAKE) MODEL=80
-
-hp45:
-	@$(MAKE) MODEL=45
-
-hp70:
-	@$(MAKE) MODEL=70
-
-hp10:
-	@$(MAKE) MODEL=10
-
-hp21:
-	@$(MAKE) MODEL=21
-
-hp22:
-	@$(MAKE) MODEL=22
-
-hp25:
-	@$(MAKE) MODEL=25
-
-hp25c:
-	@$(MAKE) MODEL=25c
-
-hp27:
-	@$(MAKE) MODEL=27
-
-hp29c:
-	@$(MAKE) MODEL=29c
-
-hp67:
-	@$(MAKE) MODEL=67
-
-hp31e:
-	@$(MAKE) MODEL=31e
-
-hp32e:
-	@$(MAKE) MODEL=32e
-
-hp33e:
-	@$(MAKE) MODEL=33e
-
-hp33c:
-	@$(MAKE) MODEL=33c
-
-hp34c:
-	@$(MAKE) MODEL=34c
-
-hp37e:
-	@$(MAKE) MODEL=37e
-
-hp38e:
-	@$(MAKE) MODEL=38e
-
-hp38c:
-	@$(MAKE) MODEL=38c
-
-hp10c:
-	@$(MAKE) MODEL=10c
-
-hp11c:
-	@$(MAKE) MODEL=11c
-
-hp12c:
-	@$(MAKE) MODEL=12c
-
-hp15c:
-	@$(MAKE) MODEL=15c
-
-hp16c:
-	@$(MAKE) MODEL=16c
-
-launcher:
-	@install -m755 ./src/x11-calc.in ./bin/x11-calc.sh
-
+desktop: $(wildcard ./src/x11-calc.desktop.*)
+	@install -m644 ./src/x11-calc.desktop.linux .
+	@for _m in $(MENU_LIST); do \
+		printf "\n[Desktop Action hp$$_m]\nName=hp$$_m\nExec=x11-calc.sh hp$$_m\n">>x11-calc.desktop.linux; \
+		sed -i "s/^Actions=.*/&;hp$$_m/" x11-calc.desktop.linux; \
+	done
+	ls --color x11-calc.desktop.linux
 
 clean:
-	@rm  -f ./src/*.o
-	@test -d ./bin && find ./bin -type f  ! -name "*.*" -delete || true
+	@rm  -f ./src/*.o ./x11-calc.desktop.*
+	@test -d $(TARGETDIR) && (cd $(TARGETDIR) && rm -f *) || true
 
-backup:
+$(TARGETDIR):
+	@mkdir -pv $(TARGETDIR)
+
+backup: $(FILES)
 	@echo "$(PROGRAM)-`date +'%Y%m%d%H%M'`.tar.gz"; tar -czpf ..\/$(PROGRAM)-`date +'%Y%m%d%H%M'`.tar.gz $(FILES)
