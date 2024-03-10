@@ -52,8 +52,11 @@
 #                      paths) and simplify default .rom path logic - macmpi
 #                    - Use hidden files in $HOME if $XDG_DATA_HOME does not
 #                      exist - MT
-#                    - Renamed  x11-calc.in  (script source files) - macmpi
+#                    - Renamed x11-calc.in (script source file) - macmpi
 #  05 Mar 24         - Avoid eval (risks on variables assignments) - macmpi
+#  09 Mar 24         - Can launch a specific emulator from the command line
+#                      using either hp<model_no> or just <model_no> (aligns
+#                      behaviour with makefile) - MT
 #
 
 SUCCESS=0
@@ -98,6 +101,7 @@ _launch() {
    else
       `exit $ENOCMD`
    fi
+
 
    case $? in
       $SUCCESS)
@@ -258,8 +262,7 @@ if [ -z "$MODEL" ]; then
    echo "`basename $0`: Model not defined - configure using '$0 --setup'"
 fi
 
-
-if echo "$1" | grep -qE "$_models"
+if $(echo "$1" | grep -qE "$_models") || $(echo "hp$1" | grep -qE "$_models")
 then
    MODEL="$1"
    shift
