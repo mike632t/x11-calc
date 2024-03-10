@@ -51,16 +51,17 @@
 
 PROGRAM	=  x11-calc
 
-SOURCES		= $(wildcard ./src/*.c) $(wildcard ./src/*.h)
-SOURCES		+= $(wildcard make.sh*) $(wildcard make.com*) $(wildcard makefile*) $(wildcard ./src/makefile*)
-FILES		= $(SOURCES) $(wildcard ./src/*.c.[0-9]) $(wildcard ./src/*.h.[0-9])
-FILES		+= $(wildcard ./src/*.in) $(wildcard ./src/*.desktop.*)
-FILES		+= $(wildcard *.md)
-FILES		+= $(wildcard ./bin/x11-calc-*) $(wildcard *.md) LICENSE
-FILES		+= $(wildcard ./rom/*) $(wildcard ./prg/*.dat) $(wildcard ./img/x11-calc-*.png)
-FILES		+= .gitignore .gitattributes
 TARGETDIR	:= ./bin
 SOURCEDIR	:= ./src
+
+SOURCES		= $(wildcard $SOURCEDIR/*.c) $(wildcard $SOURCEDIR/*.h)
+SOURCES		+= $(wildcard make.sh*) $(wildcard make.com*) $(wildcard makefile*) $(wildcard $SOURCEDIR/makefile*)
+FILES		= $(SOURCES) $(wildcard $SOURCEDIR/*.c.[0-9]) $(wildcard $SOURCEDIR/*.h.[0-9])
+FILES		+= $(wildcard $SOURCEDIR/*.in) $(wildcard $SOURCEDIR/*.desktop*)
+FILES		+= $(wildcard *.md)
+FILES		+= $(wildcard $TARGETDIR/x11-calc-*) $(wildcard *.md) LICENSE
+FILES		+= $(wildcard ./rom/*) $(wildcard ./prg/*.dat) $(wildcard ./img/x11-calc-*.png)
+FILES		+= .gitignore .gitattributes
 
 MAKE		=  make --no-print-directory -C ./src -f makefile.linux
 
@@ -78,12 +79,16 @@ MENU_LIST	= 35 21 25c 29c 31e 32e 33c 34c 10c 11c 12c 15c 16c
 
 .PHONY: all classic woodstock topcat spice voyager clean
 
+all: clean $(ALL) $(OTHERS)
+
 classic: clean $(CLASSIC) $(OTHERS)
 woodstock: clean $(WOODSTOCK) $(OTHERS)
 topcat: clean $(TOPCAT) $(OTHERS)
 spice: clean $(SPICE) $(OTHERS)
 voyager: clean $(VOYAGER) $(OTHERS)
-all: clean $(ALL) $(OTHERS)
+
+$(TARGETDIR):
+	mkdir -pv $(TARGETDIR)
 
 define prog_template =
 hp$(1): $(1)
@@ -97,20 +102,17 @@ launcher: $(TARGETDIR) $(SOURCEDIR)/x11-calc.in
 	@install -m755 $(SOURCEDIR)/x11-calc.in $(TARGETDIR)/x11-calc.sh
 	( cd $(TARGETDIR) && ls --color x11-calc.sh )
 
-desktop: $(SOURCEDIR)/x11-calc.desktop
-	@install -m644 $(SOURCEDIR)/x11-calc.desktop $(TARGETDIR)
-	@for _m in $(MENU_LIST); do \
-		printf "\n[Desktop Action hp$$_m]\nName=hp$$_m\nExec=x11-calc.sh hp$$_m\n">> $(TARGETDIR)/x11-calc.desktop; \
-		sed -i "s/^Actions=.*/&;hp$$_m/"  $(TARGETDIR)/x11-calc.desktop; \
-	done
-	( cd $(TARGETDIR) && ls --color x11-calc.desktop )
+#desktop: $(SOURCEDIR)/x11-calc.desktop
+#	@install -m644 $(SOURCEDIR)/x11-calc.desktop $(TARGETDIR)
+#	@for _m in $(MENU_LIST); do \
+#		printf "\n[Desktop Action hp$$_m]\nName=hp$$_m\nExec=x11-calc.sh hp$$_m\n">> $(TARGETDIR)/x11-calc.desktop; \
+#		sed -i "s/^Actions=.*/&;hp$$_m/"  $(TARGETDIR)/x11-calc.desktop; \
+#	done
+#	( cd $(TARGETDIR) && ls --color x11-calc.desktop )
 
 clean:
 	@rm  -f $(SOURCEDIR)/*.o $(TARGETDIR)/x11-calc.desktop*
 	@test -d $(TARGETDIR) && (cd $(TARGETDIR) && rm -f *) || true
-
-$(TARGETDIR):
-	@mkdir -pv $(TARGETDIR)
 
 backup: $(FILES)
 	@echo "$(PROGRAM)-`date +'%Y%m%d%H%M'`.tar.gz"; tar -czpf ..\/$(PROGRAM)-`date +'%Y%m%d%H%M'`.tar.gz $(FILES)
