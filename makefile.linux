@@ -47,6 +47,8 @@
 #                      and desktop file has built models shortcuts - macmpi
 #  10 Mar 24         - Moved new desktop file to TARGET directory - MT
 #                    - Create TARGET directory if it doesn't exist - MT
+#                    - Fixed error in directory path when TARGET is defined
+#                      on the command line - MT
 #
 
 PROGRAM	=  x11-calc
@@ -93,7 +95,7 @@ voyager: clean $(VOYAGER) $(OTHERS)
 define prog_template =
 hp$(1): $(1)
 $(1): $(SOURCES)
-	@$$(MAKE) MODEL=$(1) TARGET=.$(TARGET)
+	@$$(MAKE) MODEL=$(1) TARGET=../$(TARGET)
 endef
 
 $(foreach calc,$(ALL),$(eval $(call prog_template,$(calc))))
