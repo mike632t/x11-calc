@@ -2,6 +2,6 @@
 !src/*.c
 !src/*.h
 !src/*.in
-!src/*.desktop.*
+!src/*.desktop
 !LICENSE
 !README.md
