@@ -21,5 +21,6 @@
 #  09 Oct 21         - Initial version - MT
 #
 
+all:
 %:
 	@./make.sh $@

@@ -16,7 +16,7 @@
 #  You  should have received a copy of the GNU General Public License along
 #  with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-#	Note separator (tab) at the beginning of the line CANNOT be a space..!
+#  Note separator (tab) at the beginning of the line CANNOT be a space..!
 #
 #  09 Oct 21   0.1   - Initial version - MT
 #  22 Nov 21   0.2   - Added data files to backups - MT
@@ -45,25 +45,28 @@
 #  04 Mar 24         - Added launcher build - macmpi
 #  09 Mar 24         - Individual  calc recipes are  dynamically  generated
 #                      and desktop file has built models shortcuts - macmpi
-#                    - Renamed desktop file - MT
-#                    - Moved new desktop file to TARGET directory - MT
+#  10 Mar 24         - Moved new desktop file to TARGET directory - MT
+#                    - Create TARGET directory if it doesn't exist - MT
 #
 
 PROGRAM	=  x11-calc
 
-TARGETDIR	:= ./bin
-SOURCEDIR	:= ./src
+TARGET	:= ./bin
+SRC	:= ./src
+PRG	:= ./prg
+ROM	:= ./rom
+IMG	:= ./img
 
-SOURCES		= $(wildcard $SOURCEDIR/*.c) $(wildcard $SOURCEDIR/*.h)
-SOURCES		+= $(wildcard make.sh*) $(wildcard make.com*) $(wildcard makefile*) $(wildcard $SOURCEDIR/makefile*)
-FILES		= $(SOURCES) $(wildcard $SOURCEDIR/*.c.[0-9]) $(wildcard $SOURCEDIR/*.h.[0-9])
-FILES		+= $(wildcard $SOURCEDIR/*.in) $(wildcard $SOURCEDIR/*.desktop*)
+SOURCES		= $(wildcard $(SRC)/*.c) $(wildcard $(SRC)/*.h)
+SOURCES		+= $(wildcard make.sh*) $(wildcard make.com*) $(wildcard makefile*) $(wildcard $(SRC)/makefile*)
+FILES		= $(SOURCES) $(wildcard $(SRC)/*.c.[0-9]) $(wildcard $(SRC)/*.h.[0-9])
+FILES		+= $(wildcard $(SRC)/*.in) $(wildcard $(SRC)/*.desktop*)
 FILES		+= $(wildcard *.md)
-FILES		+= $(wildcard $TARGETDIR/x11-calc-*) $(wildcard *.md) LICENSE
-FILES		+= $(wildcard ./rom/*) $(wildcard ./prg/*.dat) $(wildcard ./img/x11-calc-*.png)
+FILES		+= $(wildcard $(TARGET)/x11-calc-*) $(wildcard *.md) LICENSE
+FILES		+= $(wildcard $(ROM)/*) $(wildcard $(PRG)/*.dat) $(wildcard $(IMG)/x11-calc-*.png)
 FILES		+= .gitignore .gitattributes
 
-MAKE		=  make --no-print-directory -C ./src -f makefile.linux
+MAKE		= make --no-print-directory -C ./src -f makefile.linux
 
 CLASSIC		= 35 45 70 80
 WOODSTOCK	= 21 22 25 25c 27 29c
@@ -87,32 +90,39 @@ topcat: clean $(TOPCAT) $(OTHERS)
 spice: clean $(SPICE) $(OTHERS)
 voyager: clean $(VOYAGER) $(OTHERS)
 
-$(TARGETDIR):
-	mkdir -pv $(TARGETDIR)
-
 define prog_template =
 hp$(1): $(1)
 $(1): $(SOURCES)
-	@$$(MAKE) MODEL=$(1)
+	@$$(MAKE) MODEL=$(1) TARGET=.$(TARGET)
 endef
 
 $(foreach calc,$(ALL),$(eval $(call prog_template,$(calc))))
 
-launcher: $(TARGETDIR) $(SOURCEDIR)/x11-calc.in
-	@install -m755 $(SOURCEDIR)/x11-calc.in $(TARGETDIR)/x11-calc.sh
-	( cd $(TARGETDIR) && ls --color x11-calc.sh )
+launcher: $(SRC)/x11-calc.in
+ifeq ($(wildcard $(TARGET)/.),)
+	@mkdir -p $(TARGET)
+endif
+#	@install -m755 $(SRC)/x11-calc.in $(TARGET)/x11-calc.sh
+	@cp $(SRC)/x11-calc.in $(TARGET)/x11-calc.sh
+	@chmod +x $(TARGET)/x11-calc.sh
+	( cd $(TARGET) && ls --color x11-calc.sh )
 
-#desktop: $(SOURCEDIR)/x11-calc.desktop
-#	@install -m644 $(SOURCEDIR)/x11-calc.desktop $(TARGETDIR)
-#	@for _m in $(MENU_LIST); do \
-#		printf "\n[Desktop Action hp$$_m]\nName=hp$$_m\nExec=x11-calc.sh hp$$_m\n">> $(TARGETDIR)/x11-calc.desktop; \
-#		sed -i "s/^Actions=.*/&;hp$$_m/"  $(TARGETDIR)/x11-calc.desktop; \
-#	done
-#	( cd $(TARGETDIR) && ls --color x11-calc.desktop )
+desktop: $(SRC)/x11-calc.desktop
+ifeq ($(wildcard $(TARGET)/.),)
+	@mkdir -p $(TARGET)
+endif
+#	@install -m644 $(SRC)/x11-calc.desktop $(TARGET)
+	@cp $(SRC)/x11-calc.desktop $(TARGET)
+	@chmod +x $(TARGET)/x11-calc.desktop
+	@for _m in $(MENU_LIST); do \
+		printf "\n[Desktop Action hp$$_m]\nName=hp$$_m\nExec=x11-calc.sh hp$$_m\n">> $(TARGET)/x11-calc.desktop; \
+		sed -i "s/^Actions=.*/&;hp$$_m/"  $(TARGET)/x11-calc.desktop; \
+	done
+	( cd $(TARGET) && ls --color x11-calc.desktop )
 
 clean:
-	@rm  -f $(SOURCEDIR)/*.o $(TARGETDIR)/x11-calc.desktop*
-	@test -d $(TARGETDIR) && (cd $(TARGETDIR) && rm -f *) || true
+	@rm  -f $(SRC)/*.o $(TARGET)/x11-calc.desktop*
+	@test -d $(TARGET) && (cd $(TARGET) && rm -f *) || true
 
 backup: $(FILES)
 	@echo "$(PROGRAM)-`date +'%Y%m%d%H%M'`.tar.gz"; tar -czpf ..\/$(PROGRAM)-`date +'%Y%m%d%H%M'`.tar.gz $(FILES)

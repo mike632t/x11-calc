@@ -63,6 +63,7 @@
 #  18 Feb 24         - Attempts to redefine the COMMIT_ID based on the last
 #                      commit using git - MT
 #  25 Feb 24         - Removed unused defination - MT
+#  10 Mar 24         - Don't redefine target if already defined - MT
 #
 #
 
@@ -75,8 +76,11 @@ OBJECTS	= $(SOURCES:.c=.o)
 OUTPUT	= $(PROGRAM).out
 LANG	= LANG_$(shell (echo $$LANG | cut -f 1 -d '_'))
 UNAME	= $(shell uname)
-TARGET	= ../bin
 COMMIT	= $(shell git log -1 HEAD --format=%h 2> /dev/null)
+
+ifndef TARGET
+TARGET	= ../bin
+endif
 
 LIBS	= -lX11 -lm
 FLAGS	= -fcommon -Wall -pedantic -std=gnu99
@@ -115,9 +119,6 @@ ifdef VERBOSE
 	@echo
 	@echo $(CC) $(OBJECTS) $(LIBS) -o $@
 	@echo
-endif
-ifeq ($(wildcard $(TARGET)/.),)
-	@mkdir -p -v $(TARGET)
 endif
 	@$(CC) $(FLAGS) $(OBJECTS) -o $@ $(LIBS) && (cd $(TARGET) && ls --color $$(echo $@ | sed "s:$(TARGET)/::g") ) # Escape $ using $$...
 
