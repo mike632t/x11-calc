@@ -49,15 +49,16 @@
 #                    - Create TARGET directory if it doesn't exist - MT
 #                    - Fixed error in directory path when TARGET is defined
 #                      on the command line - MT
+#                    - Simplified directory creation - MT
 #
 
-PROGRAM	=  x11-calc
+PROGRAM	=  	x11-calc
 
-TARGET	:= ./bin
-SRC	:= ./src
-PRG	:= ./prg
-ROM	:= ./rom
-IMG	:= ./img
+TARGET		:= ./bin
+SRC		:= ./src
+PRG		:= ./prg
+ROM		:= ./rom
+IMG		:= ./img
 
 SOURCES		= $(wildcard $(SRC)/*.c) $(wildcard $(SRC)/*.h)
 SOURCES		+= $(wildcard make.sh*) $(wildcard make.com*) $(wildcard makefile*) $(wildcard $(SRC)/makefile*)
@@ -93,26 +94,20 @@ spice: clean $(SPICE) $(OTHERS)
 voyager: clean $(VOYAGER) $(OTHERS)
 
 define prog_template =
-hp$(1): $(1)
-$(1): $(SOURCES)
+hp$(1): $(1) $(TARGET)
+$(1): $(SOURCES) $(TARGET)
 	@$$(MAKE) MODEL=$(1) TARGET=../$(TARGET)
 endef
 
 $(foreach calc,$(ALL),$(eval $(call prog_template,$(calc))))
 
-launcher: $(SRC)/x11-calc.in
-ifeq ($(wildcard $(TARGET)/.),)
-	@mkdir -p $(TARGET)
-endif
+launcher: $(SRC)/x11-calc.in $(TARGET)
 #	@install -m755 $(SRC)/x11-calc.in $(TARGET)/x11-calc.sh
 	@cp $(SRC)/x11-calc.in $(TARGET)/x11-calc.sh
 	@chmod +x $(TARGET)/x11-calc.sh
 	( cd $(TARGET) && ls --color x11-calc.sh )
 
-desktop: $(SRC)/x11-calc.desktop
-ifeq ($(wildcard $(TARGET)/.),)
-	@mkdir -p $(TARGET)
-endif
+desktop: $(SRC)/x11-calc.desktop $(TARGET)
 #	@install -m644 $(SRC)/x11-calc.desktop $(TARGET)
 	@cp $(SRC)/x11-calc.desktop $(TARGET)
 	@chmod +x $(TARGET)/x11-calc.desktop
@@ -121,6 +116,9 @@ endif
 		sed -i "s/^Actions=.*/&;hp$$_m/"  $(TARGET)/x11-calc.desktop; \
 	done
 	( cd $(TARGET) && ls --color x11-calc.desktop )
+
+$(TARGET):
+	@mkdir -p $(TARGET)
 
 clean:
 	@rm  -f $(SRC)/*.o $(TARGET)/x11-calc.desktop*
