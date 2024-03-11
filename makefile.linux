@@ -94,7 +94,7 @@ spice: clean $(SPICE) $(OTHERS)
 voyager: clean $(VOYAGER) $(OTHERS)
 
 define prog_template =
-hp$(1): $(1) $(TARGET)
+hp$(1): $(1)
 $(1): $(SOURCES) $(TARGET)
 	@$$(MAKE) MODEL=$(1) TARGET=../$(TARGET)
 endef
