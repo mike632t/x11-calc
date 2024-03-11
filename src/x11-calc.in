@@ -81,7 +81,7 @@ _launch() {
 
    _model="`echo $MODEL | sed 's/^hp//'`"
 
-   if echo "$MODEL" | grep -qE "$_voyager"
+   if echo "$MODEL" | grep -qwE "$_voyager"
    then
       # if OPTIONS does not point to a rom file, set expected option to default location
       # no need to check file existence: app will error-out with proper message if missing
@@ -262,9 +262,10 @@ if [ -z "$MODEL" ]; then
    echo "`basename $0`: Model not defined - configure using '$0 --setup'"
 fi
 
-if $(echo "$1" | grep -qE "$_models") || $(echo "hp$1" | grep -qE "$_models")
+if echo "$1" | grep -qwE "$_models" || echo "hp$1" | grep -qwE "$_models"
 then
    MODEL="$1"
+   echo "$MODEL" | grep -qwE "$_models" || MODEL="hp$MODEL"
    shift
    CMD_OPTS="$*"
    _launch
