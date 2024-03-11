@@ -101,15 +101,15 @@ endef
 
 $(foreach calc,$(ALL),$(eval $(call prog_template,$(calc))))
 
-launcher: $(SRC)/x11-calc.in $(TARGET)
-#	@install -m755 $(SRC)/x11-calc.in $(TARGET)/x11-calc.sh
-	@cp $(SRC)/x11-calc.in $(TARGET)/x11-calc.sh
+launcher: $(SRC)/x11-calc.sh.in $(TARGET)
+#	@install -m755 $(SRC)/x11-calc.sh.in $(TARGET)/x11-calc.sh
+	@cp $(SRC)/x11-calc.sh.in $(TARGET)/x11-calc.sh
 	@chmod +x $(TARGET)/x11-calc.sh
 	( cd $(TARGET) && ls --color x11-calc.sh )
 
-desktop: $(SRC)/x11-calc.desktop $(TARGET)
-#	@install -m644 $(SRC)/x11-calc.desktop $(TARGET)
-	@cp $(SRC)/x11-calc.desktop $(TARGET)
+desktop: $(SRC)/x11-calc.desktop.in $(TARGET)
+#	@install -m644 $(SRC)/x11-calc.desktop.in $(TARGET)/x11-calc.desktop
+	@cp $(SRC)/x11-calc.desktop.in $(TARGET)/x11-calc.desktop
 	@chmod +x $(TARGET)/x11-calc.desktop
 	@for _m in $(MENU_LIST); do \
 		printf "\n[Desktop Action hp$$_m]\nName=hp$$_m\nExec=x11-calc.sh hp$$_m\n">> $(TARGET)/x11-calc.desktop; \
@@ -121,7 +121,7 @@ $(TARGET):
 	@mkdir -p $(TARGET)
 
 clean:
-	@rm  -f $(SRC)/*.o $(TARGET)/x11-calc.desktop*
+	@rm  -f $(SRC)/*.o
 	@test -d $(TARGET) && (cd $(TARGET) && rm -f *) || true
 
 backup: $(FILES)
