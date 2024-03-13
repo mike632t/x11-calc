@@ -50,23 +50,25 @@
 #                    - Fixed error in directory path when TARGET is defined
 #                      on the command line - MT
 #                    - Simplified directory creation - MT
+#  13 Mar 24         - Create  install  recipe to install in given drectory
+#                      add DESTDIR, and rename TARGET as BIN - macmpi
 #
 
 PROGRAM	=  	x11-calc
 
-TARGET		:= ./bin
-SRC		:= ./src
-PRG		:= ./prg
-ROM		:= ./rom
-IMG		:= ./img
+DESTDIR	:=.
 
-SOURCES		= $(wildcard $(SRC)/*.c) $(wildcard $(SRC)/*.h)
+BIN		:= bin
+SRC		:= src
+PRG		:= prg
+ROM		:= rom
+IMG		:= img
+
+SOURCES		= $(wildcard $(SRC)/*.c) $(wildcard $(SRC)/*.h) $(wildcard $(SRC)/*.in)
 SOURCES		+= $(wildcard make.sh*) $(wildcard make.com*) $(wildcard makefile*) $(wildcard $(SRC)/makefile*)
 FILES		= $(SOURCES) $(wildcard $(SRC)/*.c.[0-9]) $(wildcard $(SRC)/*.h.[0-9])
-FILES		+= $(wildcard $(SRC)/*.in) $(wildcard $(SRC)/*.desktop*)
-FILES		+= $(wildcard *.md)
-FILES		+= $(wildcard $(TARGET)/x11-calc-*) $(wildcard *.md) LICENSE
-FILES		+= $(wildcard $(ROM)/*) $(wildcard $(PRG)/*.dat) $(wildcard $(IMG)/x11-calc-*.png)
+FILES		+= $(wildcard *.md) LICENSE
+FILES		+= $(BIN) $(ROM) $(PRG) $(IMG)
 FILES		+= .gitignore .gitattributes
 
 MAKE		= make --no-print-directory -C ./src -f makefile.linux
@@ -76,14 +78,14 @@ WOODSTOCK	= 21 22 25 25c 27 29c
 TOPCAT		= 67
 SPICE		= 31e 32e 33e 33c 34c 37e 38e 38c
 VOYAGER		= 10c 11c 12c 15c 16c
-OTHERS		= launcher desktop
+OTHERS		= launcher
 
 ALL		= $(CLASSIC) $(WOODSTOCK) $(TOPCAT) $(SPICE) $(VOYAGER)
 
 MENU_LIST	= 35 21 25c 29c 31e 32e 33c 34c 10c 11c 12c 15c 16c
 
 
-.PHONY: all classic woodstock topcat spice voyager clean
+.PHONY: clean install
 
 all: clean $(ALL) $(OTHERS)
 
@@ -95,34 +97,35 @@ voyager: clean $(VOYAGER) $(OTHERS)
 
 define prog_template =
 hp$(1): $(1)
-$(1): $(SOURCES) $(TARGET)
-	@$$(MAKE) MODEL=$(1) TARGET=../$(TARGET)
+$(1): $(SOURCES) $(BIN)
+	@$$(MAKE) MODEL=$(1) TARGET=../$(BIN)
 endef
 
 $(foreach calc,$(ALL),$(eval $(call prog_template,$(calc))))
 
-launcher: $(SRC)/x11-calc.sh.in $(TARGET)
-#	@install -m755 $(SRC)/x11-calc.sh.in $(TARGET)/x11-calc.sh
-	@cp $(SRC)/x11-calc.sh.in $(TARGET)/x11-calc.sh
-	@chmod +x $(TARGET)/x11-calc.sh
-	( cd $(TARGET) && ls --color x11-calc.sh )
+launcher: $(SRC)/x11-calc.sh.in $(BIN)
+#	@install -m755 $(SRC)/x11-calc.sh.in $(BIN)/x11-calc.sh
+	@cp $(SRC)/x11-calc.sh.in $(BIN)/x11-calc.sh
+	@chmod +x $(BIN)/x11-calc.sh
+	( cd $(BIN) && ls --color x11-calc.sh )
 
-desktop: $(SRC)/x11-calc.desktop.in $(TARGET)
-#	@install -m644 $(SRC)/x11-calc.desktop.in $(TARGET)/x11-calc.desktop
-	@cp $(SRC)/x11-calc.desktop.in $(TARGET)/x11-calc.desktop
-	@chmod +x $(TARGET)/x11-calc.desktop
+install: $(BIN) $(SRC)/x11-calc.desktop.in
+	@install -Dm644 $(SRC)/x11-calc.desktop.in $(DESTDIR)/share/applications/x11-calc.desktop
 	@for _m in $(MENU_LIST); do \
-		printf "\n[Desktop Action hp$$_m]\nName=hp$$_m\nExec=x11-calc.sh hp$$_m\n">> $(TARGET)/x11-calc.desktop; \
-		sed -i "s/^Actions=.*/&;hp$$_m/"  $(TARGET)/x11-calc.desktop; \
+		printf "\n[Desktop Action hp$$_m]\nName=hp$$_m\nExec=x11-calc.sh hp$$_m\n" >> $(DESTDIR)/share/applications/x11-calc.desktop; \
+		sed -i "s/^Actions=.*/&;hp$$_m/" $(DESTDIR)/share/applications/x11-calc.desktop; \
 	done
-	( cd $(TARGET) && ls --color x11-calc.desktop )
+	@install -Dm644 $(SRC)/x11-calc.svg $(DESTDIR)/share/icons/hicolor/scalable/apps/x11-calc.svg
+	@install -dm755 $(DESTDIR)/share/x11-calc
+	@cp -a $(PRG) $(DESTDIR)/share/x11-calc
+	@cp -a $(BIN) $(DESTDIR) || true
 
-$(TARGET):
-	@mkdir -p $(TARGET)
+$(BIN):
+	@mkdir -p $(BIN)
 
 clean:
 	@rm  -f $(SRC)/*.o
-	@test -d $(TARGET) && (cd $(TARGET) && rm -f *) || true
+	@test -d $(BIN) && (cd $(BIN) && rm -f *) || true
 
 backup: $(FILES)
 	@echo "$(PROGRAM)-`date +'%Y%m%d%H%M'`.tar.gz"; tar -czpf ..\/$(PROGRAM)-`date +'%Y%m%d%H%M'`.tar.gz $(FILES)
