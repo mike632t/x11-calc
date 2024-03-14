@@ -64,6 +64,8 @@
 #                      commit using git - MT
 #  25 Feb 24         - Removed unused defination - MT
 #  10 Mar 24         - Don't redefine target if already defined - MT
+#  14 Mar 24         - Allow SCALE_HEIGHT and SCALE_WIDTH to be passed from
+#                      command line at compile time - MT
 #
 #
 
@@ -110,6 +112,12 @@ all: clean $(TARGET)/$(PROGRAM)-$(MODEL) $(OBJECTS)
 FLAGS	+= -D HP$(MODEL) -D $(LANG)
 ifneq ($(COMMIT),)
 FLAGS	+= -D COMMIT_ID='"[Commit Id : $(COMMIT)]"'
+endif
+ifneq ($(SCALE_WIDTH),)
+FLAGS	+= -D SCALE_WIDTH=$(SCALE_WIDTH)
+endif
+ifneq ($(SCALE_HEIGHT),)
+FLAGS	+= -D SCALE_HEIGHT=$(SCALE_HEIGHT)
 endif
 
 SOURCES += x11-calc-$(MODEL).c
