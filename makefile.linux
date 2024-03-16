@@ -85,7 +85,7 @@ ALL		= $(CLASSIC) $(WOODSTOCK) $(TOPCAT) $(SPICE) $(VOYAGER)
 MENU_LIST	= 35 21 25c 29c 31e 32e 33c 34c 10c 11c 12c 15c 16c
 
 
-.PHONY: clean install
+.PHONY: clean
 
 all: clean $(ALL) $(OTHERS)
 
@@ -104,28 +104,27 @@ endef
 $(foreach calc,$(ALL),$(eval $(call prog_template,$(calc))))
 
 launcher: $(SRC)/x11-calc.sh.in $(BIN)
-#	@install -m755 $(SRC)/x11-calc.sh.in $(BIN)/x11-calc.sh
-	@cp $(SRC)/x11-calc.sh.in $(BIN)/x11-calc.sh
-	@chmod +x $(BIN)/x11-calc.sh
+	@install -m755 $(SRC)/x11-calc.sh.in $(BIN)/x11-calc.sh
 	( cd $(BIN) && ls --color x11-calc.sh )
 
-install: $(BIN) $(SRC)/x11-calc.desktop.in
+install: $(SRC)/x11-calc.desktop.in $(SRC)/x11-calc.svg $(PRG) $(BIN)
 	@install -Dm644 $(SRC)/x11-calc.desktop.in $(DESTDIR)/share/applications/x11-calc.desktop
 	@for _m in $(MENU_LIST); do \
-		printf "\n[Desktop Action hp$$_m]\nName=hp$$_m\nExec=x11-calc.sh hp$$_m\n" >> $(DESTDIR)/share/applications/x11-calc.desktop; \
+		printf "\n[Desktop Action hp$$_m]\nName=• hp$$_m\nExec=x11-calc.sh hp$$_m\n" >> \
+			$(DESTDIR)/share/applications/x11-calc.desktop; \
 		sed -i "s/^Actions=.*/&;hp$$_m/" $(DESTDIR)/share/applications/x11-calc.desktop; \
 	done
 	@install -Dm644 $(SRC)/x11-calc.svg $(DESTDIR)/share/icons/hicolor/scalable/apps/x11-calc.svg
 	@install -dm755 $(DESTDIR)/share/x11-calc
 	@cp -a $(PRG) $(DESTDIR)/share/x11-calc
-	@cp -a $(BIN) $(DESTDIR) || true
+	-@cp -a $(BIN) $(DESTDIR)
 
 $(BIN):
 	@mkdir -p $(BIN)
 
 clean:
 	@rm  -f $(SRC)/*.o
-	@test -d $(BIN) && (cd $(BIN) && rm -f *) || true
+	-@test -d $(BIN) && (cd $(BIN) && rm -f *)
 
 backup: $(FILES)
 	@echo "$(PROGRAM)-`date +'%Y%m%d%H%M'`.tar.gz"; tar -czpf ..\/$(PROGRAM)-`date +'%Y%m%d%H%M'`.tar.gz $(FILES)
