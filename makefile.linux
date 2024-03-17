@@ -53,7 +53,7 @@
 #  13 Mar 24         - Create  install  recipe to install in given drectory
 #                      add DESTDIR, and rename TARGET as BIN - macmpi
 #  16 Mar 24         - Updated list of files (used to backup project) - MT
-#                      Improve GNU conformance with PREFIX - macmpi
+#                      Improve GNU conformance with prefix - macmpi
 #
 
 PROGRAM		=  x11-calc
@@ -65,8 +65,8 @@ ROM			:= rom
 IMG			:= img
 
 DESTDIR		?=
-PREFIX		?= $$HOME/.local
-DPREFIX		:= $(DESTDIR)$(PREFIX)
+prefix		?= $$HOME/.local
+DPREFIX		:= $(DESTDIR)$(prefix)
 
 SOURCES		=  $(wildcard $(SRC)/*.c) $(wildcard $(SRC)/*.h) $(wildcard $(SRC)/*.in)
 
