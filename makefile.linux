@@ -55,9 +55,9 @@
 #  16 Mar 24         - Updated list of files (used to backup project) - MT
 #
 
-PROGRAM	=  	x11-calc
+PROGRAM		=  x11-calc
 
-DESTDIR	:=.
+DESTDIR		:= .
 
 BIN		:= bin
 SRC		:= src
@@ -65,9 +65,9 @@ PRG		:= prg
 ROM		:= rom
 IMG		:= img
 
-SOURCES		= $(wildcard $(SRC)/*.c) $(wildcard $(SRC)/*.h) $(wildcard $(SRC)/*.in)
+SOURCES		=  $(wildcard $(SRC)/*.c) $(wildcard $(SRC)/*.h) $(wildcard $(SRC)/*.in)
 
-FILES		= $(SOURCES)
+FILES		=  $(SOURCES)
 FILES		+= $(wildcard $(SRC)/*.c.[0-9]) $(wildcard $(SRC)/*.h.[0-9])  $(wildcard $(SRC)/*.in.[0-9])
 
 FILES		+= make.sh makefile makefile.linux makefile.osf1
@@ -84,18 +84,18 @@ FILES		+= $(wildcard $(SRC)/*.png) $(wildcard $(SRC)/*.ico)
 FILES		+= $(wildcard *.md) $(wildcard *.md.[0-9]) LICENSE
 FILES		+= .gitignore .gitattributes
 
-MAKE		= make --no-print-directory -C ./src -f makefile.linux
+MAKE		=  make --no-print-directory -C ./src -f makefile.linux
 
-CLASSIC		= 35 45 70 80
-WOODSTOCK	= 21 22 25 25c 27 29c
-TOPCAT		= 67
-SPICE		= 31e 32e 33e 33c 34c 37e 38e 38c
-VOYAGER		= 10c 11c 12c 15c 16c
-OTHERS		= launcher
+CLASSIC		=  35 45 70 80
+WOODSTOCK	=  21 22 25 25c 27 29c
+TOPCAT		=  67
+SPICE		=  31e 32e 33e 33c 34c 37e 38e 38c
+VOYAGER		=  10c 11c 12c 15c 16c
+OTHERS		=  launcher
 
-ALL		= $(CLASSIC) $(WOODSTOCK) $(TOPCAT) $(SPICE) $(VOYAGER)
+ALL		=  $(CLASSIC) $(WOODSTOCK) $(TOPCAT) $(SPICE) $(VOYAGER)
 
-MENU_LIST	= 35 21 25c 29c 31e 32e 33c 34c 10c 11c 12c 15c 16c
+MENU_LIST	=  35 21 25c 29c 31e 32e 33c 34c 10c 11c 12c 15c 16c
 
 
 .PHONY: clean
