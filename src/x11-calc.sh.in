@@ -57,6 +57,7 @@
 #  09 Mar 24         - Can launch a specific emulator from the command line
 #                      using either hp<model_no> or just <model_no> (aligns
 #                      behaviour with makefile) - MT
+#  16 Mar 24         - Better -r option handling & give error clue - macmpi
 #
 
 SUCCESS=0
@@ -81,17 +82,17 @@ _launch() {
 
    _model="`echo $MODEL | sed 's/^hp//'`"
 
+   [ -n "$CMD_OPTS" ] && OPTIONS="$CMD_OPTS" # Allow command line to override options
+
    if echo "$MODEL" | grep -qwE "$_voyager"
    then
-      # if OPTIONS does not point to a rom file, set expected option to default location
-      # no need to check file existence: app will error-out with proper message if missing
-      if echo "$OPTIONS" | grep -Fvq ".rom"
+      # If OPTIONS does not contain a rom file option, set expected option to default path
+      # No need to check file existence: core_app does its own error checking
+      if echo "$OPTIONS" | grep -qv "\-r .*"
       then
-         OPTIONS="-r ${_data_path}x11-calc-${_model}.rom"
+         OPTIONS="$OPTIONS -r ${_data_path}x11-calc-${_model}.rom"
       fi
    fi
-
-   [ -n "$CMD_OPTS" ] && OPTIONS="$CMD_OPTS" # Allow command line to override options
 
    _core_app="/x11-calc-$_model"
    echo "`basename $0`: Executing '`dirname "$0"`"$_core_app $OPTIONS"'."
@@ -102,12 +103,13 @@ _launch() {
       `exit $ENOCMD`
    fi
 
-
-   case $? in
+   _err=$?
+   case $_err in
+      # NOTE: extra spaces characters in messgaes below are intended for seach & replace by newline for zenity
       $SUCCESS)
          ;;
       $EINVAL)
-         _errmsg="Invalid operand or parameter '$OPTIONS'."
+         _errmsg="Invalid operand or parameter:  '$OPTIONS'"
          ;;
       $ENOFNT)
          _fonts="'xfonts-base' or equivalent"
@@ -116,10 +118,11 @@ _launch() {
          grep -sqE "ubuntu|debian" "${_f_os_release}" && _fonts="'xfonts-base'"
          grep -sq "fedora" "${_f_os_release}" && _fonts="'xorg-x11-fonts-base' or 'xorg-x11-fonts-misc'"
          grep -sq "gentoo" "${_f_os_release}" && _fonts="'font-misc-misc'"
-         _errmsg="Please install missing fonts in $_fonts."
+         _errmsg="Please install missing fonts from:  $_fonts."
          ;;
       $ENOENT)
-         _errmsg="Missing ROM file!"
+         _errmsg="`echo "$OPTIONS" | awk -F '-r ' '{ print $2 }' | awk -F '-. ' '{ print $1 }'`"
+         _errmsg="Missing ROM file!    Please provide a rom file as:  '$_errmsg'  Or set a -r option with proper path in setup."
          ;;
       $ENODATA)
          _errmsg="Empty ROM file!"
@@ -136,10 +139,14 @@ _launch() {
 
    if [ -n "$_errmsg" ]; then
       if _has_zenity; then
-         zenity --height=100 --width=300 --error --text="$_errmsg"
+         #  replace multiple spaces by newline in zenity messages
+         _zerrmsg="$( echo "$_errmsg" | sed 's|\s\s|\n|g' )"
+         zenity --height=100 --width=400 --error --text="$_zerrmsg"
       fi
-      echo "`basename $0`: $_errmsg"
+      printf '%s\n' "`basename $0`: $_errmsg" >&2
    fi
+
+   return $_err
 }
 
 

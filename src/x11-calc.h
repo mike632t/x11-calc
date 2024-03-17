@@ -58,6 +58,8 @@
  * 18 Feb 24         - Don't redefine COMMIT_ID if already defined - MT
  * 04 Mar 24         - Check  that  all error codes are defined and  define
  *                     any that are not - MT
+ * 14 Mar 24         - Allow SCALE_HEIGHT and SCALE_WIDTH to be passed from
+ *                     command line at compile time - MT
  *
  * TO DO :           -
  */
@@ -66,11 +68,23 @@
 #endif
 
 #if defined(HP35) || defined(HP80) || defined(HP45) || defined(HP70) || defined(HP55) || defined(HP10) || defined(HP67)
+
+#if !defined(SCALE_WIDTH)
 #define SCALE_WIDTH     1.15
+#endif
+#if !defined(SCALE_HEIGHT)
 #define SCALE_HEIGHT    1
+#endif
+
 #else
+
+#if !defined(SCALE_WIDTH)
 #define SCALE_WIDTH     1
+#endif
+#if !defined(SCALE_HEIGHT)
 #define SCALE_HEIGHT    1
+#endif
+
 #endif
 
 /** #define __TIME__     "00:00:00" /* Release only */
