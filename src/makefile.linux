@@ -24,36 +24,36 @@
 #
 #  https://www.gnu.org/software/make/manual/html_node/Prerequisite-Types.html
 #
-#  01 May 13   0.1   - Initial version - MT
-#  02 Jul 13         - Separated  code  and headers for button  and  colour
+#   1 May 13         - Initial version - MT
+#   2 Jul 13         - Separated  code  and headers for button  and  colour
 #                      manipulation into separate files - MT
-#  09 Mar 14   0.2   - Separated  code for different calculator models into
+#   9 Mar 14         - Separated  code for different calculator models into
 #                      a  separate files (instead of using a single  source
 #                      file with conditional compilation - MT
-#  27 Sep 20   0.3   - Added make clean option - MT
-#  08 Aug 21   0.4   - Removed x11-calc-format - MT
-#  11 Aug 21   0.5   - Backup created in parent folder - MT
-#  12 Sep 21   0.6   - Added '-no-pie' option so that the resulting program
+#  27 Sep 20         - Added make clean option - MT
+#   8 Aug 21         - Removed x11-calc-format - MT
+#  11 Aug 21         - Backup created in parent folder - MT
+#  12 Sep 21         - Added '-no-pie' option so that the resulting program
 #                      can be executed by double clicking on it - MT
-#  23 Sep 21   0.7   - Model number can now be selected just by setting the
+#  23 Sep 21         - Model number can now be selected just by setting the
 #                      MODEL number in this file - MT
-#  26 Sep 21  0.8    - Added images to list of files (to backup) - MT
-#  30 Sep 21  0.9    - Builds label and switch 'classes' - MT
-#   3 Oct 21  0.10   - Fixed issue with backup file name - MT
-#   9 Oct 21  0.11   - Moved source code and executable files into separate
+#  26 Sep 21         - Added images to list of files (to backup) - MT
+#  30 Sep 21         - Builds label and switch 'classes' - MT
+#   3 Oct 21         - Fixed issue with backup file name - MT
+#   9 Oct 21         - Moved source code and executable files into separate
 #                      folders - MT
 #  21 Jan 22         - Moved text messages to a separate file  - MT
 #  22 jan 22         - Added a symbol for the current language - MT
 #  24 Feb 22         - Clean now deletes ALL object files - MT
 #  31 Mar 22         - Added additional libs and flags that are needed when
 #                      building the project on NetBSD - MT
-#  15 jan 23         - Delete execuitable before re-compiling - MT
+#  15 Jan 23         - Delete execuitable before re-compiling - MT
 #  18 Jan 23         - Allow VERBOSE and DEBUG options to be specified from
 #                      the command line - MT
 #                    - Conditionally sets operating specific options (don't
 #                      need to comment them out when not required) - MT
 #  26 Mar 23         - Set compiler specific flags for gcc - MT
-#  01 May 23         - Fixed ordering of compiler options - MT
+#   1 May 23         - Fixed ordering of compiler options - MT
 #  22 Sep 23         - Added build options for MacOS - MT
 #   5 Oct 23         - Creates target folder if required - MT
 #                    - Lists the execuitable files instead of just the file
@@ -66,6 +66,7 @@
 #  10 Mar 24         - Don't redefine target if already defined - MT
 #  14 Mar 24         - Allow SCALE_HEIGHT and SCALE_WIDTH to be passed from
 #                      command line at compile time - MT
+#  17 Mar 24         - Removed OS specific settings for other OSs - MT
 #
 #
 
@@ -87,16 +88,6 @@ endif
 LIBS	= -lX11 -lm
 FLAGS	= -fcommon -Wall -pedantic -std=gnu99
 FLAGS	+= -Wno-comment -Wno-deprecated-declarations -Wno-builtin-macro-redefined
-
-# Operating system specific settings
-ifeq ($(UNAME), NetBSD) # NetBSD..
-LIBS	+= -lcompat
-FLAGS	+= -I /usr/X11R7/include/ -L /usr/X11R7/lib/ -R /usr/X11R7/lib
-endif
-
-ifeq ($(UNAME), Darwin) # MacOS
-FLAGS	+= -I /opt/X11/include/X11/ -L /opt/X11/lib/
-endif
 
 # Compiler specific settings
 ifeq ($(CC), cc)
