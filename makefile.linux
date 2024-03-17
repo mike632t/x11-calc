@@ -52,23 +52,39 @@
 #                    - Simplified directory creation - MT
 #  13 Mar 24         - Create  install  recipe to install in given drectory
 #                      add DESTDIR, and rename TARGET as BIN - macmpi
+#  16 Mar 24         - Updated list of files (used to backup project) - MT
+#                      Improve GNU conformance with PREFIX - macmpi
 #
 
-PROGRAM	=  	x11-calc
+PROGRAM		=  x11-calc
 
-DESTDIR	:=.
+BIN			:= bin
+SRC			:= src
+PRG			:= prg
+ROM			:= rom
+IMG			:= img
 
-BIN		:= bin
-SRC		:= src
-PRG		:= prg
-ROM		:= rom
-IMG		:= img
+DESTDIR		?=
+PREFIX		?= $$HOME/.local
+DPREFIX		:= $(DESTDIR)$(PREFIX)
 
-SOURCES		= $(wildcard $(SRC)/*.c) $(wildcard $(SRC)/*.h) $(wildcard $(SRC)/*.in)
-SOURCES		+= $(wildcard make.sh*) $(wildcard make.com*) $(wildcard makefile*) $(wildcard $(SRC)/makefile*)
-FILES		= $(SOURCES) $(wildcard $(SRC)/*.c.[0-9]) $(wildcard $(SRC)/*.h.[0-9])
-FILES		+= $(wildcard *.md) LICENSE
-FILES		+= $(BIN) $(ROM) $(PRG) $(IMG)
+SOURCES		=  $(wildcard $(SRC)/*.c) $(wildcard $(SRC)/*.h) $(wildcard $(SRC)/*.in)
+
+FILES		=  $(SOURCES)
+FILES		+= $(wildcard $(SRC)/*.c.[0-9]) $(wildcard $(SRC)/*.h.[0-9])  $(wildcard $(SRC)/*.in.[0-9])
+
+FILES		+= make.sh makefile makefile.linux makefile.osf1
+FILES		+= $(wildcard make.sh.[0-9]) $(wildcard makefile.[0-9]) $(wildcard makefile.linux.[0-9]) $(wildcard makefile.osf1.[0-9])
+
+FILES		+= $(SRC)/make.com $(SRC)/makefile.linux $(SRC)/makefile.osf1
+FILES		+= $(wildcard $(SRC)/make.com.[0-9]) $(wildcard $(SRC)/makefile.linux.[0-9]) $(wildcard $(SRC)/makefile.osf1.[0-9])
+
+FILES		+= $(wildcard $(ROM)/*.rom) $(wildcard $(ROM)/*.rom.[0-9])
+FILES		+= $(wildcard $(PRG)/*.dat) $(wildcard $(PRG)/*.dat.[0-9])
+FILES		+= $(wildcard $(IMG)/*.rom) $(wildcard $(IMG)/*.png.[0-9])
+FILES		+= $(wildcard $(SRC)/*.png) $(wildcard $(SRC)/*.ico)
+
+FILES		+= $(wildcard *.md) $(wildcard *.md.[0-9]) LICENSE
 FILES		+= .gitignore .gitattributes
 
 MAKE		= make --no-print-directory -C ./src -f makefile.linux
@@ -108,19 +124,20 @@ launcher: $(SRC)/x11-calc.sh.in $(BIN)
 	( cd $(BIN) && ls --color x11-calc.sh )
 
 install: $(SRC)/x11-calc.desktop.in $(SRC)/x11-calc.svg $(PRG) $(BIN)
-	@install -Dm644 $(SRC)/x11-calc.desktop.in $(DESTDIR)/share/applications/x11-calc.desktop
+	@install -d $(DPREFIX)
+	@install -Dm644 $(SRC)/x11-calc.desktop.in $(DPREFIX)/share/applications/x11-calc.desktop
 	@for _m in $(MENU_LIST); do \
 		printf "\n[Desktop Action hp$$_m]\nName=• hp$$_m\nExec=x11-calc.sh hp$$_m\n" >> \
-			$(DESTDIR)/share/applications/x11-calc.desktop; \
-		sed -i "s/^Actions=.*/&;hp$$_m/" $(DESTDIR)/share/applications/x11-calc.desktop; \
+			$(DPREFIX)/share/applications/x11-calc.desktop; \
+		sed -i "s/^Actions=.*/&;hp$$_m/" $(DPREFIX)/share/applications/x11-calc.desktop; \
 	done
-	@install -Dm644 $(SRC)/x11-calc.svg $(DESTDIR)/share/icons/hicolor/scalable/apps/x11-calc.svg
-	@install -dm755 $(DESTDIR)/share/x11-calc
-	@cp -a $(PRG) $(DESTDIR)/share/x11-calc
-	-@cp -a $(BIN) $(DESTDIR)
+	@install -Dm644 $(SRC)/x11-calc.svg $(DPREFIX)/share/icons/hicolor/scalable/apps/x11-calc.svg
+	@install -d $(DPREFIX)/share/x11-calc
+	@cp -a $(PRG) $(DPREFIX)/share/x11-calc
+	-@cp -a $(BIN) $(DPREFIX)
 
 $(BIN):
-	@mkdir -p $(BIN)
+	@install -d $(BIN)
 
 clean:
 	@rm  -f $(SRC)/*.o
