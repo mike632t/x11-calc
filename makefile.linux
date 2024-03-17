@@ -60,11 +60,11 @@
 
 PROGRAM		=  x11-calc
 
-BIN			:= bin
-SRC			:= src
-PRG			:= prg
-ROM			:= rom
-IMG			:= img
+BIN		:= bin
+SRC		:= src
+PRG		:= prg
+ROM		:= rom
+IMG		:= img
 
 DESTDIR		?=
 prefix		?= $$HOME/.local
@@ -103,7 +103,6 @@ OTHERS		=  launcher
 ALL		=  $(CLASSIC) $(WOODSTOCK) $(TOPCAT) $(SPICE) $(VOYAGER)
 
 MENU_LIST	=  35 21 25c 29c 31e 32e 33c 34c 10c 11c 12c 15c 16c
-
 
 .PHONY: clean
 
