@@ -87,9 +87,9 @@ FLAGS	=  -fcommon -Wall -pedantic -std=gnu99
 FLAGS	+= -Wno-comment -Wno-deprecated-declarations -Wno-builtin-macro-redefined
 
 # Operating system specific settings
-#LIBS	+= -lcompat
+LIBS	+= -lcompat
 FLAGS	+= -Wno-variadic-macros
-#FLAGS	+= -I /usr/X11R7/include/ -L /usr/X11R7/lib/ -R /usr/X11R7/lib
+FLAGS	+= -I /usr/X11R7/include/ -L /usr/X11R7/lib/ -R /usr/X11R7/lib
 
 LIBS	+= -no-pie
 FLAGS	+= -ansi
