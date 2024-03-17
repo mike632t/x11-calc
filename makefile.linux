@@ -53,6 +53,8 @@
 #  13 Mar 24         - Create  install  recipe to install in given drectory
 #                      add DESTDIR, and rename TARGET as BIN - macmpi
 #  16 Mar 24         - Updated list of files (used to backup project) - MT
+#  17 Mar 24         - Fail early if source and destination directories are
+#                      the same - MT
 #
 
 PROGRAM		=  x11-calc
@@ -70,11 +72,14 @@ SOURCES		=  $(wildcard $(SRC)/*.c) $(wildcard $(SRC)/*.h) $(wildcard $(SRC)/*.in
 FILES		=  $(SOURCES)
 FILES		+= $(wildcard $(SRC)/*.c.[0-9]) $(wildcard $(SRC)/*.h.[0-9])  $(wildcard $(SRC)/*.in.[0-9])
 
-FILES		+= make.sh makefile makefile.linux makefile.osf1
-FILES		+= $(wildcard make.sh.[0-9]) $(wildcard makefile.[0-9]) $(wildcard makefile.linux.[0-9]) $(wildcard makefile.osf1.[0-9])
+FILES		+= make.sh makefile $(SRC)/make.com
+FILES		+= $(wildcard make.sh.[0-9]) $(wildcard makefile.[0-9]) $(wildcard $(SRC)/make.com.[0-9])
 
-FILES		+= $(SRC)/make.com $(SRC)/makefile.linux $(SRC)/makefile.osf1
-FILES		+= $(wildcard $(SRC)/make.com.[0-9]) $(wildcard $(SRC)/makefile.linux.[0-9]) $(wildcard $(SRC)/makefile.osf1.[0-9])
+FILES		+= makefile.linux makefile.osf1 makefile.netbsd makefile.darwin
+FILES		+= $(wildcard makefile.linux.[0-9]) $(wildcard makefile.osf1.[0-9])
+
+FILES		+= $(SRC)/makefile.linux $(SRC)/makefile.osf1 $(SRC)/makefile.netbsd $(SRC)/makefile.darwin
+FILES		+= $(wildcard $(SRC)/makefile.linux.[0-9]) $(wildcard $(SRC)/makefile.osf1.[0-9]) $(wildcard $(SRC)/makefile.netbsd.[0-9]) $(wildcard $(SRC)/makefile.darwin.[0-9])
 
 FILES		+= $(wildcard $(ROM)/*.rom) $(wildcard $(ROM)/*.rom.[0-9])
 FILES		+= $(wildcard $(PRG)/*.dat) $(wildcard $(PRG)/*.dat.[0-9])
@@ -117,10 +122,10 @@ endef
 $(foreach calc,$(ALL),$(eval $(call prog_template,$(calc))))
 
 launcher: $(SRC)/x11-calc.sh.in $(BIN)
-	@install -m755 $(SRC)/x11-calc.sh.in $(BIN)/x11-calc.sh
-	( cd $(BIN) && ls --color x11-calc.sh )
+	@install -m755 $(SRC)/x11-calc.sh.in $(BIN)/x11-calc.sh && (cd $(BIN) && ls --color x11-calc.sh)
 
 install: $(SRC)/x11-calc.desktop.in $(SRC)/x11-calc.svg $(PRG) $(BIN)
+	@cp -a $(BIN) $(DESTDIR) # Fail early if source and destination directories are the same
 	@install -Dm644 $(SRC)/x11-calc.desktop.in $(DESTDIR)/share/applications/x11-calc.desktop
 	@for _m in $(MENU_LIST); do \
 		printf "\n[Desktop Action hp$$_m]\nName=• hp$$_m\nExec=x11-calc.sh hp$$_m\n" >> \
@@ -130,7 +135,6 @@ install: $(SRC)/x11-calc.desktop.in $(SRC)/x11-calc.svg $(PRG) $(BIN)
 	@install -Dm644 $(SRC)/x11-calc.svg $(DESTDIR)/share/icons/hicolor/scalable/apps/x11-calc.svg
 	@install -dm755 $(DESTDIR)/share/x11-calc
 	@cp -a $(PRG) $(DESTDIR)/share/x11-calc
-	-@cp -a $(BIN) $(DESTDIR)
 
 $(BIN):
 	@mkdir -p $(BIN)
