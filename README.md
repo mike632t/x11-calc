@@ -23,13 +23,19 @@ More [screenshots](./img/#top)
 
 ### Latest News
 
+18 Mar 24
+   - Added an install option to the makefile (by default the installer will
+     use `$HOME/.local` if it exists, but it is possible to specify another
+     directory by setting the directory `prefix`).
+   - Embedded missing firmware.
+
 24 Feb 24
    - By default the application will attempt to use the X11 base fonts. But
      if these are not available it will try to select an suitable alternate
      font instead from a predefined list.
 
      For all the fonts to be rendered as intended users should ensure  that
-     the X11 base fonts are installed (see prerequsites).
+     the X11 base fonts are installed (see prerequisites).
 
 16 Feb 24
    - For UNIX based systems the default location used to store the state of
@@ -55,40 +61,54 @@ More [screenshots](./img/#top)
 
 To  build the simulator on Linux check that you have all the  prerequisites
 installed  then  download the source code from github and unzip it  (a  new
-folder  will  be created to automatically).  Then change directory  to  the
-new  folder run 'make all' build all the simulators.
+folder  will  be created to automatically).
 
 e.g:
 ```
 $ wget https://github.com/mike632t/x11-calc/archive/refs/heads/stable.zip
 $ unzip x11-calc-stable.zip
+```
+Then change directory to the new folder.
+```
 $ cd x11-calc-stable
-$ make -f makefile.linux all
+```
+The to compile the emulators on a Linux system you just need to invoke make
+or if you are using another UNIX derivative you can use a make script which
+will attempt to invoke make with the correct makefile for your system.
 
+```
+$ make
+
+OR
+
+$ ./make.sh
+```
+Alternatively you can invoke the appropriate make file directly.
+```
+$ make -f makefile.osf1
+```
+It is also possible to compile a single emulator by specifying the model on
+the command line
+```
+$ make -f makefile.linux hp29c
+
+OR
+
+$ ./make.sh hp29c
+```
+By default the executable files will be created in the `bin` directory.
+```
 $ ./bin/x11-calc-29c
 x11-calc-29c: Version 0.10 [Commit ID: 399d546] 01 Nov 23 23:53:00 (Build: 0114)
 ROM Size : 4096 words
 ```
+
 If more than one C compiler is installed or if gcc is not available you can
 specify which one to use from the command line.
 ```
 $ make -f makefile.linux CC=clang VERBOSE=1 all
 
 $ make -f makefile.linux  CC=tcc VERBOSE=1 all
-```
-
-On  Tru64 UNIX a specific make file is used, and the execuitable files  are
-saved in the same folder as the source.
-
-e.g:
-```
-$ unzip x11-calc-stable.zip
-$ cd x11-calc-stable
-$ make -f makefile.tru64 all
-
-$ ./src/x11-calc-29c
-x11-calc-29c: Version 0.10 [Commit ID: 399d546] 01 Nov 23 23:53:00 (Build: 0114)
-ROM Size : 4096 words
 ```
 
 On VMS unzip the source code archive, then run the DCL `make` script.
@@ -104,7 +124,32 @@ x11-calc-29c: Version 0.10 [Commit ID: 399d546] 02 Nov 23 23:52:11 (Build: 0114)
 ROM Size : 4096 words
 ```
 
+
+### Installing
+
+On Linux systems after the compilation is complete you can use the makefile
+to install the emulator locally.
+
+By default the installer will use the`$HOME/.local` if it exists, but it is
+possible to specify another directory by setting the directory `prefix`.
+
+```
+$ make install
+
+OR
+
+$ make install prefix='/usr'
+```
+
+### Using Flatpak
+
+If you don't want to download an compile the sources your self the emulator
+is also  available on [Flathub](https://flathub.org/apps/io.github.mike632t.x11-calc) and can be installed using Flatpak.
+
+
 ### Tested
+
+The emulators have been tested on the following systems:
 
 - Debian 12 (Bookworm), clang 14.0.6, x64 + arm64
 
