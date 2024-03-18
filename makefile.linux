@@ -126,8 +126,8 @@ launcher: $(SRC)/x11-calc.sh.in $(BIN)
 	@install -m755 $(SRC)/x11-calc.sh.in $(BIN)/x11-calc.sh && (cd $(BIN) && ls --color x11-calc.sh)
 
 install: $(SRC)/x11-calc.desktop.in $(SRC)/x11-calc.svg $(PRG) $(BIN)
-	@cp -a $(BIN) $(DESTDIR)$(prefix) # Fail early if source and destination directories are the same
 	@install -d $(DESTDIR)$(prefix)
+	@cp -a $(BIN) $(DESTDIR)$(prefix) # Fail early if source and destination directories are the same
 	@install -Dm644 $(SRC)/x11-calc.desktop.in $(DESTDIR)$(prefix)/share/applications/x11-calc.desktop
 	@for _m in $(MENU_LIST); do \
 		printf "\n[Desktop Action hp$$_m]\nName=• hp$$_m\nExec=x11-calc.sh hp$$_m\n" >> \
