@@ -58,6 +58,7 @@
 #                      using either hp<model_no> or just <model_no> (aligns
 #                      behaviour with makefile) - MT
 #  16 Mar 24         - Better -r option handling & give error clue - macmpi
+#  18 Mar 24         - No need to load ROM for voyager models - MT
 #
 
 SUCCESS=0
@@ -84,15 +85,15 @@ _launch() {
 
    [ -n "$CMD_OPTS" ] && OPTIONS="$CMD_OPTS" # Allow command line to override options
 
-   if echo "$MODEL" | grep -qwE "$_voyager"
-   then
-      # If OPTIONS does not contain a rom file option, set expected option to default path
-      # No need to check file existence: core_app does its own error checking
-      if echo "$OPTIONS" | grep -qv "\-r .*"
-      then
-         OPTIONS="$OPTIONS -r ${_data_path}x11-calc-${_model}.rom"
-      fi
-   fi
+   # if echo "$MODEL" | grep -qwE "$_voyager"
+   # then
+   #    # If OPTIONS does not contain a rom file option, set expected option to default path
+   #    # No need to check file existence: core_app does its own error checking
+   #    if echo "$OPTIONS" | grep -qv "\-r .*"
+   #    then
+   #       OPTIONS="$OPTIONS -r ${_data_path}x11-calc-${_model}.rom"
+   #    fi
+   # fi
 
    _core_app="/x11-calc-$_model"
    echo "`basename $0`: Executing '`dirname "$0"`"$_core_app $OPTIONS"'."
