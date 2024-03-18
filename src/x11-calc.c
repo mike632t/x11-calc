@@ -273,6 +273,7 @@
  * 09 Mar 24         - Updated makefile and screenshots - MT
  * 14 Mar 24         - Allow SCALE_HEIGHT and SCALE_WIDTH to be passed from
  *                     command line at compile time - MT
+ * 18 Mar 24         - Embedded missing firmware - MT
  *
  *
  * To Do             - Parse command line in a separate routine.
@@ -284,9 +285,9 @@
  */
 
 #define NAME           "x11-calc"
-#define VERSION        "0.12"
-#define BUILD          "0135"
-#define DATE           "14 Mar 24"
+#define VERSION        "0.14"
+#define BUILD          "0136"
+#define DATE           "18 Mar 24"
 #define AUTHOR         "MT"
 
 #define INTERVAL 25    /* Number of ticks to execute before updating the display */
