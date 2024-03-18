@@ -56,6 +56,7 @@
 #                      Improve GNU conformance with prefix - macmpi
 #  17 Mar 24         - Fail early if source and destination directories are
 #                      the same - MT
+#  18 Mar 24         - Test that $(prefix) exists before installing - MT
 #
 
 PROGRAM		=  x11-calc
@@ -126,17 +127,20 @@ launcher: $(SRC)/x11-calc.sh.in $(BIN)
 	@install -m755 $(SRC)/x11-calc.sh.in $(BIN)/x11-calc.sh && (cd $(BIN) && ls --color x11-calc.sh)
 
 install: $(SRC)/x11-calc.desktop.in $(SRC)/x11-calc.svg $(PRG) $(BIN)
-	@cp -a $(BIN) $(DESTDIR)$(prefix) # Fail early if source and destination directories are the same
+	@test -d $(prefix) || echo "'$(prefix)' does not exist."
+	@test -d $(prefix)
 	@install -d $(DESTDIR)$(prefix)
+	@cp -a $(BIN) $(DESTDIR)$(prefix)/ # Fail early if source and destination directories are the same
+	@install -d $(DESTDIR)$(prefix)/share/applications # Create directory
 	@install -Dm644 $(SRC)/x11-calc.desktop.in $(DESTDIR)$(prefix)/share/applications/x11-calc.desktop
-	@for _m in $(MENU_LIST); do \
-		printf "\n[Desktop Action hp$$_m]\nName=• hp$$_m\nExec=x11-calc.sh hp$$_m\n" >> \
+	@for _item in $(MENU_LIST); do \
+		printf "\n[Desktop Action hp$$_item]\nName=• hp$$_item\nExec=x11-calc.sh hp$$_item\n" >> \
 			$(DESTDIR)$(prefix)/share/applications/x11-calc.desktop; \
-		sed -i "s/^Actions=.*/&;hp$$_m/" $(DESTDIR)$(prefix)/share/applications/x11-calc.desktop; \
+		sed -i "s/^Actions=.*/&;hp$$_item/" $(DESTDIR)$(prefix)/share/applications/x11-calc.desktop; \
 	done
 	@install -Dm644 $(SRC)/x11-calc.svg $(DESTDIR)$(prefix)/share/icons/hicolor/scalable/apps/x11-calc.svg
 	@install -d $(DESTDIR)$(prefix)/share/x11-calc
-	@cp -a $(PRG) $(DESTDIR)$(prefix)/share/x11-calc
+	@cp -a $(PRG) $(DESTDIR)$(prefix)/share/x11-calc/
 #	-@cp -a $(BIN) $(DESTDIR)$(prefix)
 
 $(BIN):
