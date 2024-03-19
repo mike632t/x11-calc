@@ -59,6 +59,7 @@
 #                      behaviour with makefile) - MT
 #  16 Mar 24         - Better -r option handling & give error clue - macmpi
 #  18 Mar 24         - No need to load ROM for voyager models - MT
+#  19 Mar 24         - Dynamically split models list in conf file -- macmpi
 #
 
 SUCCESS=0
@@ -81,21 +82,9 @@ _launch() {
 
    if [ -z "$MODEL" ]; then exit 0; fi
 
-   _model="`echo $MODEL | sed 's/^hp//'`"
-
    [ -n "$CMD_OPTS" ] && OPTIONS="$CMD_OPTS" # Allow command line to override options
 
-   # if echo "$MODEL" | grep -qwE "$_voyager"
-   # then
-   #    # If OPTIONS does not contain a rom file option, set expected option to default path
-   #    # No need to check file existence: core_app does its own error checking
-   #    if echo "$OPTIONS" | grep -qv "\-r .*"
-   #    then
-   #       OPTIONS="$OPTIONS -r ${_data_path}x11-calc-${_model}.rom"
-   #    fi
-   # fi
-
-   _core_app="/x11-calc-$_model"
+   _core_app="/x11-calc-$MODEL"
    echo "`basename $0`: Executing '`dirname "$0"`"$_core_app $OPTIONS"'."
 
    if [ -f "`dirname "$0"`"$_core_app ]; then
@@ -216,9 +205,6 @@ _setup() {
 if [ -d "$XDG_DATA_HOME" ] # Does XDG_DATA_HOME exist
 then
    mkdir -p "${XDG_DATA_HOME}/x11-calc" # If it does create the application data directory
-   _data_path="$XDG_DATA_HOME/x11-calc/"
-else
-   _data_path="$HOME/."
 fi
 
 if [ -d "$XDG_CONFIG_HOME" ] # Does XDG_CONFIG_HOME exist
@@ -235,19 +221,16 @@ _has_zenity() { return "$has_zenity"; }
 
 if [ ! -f "$_f_conf" ]
 then
-   if ! _has_zenity; then echo "\n`basename $0`: Did you know that installing 'zenity' will give you a graphical setup interface.\n"; fi
+   ! _has_zenity && echo "\n`basename $0`: Did you know that installing 'zenity' will give you a graphical setup interface?\n"
    mkdir -p "`dirname "${_f_conf}"`"
    cat <<-EOF >"$_f_conf"
 #
 # Select which emulator to run by setting the MODEL to one
 # of the following:
 #
-# classic: $_classic
-# woodstock: $_woodstock
-# topcat: $_topcat
-# spice: $_spice
-# voyager: $_voyager
-#
+EOF
+   echo "$_models" | sed 's/\(\([^|]*|\)\{8\}\)/\1\n/g' | sed 's/^/# /' >>"$_f_conf"
+   cat <<-EOF >>"$_f_conf"
 
 MODEL=""
 OPTIONS=""
@@ -265,6 +248,7 @@ fi
 echo "`basename $0`: Using '$_f_conf'"
 
 . "$_f_conf"
+MODEL="`echo "$MODEL" | sed 's/^hp//'`"
 
 if [ -z "$MODEL" ]; then
    echo "`basename $0`: Model not defined - configure using '$0 --setup'"
@@ -272,8 +256,7 @@ fi
 
 if echo "$1" | grep -qwE "$_models" || echo "hp$1" | grep -qwE "$_models"
 then
-   MODEL="$1"
-   echo "$MODEL" | grep -qwE "$_models" || MODEL="hp$MODEL"
+   MODEL="`echo "$1" | sed 's/^hp//'`"
    shift
    CMD_OPTS="$*"
    _launch
