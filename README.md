@@ -130,7 +130,7 @@ ROM Size : 4096 words
 On Linux systems after the compilation is complete you can use the makefile
 to install the emulator locally.
 
-By default the installer will use the`$HOME/.local` if it exists, but it is
+By default the installer will use `$HOME/.local` if it exists, but it is
 possible to specify another directory by setting the directory `prefix`.
 
 ```
@@ -138,7 +138,12 @@ $ make install
 
 OR
 
-$ make install prefix='/usr'
+$ make install prefix=/usr
+```
+
+Installer also supports staged installs in a custom directory set by DESTDIR
+```
+make DESTDIR=/tmp/staging install
 ```
 
 ### Using Flatpak
@@ -275,8 +280,6 @@ When in trace mode a jump to the same instruction produces no output.
 
 
 ### ROM Images
-
-No ROM images are included for the HP10C, HP11C, HP12C, HP15C, and HP16C.
 
 The '-r <filename>' command line option provides the ability to use the ROM
 contents held in an separate file.
