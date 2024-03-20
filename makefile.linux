@@ -58,6 +58,7 @@
 #                      the same - MT
 #  18 Mar 24         - Test that $(prefix) exists before installing - MT
 #  20 Mar 24         - Rename launcher into x11-calc - macmpi
+#                    - Updated files - MT
 #
 
 PROGRAM		=  x11-calc
@@ -85,10 +86,12 @@ FILES		+= $(wildcard makefile.linux.[0-9]) $(wildcard makefile.osf1.[0-9])
 FILES		+= $(SRC)/makefile.linux $(SRC)/makefile.osf1 $(SRC)/makefile.netbsd $(SRC)/makefile.darwin
 FILES		+= $(wildcard $(SRC)/makefile.linux.[0-9]) $(wildcard $(SRC)/makefile.osf1.[0-9]) $(wildcard $(SRC)/makefile.netbsd.[0-9]) $(wildcard $(SRC)/makefile.darwin.[0-9])
 
-FILES		+= $(wildcard $(ROM)/*.rom) $(wildcard $(ROM)/*.rom.[0-9])
-FILES		+= $(wildcard $(PRG)/*.dat) $(wildcard $(PRG)/*.dat.[0-9])
-FILES		+= $(wildcard $(IMG)/*.rom) $(wildcard $(IMG)/*.png.[0-9])
-FILES		+= $(wildcard $(SRC)/*.png) $(wildcard $(SRC)/*.ico)
+FILES		+= $(wildcard $(ROM)/x11-calc*.rom) $(wildcard $(ROM)/x11-calc*.rom.[0-9])
+FILES		+= $(wildcard $(PRG)/x11-calc*.dat) $(wildcard $(PRG)/x11-calc*.dat.[0-9])
+FILES		+= $(wildcard $(IMG)/x11-calc*.png) $(wildcard $(IMG)/x11-calc*.png.[0-9])
+FILES		+= $(wildcard $(SRC)/x11-calc*.png) $(wildcard $(SRC)/x11-calc*.png.[0-9])
+FILES		+= $(wildcard $(SRC)/x11-calc*.ico) $(wildcard $(SRC)/x11-calc*.ico.[0-9])
+FILES		+= $(wildcard $(SRC)/x11-calc*.svg) $(wildcard $(SRC)/x11-calc*.svg.[0-9])
 
 FILES		+= $(wildcard *.md) $(wildcard *.md.[0-9]) LICENSE
 FILES		+= .gitignore .gitattributes
