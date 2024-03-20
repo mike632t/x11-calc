@@ -67,7 +67,8 @@
 #  14 Mar 24         - Allow SCALE_HEIGHT and SCALE_WIDTH to be passed from
 #                      command line at compile time - MT
 #  17 Mar 24         - Removed OS specific settings for other OSs - MT
-#
+#  20 Mar 24         - Fixed issue with directory creation - MT
+#                    - Renamed $TARGET to $BIN - MT
 #
 
 MODEL	= 21
@@ -81,8 +82,8 @@ LANG	= LANG_$(shell (echo $$LANG | cut -f 1 -d '_'))
 UNAME	= $(shell uname)
 COMMIT	= $(shell git log -1 HEAD --format=%h 2> /dev/null)
 
-ifndef TARGET
-TARGET	= ../bin
+ifndef BIN
+BIN	= ../bin
 endif
 
 LIBS	= -lX11 -lm
@@ -99,7 +100,7 @@ ifdef DEBUG
 FLAGS	+=  -g
 endif
 
-all: clean $(TARGET)/$(PROGRAM)-$(MODEL) $(OBJECTS)
+all: clean $(BIN)/$(PROGRAM)-$(MODEL) $(OBJECTS)
 FLAGS	+= -D HP$(MODEL) -D $(LANG)
 ifneq ($(COMMIT),)
 FLAGS	+= -D COMMIT_ID='"[Commit Id : $(COMMIT)]"'
@@ -113,18 +114,16 @@ endif
 
 SOURCES += x11-calc-$(MODEL).c
 
-$(TARGET)/$(PROGRAM)-$(MODEL): $(OBJECTS)
+$(BIN)/$(PROGRAM)-$(MODEL): $(OBJECTS) $(BIN)
 ifdef VERBOSE
 	@echo
 	@echo $(CC) $(OBJECTS) $(LIBS) -o $@
 	@echo
 endif
-	@$(CC) $(FLAGS) $(OBJECTS) -o $@ $(LIBS) && (cd $(TARGET) && ls --color $$(echo $@ | sed "s:$(TARGET)/::g") ) # Escape $ using $$...
+	@$(CC) $(FLAGS) $(OBJECTS) -o $@ $(LIBS) && (cd $(BIN) && ls --color $$(echo $@ | sed "s:$(BIN)/::g") ) # Escape $ using $$...
 
-$(OBJECTS): | $(TARGET)
-
-$(TARGET):
-	@mkdir $(TARGET)
+$(BIN):
+	@mkdir $(BIN)
 
 $(OBJECTS) : $(SOURCES)
 ifdef VERBOSE
@@ -133,9 +132,9 @@ ifdef VERBOSE
 	@echo
 	@echo $(CC) $(FLAGS) -c $(SOURCES)
 endif
-	@rm -f $(TARGET)/$(PROGRAM)-$(MODEL)
+	@rm -f $(BIN)/$(PROGRAM)-$(MODEL)
 	@$(CC) $(FLAGS) -c $(SOURCES)
 
 clean:
 #	@rm -f $(PROGRAM)-$(MODEL).o
-	@rm -f $(TARGET)/$(OBJECTS) # -v
+	@rm -f $(BIN)/$(OBJECTS) # -v

@@ -26,7 +26,9 @@
 #                    - Tidied up comments - MT
 #  25 Feb 24         - Added font module - MT
 #  02 Mar 24         - Fixed missing target - MT
-#                    - Create target if required - MT
+#  20 Mar 24         - Updated change history - MT
+#                    - Fixed issue with directory creation - MT
+#                    - Renamed $TARGET to $BIN - MT
 #
 #
 MODEL	= 21
@@ -35,17 +37,19 @@ OUTPUT	= x11-calc-$(MODEL)
 SOURCES	= x11-calc.c x11-calc-$(MODEL).c x11-calc-cpu.c x11-calc-display.c x11-calc-messages.c x11-calc-segment.c x11-calc-button.c x11-calc-switch.c x11-calc-label.c x11-calc-colour.c x11-calc-font.c gcc-wait.c gcc-exists.c
 FILES	= *.c *.h makefile README LICENSE
 OBJECTS	= $(SOURCES:.c=.o)
-TARGET	= ../bin
+BIN	= ../bin
 #LANG	= LANG_$(shell (echo $$LANG | cut -f 1 -d '_'))
 #OS	= $(shell uname)
 LANG	= LANG_en
 OS	= OSF1
 CC	= cc
 
-$(OUTPUT): $(OBJECTS)
-	@mkdir -p $(TARGET)
+$(OUTPUT): $(OBJECTS) $(BIN)
 #	@echo '*** Linking $(OBJECTS)'
-	@$(CC) $(OBJECTS) -o $(TARGET)/$@ -lX11 -lm
+	@$(CC) $(OBJECTS) -o $(BIN)/$@ -lX11 -lm
+
+$(BIN):
+	@mkdir -p $(BIN)
 
 $(OBJECTS) : $(SOURCES)
 #	@echo '*** Compiling $(SOURCES)'

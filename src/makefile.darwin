@@ -24,48 +24,10 @@
 #
 #  https://www.gnu.org/software/make/manual/html_node/Prerequisite-Types.html
 #
-#   1 May 13         - Initial version - MT
-#   2 Jul 13         - Separated  code  and headers for button  and  colour
-#                      manipulation into separate files - MT
-#   9 Mar 14         - Separated  code for different calculator models into
-#                      a  separate files (instead of using a single  source
-#                      file with conditional compilation - MT
-#  27 Sep 20         - Added make clean option - MT
-#   8 Aug 21         - Removed x11-calc-format - MT
-#  11 Aug 21         - Backup created in parent folder - MT
-#  12 Sep 21         - Added '-no-pie' option so that the resulting program
-#                      can be executed by double clicking on it - MT
-#  23 Sep 21         - Model number can now be selected just by setting the
-#                      MODEL number in this file - MT
-#  26 Sep 21         - Added images to list of files (to backup) - MT
-#  30 Sep 21         - Builds label and switch 'classes' - MT
-#   3 Oct 21         - Fixed issue with backup file name - MT
-#   9 Oct 21         - Moved source code and executable files into separate
-#                      folders - MT
-#  21 Jan 22         - Moved text messages to a separate file  - MT
-#  22 jan 22         - Added a symbol for the current language - MT
-#  24 Feb 22         - Clean now deletes ALL object files - MT
-#  31 Mar 22         - Added additional libs and flags that are needed when
-#                      building the project on NetBSD - MT
-#  15 Jan 23         - Delete execuitable before re-compiling - MT
-#  18 Jan 23         - Allow VERBOSE and DEBUG options to be specified from
-#                      the command line - MT
-#                    - Conditionally sets operating specific options (don't
-#                      need to comment them out when not required) - MT
-#  26 Mar 23         - Set compiler specific flags for gcc - MT
-#   1 May 23         - Fixed ordering of compiler options - MT
-#  22 Sep 23         - Added build options for MacOS - MT
-#   5 Oct 23         - Creates target folder if required - MT
-#                    - Lists the execuitable files instead of just the file
-#                      names - MT
-#   7 Feb 24         - Added new functions to check if a file or  directory
-#                      exists - MT
-#  18 Feb 24         - Attempts to redefine the COMMIT_ID based on the last
-#                      commit using git - MT
-#  25 Feb 24         - Removed unused defination - MT
-#  10 Mar 24         - Don't redefine target if already defined - MT
-#  14 Mar 24         - Allow SCALE_HEIGHT and SCALE_WIDTH to be passed from
-#                      command line at compile time - MT
+#  16 Mar 24         - Initial version - MT
+#  20 Mar 24         - Updated change history - MT
+#                    - Fixed issue with directory creation - MT
+#                    - Renamed $TARGET to $BIN - MT
 #
 #
 
@@ -79,7 +41,7 @@ OUTPUT	=  $(PROGRAM).out
 UNAME	=  $(shell uname)
 COMMIT	=  $(shell git log -1 HEAD --format=%h 2> /dev/null)
 
-TARGET	=  ../bin
+BIN	=  ../bin
 LANG	=  LANG_en
 
 LIBS	=  -lX11 -lm
@@ -92,20 +54,20 @@ FLAGS	+= -I /opt/X11/include/X11/ -L /opt/X11/lib/
 LIBS	+= -no-pie
 FLAGS	+= -ansi
 
-all: clean $(TARGET)/$(PROGRAM)-$(MODEL) $(OBJECTS)
+all: clean $(BIN)/$(PROGRAM)-$(MODEL) $(OBJECTS)
 FLAGS	+= -D HP$(MODEL) -D $(LANG)
 SOURCES += x11-calc-$(MODEL).c
 
-$(TARGET)/$(PROGRAM)-$(MODEL): $(OBJECTS)
-	@$(CC) $(FLAGS) $(OBJECTS) -o $@ $(LIBS) && (cd $(TARGET) && ls $$(echo $@ | sed "s:$(TARGET)/::g") ) # Escape $ using $$...
+$(BIN)/$(PROGRAM)-$(MODEL): $(OBJECTS) $(BIN)
+	@$(CC) $(FLAGS) $(OBJECTS) -o $@ $(LIBS) && (cd $(BIN) && ls $$(echo $@ | sed "s:$(BIN)/::g") ) # Escape $ using $$...
 
-$(TARGET):
-	@mkdir $(TARGET)
+$(BIN):
+	@mkdir $(BIN)
 
 $(OBJECTS) : $(SOURCES)
-	@rm -f $(TARGET)/$(PROGRAM)-$(MODEL)
+	@rm -f $(BIN)/$(PROGRAM)-$(MODEL)
 	@$(CC) $(FLAGS) -c $(SOURCES)
 
 clean:
 #	@rm -f $(PROGRAM)-$(MODEL).o
-	@rm -f $(TARGET)/$(OBJECTS) # -v
+	@rm -f $(BIN)/$(OBJECTS) # -v
