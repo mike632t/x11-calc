@@ -34,6 +34,7 @@
 #                      add DESTDIR, and rename TARGET as BIN - macmpi
 #  16 Mar 24         - Updated list of files (used to backup project) - MT
 #  20 Mar 24         - Rename launcher into x11-calc - macmpi
+#                    - Fixed error in make clean - MT
 #
 
 PROGRAM		=  x11-calc
@@ -183,7 +184,7 @@ install: $(SRC)/x11-calc.desktop.in $(SRC)/x11-calc.svg $(PRG) $(BIN)
 
 clean:
 	@rm  -f $(SRC)/*.o
-	-@test -d $(BIN) && (cd $(BIN) && rm -f *)
+#	-@test -d $(BIN) && (cd $(BIN) && rm -f *)
 
 backup: $(FILES)
 	@echo "$(PROGRAM)-`date +'%Y%m%d%H%M'`.tar.gz"; tar -czpf ..\/$(PROGRAM)-`date +'%Y%m%d%H%M'`.tar.gz $(FILES)
