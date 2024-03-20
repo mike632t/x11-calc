@@ -80,15 +80,15 @@ _models="$_classic|$_woodstock|$_topcat|$_spice|$_voyager"
 
 _launch() {
 
-   if [ -z "$MODEL" ]; then exit 0; fi
-
+   [ -z "$MODEL" ] && exit 0
    [ -n "$CMD_OPTS" ] && OPTIONS="$CMD_OPTS" # Allow command line to override options
 
-   _core_app="/x11-calc-$MODEL"
-   echo "`basename $0`: Executing '`dirname "$0"`"$_core_app $OPTIONS"'."
+   MODEL="`echo "$MODEL" | sed 's/^hp//'`"
+   _core_app="`dirname "$0"`/x11-calc-$MODEL"
+   echo "`basename $0`: Executing '$_core_app $OPTIONS'."
 
-   if [ -f "`dirname "$0"`"$_core_app ]; then
-      "`dirname "$0"`"$_core_app $OPTIONS # Assume script is in the same directory as the executable files
+   if [ -f "$_core_app" ]; then
+      "$_core_app" $OPTIONS # Assume script is in the same directory as the executable files
    else
       `exit $ENOCMD`
    fi
@@ -248,15 +248,14 @@ fi
 echo "`basename $0`: Using '$_f_conf'"
 
 . "$_f_conf"
-MODEL="`echo "$MODEL" | sed 's/^hp//'`"
 
 if [ -z "$MODEL" ]; then
-   echo "`basename $0`: Model not defined - configure using '$0 --setup'"
+   echo "`basename $0`: Default model not defined - configure using '$0 --setup'"
 fi
 
 if echo "$1" | grep -qwE "$_models" || echo "hp$1" | grep -qwE "$_models"
 then
-   MODEL="`echo "$1" | sed 's/^hp//'`"
+   MODEL="$1"
    shift
    CMD_OPTS="$*"
    _launch
@@ -269,7 +268,7 @@ case $1 in
       _launch
       ;;
    --help)
-      if [ -z "$MODEL" ]; then _setup; fi
+      [ -z "$MODEL" ] && _setup
       CMD_OPTS="--help"
       if _has_zenity
       then
@@ -279,7 +278,7 @@ case $1 in
       fi
       ;;
    *)
-      if [ -z "$MODEL" ]; then _setup; fi
+      [ -z "$MODEL" ] && _setup
       CMD_OPTS="$*"
       _launch
       ;;

@@ -12,10 +12,6 @@ avoided in order to try to make the code as portable as possible.
 The  aim  is to have the same source code compile without  modification  on
 Linux, VAX/VMS, and Tru64 Unix.
 
-Unlike  all the other emulators the ROM images for the HP10C, HP11C, HP12C,
-HP15C, HP16C are not defined in the the source code and must be loaded from
-a separate ROM file.
-
 ![HP10](./img/x11-calc-10c.png) ![HP11](./img/x11-calc-11c.png)
 
 More [screenshots](./img/#top)
