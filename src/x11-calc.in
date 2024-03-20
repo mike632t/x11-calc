@@ -60,6 +60,7 @@
 #  16 Mar 24         - Better -r option handling & give error clue - macmpi
 #  18 Mar 24         - No need to load ROM for voyager models - MT
 #  19 Mar 24         - Dynamically split models list in conf file -- macmpi
+#  10 Mar 24         - Trim spaces before printing command line - MT
 #
 
 SUCCESS=0
@@ -85,7 +86,7 @@ _launch() {
 
    MODEL="`echo "$MODEL" | sed 's/^hp//'`"
    _core_app="`dirname "$0"`/x11-calc-$MODEL"
-   echo "`basename $0`: Executing '$_core_app $OPTIONS'."
+   echo "`basename $0`: Executing '`echo $_core_app $OPTIONS`'."
 
    if [ -f "$_core_app" ]; then
       "$_core_app" $OPTIONS # Assume script is in the same directory as the executable files
