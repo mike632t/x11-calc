@@ -37,6 +37,7 @@
 #  17 Mar 24         - Fail early if source and destination directories are
 #                      the same - MT
 #  18 Mar 24         - Test that $(prefix) exists before installing - MT
+#  20 Mar 24         - Rename launcher into x11-calc - macmpi
 #
 
 PROGRAM		=  x11-calc
@@ -82,15 +83,15 @@ TOPCAT		=  hp67
 SPICE		=  hp31e hp32e hp33e hp33c hp34c hp37e hp38e hp38c
 VOYAGER		=  hp10c hp11c hp12c hp15c hp16c
 
-all: clean $(CLASSIC) $(WOODSTOCK) $(TOPCAT) $(SPICE) $(VOYAGER) launcher
+all: clean $(CLASSIC) $(WOODSTOCK) $(TOPCAT) $(SPICE) $(VOYAGER) x11-calc
 
-classic: clean $(CLASSIC) launcher
+classic: clean $(CLASSIC) x11-calc
 
-woodstock: clean $(WOODSTOCK) launcher
+woodstock: clean $(WOODSTOCK) x11-calc
 
-spice: clean $(SPICE) launcher
+spice: clean $(SPICE) x11-calc
 
-voyager: clean $(VOYAGER) launcher
+voyager: clean $(VOYAGER) x11-calc
 
 
 hp35:
@@ -168,8 +169,8 @@ hp15c:
 hp16c:
 	@$(MAKE) MODEL=16c
 
-launcher: $(SRC)/x11-calc.sh.in $(BIN)
-	@install -m755 $(SRC)/x11-calc.sh.in $(BIN)/x11-calc.sh && (cd $(BIN) && ls x11-calc.sh)
+x11-calc: $(SRC)/x11-calc.in $(BIN)
+	@install -m755 $(SRC)/x11-calc.in $(BIN)/x11-calc && (cd $(BIN) && ls x11-calc)
 
 install: $(SRC)/x11-calc.desktop.in $(SRC)/x11-calc.svg $(PRG) $(BIN)
 	@test -d $(prefix) || echo "'$(prefix)' does not exist."
@@ -179,7 +180,7 @@ install: $(SRC)/x11-calc.desktop.in $(SRC)/x11-calc.svg $(PRG) $(BIN)
 	@install -d $(DESTDIR)$(prefix)/share/applications
 	@install -Dm644 $(SRC)/x11-calc.desktop.in $(DESTDIR)$(prefix)/share/applications/x11-calc.desktop
 	@for _item in $(MENU_LIST); do \
-		printf "\n[Desktop Action $$_item]\nName=• $$_item\nExec=x11-calc.sh $$_item\n" >> \
+		printf "\n[Desktop Action $$_item]\nName=• $$_item\nExec=x11-calc $$_item\n" >> \
 			$(DESTDIR)$(prefix)/share/applications/x11-calc.desktop; \
 		sed -i "s/^Actions=.*/&;$$_item/" $(DESTDIR)$(prefix)/share/applications/x11-calc.desktop; \
 	done
