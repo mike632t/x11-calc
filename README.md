@@ -74,12 +74,13 @@ will attempt to invoke make with the correct makefile for your system.
 
 ```
 $ make
-
+```
 OR
-
+```
 $ ./make.sh
 ```
-Alternatively you can invoke the appropriate make file directly.
+Alternatively you can invoke make directly, specifying the name appropriate
+makefile on the command line.
 ```
 $ make -f makefile.osf1
 ```
@@ -120,7 +121,6 @@ x11-calc-29c: Version 0.10 [Commit ID: 399d546] 02 Nov 23 23:52:11 (Build: 0114)
 ROM Size : 4096 words
 ```
 
-
 ### Installing
 
 On Linux systems after the compilation is complete you can use the makefile
@@ -128,7 +128,6 @@ to install the emulator locally.
 
 By default the installer will use `$HOME/.local` if it exists, but it is
 possible to specify another directory by setting the directory `prefix`.
-
 ```
 $ make install
 
@@ -136,8 +135,8 @@ OR
 
 $ make install prefix=/usr
 ```
-
-Installer also supports staged installs in a custom directory set by DESTDIR
+Installer also supports staged installs in a custom directory defined using
+DESTDIR.
 ```
 make DESTDIR=/tmp/staging install
 ```
@@ -146,7 +145,6 @@ make DESTDIR=/tmp/staging install
 
 If you don't want to download an compile the sources your self the emulator
 is also  available on [Flathub](https://flathub.org/apps/io.github.mike632t.x11-calc) and can be installed using Flatpak.
-
 
 ### Tested
 
@@ -200,7 +198,6 @@ The emulators have been tested on the following systems:
 
 - Windows 11 + WSL2, gcc 12.2.0, x64 + arm64
 
-
 ### Prerequisites
 
 The following packages are required to build and/or run the simulator.
@@ -218,7 +215,6 @@ The following packages are required to build and/or run the simulator.
 - Ubuntu : gcc make libc6-dev libx11-dev xfonts-base
 
 - Windows 11 + WSL2 : gcc make libc6-dev libx11-dev xfonts-base
-
 
 ### Keyboard Shortcuts
 
@@ -239,7 +235,6 @@ exist and 'Space' maps to 'SST' if not shifted.
 memory 'Ctrl-Z' saves the current register contents, and 'Ctrl-C'  restores
 them to the original saved state.
 
-
 ### Loading and saving
 
 For  models with continuous memory the contents of program memory and  data
@@ -255,13 +250,11 @@ copies of programs to be loaded automatically when the simulator starts  or
 the  simulator is reset using 'Ctrl-C'.  However, any changes will be
 saved in the hidden data file.
 
-
 ### Exiting
 
 For  models with a 'sliding' On/Off switch clicking on the switch will turn
 the simulator on or off, but if when switching off you hold down the switch
 down for two seconds the program will exit.
-
 
 ### Debugging
 
@@ -274,14 +267,16 @@ of the CPU registers.
 
 When in trace mode a jump to the same instruction produces no output.
 
-
 ### ROM Images
 
 The '-r <filename>' command line option provides the ability to use the ROM
-contents held in an separate file.
+contents from a separate file.  The contents of the ROM are stored as pairs
+values seperated by a colon containing the memory address and the opcode.
 
-For the HP10C, HP11C, HP12C, HP15C, and HP16C the ROM comprised of pairs of
-hexadecimal values as address:opcode.
+Anything appearing after a semi colon on each line is ignored.
+
+For the HP10C, HP11C, HP12C, HP15C and HP16C the ROM file contains pairs of
+_hexadecimal_ values.
 ```
 0000:107
 0001:04e
@@ -290,8 +285,7 @@ hexadecimal values as address:opcode.
 0004:2ee
 0005:13f
 ```
-Other models include the ROM as part of the program, but you can specify an
-alternate ROM comprising of pairs of octal values.
+For other models the ROM file contains pairs of _octal_ values.
 ```
 00000:00255
 00001:01420
@@ -300,13 +294,17 @@ alternate ROM comprising of pairs of octal values.
 00004:01746
 00005:00472
 ```
-This allows you to use your own ROM images with any of the simulators.
+When loading a ROM from file any gaps between the memory addresses will not
+be filled with zeros, and the existing ROM contents will be left unchanged.
 
+ROM files can therefore be used to load alternative version of the firmware
+for a particular model or apply a patch to the existing firmware.
 
 ### Known Issues
 
-* Keyboard shortcuts only work on Linux.
+* Keyboard shortcuts only work on Linux and NetBSD.
 * A 24 bit colour display is required.
+* For best results you need to have the X windows core fonts installed.
 
 ##### HP 37E
 
@@ -317,17 +315,22 @@ This allows you to use your own ROM images with any of the simulators.
 * Cannot read or write to magnetic cards.
 * Has continuous memory.
 
-### Raspberry Pi Specific IssuesGentoo
+### Raspberry Pi Specific Issues
 
 * The code uses a simplified display on Arm based systems (except Apple) to
 avoid the display refresh issues seen on the Raspberry Pi if either FKMS or
 KMS overlays are enabled. (Note- Do not disable KMS on the latest Raspberry
 Pi OS release).
-* The window manager on recent Raspberry Pi OS releases doesn't disable the
-ability  to resize or maximize a window if the maximum and  minimum  window
-sizes are the same. The application will resize the window automatically it
-the  user attempts to change the size but if it is maximized then the title
-bar will be hidden (by the window manager) until the window is unmaximized.
+
+### Wayland specific Issues
+
+* Performance under Xwayland is generally poor, the emulator will work well
+on a Raspberry Pi3 using Xwindows but a Raspberry Pi4 using Xwayland cannot
+redraw the display quickly enough to allow background shading to be used to
+draw the display digits. As a result the emulator's LED/LCD display doesn't
+use any background shading on ARM based systems.
+* The emulator window is supposed to be a fixed size.  However wnen running
+on Xwayland the window manager does not handle this correctly.
 
 ### VMS Specific Issues
 
