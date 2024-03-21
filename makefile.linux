@@ -121,16 +121,16 @@ voyager: clean $(VOYAGER) $(OTHERS)
 
 define prog_template =
 hp$(1): $(1)
-$(1): $(SOURCES) $(BIN)
+$(1): $(SOURCES) | $(BIN)
 	@$$(MAKE) MODEL=$(1) TARGET=../$(BIN)
 endef
 
 $(foreach calc,$(ALL),$(eval $(call prog_template,$(calc))))
 
-x11-calc: $(SRC)/x11-calc.in $(BIN)
+x11-calc: $(SRC)/x11-calc.in | $(BIN)
 	@install -m755 $(SRC)/x11-calc.in $(BIN)/x11-calc && (cd $(BIN) && ls --color x11-calc)
 
-install: $(SRC)/x11-calc.desktop.in $(SRC)/x11-calc.svg $(PRG) $(BIN)
+install: $(SRC)/x11-calc.desktop.in $(SRC)/x11-calc.svg $(PRG) | $(BIN)
 	@[ -n "$(DESTDIR)" ] || [ -d "$(prefix)" ] || \
 		{ echo "Please ensure $(prefix) path exists or set DESTDIR for staged install." >&2; exit 1; }
 	@install -d "$(DESTDIR)$(prefix)"
