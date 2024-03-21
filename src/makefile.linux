@@ -69,22 +69,23 @@
 #  17 Mar 24         - Removed OS specific settings for other OSs - MT
 #  20 Mar 24         - Fixed issue with directory creation - MT
 #                    - Renamed $TARGET to $BIN - MT
+#  21 Mar 24         - Instanciate  common  sources  generated object files
+#                      per model, so that parallel model linking use proper
+#                      object files - macmpi
 #
 
 MODEL	= 21
 PROGRAM	= x11-calc
-SOURCES = x11-calc.c x11-calc-cpu.c x11-calc-display.c x11-calc-segment.c
-SOURCES += x11-calc-button.c x11-calc-switch.c x11-calc-label.c x11-calc-colour.c
-SOURCES += x11-calc-font.c x11-calc-messages.c x11-keyboard.c gcc-wait.c gcc-exists.c
-OBJECTS	= $(SOURCES:.c=.o)
-OUTPUT	= $(PROGRAM).out
+SHAREDSOURCES = x11-calc.c x11-calc-cpu.c x11-calc-display.c x11-calc-segment.c
+SHAREDSOURCES += x11-calc-button.c x11-calc-switch.c x11-calc-label.c x11-calc-colour.c
+SHAREDSOURCES += x11-calc-font.c x11-calc-messages.c x11-keyboard.c gcc-wait.c gcc-exists.c
+SOURCES	:= $(SHAREDSOURCES:.c=_mdl_$(MODEL).c) x11-calc-$(MODEL).c
+OBJECTS := $(SOURCES:.c=.o)
 LANG	= LANG_$(shell (echo $$LANG | cut -f 1 -d '_'))
 UNAME	= $(shell uname)
 COMMIT	= $(shell git log -1 HEAD --format=%h 2> /dev/null)
 
-ifndef BIN
-BIN	= ../bin
-endif
+BIN	?= ../bin
 
 LIBS	= -lX11 -lm
 FLAGS	= -fcommon -Wall -pedantic -std=gnu99
@@ -100,7 +101,7 @@ ifdef DEBUG
 FLAGS	+=  -g
 endif
 
-all: clean $(BIN)/$(PROGRAM)-$(MODEL) $(OBJECTS)
+all: clean $(BIN)/$(PROGRAM)-$(MODEL)
 FLAGS	+= -D HP$(MODEL) -D $(LANG)
 ifneq ($(COMMIT),)
 FLAGS	+= -D COMMIT_ID='"[Commit Id : $(COMMIT)]"'
@@ -112,29 +113,37 @@ ifneq ($(SCALE_HEIGHT),)
 FLAGS	+= -D SCALE_HEIGHT=$(SCALE_HEIGHT)
 endif
 
-SOURCES += x11-calc-$(MODEL).c
-
-$(BIN)/$(PROGRAM)-$(MODEL): $(OBJECTS) $(BIN)
+$(BIN)/$(PROGRAM)-$(MODEL): $(OBJECTS) | $(BIN)	
 ifdef VERBOSE
 	@echo
 	@echo $(CC) $(OBJECTS) $(LIBS) -o $@
 	@echo
 endif
 	@$(CC) $(FLAGS) $(OBJECTS) -o $@ $(LIBS) && (cd $(BIN) && ls --color $$(echo $@ | sed "s:$(BIN)/::g") ) # Escape $ using $$...
+	@# cleanup temporary symlinks now instanciated object files are created
+	@rm -f *_mdl_$(MODEL).c
 
 $(BIN):
 	@mkdir $(BIN)
 
-$(OBJECTS) : $(SOURCES)
+$(OBJECTS) : %.o : %.c
 ifdef VERBOSE
 	@echo
 	@echo "***" $(PROGRAM)-$(MODEL)
 	@echo
-	@echo $(CC) $(FLAGS) -c $(SOURCES)
+	@echo $(CC) $(CC) $(FLAGS) -c $< -o $@
 endif
 	@rm -f $(BIN)/$(PROGRAM)-$(MODEL)
-	@$(CC) $(FLAGS) -c $(SOURCES)
+	@$(CC) $(FLAGS) -c $< -o $@
 
-clean:
+# Create model-instanciated shared souces (just symlinks) that
+# will be used to generate model-instanciated object files
+$(SOURCES) :
+	@if ! [ -f "$@" ]; then \
+		_ref="`echo "$@" | sed 's/_mdl_$(MODEL)//'`"; \
+		ln -s "$$_ref" "$@" ; \
+	fi
+
+clean: | $(BIN)
 #	@rm -f $(PROGRAM)-$(MODEL).o
 	@rm -f $(BIN)/$(OBJECTS) # -v
