@@ -61,6 +61,8 @@
 #                    - Updated files - MT
 #  22 Mar 24         - Simplify model targets auto-generation (portability)
 #                      and use same naming as in oyher makefiles - macmpi
+#                    - Clean out unwanted files before taking a backup, and
+#                      remove symbolic links too - MT
 #
 
 PROGRAM		=  x11-calc
@@ -113,14 +115,19 @@ OTHERS		=  x11-calc
 
 all: clean $(MODELS) $(OTHERS)
 	@:
+
 classic: clean $(CLASSIC) $(OTHERS)
 	@:
+
 woodstock: clean $(WOODSTOCK) $(OTHERS)
 	@:
+
 topcat: clean $(TOPCAT) $(OTHERS)
 	@:
+
 spice: clean $(SPICE) $(OTHERS)
 	@:
+
 voyager: clean $(VOYAGER) $(OTHERS)
 	@:
 
@@ -150,8 +157,9 @@ $(BIN):
 	@install -d $(BIN)
 
 clean:
+	@find $(SRC)/ -type l -delete
 	@rm  -f $(SRC)/*.o
 	-@test -d $(BIN) && (cd $(BIN) && rm -f *)
 
-backup: $(FILES)
+backup: clean $(FILES)
 	@echo "$(PROGRAM)-`date +'%Y%m%d%H%M'`.tar.gz"; tar -czpf ..\/$(PROGRAM)-`date +'%Y%m%d%H%M'`.tar.gz $(FILES)
