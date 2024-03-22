@@ -145,17 +145,17 @@ _config (){
 
    if [ "$DROPDOWN" ]
    then
-      _selection=`zenity --forms --title="x11-calc Setup" \
+      _selection="$(zenity --forms --title="x11-calc Setup" \
          --text="Select model number" \
          --add-combo="Model:" --combo-values=${_models} \
          --add-entry="Options:" --ok-label="OK" \
-         --height=96 --width=256 2>/dev/null`
+         --height=96 --width=256 2>/dev/null)"
    else
-      _selection=`zenity --forms --title="x11-calc Setup" \
+      _selection="$(zenity --forms --title="x11-calc Setup" \
          --text="Select model number" \
          --add-list="Model:" --list-values=${_models} \
          --add-entry="Options:" --ok-label="OK" \
-         --width=256 2>/dev/null`
+         --width=256 2>/dev/null)"
    fi
 
    case $? in
@@ -173,7 +173,7 @@ _config (){
          exit 0 # User pressed cancel so just quit - don't attempt to launch the emulator
          ;;
       *)
-         echo "`basename $0`: An unexpected error has occurred."
+         echo "`basename $0`: An unexpected zenity error ($?) has occurred."
       ;;
    esac
 
@@ -222,7 +222,7 @@ _has_zenity() { return "$has_zenity"; }
 
 if [ ! -f "$_f_conf" ]
 then
-   ! _has_zenity && echo "\n`basename $0`: Did you know that installing 'zenity' will give you a graphical setup interface?\n"
+   ! _has_zenity && echo "`basename $0`: Did you know that installing 'zenity' will give you a graphical setup interface?"
    mkdir -p "`dirname "${_f_conf}"`"
    cat <<-EOF >"$_f_conf"
 #

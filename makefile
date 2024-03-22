@@ -19,8 +19,10 @@
 #  Note separator (tab) at the beginning of the line CANNOT be a space..!
 #
 #  09 Oct 21         - Initial version - MT
+#  22 Mar 24         - Simple redirection, without extra make.sh - macmpi
 #
 
 all:
 %:
-	@./make.sh $@
+	@make -s -f makefile.`uname | tr '[:upper:]' '[:lower:]'` $@
+
