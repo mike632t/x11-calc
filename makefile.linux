@@ -103,15 +103,14 @@ WOODSTOCK	=  21 22 25 25c 27 29c
 TOPCAT		=  67
 SPICE		=  31e 32e 33e 33c 34c 37e 38e 38c
 VOYAGER		=  10c 11c 12c 15c 16c
+MODELS		=  $(CLASSIC) $(WOODSTOCK) $(TOPCAT) $(SPICE) $(VOYAGER)
 OTHERS		=  x11-calc
-
-ALL		=  $(CLASSIC) $(WOODSTOCK) $(TOPCAT) $(SPICE) $(VOYAGER)
 
 MENU_LIST	=  35 21 25c 29c 31e 32e 33c 34c 10c 11c 12c 15c 16c
 
 .PHONY: clean
 
-all: clean $(ALL) $(OTHERS)
+all: clean $(MODELS) $(OTHERS)
 
 classic: clean $(CLASSIC) $(OTHERS)
 woodstock: clean $(WOODSTOCK) $(OTHERS)
@@ -125,7 +124,7 @@ $(1): $(SOURCES) | $(BIN)
 	@$$(MAKE) MODEL=$(1) TARGET=../$(BIN)
 endef
 
-$(foreach calc,$(ALL),$(eval $(call prog_template,$(calc))))
+$(foreach calc,$(MODELS),$(eval $(call prog_template,$(calc))))
 
 x11-calc: $(SRC)/x11-calc.in | $(BIN)
 	@install -m755 $(SRC)/x11-calc.in $(BIN)/x11-calc && (cd $(BIN) && ls --color x11-calc)

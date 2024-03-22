@@ -76,10 +76,11 @@
 
 MODEL	= 21
 PROGRAM	= x11-calc
-SHAREDSOURCES = x11-calc.c x11-calc-cpu.c x11-calc-display.c x11-calc-segment.c
-SHAREDSOURCES += x11-calc-button.c x11-calc-switch.c x11-calc-label.c x11-calc-colour.c
-SHAREDSOURCES += x11-calc-font.c x11-calc-messages.c x11-keyboard.c gcc-wait.c gcc-exists.c
-SOURCES	:= $(SHAREDSOURCES:.c=_mdl_$(MODEL).c) x11-calc-$(MODEL).c
+SHARED = x11-calc.c x11-calc-cpu.c x11-calc-display.c x11-calc-segment.c
+SHARED += x11-calc-messages.c x11-calc-button.c 
+COMMON = x11-calc-switch.c x11-calc-label.c x11-calc-colour.c
+COMMON += x11-calc-font.c x11-keyboard.c gcc-wait.c gcc-exists.c
+SOURCES	:= $(SHARED:.c=_$(MODEL).c) $(COMMON) x11-calc-$(MODEL).c
 OBJECTS := $(SOURCES:.c=.o)
 LANG	= LANG_$(shell (echo $$LANG | cut -f 1 -d '_'))
 UNAME	= $(shell uname)
@@ -101,7 +102,6 @@ ifdef DEBUG
 FLAGS	+=  -g
 endif
 
-all: clean $(BIN)/$(PROGRAM)-$(MODEL)
 FLAGS	+= -D HP$(MODEL) -D $(LANG)
 ifneq ($(COMMIT),)
 FLAGS	+= -D COMMIT_ID='"[Commit Id : $(COMMIT)]"'
@@ -121,7 +121,7 @@ ifdef VERBOSE
 endif
 	@$(CC) $(FLAGS) $(OBJECTS) -o $@ $(LIBS) && (cd $(BIN) && ls --color $$(echo $@ | sed "s:$(BIN)/::g") ) # Escape $ using $$...
 	@# cleanup temporary symlinks now instanciated object files are created
-	@rm -f *_mdl_$(MODEL).c
+	@rm -f *_$(MODEL).c
 
 $(BIN):
 	@mkdir $(BIN)
@@ -140,10 +140,12 @@ endif
 # will be used to generate model-instanciated object files
 $(SOURCES) :
 	@if ! [ -f "$@" ]; then \
-		_ref="`echo "$@" | sed 's/_mdl_$(MODEL)//'`"; \
+		_ref="`echo "$@" | sed 's/_$(MODEL)//'`"; \
 		ln -s "$$_ref" "$@" ; \
 	fi
 
+all: clean $(BIN)/$(PROGRAM)-$(MODEL)
+
 clean: | $(BIN)
-#	@rm -f $(PROGRAM)-$(MODEL).o
-	@rm -f $(BIN)/$(OBJECTS) # -v
+	@rm -f $(OBJECTS) # -v
+
