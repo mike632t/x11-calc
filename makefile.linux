@@ -59,7 +59,8 @@
 #  18 Mar 24         - Test that $(prefix) exists before installing - MT
 #  20 Mar 24         - Rename launcher into x11-calc - macmpi
 #                    - Updated files - MT
-#  22 Mar 24         - Restore hp* targets only for consistency - macmpi
+#  22 Mar 24         - Simplify model targets auto-generation (portability)
+#                      and use same naming as in oyher makefiles - macmpi
 #
 
 PROGRAM		=  x11-calc
@@ -73,9 +74,7 @@ IMG		:= img
 DESTDIR		?=
 prefix		?= $$HOME/.local
 
-SOURCES		=  $(wildcard $(SRC)/*.c) $(wildcard $(SRC)/*.h) $(wildcard $(SRC)/*.in)
-
-FILES		=  $(SOURCES)
+FILES		=  $(wildcard $(SRC)/*.c) $(wildcard $(SRC)/*.h) $(wildcard $(SRC)/*.in)
 FILES		+= $(wildcard $(SRC)/*.c.[0-9]) $(wildcard $(SRC)/*.h.[0-9])  $(wildcard $(SRC)/*.in.[0-9])
 
 FILES		+= make.sh makefile $(SRC)/make.com
@@ -113,18 +112,21 @@ OTHERS		=  x11-calc
 .PHONY: clean
 
 all: clean $(MODELS) $(OTHERS)
-
+	@:
 classic: clean $(CLASSIC) $(OTHERS)
+	@:
 woodstock: clean $(WOODSTOCK) $(OTHERS)
+	@:
 topcat: clean $(TOPCAT) $(OTHERS)
+	@:
 spice: clean $(SPICE) $(OTHERS)
+	@:
 voyager: clean $(VOYAGER) $(OTHERS)
+	@:
 
-define prog_template =
-$(1): $(SOURCES) | $(BIN)
-	@$$(MAKE) MODEL=$(patsubst hp%,%,$(1))
-endef
-$(foreach calc,$(MODELS),$(eval $(call prog_template,$(calc))))
+# this is base model target:
+%:
+	@$(MAKE) MODEL=$(patsubst hp%,%,$@)
 
 x11-calc: $(SRC)/x11-calc.in | $(BIN)
 	@install -m755 $(SRC)/x11-calc.in $(BIN)/x11-calc && (cd $(BIN) && ls --color x11-calc)

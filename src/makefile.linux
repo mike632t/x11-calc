@@ -124,7 +124,7 @@ endif
 	@rm -f *_$(MODEL).c
 
 $(BIN):
-	@mkdir $(BIN)
+	@mkdir -p $(BIN)
 
 $(OBJECTS) : %.o : %.c
 ifdef VERBOSE
