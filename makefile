@@ -20,9 +20,13 @@
 #
 #  09 Oct 21         - Initial version - MT
 #  22 Mar 24         - Simple redirection, without extra make.sh - macmpi
+#                    - Fixed default rule so it works on NetBSD, Tru64, and
+#                      Linux (now we can get rid of make.sh) - MT
 #
 
 all:
-%:
-	@make -s -f makefile.`uname | tr '[:upper:]' '[:lower:]'` $@
+	@$(MAKE) -s -f "makefile.`uname | tr '[:upper:]' '[:lower:]'`" $@
+
+.DEFAULT:
+	@$(MAKE) -s -f "makefile.`uname | tr '[:upper:]' '[:lower:]'`" $@
 
