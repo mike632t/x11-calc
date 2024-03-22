@@ -59,6 +59,7 @@
 #  18 Mar 24         - Test that $(prefix) exists before installing - MT
 #  20 Mar 24         - Rename launcher into x11-calc - macmpi
 #                    - Updated files - MT
+#  22 Mar 24         - Restore hp* targets only for consistency - macmpi
 #
 
 PROGRAM		=  x11-calc
@@ -98,15 +99,16 @@ FILES		+= .gitignore .gitattributes
 
 MAKE		=  make --no-print-directory -C ./src -f makefile.linux
 
-CLASSIC		=  35 45 70 80
-WOODSTOCK	=  21 22 25 25c 27 29c
-TOPCAT		=  67
-SPICE		=  31e 32e 33e 33c 34c 37e 38e 38c
-VOYAGER		=  10c 11c 12c 15c 16c
+LIST		=  hp35 hp21 hp25c hp29c hp31e hp32e hp33c hp34c hp10c hp11c hp12c hp15c hp16c
+
+CLASSIC		=  hp35 hp45 hp70 hp80
+WOODSTOCK	=  hp21 hp22 hp25 hp25c hp27 hp29c
+TOPCAT		=  hp67
+SPICE		=  hp31e hp32e hp33e hp33c hp34c hp37e hp38e hp38c
+VOYAGER		=  hp10c hp11c hp12c hp15c hp16c
 MODELS		=  $(CLASSIC) $(WOODSTOCK) $(TOPCAT) $(SPICE) $(VOYAGER)
 OTHERS		=  x11-calc
 
-MENU_LIST	=  35 21 25c 29c 31e 32e 33c 34c 10c 11c 12c 15c 16c
 
 .PHONY: clean
 
@@ -119,11 +121,9 @@ spice: clean $(SPICE) $(OTHERS)
 voyager: clean $(VOYAGER) $(OTHERS)
 
 define prog_template =
-hp$(1): $(1)
 $(1): $(SOURCES) | $(BIN)
-	@$$(MAKE) MODEL=$(1) TARGET=../$(BIN)
+	@$$(MAKE) MODEL=$(patsubst hp%,%,$(1))
 endef
-
 $(foreach calc,$(MODELS),$(eval $(call prog_template,$(calc))))
 
 x11-calc: $(SRC)/x11-calc.in | $(BIN)
@@ -135,10 +135,10 @@ install: $(SRC)/x11-calc.desktop.in $(SRC)/x11-calc.svg $(PRG) | $(BIN)
 	@install -d "$(DESTDIR)$(prefix)"
 	@cp -a $(BIN) "$(DESTDIR)$(prefix)"/ # Fail early if source and destination directories are the same
 	@install -Dm644 $(SRC)/x11-calc.desktop.in "$(DESTDIR)$(prefix)"/share/applications/x11-calc.desktop
-	@for _item in $(MENU_LIST); do \
-		printf "\n[Desktop Action hp$$_item]\nName=• hp$$_item\nExec=x11-calc hp$$_item\n" >> \
+	@for _item in $(LIST); do \
+		printf "\n[Desktop Action $$_item]\nName=• $$_item\nExec=x11-calc $$_item\n" >> \
 			"$(DESTDIR)$(prefix)"/share/applications/x11-calc.desktop; \
-		sed -i "s/^Actions=.*/&;hp$$_item/" "$(DESTDIR)$(prefix)"/share/applications/x11-calc.desktop; \
+		sed -i "s/^Actions=.*/&;$$_item/" "$(DESTDIR)$(prefix)"/share/applications/x11-calc.desktop; \
 	done
 	@install -Dm644 $(SRC)/x11-calc.svg "$(DESTDIR)$(prefix)"/share/icons/hicolor/scalable/apps/x11-calc.svg
 	@install -d "$(DESTDIR)$(prefix)"/share/x11-calc
