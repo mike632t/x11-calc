@@ -20,6 +20,7 @@
  *
  * 30 Jan 22         - Initial version (derived from x11-calc-10.c) - MT
  * 09 Mar 22         - Fixed width and height (when scaled) - MT
+ * 21 Mar 24         - Fixed display position - MT
  *
  */
 
@@ -36,16 +37,6 @@
 #define DISPLAY_BACKGROUND MID_GREY
 #define BEZEL_COLOUR       LIGHT_GREY
 
-#define BEZEL_LEFT         0 * SCALE_WIDTH
-#define BEZEL_TOP          0 * SCALE_HEIGHT
-#define BEZEL_WIDTH        411 * SCALE_WIDTH /* 381 / 411 */
-#define BEZEL_HEIGHT       64 * SCALE_HEIGHT
-
-#define DISPLAY_LEFT       45 * SCALE_WIDTH
-#define DISPLAY_TOP        8 * SCALE_HEIGHT
-#define DISPLAY_WIDTH      200 * SCALE_WIDTH
-#define DISPLAY_HEIGHT     48 * SCALE_HEIGHT
-
 #define KBD_LEFT           12 * SCALE_WIDTH
 #define KBD_TOP            59 * SCALE_HEIGHT
 #define KBD_ROW            48 * SCALE_HEIGHT /* 43 / 48 */
@@ -54,6 +45,16 @@
 #define KEY_WIDTH          36 * SCALE_WIDTH  /* 33 / 36 */
 #define KEY_NUMERIC        41 * SCALE_WIDTH
 #define KEY_GAP            3 * SCALE_WIDTH
+
+#define BEZEL_LEFT         0 * SCALE_WIDTH
+#define BEZEL_TOP          0 * SCALE_HEIGHT
+#define BEZEL_WIDTH        411 * SCALE_WIDTH /* 381 / 411 */
+#define BEZEL_HEIGHT       64 * SCALE_HEIGHT
+
+#define DISPLAY_LEFT       KBD_LEFT + KEY_WIDTH + KEY_GAP
+#define DISPLAY_TOP        8 * SCALE_HEIGHT
+#define DISPLAY_WIDTH      200 * SCALE_WIDTH
+#define DISPLAY_HEIGHT     48 * SCALE_HEIGHT
 
 #define MEMORY_SIZE        256
 #define ROM_SIZE           014000

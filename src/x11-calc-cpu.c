@@ -384,6 +384,7 @@
  * 23 Feb 24         - Fixed bug in read_rom() - MT
  * 03 Mar 24         - Updated error handling (now passes the  error number
  *                     to the error handler) - MT
+ * 21 Mar 24         - Fixed display position (12C 15C and 16C)- MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
