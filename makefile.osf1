@@ -30,7 +30,7 @@
 #                      in the same folder untouched) - MT
 #
 
-PROGRAM	=  x11-calc
+PROGRAM		=  x11-calc
 
 MAKE		=  make
 
