@@ -60,7 +60,9 @@
 #  16 Mar 24         - Better -r option handling & give error clue - macmpi
 #  18 Mar 24         - No need to load ROM for voyager models - MT
 #  19 Mar 24         - Dynamically split models list in conf file -- macmpi
-#  10 Mar 24         - Trim spaces before printing command line - MT
+#  20 Mar 24         - Trim spaces before printing command line - MT
+#  23 Mar 24         - Updated some error messages and trimmed extra spaces
+#                      from the console output - MT
 #
 
 SUCCESS=0
@@ -78,6 +80,7 @@ _spice="hp31e|hp32e|hp33e|hp33c|hp34c|hp37e|hp38e|hp38c"
 _voyager="hp10c|hp11c|hp12c|hp15c|hp16c"
 _models="$_classic|$_woodstock|$_topcat|$_spice|$_voyager"
 
+#- launch()
 
 _launch() {
 
@@ -100,7 +103,7 @@ _launch() {
       $SUCCESS)
          ;;
       $EINVAL)
-         _errmsg="Invalid operand or parameter:  '$OPTIONS'"
+         _errmsg="Invalid operand or parameter:    '$OPTIONS'"
          ;;
       $ENOFNT)
          _fonts="'xfonts-base' or equivalent"
@@ -109,11 +112,11 @@ _launch() {
          grep -sqE "ubuntu|debian" "${_f_os_release}" && _fonts="'xfonts-base'"
          grep -sq "fedora" "${_f_os_release}" && _fonts="'xorg-x11-fonts-base' or 'xorg-x11-fonts-misc'"
          grep -sq "gentoo" "${_f_os_release}" && _fonts="'font-misc-misc'"
-         _errmsg="Please install missing fonts from:  $_fonts."
+         _errmsg="Please install missing fonts from:    $_fonts."
          ;;
       $ENOENT)
          _errmsg="`echo "$OPTIONS" | awk -F '-r ' '{ print $2 }' | awk -F '-. ' '{ print $1 }'`"
-         _errmsg="Missing ROM file!    Please provide a rom file as:  '$_errmsg'  Or set a -r option with proper path in setup."
+         _errmsg="Unable to open file:    '$_errmsg'    Please check that the file exists and you  can access it. Then specify the correct  path using the '-r' option."
          ;;
       $ENODATA)
          _errmsg="Empty ROM file!"
@@ -130,16 +133,15 @@ _launch() {
 
    if [ -n "$_errmsg" ]; then
       if _has_zenity; then
-         #  replace multiple spaces by newline in zenity messages
-         _zerrmsg="$( echo "$_errmsg" | sed 's|\s\s|\n|g' )"
-         zenity --height=100 --width=400 --error --text="$_zerrmsg"
+         zenity --height=100 --width=400 --error --text="` echo "$_errmsg" | sed 's|\s\s|\n|g'`" #  Replace multiple spaces by newline
       fi
-      printf '%s\n' "`basename $0`: $_errmsg" >&2
+      printf '%s\n' "`basename $0`: `echo "$_errmsg" | tr -s ' '`" >&2 # Remove multiple spaces
    fi
 
    return $_err
 }
 
+#- config()
 
 _config (){
 
@@ -179,6 +181,7 @@ _config (){
 
 }
 
+#- setup()
 
 _setup() {
    if _has_zenity
@@ -196,9 +199,7 @@ _setup() {
    . "$_f_conf" # Reload modified settings from config file
 }
 
-
-
-
+#- main()
 
 : "${XDG_CONFIG_HOME:="$HOME/.config"}" # Define default path for XDG_CONFIG_HOME if not defined
 : "${XDG_DATA_HOME:="$HOME/.local/share"}" # Define default path for XDG_DATA_HOME if not defined
