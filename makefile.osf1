@@ -24,6 +24,7 @@
 #                    - Just copy launcher to target - MT
 #  16 Mar 24         - Set execute permission on launcher - MT
 #  20 Mar 24         - Rename launcher into x11-calc - macmpi
+#  23 Mar 24         - Do not delete execuitables - MT
 #
 
 PROGRAM	=  x11-calc
@@ -123,5 +124,5 @@ x11-calc:
 
 clean:
 	@rm  -f ./src/*.o
-	@test -d ./bin && rm ./bin/* || true
+#	@test -d ./bin && rm ./bin/* || true
 

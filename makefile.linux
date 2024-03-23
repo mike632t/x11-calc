@@ -63,6 +63,7 @@
 #                      and use same naming as in oyher makefiles - macmpi
 #                    - Clean out unwanted files before taking a backup, and
 #                      remove symbolic links too - MT
+#  23 Mar 24         - Do not delete execuitables - MT
 #
 
 PROGRAM		=  x11-calc
@@ -159,7 +160,7 @@ $(BIN):
 clean:
 	@find $(SRC)/ -type l -delete
 	@rm  -f $(SRC)/*.o
-	-@test -d $(BIN) && (cd $(BIN) && rm -f *)
+#	-@test -d $(BIN) && (cd $(BIN) && rm -f *)
 
 backup: clean $(FILES)
 	@echo "$(PROGRAM)-`date +'%Y%m%d%H%M'`.tar.gz"; tar -czpf ..\/$(PROGRAM)-`date +'%Y%m%d%H%M'`.tar.gz $(FILES)
