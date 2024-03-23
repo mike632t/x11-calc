@@ -128,6 +128,6 @@ x11-calc:
 clean:
 #	@find $(SRC)/ -type l -delete
 	@rm  -f $(SRC)/*.o
-	@find bin -type f -name "x11-calc*" ! -name "*.*" \( -perm -u=x -o -perm -g=x -o -perm -o=x \) -exec rm -f {} \; # Delete all execuitable files
+	@find bin -type f -name "x11-calc*" ! -name "*.*" \( -perm -u=x -o -perm -g=x -o -perm -o=x \) -exec rm -f {} \;  2> /dev/null || true # Delete all execuitable files
 	@rmdir $(BIN) 2> /dev/null || true
 
