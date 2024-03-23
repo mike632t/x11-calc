@@ -19,6 +19,9 @@ More [screenshots](./img/#top)
 
 ### Latest News
 
+22 Mar 24
+   - Simplified the build process.
+
 18 Mar 24
    - Added an install option to the makefile (by default the installer will
      use `$HOME/.local` if it exists, but it is possible to specify another
@@ -55,9 +58,9 @@ More [screenshots](./img/#top)
 
 ### Compiling
 
-To  build the simulator on Linux check that you have all the  prerequisites
-installed  then  download the source code from github and unzip it  (a  new
-folder  will  be created to automatically).
+To  build the simulator check that you have all the prerequisites installed
+then download the source code from github and unzip it (this will created a
+new directory automatically).
 
 e.g:
 ```
@@ -68,47 +71,38 @@ Then change directory to the new folder.
 ```
 $ cd x11-calc-stable
 ```
-The to compile the emulators on a Linux system you just need to invoke make
-or if you are using another UNIX derivative you can use a make script which
-will attempt to invoke make with the correct makefile for your system.
-
+The to compile all the emulators you just need to invoke make.
 ```
 $ make
-```
-OR
-```
-$ ./make.sh
-```
-Alternatively you can invoke make directly, specifying the name appropriate
-makefile on the command line.
-```
-$ make -f makefile.osf1
 ```
 It is also possible to compile a single emulator by specifying the model on
 the command line
 ```
-$ make -f makefile.linux hp29c
-
-OR
-
-$ ./make.sh hp29c
+$ make hp29c
 ```
-By default the executable files will be created in the `bin` directory.
+By default the executable files will be created in the `bin` directory, and
+can run either a particular emulator directly, or invoke the launcher which
+will allow you to select which enulator to use by default the next time you
+launch it.
 ```
 $ ./bin/x11-calc-29c
 x11-calc-29c: Version 0.10 [Commit ID: 399d546] 01 Nov 23 23:53:00 (Build: 0114)
 ROM Size : 4096 words
 ```
-
+OR
+```
+$ bin/x11-calc
+```
 If more than one C compiler is installed or if gcc is not available you can
 specify which one to use from the command line.
 ```
-$ make -f makefile.linux CC=clang VERBOSE=1 all
+$ make CC=clang hp11c
 
-$ make -f makefile.linux  CC=tcc VERBOSE=1 all
+$ make CC=tcc
 ```
-
-On VMS unzip the source code archive, then run the DCL `make` script.
+#### VMS
+On VMS unzip the source code archive, change the default directory and then
+run `make.com`.
 
 e.g:
 ```
@@ -181,6 +175,8 @@ The emulators have been tested on the following systems:
 - MacOS 10 (Catalina), clang 12.0.0, x64
 
 - MacOS 13.4.1 (Venture), clang 14.0.3, arm64
+
+- NetBSD 9.2, gcc 7.5.0, x64
 
 - SUSE 15.4, clang 13. 0.1, x64
 
