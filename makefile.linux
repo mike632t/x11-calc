@@ -69,7 +69,8 @@
 #                    - Do not clean up files before backing up - MT
 #                    - Make clean deletes execuitables (leaving other files
 #                      in the same folder untouched) - MT
-#                      Use .DEFAULT target + improve x11-calc deps - macmpi
+#                    - Use .DEFAULT target + improve x11-calc deps - macmpi
+#                    - Feed x11-calc _models with makefile  MODELS - macmpi
 #
 
 PROGRAM		=  x11-calc
@@ -137,7 +138,10 @@ voyager: $(VOYAGER) $(OTHERS)
 	@$(MAKE) MODEL=$(patsubst hp%,%,$@)
 
 $(BIN)/x11-calc: $(SRC)/x11-calc.in
-	@install -Dm755 $< $@ && (cd $(BIN) && ls --color x11-calc)
+	@install -Dm755 $< $@
+	@_mdls="$$(echo "$(MODELS)" | tr ' ' '|')"; \
+		sed -i "s/^_models=\".*/_models=\"$$_mdls\"/" $@
+	@(cd $(BIN) && ls --color x11-calc)
 
 install: $(SRC)/x11-calc.desktop.in $(SRC)/x11-calc.svg $(PRG) | $(BIN)
 	@[ -n "$(DESTDIR)" ] || [ -d "$(prefix)" ] || \
