@@ -73,7 +73,7 @@ $ cd x11-calc-stable
 ```
 The to compile all the emulators you just need to invoke make.
 ```
-$ make
+$ make clean; make all
 ```
 It is also possible to compile a single emulator by specifying the model on
 the command line
