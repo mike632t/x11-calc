@@ -191,7 +191,7 @@ clean:
 	@find $(SRC)/ -type l -delete
 	@rm  -f $(SRC)/*.o
 	@find bin -type f -name "x11-calc*" ! -name "*.*" \( -perm -u=x -o -perm -g=x -o -perm -o=x \) -delete # Delete all execuitable files
-	@rmdir $(BIN) > 2> /dev/null || true
+	@rmdir $(BIN) 2> /dev/null || true
 
 backup: $(FILES)
 	@echo "$(PROGRAM)-`date +'%Y%m%d%H%M'`.tar.gz"; tar -czpf ..\/$(PROGRAM)-`date +'%Y%m%d%H%M'`.tar.gz $(FILES)
