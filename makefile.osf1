@@ -26,6 +26,8 @@
 #  20 Mar 24         - Rename launcher into x11-calc - macmpi
 #  23 Mar 24         - Do not delete execuitables - MT
 #                    - Do not automatically delete object files - MT
+#                    - Make clean deletes execuitables (leaving other files
+#                      in the same folder untouched) - MT
 #
 
 PROGRAM	=  x11-calc
@@ -124,6 +126,9 @@ x11-calc:
 #	@chmod +x ./bin/x11-calc
 
 clean:
-	@rm  -f ./src/*.o
-#	@test -d ./bin && rm ./bin/* || true
+clean:
+#	@find $(SRC)/ -type l -delete
+	@rm  -f $(SRC)/*.o
+	@find bin -type f -name "x11-calc*" ! -name "*.*" \( -perm -u=x -o -perm -g=x -o -perm -o=x \) -exec rm -f {} \; # Delete all execuitable files
+	@rmdir $(BIN) 2> /dev/null || true
 

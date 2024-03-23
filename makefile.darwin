@@ -37,6 +37,8 @@
 #                    - Fixed error in make clean - MT
 #  23 Mar 24         - Do not automatically delete object files - MT
 #                    - Removed make.sh from list of files - MT
+#                    - Make clean deletes execuitables (leaving other files
+#                      in the same folder untouched) - MT
 #
 
 PROGRAM		=  x11-calc
@@ -186,8 +188,10 @@ install: $(SRC)/x11-calc.desktop.in $(SRC)/x11-calc.svg $(PRG) $(BIN)
 #	@cp -a $(PRG) $(DESTDIR)/share/x11-calc # Copy program files...
 
 clean:
+	@find $(SRC)/ -type l -delete
 	@rm  -f $(SRC)/*.o
-#	-@test -d $(BIN) && (cd $(BIN) && rm -f *)
+	@find bin -type f -name "x11-calc*" ! -name "*.*" \( -perm -u=x -o -perm -g=x -o -perm -o=x \) -delete # Delete all execuitable files
+	@rmdir $(BIN) > 2> /dev/null || true
 
 backup: $(FILES)
 	@echo "$(PROGRAM)-`date +'%Y%m%d%H%M'`.tar.gz"; tar -czpf ..\/$(PROGRAM)-`date +'%Y%m%d%H%M'`.tar.gz $(FILES)
