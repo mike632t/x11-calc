@@ -25,21 +25,22 @@
 #  16 Mar 24         - Set execute permission on launcher - MT
 #  20 Mar 24         - Rename launcher into x11-calc - macmpi
 #  23 Mar 24         - Do not delete execuitables - MT
+#                    - Do not automatically delete object files - MT
 #
 
 PROGRAM	=  x11-calc
 
 MAKE		=  make
 
-all: clean hp35 hp45 hp70 hp80 hp21 hp22 hp25 hp25c hp27 hp29c hp67 hp31e hp32e hp33e hp33c hp34c hp37e hp38e hp38c hp10c hp11c hp12c hp15c hp16c x11-calc
+all: hp35 hp45 hp70 hp80 hp21 hp22 hp25 hp25c hp27 hp29c hp67 hp31e hp32e hp33e hp33c hp34c hp37e hp38e hp38c hp10c hp11c hp12c hp15c hp16c x11-calc
 
-classic: clean hp35 hp80 hp45 hp70 x11-calc
+classic: hp35 hp80 hp45 hp70 x11-calc
 
-woodstock: clean hp21 hp22 hp25 hp25c hp27 hp29c x11-calc
+woodstock: hp21 hp22 hp25 hp25c hp27 hp29c x11-calc
 
-spice: clean hp31e hp32e hp33e hp33c hp34c hp37e hp38e hp38c x11-calc
+spice: hp31e hp32e hp33e hp33c hp34c hp37e hp38e hp38c x11-calc
 
-voyager: clean hp10c hp11c hp12c hp15c hp16c x11-calc
+voyager: hp10c hp11c hp12c hp15c hp16c x11-calc
 
 
 hp35:

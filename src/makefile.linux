@@ -72,47 +72,48 @@
 #  21 Mar 24         - Instanciate  common  sources  generated object files
 #                      per model, so that parallel model linking use proper
 #                      object files - macmpi
-#  23 Mar 24         - Do not automatically clean up objects as this breaks
-#                      parallel make operations - MT
+#  23 Mar 24         - Do not automatically delete object files as this can
+#                      break parallel make operations - MT
+#                    - Clean removes symbolic links - MT
 #
 
-MODEL	= 21
-PROGRAM	= x11-calc
-SHARED = x11-calc.c x11-calc-cpu.c x11-calc-display.c x11-calc-segment.c
-SHARED += x11-calc-messages.c x11-calc-button.c
-COMMON = x11-calc-switch.c x11-calc-label.c x11-calc-colour.c
-COMMON += x11-calc-font.c x11-keyboard.c gcc-wait.c gcc-exists.c
-SOURCES	:= $(SHARED:.c=_$(MODEL).c) $(COMMON) x11-calc-$(MODEL).c
-OBJECTS := $(SOURCES:.c=.o)
-LANG	= LANG_$(shell (echo $$LANG | cut -f 1 -d '_'))
-UNAME	= $(shell uname)
-COMMIT	= $(shell git log -1 HEAD --format=%h 2> /dev/null)
+MODEL		= 21
+PROGRAM		= x11-calc
+SHARED		= x11-calc.c x11-calc-cpu.c x11-calc-display.c x11-calc-segment.c
+SHARED		+= x11-calc-messages.c x11-calc-button.c
+COMMON		= x11-calc-switch.c x11-calc-label.c x11-calc-colour.c
+COMMON		+= x11-calc-font.c x11-keyboard.c gcc-wait.c gcc-exists.c
+SOURCES		:= $(SHARED:.c=_$(MODEL).c) $(COMMON) x11-calc-$(MODEL).c
+OBJECTS 	:= $(SOURCES:.c=.o)
+LANG		= LANG_$(shell (echo $$LANG | cut -f 1 -d '_'))
+UNAME		= $(shell uname)
+COMMIT		= $(shell git log -1 HEAD --format=%h 2> /dev/null)
 
-BIN	?= ../bin
+BIN		?= ../bin
 
-LIBS	= -lX11 -lm
-FLAGS	= -fcommon -Wall -pedantic -std=gnu99
-FLAGS	+= -Wno-comment -Wno-deprecated-declarations -Wno-builtin-macro-redefined
+LIBS		= -lX11 -lm
+FLAGS		= -fcommon -Wall -pedantic -std=gnu99
+FLAGS		+= -Wno-comment -Wno-deprecated-declarations -Wno-builtin-macro-redefined
 
 # Compiler specific settings
 ifeq ($(CC), cc)
-LIBS	+=  -no-pie
-FLAGS	+= -ansi
+LIBS		+=  -no-pie
+FLAGS		+= -ansi
 endif
 
 ifdef DEBUG
-FLAGS	+=  -g
+FLAGS		+=  -g
 endif
 
-FLAGS	+= -D HP$(MODEL) -D $(LANG)
+FLAGS		+= -D HP$(MODEL) -D $(LANG)
 ifneq ($(COMMIT),)
-FLAGS	+= -D COMMIT_ID='"[Commit Id : $(COMMIT)]"'
+FLAGS		+= -D COMMIT_ID='"[Commit Id : $(COMMIT)]"'
 endif
 ifneq ($(SCALE_WIDTH),)
-FLAGS	+= -D SCALE_WIDTH=$(SCALE_WIDTH)
+FLAGS		+= -D SCALE_WIDTH=$(SCALE_WIDTH)
 endif
 ifneq ($(SCALE_HEIGHT),)
-FLAGS	+= -D SCALE_HEIGHT=$(SCALE_HEIGHT)
+FLAGS		+= -D SCALE_HEIGHT=$(SCALE_HEIGHT)
 endif
 
 $(BIN)/$(PROGRAM)-$(MODEL): $(OBJECTS) | $(BIN)
@@ -131,8 +132,6 @@ $(BIN):
 $(OBJECTS) : %.o : %.c
 ifdef VERBOSE
 	@echo
-	@echo "***" $(PROGRAM)-$(MODEL)
-	@echo
 	@echo $(CC) $(CC) $(FLAGS) -c $< -o $@
 endif
 	@rm -f $(BIN)/$(PROGRAM)-$(MODEL)
@@ -140,6 +139,7 @@ endif
 
 # Create model-instanciated shared souces (just symlinks) that
 # will be used to generate model-instanciated object files
+
 $(SOURCES) :
 	@if ! [ -f "$@" ]; then \
 		_ref="`echo "$@" | sed 's/_$(MODEL)//'`"; \
@@ -149,5 +149,6 @@ $(SOURCES) :
 all: $(BIN)/$(PROGRAM)-$(MODEL)
 
 clean: | $(BIN)
+	@find . -type l -delete
 	@rm -f $(OBJECTS) # -v
 

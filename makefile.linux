@@ -64,6 +64,7 @@
 #                    - Clean out unwanted files before taking a backup, and
 #                      remove symbolic links too - MT
 #  23 Mar 24         - Do not delete execuitables - MT
+#                    - Do not automatically delete object files - MT
 #
 
 PROGRAM		=  x11-calc
@@ -114,22 +115,22 @@ OTHERS		=  x11-calc
 
 .PHONY: clean
 
-all: clean $(MODELS) $(OTHERS)
+all: $(MODELS) $(OTHERS)
 	@:
 
-classic: clean $(CLASSIC) $(OTHERS)
+classic: $(CLASSIC) $(OTHERS)
 	@:
 
-woodstock: clean $(WOODSTOCK) $(OTHERS)
+woodstock: $(WOODSTOCK) $(OTHERS)
 	@:
 
 topcat: clean $(TOPCAT) $(OTHERS)
 	@:
 
-spice: clean $(SPICE) $(OTHERS)
+spice: $(SPICE) $(OTHERS)
 	@:
 
-voyager: clean $(VOYAGER) $(OTHERS)
+voyager: $(VOYAGER) $(OTHERS)
 	@:
 
 # this is base model target:

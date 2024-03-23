@@ -40,6 +40,7 @@
 #  20 Mar 24         - Rename launcher into x11-calc - macmpi
 #                    - Tidied up MAKE commands- MT
 #                    - Fixed error in make clean - MT
+#  23 Mar 24         - Do not automatically delete object files - MT
 #
 
 PROGRAM		=  x11-calc
@@ -86,15 +87,15 @@ SPICE		=  hp31e hp32e hp33e hp33c hp34c hp37e hp38e hp38c
 VOYAGER		=  hp10c hp11c hp12c hp15c hp16c
 MODELS		=  $(CLASSIC) $(WOODSTOCK) $(TOPCAT) $(SPICE) $(VOYAGER)
 
-all: clean $(MODELS) x11-calc
+all: $(MODELS) x11-calc
 
-classic: clean $(CLASSIC) x11-calc
+classic: $(CLASSIC) x11-calc
 
-woodstock: clean $(WOODSTOCK) x11-calc
+woodstock: $(WOODSTOCK) x11-calc
 
-spice: clean $(SPICE) x11-calc
+spice: $(SPICE) x11-calc
 
-voyager: clean $(VOYAGER) x11-calc
+voyager: $(VOYAGER) x11-calc
 
 
 hp35:
