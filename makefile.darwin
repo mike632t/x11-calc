@@ -36,6 +36,7 @@
 #  20 Mar 24         - Rename launcher into x11-calc - macmpi
 #                    - Fixed error in make clean - MT
 #  23 Mar 24         - Do not automatically delete object files - MT
+#                    - Removed make.sh from list of files - MT
 #
 
 PROGRAM		=  x11-calc
@@ -53,7 +54,7 @@ SOURCES		=  $(wildcard $(SRC)/*.c) $(wildcard $(SRC)/*.h) $(wildcard $(SRC)/*.in
 FILES		=  $(SOURCES)
 FILES		+= $(wildcard $(SRC)/*.c.[0-9]) $(wildcard $(SRC)/*.h.[0-9])  $(wildcard $(SRC)/*.in.[0-9])
 
-FILES		+= make.sh makefile makefile.linux makefile.osf1
+FILES		+= makefile makefile.linux makefile.osf1
 FILES		+= $(wildcard make.sh.[0-9]) $(wildcard makefile.[0-9]) $(wildcard makefile.linux.[0-9]) $(wildcard makefile.osf1.[0-9])
 
 FILES		+= $(SRC)/make.com $(SRC)/makefile.linux $(SRC)/makefile.osf1

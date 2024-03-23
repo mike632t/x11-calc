@@ -65,6 +65,7 @@
 #                      remove symbolic links too - MT
 #  23 Mar 24         - Do not delete execuitables - MT
 #                    - Do not automatically delete object files - MT
+#                    - Removed make.sh from list of files - MT
 #
 
 PROGRAM		=  x11-calc
@@ -81,7 +82,7 @@ prefix		?= $$HOME/.local
 FILES		=  $(wildcard $(SRC)/*.c) $(wildcard $(SRC)/*.h) $(wildcard $(SRC)/*.in)
 FILES		+= $(wildcard $(SRC)/*.c.[0-9]) $(wildcard $(SRC)/*.h.[0-9])  $(wildcard $(SRC)/*.in.[0-9])
 
-FILES		+= make.sh makefile $(SRC)/make.com
+FILES		+= makefile $(SRC)/make.com
 FILES		+= $(wildcard make.sh.[0-9]) $(wildcard makefile.[0-9]) $(wildcard $(SRC)/make.com.[0-9])
 
 FILES		+= makefile.linux makefile.osf1 makefile.netbsd makefile.darwin
