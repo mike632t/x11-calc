@@ -302,6 +302,8 @@ for a particular model or apply a patch to the existing firmware.
 * A 24 bit colour display is required.
 * For best results you need to have the X windows core fonts installed.
 
+* Parallel make only works on Linux.
+
 ##### HP 29C
 
 * All 30 registers have continuous memory.
