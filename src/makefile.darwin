@@ -54,7 +54,7 @@ FLAGS	+= -I /opt/X11/include/X11/ -L /opt/X11/lib/
 LIBS	+= -no-pie
 FLAGS	+= -ansi
 
-all: clean $(BIN)/$(PROGRAM)-$(MODEL) $(OBJECTS)
+all: $(BIN)/$(PROGRAM)-$(MODEL) $(OBJECTS)
 FLAGS	+= -D HP$(MODEL) -D $(LANG)
 SOURCES += x11-calc-$(MODEL).c
 
