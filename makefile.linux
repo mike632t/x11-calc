@@ -69,6 +69,7 @@
 #                    - Do not clean up files before backing up - MT
 #                    - Make clean deletes execuitables (leaving other files
 #                      in the same folder untouched) - MT
+#                      Use .DEFAULT target + improve x11-calc deps - macmpi
 #
 
 PROGRAM		=  x11-calc
@@ -114,35 +115,29 @@ TOPCAT		=  hp67
 SPICE		=  hp31e hp32e hp33e hp33c hp34c hp37e hp38e hp38c
 VOYAGER		=  hp10c hp11c hp12c hp15c hp16c
 MODELS		=  $(CLASSIC) $(WOODSTOCK) $(TOPCAT) $(SPICE) $(VOYAGER)
-OTHERS		=  x11-calc
+OTHERS		=  $(BIN)/x11-calc
 
 
 .PHONY: clean
 
 all: $(MODELS) $(OTHERS)
-	@:
 
 classic: $(CLASSIC) $(OTHERS)
-	@:
 
 woodstock: $(WOODSTOCK) $(OTHERS)
-	@:
 
 topcat: clean $(TOPCAT) $(OTHERS)
-	@:
 
 spice: $(SPICE) $(OTHERS)
-	@:
 
 voyager: $(VOYAGER) $(OTHERS)
-	@:
 
 # this is base model target:
-%:
+.DEFAULT:
 	@$(MAKE) MODEL=$(patsubst hp%,%,$@)
 
-x11-calc: $(SRC)/x11-calc.in | $(BIN)
-	@install -m755 $(SRC)/x11-calc.in $(BIN)/x11-calc && (cd $(BIN) && ls --color x11-calc)
+$(BIN)/x11-calc: $(SRC)/x11-calc.in
+	@install -Dm755 $< $@ && (cd $(BIN) && ls --color x11-calc)
 
 install: $(SRC)/x11-calc.desktop.in $(SRC)/x11-calc.svg $(PRG) | $(BIN)
 	@[ -n "$(DESTDIR)" ] || [ -d "$(prefix)" ] || \
@@ -165,8 +160,7 @@ $(BIN):
 clean:
 	@find $(SRC)/ -type l -delete
 	@rm  -f $(SRC)/*.o
-	@find $(BIN) -type f -name "$(PROGRAM)*" ! -name "*.*" \( -perm -u=x -o -perm -g=x -o -perm -o=x \) -delete  2> /dev/null || true # Delete all execuitable files
-	@rmdir $(BIN) 2> /dev/null || true
+	-@[ -d "$(BIN)" ] && rm -rf $(BIN)
 
 backup: $(FILES)
 	@echo "$(PROGRAM)-`date +'%Y%m%d%H%M'`.tar.gz"; tar -czpf ..\/$(PROGRAM)-`date +'%Y%m%d%H%M'`.tar.gz $(FILES)

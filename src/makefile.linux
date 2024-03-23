@@ -116,6 +116,8 @@ ifneq ($(SCALE_HEIGHT),)
 FLAGS		+= -D SCALE_HEIGHT=$(SCALE_HEIGHT)
 endif
 
+all: $(BIN)/$(PROGRAM)-$(MODEL)
+
 $(BIN)/$(PROGRAM)-$(MODEL): $(OBJECTS) | $(BIN)
 ifdef VERBOSE
 	@echo
@@ -145,8 +147,6 @@ $(SOURCES) :
 		_ref="`echo "$@" | sed 's/_$(MODEL)//'`"; \
 		ln -s "$$_ref" "$@" ; \
 	fi
-
-all: $(BIN)/$(PROGRAM)-$(MODEL)
 
 clean: | $(BIN)
 	@find . -type l -delete
