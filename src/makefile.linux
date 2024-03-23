@@ -72,12 +72,14 @@
 #  21 Mar 24         - Instanciate  common  sources  generated object files
 #                      per model, so that parallel model linking use proper
 #                      object files - macmpi
+#  23 Mar 24         - Do not automatically clean up objects as this breaks
+#                      parallel make operations - MT
 #
 
 MODEL	= 21
 PROGRAM	= x11-calc
 SHARED = x11-calc.c x11-calc-cpu.c x11-calc-display.c x11-calc-segment.c
-SHARED += x11-calc-messages.c x11-calc-button.c 
+SHARED += x11-calc-messages.c x11-calc-button.c
 COMMON = x11-calc-switch.c x11-calc-label.c x11-calc-colour.c
 COMMON += x11-calc-font.c x11-keyboard.c gcc-wait.c gcc-exists.c
 SOURCES	:= $(SHARED:.c=_$(MODEL).c) $(COMMON) x11-calc-$(MODEL).c
@@ -113,7 +115,7 @@ ifneq ($(SCALE_HEIGHT),)
 FLAGS	+= -D SCALE_HEIGHT=$(SCALE_HEIGHT)
 endif
 
-$(BIN)/$(PROGRAM)-$(MODEL): $(OBJECTS) | $(BIN)	
+$(BIN)/$(PROGRAM)-$(MODEL): $(OBJECTS) | $(BIN)
 ifdef VERBOSE
 	@echo
 	@echo $(CC) $(OBJECTS) $(LIBS) -o $@
@@ -144,7 +146,7 @@ $(SOURCES) :
 		ln -s "$$_ref" "$@" ; \
 	fi
 
-all: clean $(BIN)/$(PROGRAM)-$(MODEL)
+all: $(BIN)/$(PROGRAM)-$(MODEL)
 
 clean: | $(BIN)
 	@rm -f $(OBJECTS) # -v
