@@ -66,6 +66,7 @@
 #  23 Mar 24         - Do not delete execuitables - MT
 #                    - Do not automatically delete object files - MT
 #                    - Removed make.sh from list of files - MT
+#                    - Do not clean up files before backing up - MT
 #
 
 PROGRAM		=  x11-calc
@@ -164,5 +165,5 @@ clean:
 	@rm  -f $(SRC)/*.o
 #	-@test -d $(BIN) && (cd $(BIN) && rm -f *)
 
-backup: clean $(FILES)
+backup: $(FILES)
 	@echo "$(PROGRAM)-`date +'%Y%m%d%H%M'`.tar.gz"; tar -czpf ..\/$(PROGRAM)-`date +'%Y%m%d%H%M'`.tar.gz $(FILES)
