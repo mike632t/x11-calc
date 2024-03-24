@@ -71,6 +71,7 @@
 #                      in the same folder untouched) - MT
 #                    - Use .DEFAULT target + improve x11-calc deps - macmpi
 #                    - Feed x11-calc _models with makefile  MODELS - macmpi
+#  24 Mar 24         - Updated FILES - MT
 #
 
 PROGRAM		=  x11-calc
@@ -87,21 +88,19 @@ prefix		?= $$HOME/.local
 FILES		=  $(wildcard $(SRC)/*.c) $(wildcard $(SRC)/*.h) $(wildcard $(SRC)/*.in)
 FILES		+= $(wildcard $(SRC)/*.c.[0-9]) $(wildcard $(SRC)/*.h.[0-9])  $(wildcard $(SRC)/*.in.[0-9])
 
-FILES		+= makefile $(SRC)/make.com
-FILES		+= $(wildcard make.sh.[0-9]) $(wildcard makefile.[0-9]) $(wildcard $(SRC)/make.com.[0-9])
+FILES		+= makefile makefile.linux makefile.osf1 makefile.netbsd makefile.darwin
+FILES		+= $(wildcard makefile.[0-9]) $(wildcard makefile.linux.[0-9]) $(wildcard makefile.osf1.[0-9]) $(wildcard makefile.netbsd.[0-9]) $(wildcard makefile.darwin.[0-9])
+FILES		+= $(SRC)/makefile $(SRC)/makefile.linux $(SRC)/makefile.osf1 $(SRC)/makefile.netbsd $(SRC)/makefile.darwin
+FILES		+= $(wildcard $(SRC)/makefile.[0-9]) $(wildcard $(SRC)/makefile.linux.[0-9]) $(wildcard $(SRC)/makefile.osf1.[0-9]) $(wildcard $(SRC)/makefile.netbsd.[0-9]) $(wildcard $(SRC)/makefile.darwin.[0-9])
+FILES		+= $(SRC)/make.com $(wildcard $(SRC)/make.com.[0-9])
 
-FILES		+= makefile.linux makefile.osf1 makefile.netbsd makefile.darwin
-FILES		+= $(wildcard makefile.linux.[0-9]) $(wildcard makefile.osf1.[0-9])
-
-FILES		+= $(SRC)/makefile.linux $(SRC)/makefile.osf1 $(SRC)/makefile.netbsd $(SRC)/makefile.darwin
-FILES		+= $(wildcard $(SRC)/makefile.linux.[0-9]) $(wildcard $(SRC)/makefile.osf1.[0-9]) $(wildcard $(SRC)/makefile.netbsd.[0-9]) $(wildcard $(SRC)/makefile.darwin.[0-9])
+FILES		+= $(wildcard $(SRC)/x11-calc*.png) $(wildcard $(SRC)/x11-calc*.png.[0-9])
+FILES		+= $(wildcard $(SRC)/x11-calc*.ico) $(wildcard $(SRC)/x11-calc*.ico.[0-9])
+FILES		+= $(wildcard $(SRC)/x11-calc*.svg) $(wildcard $(SRC)/x11-calc*.svg.[0-9])
 
 FILES		+= $(wildcard $(ROM)/x11-calc*.rom) $(wildcard $(ROM)/x11-calc*.rom.[0-9])
 FILES		+= $(wildcard $(PRG)/x11-calc*.dat) $(wildcard $(PRG)/x11-calc*.dat.[0-9])
 FILES		+= $(wildcard $(IMG)/x11-calc*.png) $(wildcard $(IMG)/x11-calc*.png.[0-9])
-FILES		+= $(wildcard $(SRC)/x11-calc*.png) $(wildcard $(SRC)/x11-calc*.png.[0-9])
-FILES		+= $(wildcard $(SRC)/x11-calc*.ico) $(wildcard $(SRC)/x11-calc*.ico.[0-9])
-FILES		+= $(wildcard $(SRC)/x11-calc*.svg) $(wildcard $(SRC)/x11-calc*.svg.[0-9])
 
 FILES		+= $(wildcard *.md) $(wildcard *.md.[0-9]) LICENSE
 FILES		+= .gitignore .gitattributes
