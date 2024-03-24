@@ -29,20 +29,20 @@
 #                    - Fixed issue with directory creation - MT
 #                    - Renamed $TARGET to $BIN - MT
 #  24 Mar 24         - Fixed bug in 'make clean' - MT
+#                    - Split compilation of the common and shared code into
+#                      seperate tasks - MT
 #
 
 MODEL	=  21
 PROGRAM	=  x11-calc
-SOURCES	=  x11-calc.c x11-calc-cpu.c x11-calc-display.c x11-calc-segment.c
-SOURCES	+= x11-calc-button.c x11-calc-switch.c x11-calc-label.c x11-calc-colour.c
-SOURCES	+= x11-calc-font.c x11-calc-messages.c x11-keyboard.c gcc-wait.c gcc-exists.c
-OBJECTS	=  $(SOURCES:.c=.o)
-OUTPUT	=  $(PROGRAM).out
-UNAME	=  $(shell uname)
-COMMIT	=  $(shell git log -1 HEAD --format=%h 2> /dev/null)
+TARGET	=  x11-calc-$(MODEL)
+SHARED	=  x11-calc.c $(TARGET).c x11-calc-cpu.c x11-calc-display.c x11-calc-segment.c x11-calc-messages.c x11-calc-button.c
+COMMON	=  x11-calc-switch.c x11-calc-label.c x11-keyboard.c x11-calc-colour.c x11-calc-font.c gcc-wait.c gcc-exists.c
 
-BIN	=  ../bin
 LANG	=  LANG_en
+OS	!= uname | tr '[:upper:]' '[:lower:]'
+#COMMIT	= $(shell git log -1 HEAD --format=%h 2> /dev/null)
+BIN	= ../bin
 
 LIBS	=  -lX11 -lm
 FLAGS	=  -fcommon -Wall -pedantic -std=gnu99
@@ -56,20 +56,30 @@ FLAGS	+= -I /usr/X11R7/include/ -L /usr/X11R7/lib/ -R /usr/X11R7/lib
 LIBS	+= -no-pie
 FLAGS	+= -ansi
 
-all: $(BIN)/$(PROGRAM)-$(MODEL) $(OBJECTS)
-FLAGS	+= -D HP$(MODEL) -D $(LANG)
-SOURCES += x11-calc-$(MODEL).c
+all: $(BIN)/$(TARGET)
 
-$(BIN)/$(PROGRAM)-$(MODEL): $(OBJECTS) $(BIN)
-	@$(CC) $(FLAGS) $(OBJECTS) -o $@ $(LIBS) && (cd $(BIN) && ls $$(echo $@ | sed "s:$(BIN)/::g") ) # Escape $ using $$...
+$(BIN)/$(TARGET): $(SHARED:.c=.o) $(COMMON:.c=.o) $(BIN)
+.ifdef VERBOSE
+	@echo "$(CC) $(FLAGS) $(SHARED:.c=.o) $(COMMON:.c=.o) -o $(BIN)/$@ $(LIBS)"
+.endif
+	@$(CC) $(FLAGS) $(SHARED:.c=.o) $(COMMON:.c=.o) -o $(BIN)/$@ $(LIBS) && (cd $(BIN) && ls $$(echo $@ | sed "s:$(BIN)/::g") ) # Escape $ using $$...
 
 $(BIN):
-	@mkdir $(BIN)
+	@mkdir -p $(BIN)
 
-$(OBJECTS) : $(SOURCES)
-	@rm -f $(BIN)/$(PROGRAM)-$(MODEL)
-	@$(CC) $(FLAGS) -c $(SOURCES)
+$(SHARED:.c=.o) : $(SHARED)
+.ifdef VERBOSE
+	@echo
+	@echo "$(CC) $(FLAGS) -c $(SHARED) -DHP$(MODEL) -D$(OS) -D$(LANG)"
+.endif
+	@$(CC) $(FLAGS) -c $(SHARED) -D HP$(MODEL) -D $(OS) -D $(LANG)
+
+$(COMMON:.c=.o)  : $(COMMON)
+.ifdef VERBOSE
+	@echo "$(CC) $(FLAGS) -c $(SHARED) -DHP$(MODEL) -D$(OS) -D$(LANG)"
+.endif
+	@$(CC) $(FLAGS) -c $(COMMON) -DHP$(MODEL) -D$(OS) -D$(LANG)
 
 clean:
-#	@rm -f $(PROGRAM)-$(MODEL).o
-	@rm -f $(OBJECTS) # -v
+	@find . -type l -exec rm -f {} \;
+	@rm -f $(SHARED:.c=.o) $(COMMON:.c=.o) # -v
