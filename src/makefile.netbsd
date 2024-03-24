@@ -28,7 +28,7 @@
 #  20 Mar 24         - Updated change history - MT
 #                    - Fixed issue with directory creation - MT
 #                    - Renamed $TARGET to $BIN - MT
-#
+#  24 Mar 24         - Fixed bug in 'make clean' - MT
 #
 
 MODEL	=  21
@@ -72,4 +72,4 @@ $(OBJECTS) : $(SOURCES)
 
 clean:
 #	@rm -f $(PROGRAM)-$(MODEL).o
-	@rm -f $(BIN)/$(OBJECTS) # -v
+	@rm -f $(OBJECTS) # -v
