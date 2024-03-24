@@ -22,11 +22,14 @@
 #  22 Mar 24         - Simple redirection, without extra make.sh - macmpi
 #                    - Fixed default rule so it works on NetBSD, Tru64, and
 #                      Linux (now we can get rid of make.sh) - MT
+#  24 Mar 24         - Pass model number - MT
 #
 
+MODEL	=  21
+
 all:
-	@$(MAKE) -s -f "makefile.`uname | tr '[:upper:]' '[:lower:]'`" $@
+	@$(MAKE) -s -f "makefile.`uname | tr '[:upper:]' '[:lower:]'`" MODEL=$(MODEL) $@
 
 .DEFAULT:
-	@$(MAKE) -s -f "makefile.`uname | tr '[:upper:]' '[:lower:]'`" $@
+	@$(MAKE) -s -f "makefile.`uname | tr '[:upper:]' '[:lower:]'`" MODEL=$(MODEL) $@
 
