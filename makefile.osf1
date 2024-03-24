@@ -129,5 +129,5 @@ x11-calc:
 clean:
 #	@find src/ -type l -delete
 	@rm  -f src/*.o
-	@rmdir bin 2> /dev/null || true
+	@rm -rf bin 2> /dev/null || true
 
