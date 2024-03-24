@@ -29,30 +29,49 @@
 #  20 Mar 24         - Updated change history - MT
 #                    - Fixed issue with directory creation - MT
 #                    - Renamed $TARGET to $BIN - MT
+#  24 Mar 24         - Updated to use $SHARED and $COMMON source files - MT
+#                    - Added 'make all' and 'make clean' - MT
+#                    - Split compilation of the common and shared code into
+#                      seperate tasks (which is up to be 18% quicker) - MT
 #
 #
-MODEL	= 21
-PROGRAM	= x11-calc
-OUTPUT	= x11-calc-$(MODEL)
-SOURCES	= x11-calc.c x11-calc-$(MODEL).c x11-calc-cpu.c x11-calc-display.c x11-calc-messages.c x11-calc-segment.c x11-calc-button.c x11-calc-switch.c x11-calc-label.c x11-calc-colour.c x11-calc-font.c gcc-wait.c gcc-exists.c
-FILES	= *.c *.h makefile README LICENSE
-OBJECTS	= $(SOURCES:.c=.o)
+#
+
+MODEL	=  21
+PROGRAM	=  x11-calc
+TARGET	=  x11-calc-$(MODEL)
+SHARED	=  x11-calc.c $(TARGET).c x11-calc-cpu.c x11-calc-display.c x11-calc-segment.c x11-calc-messages.c x11-calc-button.c
+COMMON	=  x11-calc-switch.c x11-calc-label.c x11-calc-colour.c x11-calc-font.c gcc-wait.c gcc-exists.c # Do not include x11-keyboard.c
+SOURCES	=  $(SHARED) $(COMMON)
+OBJECTS	=  $(SOURCES:.c=.o)
+
+LANG	=  LANG_en
+OS	=  $(shell uname)
+#COMMIT	= $(shell git log -1 HEAD --format=%h 2> /dev/null)
 BIN	= ../bin
-#LANG	= LANG_$(shell (echo $$LANG | cut -f 1 -d '_'))
-#OS	= $(shell uname)
-LANG	= LANG_en
-OS	= OSF1
+
+LIBS	= -lX11 -lm
+#FLAGS	=
 CC	= cc
 
-$(OUTPUT): $(OBJECTS) $(BIN)
+all: $(BIN)/$(TARGET)
+
+$(BIN)/$(TARGET): $(OBJECTS) $(BIN)
 #	@echo '*** Linking $(OBJECTS)'
-	@$(CC) $(OBJECTS) -o $(BIN)/$@ -lX11 -lm
+	@$(CC) $(OBJECTS) -o $(BIN)/$@ $(LIBS)
 
 $(BIN):
 	@mkdir -p $(BIN)
 
-$(OBJECTS) : $(SOURCES)
-#	@echo '*** Compiling $(SOURCES)'
-	@$(CC) -c $(SOURCES)  -DHP$(MODEL) -D$(OS) -D $(LANG)
 
-#
+$(SHARED:.c=.o) : $(SHARED)
+#	@echo '*** Compiling $(SOURCES)'
+	@$(CC) -c $(SHARED)  -DHP$(MODEL) -D$(OS) -D $(LANG)
+
+$(COMMON:.c=.o)  : $(COMMON)
+#	@echo '*** Compiling $(SOURCES)'
+	@$(CC) -c $(COMMON)  -DHP$(MODEL) -D$(OS) -D $(LANG)
+
+clean:
+	@find . -type l -exec rm -f {} \;
+	@rm -f $(OBJECTS) # -v
