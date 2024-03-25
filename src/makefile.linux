@@ -69,86 +69,69 @@
 #  17 Mar 24         - Removed OS specific settings for other OSs - MT
 #  20 Mar 24         - Fixed issue with directory creation - MT
 #                    - Renamed $TARGET to $BIN - MT
-#  21 Mar 24         - Instanciate  common  sources  generated object files
+#  21 Mar 24         - Instantiate  common  sources  generated object files
 #                      per model, so that parallel model linking use proper
 #                      object files - macmpi
 #  23 Mar 24         - Do not automatically delete object files as this can
 #                      break parallel make operations - MT
 #                    - Clean removes symbolic links - MT
+#  23 Mar 25         - Instantiate without symlinks trick and use std FLAGS
+#                      to maximize use of implicit build rules - macmpi
+#                    - Remove VERBOSE in favor of make --dry-run - macmpi
 #
 
 MODEL		= 21
 PROGRAM		= x11-calc
-SHARED		= x11-calc.c x11-calc-cpu.c x11-calc-display.c x11-calc-segment.c
-SHARED		+= x11-calc-messages.c x11-calc-button.c
-COMMON		= x11-calc-switch.c x11-calc-label.c x11-calc-colour.c
-COMMON		+= x11-calc-font.c x11-keyboard.c gcc-wait.c gcc-exists.c
-SOURCES		:= $(SHARED:.c=_$(MODEL).c) $(COMMON) x11-calc-$(MODEL).c
-OBJECTS 	:= $(SOURCES:.c=.o)
+SHARED_SRC	= x11-calc.c x11-calc-cpu.c x11-calc-display.c x11-calc-segment.c
+SHARED_SRC	+= x11-calc-messages.c x11-calc-button.c
+COMMON_SRC	= x11-calc-switch.c x11-calc-label.c x11-calc-colour.c
+COMMON_SRC	+= x11-calc-font.c x11-keyboard.c gcc-wait.c gcc-exists.c
+SHARED_OBJ	:= $(SHARED_SRC:.c=_$(MODEL).o)
+COMMON_OBJ	:= $(COMMON_SRC:.c=.o)
+OBJECTS 	:= $(SHARED_OBJ) $(COMMON_OBJ) x11-calc-$(MODEL).o
 LANG		= LANG_$(shell (echo $$LANG | cut -f 1 -d '_'))
 UNAME		= $(shell uname)
 COMMIT		= $(shell git log -1 HEAD --format=%h 2> /dev/null)
 
 BIN		?= ../bin
 
-LIBS		= -lX11 -lm
-FLAGS		= -fcommon -Wall -pedantic -std=gnu99
-FLAGS		+= -Wno-comment -Wno-deprecated-declarations -Wno-builtin-macro-redefined
+LDLIBS		= -lX11 -lm
+CFLAGS		= -fcommon -Wall -pedantic -std=gnu99
+CFLAGS		+= -Wno-comment -Wno-deprecated-declarations -Wno-builtin-macro-redefined
 
 # Compiler specific settings
 ifeq ($(CC), cc)
-LIBS		+=  -no-pie
-FLAGS		+= -ansi
+LDFLAGS		=  -no-pie
+CFLAGS		+= -ansi
 endif
 
 ifdef DEBUG
-FLAGS		+=  -g
+CFLAGS		+=  -g
 endif
 
-FLAGS		+= -D HP$(MODEL) -D $(LANG)
+CFLAGS		+= -D HP$(MODEL) -D $(LANG)
 ifneq ($(COMMIT),)
-FLAGS		+= -D COMMIT_ID='"[Commit Id : $(COMMIT)]"'
+CFLAGS		+= -D COMMIT_ID='"[Commit Id : $(COMMIT)]"'
 endif
 ifneq ($(SCALE_WIDTH),)
-FLAGS		+= -D SCALE_WIDTH=$(SCALE_WIDTH)
+CFLAGS		+= -D SCALE_WIDTH=$(SCALE_WIDTH)
 endif
 ifneq ($(SCALE_HEIGHT),)
-FLAGS		+= -D SCALE_HEIGHT=$(SCALE_HEIGHT)
+CFLAGS		+= -D SCALE_HEIGHT=$(SCALE_HEIGHT)
 endif
 
 all: $(BIN)/$(PROGRAM)-$(MODEL)
 
 $(BIN)/$(PROGRAM)-$(MODEL): $(OBJECTS) | $(BIN)
-ifdef VERBOSE
-	@echo
-	@echo $(CC) $(OBJECTS) $(LIBS) -o $@
-	@echo
-endif
-	@$(CC) $(FLAGS) $(OBJECTS) -o $@ $(LIBS) && (cd $(BIN) && ls --color $$(echo $@ | sed "s:$(BIN)/::g") ) # Escape $ using $$...
-	@# cleanup temporary symlinks now instanciated object files are created
-	@rm -f *_$(MODEL).c
+	@rm -f $(BIN)/$(PROGRAM)-$(MODEL)
+	@$(CC) $(OBJECTS) $(LDFLAGS) $(LDLIBS) -o $@ && (cd $(BIN) && ls --color $$(echo $@ | sed "s:$(BIN)/::g") ) # Escape $ using $$...
 
 $(BIN):
 	@mkdir -p $(BIN)
 
-$(OBJECTS) : %.o : %.c
-ifdef VERBOSE
-	@echo
-	@echo $(CC) $(CC) $(FLAGS) -c $< -o $@
-endif
-	@rm -f $(BIN)/$(PROGRAM)-$(MODEL)
-	@$(CC) $(FLAGS) -c $< -o $@
-
-# Create model-instanciated shared souces (just symlinks) that
-# will be used to generate model-instanciated object files
-
-$(SOURCES) :
-	@if ! [ -f "$@" ]; then \
-		_ref="`echo "$@" | sed 's/_$(MODEL)//'`"; \
-		ln -s "$$_ref" "$@" ; \
-	fi
+$(SHARED_OBJ) : %_$(MODEL).o : %.c
+	@$(CC) $(CFLAGS) -c $< -o $@
 
 clean: | $(BIN)
-	@find . -type l -delete
-	@rm -f $(OBJECTS) # -v
+	@rm -f $(OBJECTS)
 

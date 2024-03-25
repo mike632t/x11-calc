@@ -105,7 +105,7 @@ FILES		+= $(wildcard $(IMG)/x11-calc*.png) $(wildcard $(IMG)/x11-calc*.png.[0-9]
 FILES		+= $(wildcard *.md) $(wildcard *.md.[0-9]) LICENSE
 FILES		+= .gitignore .gitattributes
 
-MAKE		=  make --no-print-directory -C ./src -f makefile.linux
+SUBMAKE		=  --no-print-directory -C ./src -f makefile.linux
 
 LIST		=  hp35 hp21 hp25c hp29c hp31e hp32e hp33c hp34c hp10c hp11c hp12c hp15c hp16c
 
@@ -134,7 +134,7 @@ voyager: $(VOYAGER) $(OTHERS)
 
 # this is base model target:
 .DEFAULT:
-	@$(MAKE) MODEL=$(patsubst hp%,%,$@)
+	@$(MAKE) $(SUBMAKE) MODEL=$(patsubst hp%,%,$@)
 
 $(BIN)/x11-calc: $(SRC)/x11-calc.in
 	@install -Dm755 $< $@
