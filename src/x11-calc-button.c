@@ -53,14 +53,17 @@
  * 24 Feb 24         - Do not need to include "x11-font.h" - MT
  * 03 Mar 24         - Updated error handling (now passes the  error number
  *                     to the error handler) - MT
+ * 25 Mar 24         - If the button is pressed the text now moves down one
+ *                     pixel if using the classic button style, not up like
+ *                     the later models - MT
  *
  * To Do             - Add a new style to handle the type of button used by
  *                     the classic series.
  */
 
 #define NAME           "x11-calc-button"
-#define BUILD          "0019"
-#define DATE           "03 Mar 24"
+#define BUILD          "0020"
+#define DATE           "25 Mar 24"
 #define AUTHOR         "MT"
 
 #include <errno.h>     /* errno */
@@ -222,12 +225,25 @@ int i_button_draw(Display *h_display, int x_application_window, int i_screen, ob
          i_upper = i_offset + (h_button->text_font->ascent + h_button->text_font->descent) / 2 - h_button->text_font->descent - 2; /* Find vertical position of text */
       i_lower = i_offset + (i_lower - i_offset + h_button->label_font->ascent + h_button->label_font->descent) / 2 - h_button->label_font->descent;
 
-      if ((h_button->state)){ /* Is the button pressed? */
-         i_offset--;
-         i_upper--;
+      if (h_button->style == 0)
+      {
+         if ((h_button->state)){ /* Is the button pressed? */
+            i_offset--;
+            i_upper--;
+         }
+         else {
+            i_lower++;
+         }
       }
-      else {
-         i_lower++;
+      else
+      {
+         if ((h_button->state)){ /* Is the button pressed? */
+            i_lower++;
+         }
+         else {
+            i_offset--;
+            i_upper--;
+         }
       }
 
       if (h_button->style == 0)
