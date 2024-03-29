@@ -72,6 +72,7 @@
 #                    - Use .DEFAULT target + improve x11-calc deps - macmpi
 #                    - Feed x11-calc _models with makefile  MODELS - macmpi
 #  24 Mar 24         - Updated FILES - MT
+#  28 Mar 24         - Leverage src/makefile.generic - macmpi
 #
 
 PROGRAM		=  x11-calc
@@ -162,7 +163,7 @@ $(BIN):
 
 clean:
 	@find $(SRC)/ -type l -delete
-	@rm  -f $(SRC)/*.o
+	@rm  -f $(SRC)/*.o $(SRC)/*.o_*
 	-@[ -d "$(BIN)" ] && rm -rf $(BIN)
 
 backup: $(FILES)
