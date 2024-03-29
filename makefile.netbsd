@@ -44,6 +44,7 @@
 #                    - Removed make.sh from list of files - MT
 #                    - Make clean deletes execuitables (leaving other files
 #                      in the same folder untouched) - MT
+#  29 Mar 24         - Use generic bsd submake & propagate options - macmpi
 #
 
 PROGRAM		=  x11-calc
@@ -79,7 +80,7 @@ FILES		+= $(wildcard $(SRC)/*.png) $(wildcard $(SRC)/*.ico)
 FILES		+= $(wildcard *.md) $(wildcard *.md.[0-9]) LICENSE
 FILES		+= .gitignore .gitattributes
 
-MAKE		=  @make -C ./src -f makefile.netbsd
+SUBMAKE		=  -C ./src -f makefile.bsd
 
 LIST		=  hp35 hp21 hp25c hp29c hp31e hp32e hp33c hp34c hp10c hp11c hp12c hp15c hp16c
 
@@ -102,79 +103,79 @@ voyager: $(VOYAGER) x11-calc
 
 
 hp35:
-	$(MAKE) MODEL=35
+	$(MAKE) $(SUBMAKE) MODEL=35
 
 hp80:
-	$(MAKE) MODEL=80
+	$(MAKE) $(SUBMAKE) MODEL=80
 
 hp45:
-	$(MAKE) MODEL=45
+	$(MAKE) $(SUBMAKE) MODEL=45
 
 hp70:
-	$(MAKE) MODEL=70
+	$(MAKE) $(SUBMAKE) MODEL=70
 
 hp10:
-	$(MAKE) MODEL=10
+	$(MAKE) $(SUBMAKE) MODEL=10
 
 hp21:
-	$(MAKE) MODEL=21
+	$(MAKE) $(SUBMAKE) MODEL=21
 
 hp22:
-	$(MAKE) MODEL=22
+	$(MAKE) $(SUBMAKE) MODEL=22
 
 hp25:
-	$(MAKE) MODEL=25
+	$(MAKE) $(SUBMAKE) MODEL=25
 
 hp25c:
-	$(MAKE) MODEL=25c
+	$(MAKE) $(SUBMAKE) MODEL=25c
 
 hp27:
-	$(MAKE) MODEL=27
+	$(MAKE) $(SUBMAKE) MODEL=27
 
 hp29c:
-	$(MAKE) MODEL=29c
+	$(MAKE) $(SUBMAKE) MODEL=29c
 
 hp67:
-	$(MAKE) MODEL=67
+	$(MAKE) $(SUBMAKE) MODEL=67
 
 hp31e:
-	$(MAKE) MODEL=31e
+	$(MAKE) $(SUBMAKE) MODEL=31e
 
 hp32e:
-	$(MAKE) MODEL=32e
+	$(MAKE) $(SUBMAKE) MODEL=32e
 
 hp33e:
-	$(MAKE) MODEL=33e
+	$(MAKE) $(SUBMAKE) MODEL=33e
 
 hp33c:
-	$(MAKE) MODEL=33c
+	$(MAKE) $(SUBMAKE) MODEL=33c
 
 hp34c:
-	$(MAKE) MODEL=34c
+	$(MAKE) $(SUBMAKE) MODEL=34c
 
 hp37e:
-	$(MAKE) MODEL=37e
+	$(MAKE) $(SUBMAKE) MODEL=37e
 
 hp38e:
-	$(MAKE) MODEL=38e
+	$(MAKE) $(SUBMAKE) MODEL=38e
 
 hp38c:
-	$(MAKE) MODEL=38c
+	$(MAKE) $(SUBMAKE) MODEL=38c
 
 hp10c:
-	$(MAKE) MODEL=10c
+	$(MAKE) $(SUBMAKE) MODEL=10c
 
 hp11c:
-	$(MAKE) MODEL=11c
+	$(MAKE) $(SUBMAKE) MODEL=11c
 
 hp12c:
-	$(MAKE) MODEL=12c
+	$(MAKE) $(SUBMAKE) MODEL=12c
 
 hp15c:
-	$(MAKE) MODEL=15c
+	$(MAKE) $(SUBMAKE) MODEL=15c
 
 hp16c:
-	$(MAKE) MODEL=16c
+	$(MAKE) $(SUBMAKE) MODEL=16c
 
 x11-calc: $(SRC)/x11-calc.in $(BIN)
 	@install -m755 $(SRC)/x11-calc.in $(BIN)/x11-calc && (cd $(BIN) && ls x11-calc)
@@ -202,7 +203,7 @@ $(BIN):
 
 clean:
 	@find $(SRC)/ -type l -delete
-	@rm  -f $(SRC)/*.o
+	@rm  -f $(SRC)/*.o $(SRC)/*.o_*
 	@find bin -type f -name "x11-calc*" ! -name "*.*" \( -perm -u=x -o -perm -g=x -o -perm -o=x \) -delete  2> /dev/null || true # Delete all execuitable files
 	@rmdir $(BIN) 2> /dev/null || true
 
