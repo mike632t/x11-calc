@@ -78,9 +78,60 @@
 #  23 Mar 25         - Instantiate without symlinks trick and use std FLAGS
 #                      to maximize use of implicit build rules - macmpi
 #                    - Remove VERBOSE in favor of make --dry-run - macmpi
-#  23 Mar 25         - Rely on makefile.generic
 #
 
-LANG	= LANG_$(shell (echo $$LANG | cut -f 1 -d '_'))
+MODEL		= 21
+PROGRAM		= x11-calc
+SHARED_SRC	= x11-calc.c x11-calc-cpu.c x11-calc-display.c x11-calc-segment.c
+SHARED_SRC	+= x11-calc-messages.c x11-calc-button.c
+COMMON_SRC	= x11-calc-switch.c x11-calc-label.c x11-calc-colour.c
+COMMON_SRC	+= x11-calc-font.c x11-keyboard.c gcc-wait.c gcc-exists.c
+SHARED_OBJ	:= $(SHARED_SRC:.c=_$(MODEL).o)
+COMMON_OBJ	:= $(COMMON_SRC:.c=.o)
+OBJECTS 	:= $(SHARED_OBJ) $(COMMON_OBJ) x11-calc-$(MODEL).o
+LANG		= LANG_$(shell (echo $$LANG | cut -f 1 -d '_'))
+UNAME		= $(shell uname)
+COMMIT		= $(shell git log -1 HEAD --format=%h 2> /dev/null)
 
-include makefile.generic
+BIN		?= ../bin
+
+LDLIBS		= -lX11 -lm
+CFLAGS		= -fcommon -Wall -pedantic -std=gnu99
+CFLAGS		+= -Wno-comment -Wno-deprecated-declarations -Wno-builtin-macro-redefined
+
+# Compiler specific settings
+ifeq ($(CC), cc)
+LDFLAGS		=  -no-pie
+CFLAGS		+= -ansi
+endif
+
+ifdef DEBUG
+CFLAGS		+=  -g
+endif
+
+CFLAGS		+= -D HP$(MODEL) -D $(LANG)
+ifneq ($(COMMIT),)
+CFLAGS		+= -D COMMIT_ID='"[Commit Id : $(COMMIT)]"'
+endif
+ifneq ($(SCALE_WIDTH),)
+CFLAGS		+= -D SCALE_WIDTH=$(SCALE_WIDTH)
+endif
+ifneq ($(SCALE_HEIGHT),)
+CFLAGS		+= -D SCALE_HEIGHT=$(SCALE_HEIGHT)
+endif
+
+all: $(BIN)/$(PROGRAM)-$(MODEL)
+
+$(BIN)/$(PROGRAM)-$(MODEL): $(OBJECTS) | $(BIN)
+	@rm -f $(BIN)/$(PROGRAM)-$(MODEL)
+	@$(CC) $(OBJECTS) $(LDFLAGS) $(LDLIBS) -o $@ && (cd $(BIN) && ls --color $$(echo $@ | sed "s:$(BIN)/::g") ) # Escape $ using $$...
+
+$(BIN):
+	@mkdir -p $(BIN)
+
+$(SHARED_OBJ) : %_$(MODEL).o : %.c
+	@$(CC) $(CFLAGS) -c $< -o $@
+
+clean: | $(BIN)
+	@rm -f $(OBJECTS)
+
