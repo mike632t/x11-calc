@@ -53,6 +53,8 @@
  *                     more generic (only German translation changed) - MT
  *                   - Added a new command line option '--zoom' to the help
  *                     text - MT
+ * 14 Apr 14         - Added a new command line option '--euro' to the help
+ *                     text - MT
  *
  */
 
@@ -116,18 +118,34 @@ const char * h_err_invalid_register = "Registro inválido (REG[%03d]) en %1o-%04
 const char * h_err_missing_argument = "opcion requiere un argumento -- '%s'\n";
 
 #if defined(unix) || defined(__unix__) || defined(__APPLE__)
+#if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
 const char * c_msg_usage = "Uso: %s [OPCION]... [ARCHIVO]\n\
 Una emulador de emulador RPN para X11.\n\n\
   -b  ADDR                 punto de interrupcion (octal)\n\
   -i  OPCODE               instruccion de trampa (octal)\n\
   -r  FILE                 leer el contenido de la ROM de FILE\n\
-  -s,                      un paso\n\
-  -t,                      seguimiento de la ejecucion\n\
-      --zoom ZOOM          ampliar el tamaño de la ventana\n\
+  -s                       un paso\n\
+  -t                       seguimiento de la ejecucion\n\
+  -e, --euro               use european display format\n\
       --cursor             mostrar cursor (default)\n\
       --no-cursor          ocultar cursor\n\
+      --zoom ZOOM          ampliar el tamaño de la ventana\n\
       --help               mostrar esta ayuda y salir\n\
       --version            mostrar version y salir\n\n";
+#else
+const char * c_msg_usage = "Uso: %s [OPCION]... [ARCHIVO]\n\
+Una emulador de emulador RPN para X11.\n\n\
+  -b  ADDR                 punto de interrupcion (octal)\n\
+  -i  OPCODE               instruccion de trampa (octal)\n\
+  -r  FILE                 leer el contenido de la ROM de FILE\n\
+  -s                       un paso\n\
+  -t                       seguimiento de la ejecucion\n\
+      --cursor             mostrar cursor (default)\n\
+      --no-cursor          ocultar cursor\n\
+      --zoom ZOOM          ampliar el tamaño de la ventana\n\
+      --help               mostrar esta ayuda y salir\n\
+      --version            mostrar version y salir\n\n";
+#endif
 const char * h_err_invalid_operand = "operando(s) inválido\n";
 const char * h_err_invalid_option = "opcion invalida -- '%c'\n";
 const char * h_err_unrecognised_option = "opcion no reconocida '%s'\n";
@@ -176,18 +194,35 @@ const char * h_err_invalid_register = "Ungultiges register (REG[%03d]) an %1o-%0
 const char * h_err_missing_argument = "option benoetigt ein argument -- '%s'\n";
 
 #if defined(unix) || defined(__unix__) || defined(__APPLE__)
+#if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
 const char * c_msg_usage = "Verwendung: %s [OPTION]... [DATEI]\n\
 Eine RPN rechner-emulator fur X11.\n\n\
   -b  ADDR                 haltepunkt an adresse setzen (oktal)\n\
   -i  OPCODE               haltepunkt auf Opcode setzen  (oktal)\n\
   -r  FILE                 lesen sie den ROM inhalt von FILE\n\
-  -s,                      einzelschritt\n\
-  -t,                      ausfuehrung protokollieren\n\
-      --zoom ZOOM          fenstergrobe erweitern\n\
+  -s                       einzelschritt\n\
+  -t                       ausfuehrung protokollieren\n\
+  -e, --euro               use european display format\n\
       --cursor             cursor anzeigen (default)\n\
       --no-cursor          cursor verbergen\n\
+      --zoom ZOOM          fenstergrobe erweitern\n\
       --help               diese hilfe anzeigen und dann beenden\n\
       --version            versionsinformationen ausgeben und dann beenden\n\n";
+#else
+const char * c_msg_usage = "Verwendung: %s [OPTION]... [DATEI]\n\
+Eine RPN rechner-emulator fur X11.\n\n\
+  -b  ADDR                 haltepunkt an adresse setzen (oktal)\n\
+  -i  OPCODE               haltepunkt auf Opcode setzen  (oktal)\n\
+  -r  FILE                 lesen sie den ROM inhalt von FILE\n\
+  -s                       einzelschritt\n\
+  -t                       ausfuehrung protokollieren\n\
+      --cursor             cursor anzeigen (default)\n\
+      --no-cursor          cursor verbergen\n\
+      --zoom ZOOM          fenstergrobe erweitern\n\
+      --help               diese hilfe anzeigen und dann beenden\n\
+      --version            versionsinformationen ausgeben und dann beenden\n\n";
+
+#endif
 const char * h_err_invalid_operand = "ungueltige(r) operand(en)\n";
 const char * h_err_invalid_option = "ungueltige option -- '%c'\n";
 const char * h_err_unrecognised_option = "unbekannte option '%s'\n";
@@ -236,18 +271,34 @@ const char * h_err_invalid_register = "Registre invalide (REG[%03d]) à %1o-%04o
 const char * h_err_missing_argument = "l'option necessite un argument -- '%s'\n";
 
 #if defined(unix) || defined(__unix__) || defined(__APPLE__)
+#if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
 const char * c_msg_usage = "Utilisation : %s [OPTION]... [FICHIER]\n\
 Une émulateur RPN Calculator pour X11.\n\n\
   -b  ADDR                 définir un point d'arrêt (octal)\n\
   -i  OPCODE               définir un piège d'instruction (octal)\n\
   -r  FILE                 lire le contenu de la ROM de FILE\n\
-  -s,                      single step\n\
-  -t,                      trace execution\n\
-      --zoom ZOOM          agrandir la taille de la fenêtre\n\
+  -s                       single step\n\
+  -t                       trace execution\n\
+  -e, --euro               use european display format\n\
       --cursor             curseur d'affichage (par défaut)\n\
       --no-cursor          masquer le curseur\n\
+      --zoom ZOOM          agrandir la taille de la fenêtre\n\
       --help               afficher cette aide et quitter\n\
       --version            affiche les informations de version et quitte\n\n";
+#else
+const char * c_msg_usage = "Utilisation : %s [OPTION]... [FICHIER]\n\
+Une émulateur RPN Calculator pour X11.\n\n\
+  -b  ADDR                 définir un point d'arrêt (octal)\n\
+  -i  OPCODE               définir un piège d'instruction (octal)\n\
+  -r  FILE                 lire le contenu de la ROM de FILE\n\
+  -s                       single step\n\
+  -t                       trace execution\n\
+      --cursor             curseur d'affichage (par défaut)\n\
+      --no-cursor          masquer le curseur\n\
+      --zoom ZOOM          agrandir la taille de la fenêtre\n\
+      --help               afficher cette aide et quitter\n\
+      --version            affiche les informations de version et quitte\n\n";
+#endif
 const char * h_err_invalid_operand = "opérande(s) invalide(s)\n";
 const char * h_err_invalid_option = "option invalide -- '%c'\n";
 const char * h_err_unrecognised_option = "option non reconnue '%s'\n";
@@ -297,18 +348,34 @@ const char * h_err_invalid_register = "Invalid register (REG[%03d]) at %1o-%04o 
 const char * h_err_missing_argument = "option requires an argument -- '%s'\n";
 
 #if defined(unix) || defined(__unix__) || defined(__APPLE__)
+#if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
 const char * c_msg_usage = "Usage: %s [OPTION]... [FILE]\n\
 An RPN Calculator emulator for X11.\n\n\
   -b  ADDR                 set break-point (octal)\n\
   -i  OPCODE               set instruction trap (octal)\n\
   -r  FILE                 read ROM from FILE\n\
-  -s,                      single step\n\
-  -t,                      trace\n\
-      --zoom ZOOM          enlarge window size\n\
+  -s                       single step\n\
+  -t                       trace\n\
+  -e, --euro               use european display format\n\
       --cursor             display cursor\n\
       --no-cursor          hide cursor\n\
+      --zoom ZOOM          enlarge window size\n\
       --help               display this help and exit\n\
       --version            output version information and exit\n\n";
+#else
+const char * c_msg_usage = "Usage: %s [OPTION]... [FILE]\n\
+An RPN Calculator emulator for X11.\n\n\
+  -b  ADDR                 set break-point (octal)\n\
+  -i  OPCODE               set instruction trap (octal)\n\
+  -r  FILE                 read ROM from FILE\n\
+  -s                       single step\n\
+  -t                       trace\n\
+      --cursor             display cursor\n\
+      --no-cursor          hide cursor\n\
+      --zoom ZOOM          enlarge window size\n\
+      --help               display this help and exit\n\
+      --version            output version information and exit\n\n";
+#endif
 const char * h_err_invalid_operand = "invalid operand(s)\n";
 const char * h_err_invalid_option = "invalid option -- '%c'\n";
 const char * h_err_unrecognised_option = "unrecognised option '%s'\n";

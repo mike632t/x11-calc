@@ -84,6 +84,8 @@
  *                   - Finally renamed x11-calc-segment to the more correct
  *                     x11-calc-digit - MT
  * 14 Apr 24         - Simplified the SPICE series display decoder - MT
+ *                   - Added support for European display formats for SPICE
+ *                     series - MT
  *
  */
 
@@ -145,7 +147,10 @@ odisplay *h_display_create(int i_index, int i_left, int i_top, int i_width, int 
    h_display->display_position.y = i_display_top;
    h_display->display_position.width = i_display_width;
    h_display->display_position.height = i_display_height;
-   h_display->enabled = True;
+   h_display->enabled = False;
+#if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
+   h_display->euro = False;
+#endif
    h_display->foreground = i_foreground;
    h_display->background = i_background;
    h_display->fill = i_fill;
@@ -423,6 +428,65 @@ int i_display_update(odisplay *h_display, oprocessor *h_processor)
     * o) in the and the B register is used to indecate if the display contains
     * a minus sign, period, or comma.
     *
+    * Display        '_' '0.''0' '0' '0' '0' '_' '_' '_' '_' '_'
+    *
+    * HP31e
+    * A Register  0x  0   0   0   0   0   0   f   f   f   f   f   0   0   0
+    *
+    * B Register  0x  f   1   0   0   0   0   0   0   0   0   0   0   0   0
+    *
+    * HP33e
+    * A Register  0x  0   0   0   0   0   0   f   f   f   f   f   f   f   f
+    *
+    * B Register  0x  0   1   0   0   0   0   0   0   0   0   0   0   0   0
+    *
+    *
+    * Display        '_' '1.''_' '_' '_' '_' '_' '_' '_' '_' '_'
+    *
+    * HP31e
+    * A Register  0x  0   1   f   f   f   f   f   f   f   f   f   0   0   0
+    *
+    * B Register  0x  f   1   0   0   0   0   0   0   0   0   0   0   0   0
+    *
+    * HP33e
+    * A Register  0x  0   1   f   f   f   f   f   f   f   f   f   f   f   f
+    *
+    * B Register  0x  0   1   0   0   0   0   0   0   0   0   0   0   0   0
+    *
+    *
+    * Display        '-' '1.''0' '0' '0' '0' '_' '_' '_' '_' '_'
+    *
+    * HP31e
+    * A Register  0x  0   1   0   0   0   0   f   f   f   f   f   0   0   0
+    *
+    * B Register  0x  f   5   0   0   0   0   0   0   0   0   0   0   0   0
+    *
+    * HP33e
+    * A Register  0x  0   1   0   0   0   0   f   f   f   f   f   0   0   0
+    *
+    * B Register  0x  0   5   0   0   0   0   0   0   0   0   0   0   0   0
+    *
+    *
+    * Display        '-' '1' '2,''3' '4' '5.''6' '7' '8' '9' '_'
+    *
+    * HP31e
+    * A Register  0x  4   1   2   3   4   5   6   7   8   9   f   0   0   0
+    *
+    * B Register  0x  f   4   3   0   0   1   0   0   0   0   0   0   0   0
+    *
+    * HP33e
+    * A Register  0x  4   1   2   3   4   5   6   7   8   9   f   f   f   f
+    *
+    * B Register  0x  4   4   3   0   0   1   0   0   0   0   0   0   0   0
+    *
+    *
+    * Display        '_' '0' '1' '-' '_' '_' '_' '_' '_' '7' '4'
+    *
+    * HP33e
+    * A Register  0x  0   0   1   9   f   f   f   f   f   7   4   7   b   0
+    *
+    * B Register  0x  0   0   0   6   0   0   0   0   0   0   0   0   0   0
+    *
     */
    int i_count;
    static int c_digits [] =
@@ -459,17 +523,32 @@ int i_display_update(odisplay *h_display, oprocessor *h_processor)
                      h_display->digit[i_count]->mask = DISPLAY_SPACE;
                }
             }
-
             if ((h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x01) != 0) /* Decimal point OR seperator*/
             {
                if (i_count != 0) /* Ignore first digit */
                {
-                  h_display->digit[i_count]->mask = (h_display->digit[i_count]->mask & DISPLAY_EIGHT) | DISPLAY_DECIMAL;
-                  if ((h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x02) != 0) /* Seperator */
+                  if (h_display->euro)
+                  {
                      h_display->digit[i_count]->mask = (h_display->digit[i_count]->mask & DISPLAY_EIGHT) | DISPLAY_COMMA;
+                     if ((h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x02) != 0) /* Seperator */
+                        h_display->digit[i_count]->mask = (h_display->digit[i_count]->mask & DISPLAY_EIGHT) | DISPLAY_DECIMAL;
+                  }
+                  else
+                  {
+                     h_display->digit[i_count]->mask = (h_display->digit[i_count]->mask & DISPLAY_EIGHT) | DISPLAY_DECIMAL;
+                     if ((h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x02) != 0) /* Seperator */
+                        h_display->digit[i_count]->mask = (h_display->digit[i_count]->mask & DISPLAY_EIGHT) | DISPLAY_COMMA;
+                  }
                }
             }
+            else
+            {
+               if (i_count != 0) /* Ignore first digit */
+                  if ((h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x02) != 0) /* Seperator*/
+                     if ((h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x04) == 0) h_display->digit[i_count]->mask = (h_display->digit[i_count]->mask & DISPLAY_EIGHT) | DISPLAY_COMMA;
 
+               if (h_processor->reg[B_REG]->nibble[REG_SIZE - 3] == 0x02) h_display->digit[0]->mask = DISPLAY_MINUS; /* Self test */
+            }
          }
          else
             h_display->digit[i_count]->mask = DISPLAY_SPACE;

@@ -44,6 +44,8 @@
  *                     and the current position of the display - MT
  *                   - Finally renamed x11-calc-segment to the more correct
  *                     x11-calc-digit - MT
+ * 14 Apr 24         - Added support for European display formats for SPICE
+ *                     series - MT
  *
  */
 
@@ -88,6 +90,9 @@ typedef struct /* Calculator display structure. */
    XRectangle display_geometry;  /* Original display position */
    odigit* digit[DIGITS];
    char enabled;
+#if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
+   char euro;
+#endif
    unsigned int foreground;
    unsigned int background;
    unsigned int fill;
