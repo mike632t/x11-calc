@@ -83,6 +83,7 @@
  *                     and the current position of the display - MT
  *                   - Finally renamed x11-calc-segment to the more correct
  *                     x11-calc-digit - MT
+ * 14 Apr 24         - Simplified the SPICE series display decoder - MT
  *
  */
 
@@ -415,6 +416,14 @@ int i_display_update(odisplay *h_display, oprocessor *h_processor)
       i_offset--;
    }
 #elif defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
+   /*
+    * The display decoder uses the contents of the A and B registers.
+    *
+    * The A register holds the BCD representation of each digit (0-9, E, r, or
+    * o) in the and the B register is used to indecate if the display contains
+    * a minus sign, period, or comma.
+    *
+    */
    int i_count;
    static int c_digits [] =
    {
@@ -432,35 +441,35 @@ int i_display_update(odisplay *h_display, oprocessor *h_processor)
                h_display->digit[i_count]->mask = DISPLAY_SPACE;
             else
                h_display->digit[i_count]->mask = c_digits[h_processor->reg[A_REG]->nibble[REG_SIZE - 1 - i_count]];
-            if ((h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x04) != 0)
+
+            if ((h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x04) != 0) /* Minus sign */
             {
                if (i_count > 1)
                {
-                  if (h_processor->reg[A_REG]->nibble[REG_SIZE - 1 - i_count]== 0x9)
+                  if (h_processor->reg[A_REG]->nibble[REG_SIZE - 1 - i_count]== 0x9) /* Check A register to see if we should display a minus sign) */
                      h_display->digit[i_count]->mask = DISPLAY_MINUS;
                   else
                      h_display->digit[i_count]->mask = DISPLAY_SPACE;
                }
                else
-                  if (i_count == 1) h_display->digit[0]->mask = DISPLAY_MINUS; /* Negative value */
+               {
+                  if (i_count == 1)
+                     h_display->digit[0]->mask = DISPLAY_MINUS; /* Minus sign in first digit is always shown regardless of A register */
+                  else
+                     h_display->digit[i_count]->mask = DISPLAY_SPACE;
+               }
             }
-            if ((h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x02) != 0)
-            {
-               if ((h_display->digit[i_count]->mask != DISPLAY_COMMA)
-                  && (h_display->digit[i_count]->mask != DISPLAY_SPACE)
-                  && (h_display->digit[i_count]->mask != DISPLAY_MINUS))
-                  h_display->digit[i_count]->mask = h_display->digit[i_count]->mask | DISPLAY_COMMA;
-               if ((i_count == 1) && ((h_processor->reg[B_REG]->nibble[REG_SIZE - 3] & 0x02) != 0))
-                  h_display->digit[0]->mask = DISPLAY_MINUS; /* Self test */
 
-            }
-            if ((h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x01) != 0)
+            if ((h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x01) != 0) /* Decimal point OR seperator*/
             {
-               if (i_count == 0)
-                  h_display->digit[i_count]->mask = DISPLAY_SPACE;
-               else
-                  h_display->digit[i_count]->mask = h_display->digit[i_count]->mask | DISPLAY_DECIMAL;
+               if (i_count != 0) /* Ignore first digit */
+               {
+                  h_display->digit[i_count]->mask = (h_display->digit[i_count]->mask & DISPLAY_EIGHT) | DISPLAY_DECIMAL;
+                  if ((h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x02) != 0) /* Seperator */
+                     h_display->digit[i_count]->mask = (h_display->digit[i_count]->mask & DISPLAY_EIGHT) | DISPLAY_COMMA;
+               }
             }
+
          }
          else
             h_display->digit[i_count]->mask = DISPLAY_SPACE;
