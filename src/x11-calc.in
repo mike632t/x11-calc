@@ -75,7 +75,7 @@ ENOCMD=127 # Executable file not found (not official)
 ENOFNT=192 # No font (not official)
 
 # Prototype model list: is to be filled-in by makefile
-_models="hp34c|hp11"
+_models="hp34c|hp11c"
 
 #- launch()
 
@@ -96,11 +96,11 @@ _launch() {
 
    _err=$?
    case $_err in
-      # NOTE: extra spaces characters in messgaes below are intended for seach & replace by newline for zenity
+      # NOTE: * characters in messages below are intended for seach & replace by newline for zenity
       $SUCCESS)
          ;;
       $EINVAL)
-         _errmsg="Invalid operand or parameter:    '$OPTIONS'"
+         _errmsg="Invalid operand or parameter:**'$OPTIONS'"
          ;;
       $ENOFNT)
          _fonts="'xfonts-base' or equivalent"
@@ -109,11 +109,11 @@ _launch() {
          grep -sqE "ubuntu|debian" "${_f_os_release}" && _fonts="'xfonts-base'"
          grep -sq "fedora" "${_f_os_release}" && _fonts="'xorg-x11-fonts-base' or 'xorg-x11-fonts-misc'"
          grep -sq "gentoo" "${_f_os_release}" && _fonts="'font-misc-misc'"
-         _errmsg="Please install missing fonts from:    $_fonts."
+         _errmsg="Please install missing fonts from:**$_fonts."
          ;;
       $ENOENT)
          _errmsg="`echo "$OPTIONS" | awk -F '-r ' '{ print $2 }' | awk -F '-. ' '{ print $1 }'`"
-         _errmsg="Unable to open file:    '$_errmsg'    Please check that the file exists and you  can access it. Then specify the correct  path using the '-r' option."
+         _errmsg="Unable to open file:**'$_errmsg'**Please check that the file exists and you*can access it. Then specify the correct*path using the '-r' option."
          ;;
       $ENODATA)
          _errmsg="Empty ROM file!"
@@ -130,9 +130,9 @@ _launch() {
 
    if [ -n "$_errmsg" ]; then
       if _has_zenity; then
-         zenity --height=100 --width=400 --error --text="` echo "$_errmsg" | sed 's|\s\s|\n|g'`" #  Replace multiple spaces by newline
+         zenity --height=100 --width=400 --error --text="` echo "$_errmsg" | tr '*' '\n'`" #  Replace * by newline
       fi
-      printf '%s\n' "`basename $0`: `echo "$_errmsg" | tr -s ' '`" >&2 # Remove multiple spaces
+      printf '%s\n' "`basename $0`: `echo "$_errmsg" | tr '*' ' ' | tr -s ' '`" >&2 # Remove multiple spaces
    fi
 
    return $_err

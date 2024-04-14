@@ -295,11 +295,12 @@
  * 13 Apr 24         - Uses the key height to draw a button with horizontal
  *                     dividing line in the same place regardless of aspect
  *                     ratio - MT
- * 14 Apr 24         - Allows the display seperators on the SPICE series to
+ * 14 Apr 24         - Fixed zoom validation and checks that zoom value has
+ *                     been specified - MT
+ *                   - Allows the display seperators on the SPICE series to
  *                     be changed to the use european format, by effectivly
  *                     cutting  the jumper on the power supply board  using
  *                     the '-e, --euro' option - MT
- *
  *
  * To Do             - Fix vertical button shape when zoomed in
  *                   - Parse command line in a separate routine.
@@ -312,8 +313,8 @@
 
 #define  NAME          "x11-calc"
 #define  VERSION       "0.14"
-#define  BUILD         "0147"
-#define  DATE          "13 Apr 24"
+#define  BUILD         "0148"
+#define  DATE          "14 Apr 24"
 #define  AUTHOR        "MT"
 
 #define  INTERVAL 25   /* Number of ticks to execute before updating the display */
@@ -561,24 +562,29 @@ int main(int argc, char *argv[])
 #endif
                   else if (!strncmp(argv[i_count], "--zoom", i_index))
                   {
-                     i_zoom = 0;
-                     for (i_offset = 0; i_offset < strlen(argv[i_count + 1]); i_offset++) /* Parse octal number */
+                     if (i_count + 1 < argc)
                      {
-                        if ((argv[i_count + 1][i_offset] < '0') || (argv[i_count + 1][i_offset] > '4'))
-                           v_error(EINVAL, h_err_numeric_range, argv[i_count + 1]);
+                        i_zoom = 0;
+                        for (i_offset = 0; i_offset < strlen(argv[i_count + 1]); i_offset++) /* Parse decimal number */
+                        {
+                           if ((argv[i_count + 1][i_offset] < '0') || (argv[i_count + 1][i_offset] > '9'))
+                              v_error(EINVAL, h_err_numeric_range, argv[i_count + 1]);
+                           else
+                              i_zoom = i_zoom * 10 + argv[i_count + 1][i_offset] - '0';
+                        }
+                        if ((i_zoom < 0) || (i_zoom > 4)) /* Check range */
+                           v_error(EINVAL, h_err_numeric_range, argv[i_count + 1]); /** TODO: Add new error message */
                         else
-                           i_zoom = i_zoom * 8 + argv[i_count + 1][i_offset] - '0';
+                        {
+                           if (i_count + 2 < argc) /* Remove the parameter from the arguments */
+                              for (i_offset = i_count + 1; i_offset < argc - 1; i_offset++)
+                                 argv[i_offset] = argv[i_offset + 1];
+                           argc--;
+                        }
+                        f_scale = 1 + (0.125 * i_zoom);
                      }
-                     if ((i_zoom < 0) || (i_zoom > 8)) /* Check range */
-                        v_error(EINVAL, h_err_numeric_range, argv[i_count + 1]); /** TODO: Add new error message */
                      else
-                     {
-                        if (i_count + 2 < argc) /* Remove the parameter from the arguments */
-                           for (i_offset = i_count + 1; i_offset < argc - 1; i_offset++)
-                              argv[i_offset] = argv[i_offset + 1];
-                        argc--;
-                     }
-                     f_scale = 1 + (0.125 * i_zoom);
+                        v_error(EINVAL, h_err_missing_argument, argv[i_count]);
                   }
                   else if (!strncmp(argv[i_count], "--version", i_index))
                   {
