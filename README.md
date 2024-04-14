@@ -19,6 +19,12 @@ More [screenshots](./img/#top)
 
 ### Latest News
 
+14 Apr 24
+
+   - Allows the display seperators on the SPICE series to be changed to the
+     use european format, effectivly cutting the jumper on the power supply
+     board using the `-e, --euro` option - MT
+
 12 Apr 24
 
    - Allows the size of the window to be adjusted using the `--zoom n` option
