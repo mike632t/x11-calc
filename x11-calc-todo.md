@@ -24,13 +24,15 @@
 - [ ] Fix window resizing.
       Using window hints to resize the window when doesn't work every where environments
 
-- [ ] Allow user to resize the window at runtime (scroll wheel?).
+  [https://tronche.com/gui/x/xlib/window/XMoveResizeWindow.html]::
 
-- [ ] Finish debugging HP10 instruction set.
+- [ ] Allow user to resize the window at runtime (scroll wheel?).
 
 - [ ] Add logic for a  separate 'PIK chip' and move printer code.
 
-- [ ] Add new button styles for HP67 and HP1x.
+- [ ] Finish debugging HP10 instruction set.
+
+- [ ] Add new button styles for HP67 and HP1xC.
 
 - [ ] Implement  different styles of digit (to allow for different  decimal
       point positions, and number of segments etc).
