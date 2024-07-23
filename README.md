@@ -83,6 +83,8 @@ Tru64 Unix.
 
 The simulator has been successfully compiled and tested on:
 
+   - Alpine 3.20, gcc 13.2.1, x64 + arm64
+
    - Alpine 3.19, gcc 13.2.1, x64 + arm64
 
    - Debian 12 (Bookworm), clang 14.0.6, x64 + arm64
@@ -158,11 +160,11 @@ If you install the simulator on most modern desktops it should create a new
 menu entry that will start the launcher script by default. When invoked for
 the first time this will prompt you to select the default simulator as well
 as any additional command line options.  These selections will be saved and
-used in future.
+the selected simulator will become the new default.
 
-On some desktop environments it is also possible to right click on the menu
-icon which will display a sub-menu that will allow you to select a specific
-model directly as well as change the default model and options.
+When using some desktop environments (like GNOME and KDE) it is possible to
+access a sub-menu that will allow you to select a specific model as well as
+change the default settings by right clicking on the menu icon.
 
 #### Keyboard Shortcuts
 
@@ -217,6 +219,12 @@ saved in the hidden data file.
 For  models with a 'sliding' On/Off switch clicking on the switch will turn
 the simulator on or off, but if when switching off you hold down the switch
 down for two seconds the program will exit.
+
+#### Window Size
+
+The size of the simulator window can be adjusted from the command line with
+the `--zoom ZOOM` option, where the value for ZOOM can be in the range zero
+to four (0-4).
 
 #### Debugging
 
@@ -369,7 +377,12 @@ make DESTDIR=/tmp/staging install
 ### Using a pre-compiled package <sup>[Back to Top](#top)</sup>
 
 If you don't want to download an compile the sources yourself you can use a
-pre-compiled binary package from [Flathub](https://flathub.org/apps/io.github.mike632t.x11-calc) using Flatpak.
+pre-compiled binary package compatible with most distros from [Flathub](https://flathub.org/apps/io.github.mike632t.x11-calc) using Flatpak.
+
+A native binary package is also available on Alpine Linux 3.20 release.\
+If x11 is not already installed, add it as standalone (`setup-xorg-base`) or together with a standard desktop (`setup-desktop`).\
+Make sure `community` repo is enabled and then install with `apk add x11-calc`.\
+To leverage GUI for setup, install `apk add zenity`. Optional program saves may be installed with `apk add x11-calc-prg`.
 
 <a id="issues"></a>
 ### Known Issues <sup>[Back to Top](#top)</sup>
@@ -384,10 +397,6 @@ pre-compiled binary package from [Flathub](https://flathub.org/apps/io.github.mi
 ##### HP 11C + HP 12C + HP 15C + HP 16C
 
 - Keyboard test is successful but these models do not pass the self-test.
-
-##### HP 29C
-
-- All 30 registers have continuous memory.
 
 ##### HP 37E
 
@@ -426,21 +435,23 @@ on Xwayland the window manager does not handle this correctly.
 ### Acknowledgements <sup>[Back to Top](#top)</sup>
 
 There are almost certainly some names I've missed off this list but without
-the help and encouragement from a multiple it is unlikely that this project
-would have happened at all or that it would got as far as it has.
+the help and encouragement from several members of the calculator community
+it is unlikely that this project would have happened at all or that I would
+have managed to get as far as I have.
 
-- `Teenix` for convincing me that it was possible in the first place and help
-since (at least I think I glad he did).
+- `Teenix` for convincing me that it was possible in the first place.
 
-- `Teenix/Panamatik` for their excellent simulators from which I was able to
-figure out most of what should happen when each instruction is executed.
+- `Teenix` and `Panamatik` for their excellent simulators from which I was able
+to figure out most of what should happen when each instruction is executed.
 
 - `Agarza` for providing the details of the voyager displays.
 
-- `Macmpi` for completely rewriting the makefiles creating a Flatpak package  the simulator
-for Flatpak and for packaging and testing the simulators on Alpine Linux.
+- `Macmpi` for completely rewriting the makefiles and packaging the simulator
+for Flatpak.
 
-- `Agarza/Martin HEPPERLE` for translating the help text.
+- `Macmpi` for packaging and testing the simulators on Alpine Linux
+
+- `Agarza` and `Martin HEPPERLE` for translating the help text.
 
 - `Brouhaha` for taking the time to explain the workings of various models.
 
