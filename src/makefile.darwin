@@ -1,9 +1,9 @@
 #
 #  makefile - RPN (Reverse Polish) calculator simulator.
 #
-#  Copyright(C) 2024 - macmpi
+#  Copyright(C) 2019 - MT
 #
-#  makefile for BSD variants systems (NetBSD & Darwin)
+#  makefile.darwin
 #
 #  This  program is free software: you can redistribute it and/or modify it
 #  under  the terms of the GNU General Public License as published  by  the
@@ -24,32 +24,23 @@
 #
 #  https://www.gnu.org/software/make/manual/html_node/Prerequisite-Types.html
 #
-#  28 Mar 24         - Initial version - macmpi
-#  06 May 24			- Fixed include path for Darwin - MT
-#  12 May 24         - Use a separate makefile for MacOS - MT
+#  12 May 24         - Initial version - MT
 #
 
-CFLAGS	?=
-LDFLAGS	?=
+CFLAGS	+= -I/opt/X11/include/
+LDFLAGS += -L/opt/X11/lib/
 LDLIBS	?=
 
-OS != uname -s
-
-# Operating system specific settings
-.if ${OS} == "FreeBSD"
 LANG 	= LANG_en
-LDLIBS	+= -lcompat
-CFLAGS	+= -Wno-variadic-macros
-CFLAGS	+= -I/usr/local/include/
-LDFLAGS	+= -L/usr/local/lib/
-.endif
 
-.if ${OS} == "NetBSD"
-LANG 	= LANG_en
-LDLIBS	+= -lcompat
-CFLAGS	+= -Wno-variadic-macros
-CFLAGS	+= -I/usr/X11R7/include/
-LDFLAGS	+= -L/usr/X11R7/lib/ -R /usr/X11R7/lib
-.endif
+ifneq ($(COMMIT),)
+CFLAGS	+= -DCOMMIT_ID='"[Commit Id : $(COMMIT)]"'
+endif
+ifneq ($(SCALE_WIDTH),)
+CFLAGS	+= -DSCALE_WIDTH=$(SCALE_WIDTH)
+endif
+ifneq ($(SCALE_HEIGHT),)
+CFLAGS	+= -DSCALE_HEIGHT=$(SCALE_HEIGHT)
+endif
 
 include makefile.all

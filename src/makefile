@@ -24,16 +24,17 @@
 #                      Linux (now we can get rid of make.sh) - MT
 #  24 Mar 24         - Pass model number - MT
 #  29 Mar 24         - Use linux/bsd/osf1 makefiles -macmpi
+#  12 May 24         - Use a separate makefile for MacOS - MT
 #
 
 MODEL	= 21
 
 all:
 	@_os="`uname -s | tr '[:upper:]' '[:lower:]'`"; \
-	echo "$$_os" | grep -qwE "freebsd|netbsd|darwin" && _os=bsd; \
+	echo "$$_os" | grep -qwE "freebsd|netbsd" && _os=bsd; \
 	$(MAKE) -s -f "makefile.$$_os" MODEL=$(MODEL) $@
 
 .DEFAULT:
 	@_os="`uname -s | tr '[:upper:]' '[:lower:]'`"; \
-	echo "$$_os" | grep -qwE "freebsd|netbsd|darwin" && _os=bsd; \
+	echo "$$_os" | grep -qwE "freebsd|netbsd" && _os=bsd; \
 	$(MAKE) -s -f "makefile.$$_os" MODEL=$(MODEL) $@
