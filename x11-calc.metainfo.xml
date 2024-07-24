@@ -60,6 +60,16 @@
   </screenshots>
 
   <releases>
+  <release version="0.14.0156" date="2024-07-24">
+    <description>
+      <p>Updated release meta data</p>
+    </description>
+  </release>
+  <release version="0.14.0155" date="2024-07-23">
+    <description>
+      <p>Application now sets the icon</p>
+    </description>
+  </release>
   <release version="0.14.0154" date="2024-05-06">
     <description>
       <p>Another bug fix and addition of shortcut keys for 'A-E' on 15C and 11C</p>
