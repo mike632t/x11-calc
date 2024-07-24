@@ -309,6 +309,7 @@
  *                     before the main loop - MT
  * 04 May 24         - Do not define unused switches - MT
  * 15 Jun 24         - Sets the application icon to the X windows logo - MT
+ * 24 Jul 24         - Updated release meta data - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Add verbose option.
@@ -320,8 +321,8 @@
 
 #define  NAME          "x11-calc"
 #define  VERSION       "0.14"
-#define  BUILD         "0155"
-#define  DATE          "15 Jun 24"
+#define  BUILD         "0156"
+#define  DATE          "24 Jul 24"
 #define  AUTHOR        "MT"
 
 #define  INTERVAL 25   /* Number of ticks to execute before updating the display */
