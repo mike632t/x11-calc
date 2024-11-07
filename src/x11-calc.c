@@ -5,8 +5,9 @@
  *
  * Emulation of various models of HP calculator for X11.
  *
- * Deliberately parses the command line without using 'getopt' or 'argparse'
- * to maximise portability.
+ * Deliberatly does not use 'getopt' or 'argparse' to parse command line in
+ * order to minimize the number of dependancies and make it easier to build
+ * the code on as many different systems as possible.
  *
  * This  program is free software: you can redistribute it and/or modify it
  * under  the terms of the GNU General Public License as published  by  the
@@ -24,7 +25,7 @@
  * 13 Jun 13   0.1   - Initial version - MT
  * 16 Jun 13         - Can use predefined button colours - MT
  *                   - Added text to buttons - MT
- *                   - Defined  all  the font names and colours defined  as
+ *                   - Defined  all  the font names and colours  defined as
  *                     constants - MT
  * 17 Jun 13         - All fonts now loaded in main routine - MT
  * 18 Jun 13         - Added font attributes to each button - MT
@@ -32,18 +33,18 @@
  *                     pointer to the new structure - MT
  *                   - Changed button_draw now extracts parameters from the
  *                     button structure - MT
- *                   - Modified  string  constants  in  key  definitions  to
+ *                   - Modified  string  constants  in  key  definitions to
  *                     define any hex character codes properly - MT
  * 27 Jun 13         - Any error opening the display are now handled in the
  *                     same way as other errors - MT
  * 30 Jun 13         - Defined text colours as constants - MT
  * 01 Jul 13         - Buttons now move when pressed - MT
- * 02 Jul 13         - Separated  code  and  headers for button  and  colour
+ * 02 Jul 13         - Separated  code  and  headers for button and  colour
  *                     manipulation into separate files - MT
- * 07 Jul 13         - Made  all  global variables local  variables  (except
+ * 07 Jul 13         - Made  all global variables local  variables  (except
  *                     fonts) - MT
  *                   - Use window size hints to set window size - MT
- *                   - Changed  display of inverse trig functions  so  that
+ *                   - Changed  display  of inverse trig functions so  that
  *                     minus sign is shown as a super script - MT
  * 14 Jul 13         - Added display segments - MT
  * 15 Jul 13         - Created a display , to allow the 7 segment LEDs
@@ -52,7 +53,7 @@
  * 14 Aug 13         - Tidied up comments - MT
  * 17 Aug 13         - Window is now redrawn automatically when application
  *                     loads - MT
- * 09 Mar 14         - Created  separate files for code that is dependent on
+ * 09 Mar 14         - Created separate files for code that is dependent on
  *                     calculator the model - MT
  * 10 Mar 14         - Changed key code indexes to BCD hex values - MT
  *                   - Changed  names  of display masks to highlight  their
@@ -79,22 +80,22 @@
  *                     no longer blocks program execution - MT
  * 10 Aug 21         - Moved  version(), about(), and error() back to their
  *                     original position - MT
- * 16 Aug 21         - Executes  a single instruction in every iteration of
+ * 16 Aug 21         - Executes a single instruction in every iteration  of
  *                     the main event loop - MT
- * 19 Aug 21         - Modified processor simulation to make it more ,
+ * 19 Aug 21         - Modified processor simulation to make it more object
  *                     orientated - MT
  * 21 Aug 21         - Removed short form of the help option and fixed help
  *                     text - MT
  *                   - Added a flags for the Shift, Ctrl and Alt keys - MT
  *                   - Added single step and trace command line options and
- *                     the  ability  to control the processor using  ctrl-s
+ *                     the ability  to control the processor  using  ctrl-s
  *                     and ctrl-q for single stepping, and ctrl-t to enable
  *                     or disable tracing - MT
  *                   - Added definition for commit id - MT
  * 30 Aug 21         - Separated version and licence notices into their own
  *                     routines - MT
  *                   - Abort if an error occurs - MT
- *  2 Sep 21         - Can  now enable single stepping and tracing using  a
+ *  2 Sep 21         - Can  now  enable single stepping and tracing using a
  *                     hard-coded break-point - MT
  *  5 Sep 21         - The display is no longer blanked automatically  when
  *                     a key is pressed - MT
@@ -111,12 +112,12 @@
  * 15 Sep 21         - The  escape key now resets the simulator instead  of
  *                     exiting - MT
  * 16 Sep 21         - Improved the display flicker problem by updating the
- *                     display  only once every 100 ticks instead of  every
+ *                     display  only once every 100 ticks instead  of every
  *                     tick- MT
  * 18 Sep 21         - Added keycode to the button properties and a  method
- *                     to  determine if this corresponds to a button  which
+ *                     to  determine if this corresponds to a  button which
  *                     allows a button to be operated by a key - MT
- * 19 Sep 21         - Created a keyboard class to keep track of the  input
+ * 19 Sep 21         - Created  a keyboard class to keep track of the input
  *                     state and translate keystrokes into characters - MT
  * 21 Sep 21         - Set the default active button to NULL - MT
  * 28 Sep 21         - The  escape key now mapped to 'Clx' - MT
@@ -125,9 +126,9 @@
  *  4 Oct 21         - Added the ability to display the CPU registers using
  *                     Ctrl-R when in trace mode - MT
  *  7 Oct 21   0.3   - HP25 simulator now working..
- * 10 Oct 21         - Allows  switches and buttons to be undefined if  not
+ * 10 Oct 21         - Allows  switches  and buttons to be undefined if not
  *                     used - MT
- * 11 Oct 21         - Most  text  messages are now defined in the  header,
+ * 11 Oct 21         - Most text  messages are now defined in  the  header,
  *                     this allows the content to be defined separately for
  *                     each platform which means that about() and licence()
  *                     can  be replaced by simple calls to fprintf().  This
@@ -151,7 +152,7 @@
  *                   - HP 33C simulator works.
  * 29 Oct 21         - Draw display when window is exposed - MT
  * 01 Nov 21         - Explicitly define the cursor - MT
- *                   - Attempts  to center the window on the display.  Most
+ *                   - Attempts to center the window on the  display.  Most
  *                     window managers ignore this, but it does work if the
  *                     application is invoked directly by startx - MT
  * 02 Nov 21         - Allows size of the window to be changed by modifying
@@ -161,7 +162,7 @@
  * 17 Nov 21         - Defined text messages as string constants instead of
  *                     macros and moved them into this file to get the code
  *                     to compile using VAXC.  I would have preferred to be
- *                     able to define them in a separate language  specific
+ *                     able  to define them in a separate language specific
  *                     module but I can't figure out how to make it work on
  *                     the older C compilers - MT
  * 21 Nov 21         - Mapped backspace key to escape - MT
@@ -193,7 +194,7 @@
  *                     will see it yet - MT
  * 31 Jan 22         - Added support for the HP10C, HP11C, HP12C, HP15C and
  *                     HP16C - MT
- * 28 Feb 22         - Read  option implemented to allow ROM contents to be
+ * 28 Feb 22         - Read option implemented to allow ROM contents to  be
  *                     loaded from a file - MT
  * 04 Mar 22         - Modified  the delay between each tick for the HP10C,
  *                     HP11C, HP12C, HP15C and HP16C - MT
@@ -205,7 +206,7 @@
  *                   - Reduced the length of time that the off button  must
  *                     be held down to exit - MT
  * 26 May 22         - Blank line after an error message not needed - MT
- * 11 Dec 22         - Renamed models with continious memory and added HP25
+ * 11 Dec 22         - Renamed models with continious memory and added HP25,
  *                     HP33E, and HP38E - MT
  * 24 Dec 22         - Command line parsing routine now uses the same macro
  *                     definitions as the the error message definitions.
@@ -236,9 +237,9 @@
  *                     an error if they are.  Hopefully this will serve  as
  *                     a reminder to specify the ROM file when using any of
  *                     the Voyager emulators - MT
- *                   - Use ROM_SIZE instead of calculating the size of  the
+ *                   - Use  ROM_SIZE instead of calculating the size of the
  *                     ROM - MT
- *             0.11  - Display  the version information just before the ROM
+ *             0.11  - Display the version information just before the  ROM
  *                     size when starting so any error messages are printed
  *                     before the version number is shown - MT
  * 18 Feb 24         - Updated  version number format to include the  build
@@ -310,6 +311,7 @@
  * 04 May 24         - Do not define unused switches - MT
  * 15 Jun 24         - Sets the application icon to the X windows logo - MT
  * 24 Jul 24         - Updated release meta data - MT
+ * 07 Nov 24         - Tidied up comments - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Add verbose option.
