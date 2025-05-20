@@ -30,7 +30,8 @@
  *                     to be different from the main text colour- MT
  */
 
-typedef struct { /* Calculator button structure. */
+struct obutton /* Calculator button structure. */
+{
    int index;
    XRectangle button_position;   /* Current button position */
    XRectangle button_geometry;   /* Original button position */
@@ -48,13 +49,13 @@ typedef struct { /* Calculator button structure. */
    unsigned int function_colour; /* Function key colour */
    unsigned int shifted_colour;  /* Alternate function key colour */
    unsigned int label_colour;    /* Shifted function key colour */
-} obutton;
+} ;
 
-obutton *h_button_key_pressed(obutton *h_button, char c_key);
+struct obutton *h_button_key_pressed(struct obutton *h_button, char c_key);
 
-obutton *h_button_pressed(obutton *h_button, int i_xpos, int i_ypos);
+struct obutton *h_button_pressed(struct obutton *h_button, int i_xpos, int i_ypos);
 
-obutton *h_button_create(int i_index, char c_key,
+struct obutton *h_button_create(int i_index, char c_key,
    char* s_text, char* s_function ,char* s_alternate ,char* s_label,
    XFontStruct *h_normal_font, XFontStruct *h_shift_font, XFontStruct *h_label_font,
    int i_left, int i_top, int i_width, int i_height,
@@ -62,6 +63,6 @@ obutton *h_button_create(int i_index, char c_key,
    unsigned int i_colour, unsigned int i_function_colour,
    unsigned int i_shifted_colour, unsigned int i_label_colour);
 
-int i_button_resize(obutton *h_button, float f_scale);
+int i_button_resize(struct obutton *h_button, float f_scale);
 
-int i_button_draw(Display *h_display, int x_application_window, int i_screen,obutton *h_button);
+int i_button_draw(Display *h_display, int x_application_window, int i_screen,struct obutton *h_button);

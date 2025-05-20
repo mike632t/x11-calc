@@ -19,8 +19,9 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * 11 Dec 22         - Initial version derived from hp38c - MT
- * 21 Oct 23         - Updated switch parameters to accomodate a 3 position
- *                     switch - MT
+ * 21 Oct 23         - Updated  switch parameters to accommodate 3 position
+ *                     switches - MT
+ * 20 May 25         - Tidied up data structure definitions - MT
  *
  */
 
@@ -50,13 +51,13 @@
 
 oregister o_mem[MEMORY_SIZE];
 
-void v_init_switches(oswitch *h_switch[]) /* Define the switches. */
+void v_init_switches(struct oswitch *h_switch[]) /* Define the switches. */
 {
    h_switch[0] = h_switch_create(00000, "OFF", "", "ON ", h_alternate_font, KBD_LEFT, KBD_TOP, 2 * KEY_NUMERIC + KEY_GAP, SWITCH_HEIGHT, True, MID_GREY, DARK_GREY);
    h_switch[1] = h_switch_create(00000, "BEGIN", "", "END", h_alternate_font, KBD_LEFT + 3 * KEY_WIDTH + 2 * KEY_GAP, KBD_TOP, 2 * KEY_WIDTH + KEY_GAP, SWITCH_HEIGHT, True, MID_GREY, DARK_GREY);
 }
 
-void v_init_buttons(obutton *h_button[]) {
+void v_init_buttons(struct obutton *h_button[]) {
    int i_left, i_top;
 
    /* Define top row of keys. */

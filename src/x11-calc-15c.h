@@ -64,6 +64,6 @@
 
 extern int i_rom [ROM_SIZE];
 
-void v_init_buttons(obutton *h_button[]);
+void v_init_buttons(struct obutton *h_button[]);
 
-void v_init_labels(olabel *h_label[]);
+void v_init_labels(struct olabel *h_label[]);

@@ -23,6 +23,7 @@
  * 18 Mar 24         - Embedded firmware - MT
  * 22 Apr 24         - Removed duplicate definition - MT
  *  2 May 24         - Added shortcut keys 'A-E' - MT
+ * 20 May 25         - Tidied up data structure definitions - MT
  *
  * TO DO :           -
  */
@@ -53,14 +54,14 @@
 
 oregister o_mem[MEMORY_SIZE];
 
-void v_init_labels(olabel *h_label[]) {
+void v_init_labels(struct olabel *h_label[]) {
    int i_height = h_small_font->ascent + h_small_font->descent;
    h_label[0] = h_label_create(001, "CLEAR" , h_alternate_font, KBD_LEFT + KEY_WIDTH + KEY_GAP,
       KBD_TOP + KEY_HEIGHT +  2 * (KBD_ROW - i_height) + h_small_font->descent,
       3 * (KEY_WIDTH + KEY_GAP) + KEY_WIDTH, i_height, YELLOW, BACKGROUND, -1);
 }
 
-void v_init_buttons(obutton *h_button[]) {
+void v_init_buttons(struct obutton *h_button[]) {
    int i_left, i_top, i_count;
 
    /* Define top row of keys. */

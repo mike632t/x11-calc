@@ -24,6 +24,7 @@
  * 04 Mar 22         - Enabled continuous memory - MT
  * 09 Mar 22         - Fixed width and height (when scaled) - MT
  * 22 Apr 24         - Define display colour separately - MT
+ * 20 May 25         - Tidied up data structure definitions - MT
  *
  */
 
@@ -65,6 +66,6 @@
 
 extern int i_rom [ROM_SIZE];
 
-void v_init_buttons(obutton *h_button[]);
+void v_init_buttons(struct obutton *h_button[]);
 
-void v_init_labels(olabel *h_label[]);
+void v_init_labels(struct olabel *h_label[]);

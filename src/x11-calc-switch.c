@@ -33,6 +33,7 @@
  *                     warnings - MT
  * 23 Apr 24         - Separated out prototypes for error handlers - MT
  *                   - Removed unnecessary includes - MT
+ * 20 May 25         - Tidied up data structure definitions - MT
  *
  */
 
@@ -61,7 +62,7 @@
 
 /* switch_pressed (switch, x, y) */
 
-oswitch *h_switch_pressed(oswitch *h_switch, int i_xpos, int i_ypos)
+struct oswitch *h_switch_pressed(struct oswitch *h_switch, int i_xpos, int i_ypos)
 {
    int i_indent, i_extent, i_upper, i_lower;
 
@@ -81,12 +82,12 @@ oswitch *h_switch_pressed(oswitch *h_switch, int i_xpos, int i_ypos)
 
 /* switch_create (index, text, font, left, top, width, height, colour) */
 
-oswitch *h_switch_create(int i_index, char* s_on, char* s_mid, char* s_off,
+struct oswitch *h_switch_create(int i_index, char* s_on, char* s_mid, char* s_off,
    XFontStruct *h_normal_font,
    int i_left, int i_top, int i_width, int i_height, char b_state,
    unsigned int i_colour, unsigned int i_alternate_colour)
 {
-   oswitch *h_switch; /* Ponter to switch. */
+   struct oswitch *h_switch; /* Ponter to switch. */
 
    /* Attempt to allcoate memory for a switch. */
    if ((h_switch = malloc (sizeof(*h_switch)))==NULL) v_error(errno, h_err_memmory_alloc, __FILE__, __LINE__);
@@ -117,7 +118,7 @@ oswitch *h_switch_create(int i_index, char* s_on, char* s_mid, char* s_off,
  *
  */
 
-int i_switch_resize(oswitch *h_switch, float f_scale)
+int i_switch_resize(struct oswitch *h_switch, float f_scale)
 {
    h_switch->switch_position.x = h_switch->switch_geometry.x * f_scale;
    h_switch->switch_position.y = h_switch->switch_geometry.y * f_scale;
@@ -128,7 +129,7 @@ int i_switch_resize(oswitch *h_switch, float f_scale)
 
 /* switch_draw (display, window, screen, switch) */
 
-int i_switch_draw(Display *h_display, int x_application_window, int i_screen, oswitch *h_switch)
+int i_switch_draw(Display *h_display, int x_application_window, int i_screen, struct oswitch *h_switch)
 {
    int i_indent, i_upper;
    int i_on_colour = h_switch->colour, i_mid_colour = h_switch->alternate_colour, i_off_colour = h_switch->alternate_colour;
@@ -198,7 +199,7 @@ int i_switch_draw(Display *h_display, int x_application_window, int i_screen, os
 
 /* switch_click (display, window, screen, switch) - Updates switch status */
 
-int i_switch_click(oswitch *h_switch)
+int i_switch_click(struct oswitch *h_switch)
 {
    if (h_switch != NULL)
    {

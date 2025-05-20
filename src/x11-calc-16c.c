@@ -51,7 +51,7 @@
 
 oregister o_mem[MEMORY_SIZE];
 
-void v_init_labels(olabel *h_label[]) {
+void v_init_labels(struct olabel *h_label[]) {
    int i_height = h_small_font->ascent + h_small_font->descent;
    h_label[0] = h_label_create(000, "SHOW" , h_small_font, KBD_LEFT + 2 * (KEY_WIDTH + KEY_GAP),
       KBD_TOP + KEY_HEIGHT +  KBD_ROW - i_height - 1,
@@ -67,7 +67,7 @@ void v_init_labels(olabel *h_label[]) {
 
 }
 
-void v_init_buttons(obutton *h_button[]) {
+void v_init_buttons(struct obutton *h_button[]) {
    int i_left, i_top, i_count;
 
    /* Define top row of keys. */

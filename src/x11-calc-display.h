@@ -23,7 +23,7 @@
  *
  * 14 Jul 13         - Initial version - MT
  * 17 Aug 13         - Added constants for mask values - MT
- * 10 Mar 14         - Changed names of display masks to highlight their
+ * 10 Mar 14         - Changed  names  of display masks to highlight  their
  *                     association with the display module - MT
  * 30 Aug 20         - Base  the number of display segments on the  maximum
  *                     number of digits in the display - MT
@@ -32,7 +32,7 @@
  * 29 Jan 22         - Added an optional bezel to the display - MT
  * 01 Mar 22         - Only define constants that are required - MT
  * 12 Mar 22         - Added display annunciators - MT
- * 11 Dec 22         - Renamed models with continious memory and added HP25
+ * 11 Dec 22         - Renamed models with continuous memory and added HP25
  *                     HP33E, and HP38E - MT
  * 26 Oct 23         - Added an enabled property to the display - MT
  * 09 Apr 24         - Removed some unused parameters from display-update()
@@ -40,7 +40,7 @@
  *                   - Changed display data structure to store the size and
  *                     position of the bezel and display using a predefined
  *                     XRectangle structure - MT
- *                   - Display structure stores both the original geometery
+ *                   - Display structure stores both the original  geometry
  *                     and the current position of the display - MT
  *                   - Finally renamed x11-calc-segment to the more correct
  *                     x11-calc-digit - MT
@@ -79,31 +79,31 @@
 #endif
 
 
-typedef struct /* Calculator display structure. */
+struct odisplay/* Calculator display structure. */
 {
    int index;
    XRectangle bezel_position;    /* Current bezel position */
    XRectangle display_position;  /* Current display position */
    XRectangle bezel_geometry;    /* Original bezel position */
    XRectangle display_geometry;  /* Original display position */
-   odigit* digit[DIGITS];
    char enabled;
    unsigned int foreground;
    unsigned int background;
    unsigned int fill;
    unsigned int border;
+   struct odigit* digit[DIGITS];
 #if defined(INDECATORS)
-   olabel* label[INDECATORS];
+   struct olabel* label[INDECATORS];
 #endif
-} odisplay;
+} ;
 
-odisplay *h_display_create(int i_index,
+struct odisplay *h_display_create(int i_index,
    int i_left, int i_top, int i_width, int i_height,
    int i_display_left, int i_display_top, int i_display_width, int i_display_height,
    unsigned int i_foreground, unsigned int i_background, unsigned int i_fill, unsigned int i_border);
 
-int i_display_draw(Display *x_display, int x_application_window, int i_screen, odisplay *h_display);
+int i_display_draw(Display *x_display, int x_application_window, int i_screen, struct odisplay *h_display);
 
-int i_display_resize(odisplay *h_display, float f_scale);
+int i_display_resize(struct odisplay *h_display, float f_scale);
 
-int i_display_update(odisplay *h_display, oprocessor *h_processor);
+int i_display_update(struct odisplay *h_display, oprocessor *h_processor);

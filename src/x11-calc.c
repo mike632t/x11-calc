@@ -308,8 +308,10 @@
  * 03 May 24         - Sets the abort flag and interval counter immediately
  *                     before the main loop - MT
  * 04 May 24         - Do not define unused switches - MT
+ * 19 May 24         - Remove unnecessary call to set windows size - MT
  * 15 Jun 24         - Sets the application icon to the X windows logo - MT
  * 24 Jul 24         - Updated release meta data - MT
+ * 20 May 25         - Tidied up data structure definitions - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Add verbose option.
@@ -321,16 +323,18 @@
 
 #define  NAME          "x11-calc"
 #define  VERSION       "0.14"
-#define  BUILD         "0156"
+#define  BUILD         "0158"
 #define  DATE          "24 Jul 24"
 #define  AUTHOR        "MT"
+
+#define  DEBUG
 
 #define  INTERVAL 25   /* Number of ticks to execute before updating the display */
 #define  DELAY 50      /* Number of intervals to wait before exiting */
 
 #include <errno.h>     /* errno */
 
-#include <stdarg.h>    /* strlen(), etc */
+#include <stdarg.h>    /* vargs(), etc */
 #include <string.h>    /* strlen(), etc */
 #include <stdio.h>     /* fprintf(), etc */
 #include <stdlib.h>    /* getenv(), etc */
@@ -412,9 +416,9 @@ int main(int argc, char *argv[])
    Atom wm_delete;
    XRectangle o_window_position;
    XRectangle o_window_geometry;
-   obutton *h_button[BUTTONS];   /* Array to hold pointers to buttons */
-   obutton *h_pressed = NULL;
-   odisplay *h_display;          /* Pointer to display structure */
+   struct obutton *h_button[BUTTONS];   /* Array to hold pointers to buttons */
+   struct obutton *h_pressed = NULL;
+   struct odisplay *h_display;          /* Pointer to display structure */
    oprocessor *h_processor;
 
    char *s_display_name = "";    /* Just use the default display */
@@ -449,11 +453,11 @@ int main(int argc, char *argv[])
    int i_ticks = -1;
 
 #if defined(SWITCHES)
-   oswitch *h_switch[SWITCHES];
+   struct oswitch *h_switch[SWITCHES];
 #endif
 
 #if defined(LABELS)
-   olabel *h_label[LABELS];
+   struct olabel *h_label[LABELS];
 #endif
 
 #if defined(__linux__) || defined(__NetBSD__) || defined(__FreeBSD__)
@@ -902,7 +906,7 @@ int main(int argc, char *argv[])
             break;
 #endif
          case ButtonPress :
-            debug(printf("Mouse button [%d] pressed.\n", x_event.xbutton.button));
+            /** debug(printf("Mouse button [%d] pressed.\n", x_event.xbutton.button)); */
             if (x_event.xbutton.button == 1)
             {
                int i_count;

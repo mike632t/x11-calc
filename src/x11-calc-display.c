@@ -64,7 +64,7 @@
  * 01 Mar 22         - Fixed digits 4 and 10 (11C, 12C, 15C and 16C) tested
  *                     all digits now work as expected - MT
  * 12 Mar 22         - Added display annunciators - MT
- * 11 Dec 22         - Renamed models with continious memory and added HP25
+ * 11 Dec 22         - Renamed models with continuous memory and added HP25
  *                     HP33E, and HP38E - MT
  * 24 Dec 21         - Simplified the display creation routine by using the
  *                     number digits to determine the size and position  of
@@ -79,7 +79,7 @@
  *                   - Changed display data structure to store the size and
  *                     position of the bezel and display using a predefined
  *                     XRectangle structure - MT
- *                   - Display structure stores both the original geometery
+ *                   - Display structure stores both the original  geometry
  *                     and the current position of the display - MT
  *                   - Finally renamed x11-calc-segment to the more correct
  *                     x11-calc-digit - MT
@@ -130,12 +130,12 @@
  *
  */
 
-odisplay *h_display_create(int i_index, int i_left, int i_top, int i_width, int i_height,
+struct odisplay *h_display_create(int i_index, int i_left, int i_top, int i_width, int i_height,
    int i_display_left, int i_display_top, int i_display_width, int i_display_height,
    unsigned int i_foreground, unsigned int i_background, unsigned int i_fill, unsigned int i_border)
 {
 
-   odisplay *h_display; /* Pointer to display. */
+   struct odisplay *h_display; /* Pointer to display. */
    int i_count, i_offset, i_size;
 
    /* Attempt to allocate memory for a display. */
@@ -236,7 +236,7 @@ odisplay *h_display_create(int i_index, int i_left, int i_top, int i_width, int 
  *
  */
 
-int i_display_draw(Display *x_display, int x_application_window, int i_screen, odisplay *h_display)
+int i_display_draw(Display *x_display, int x_application_window, int i_screen, struct odisplay *h_display)
 {
    int i_count;
 
@@ -271,7 +271,7 @@ int i_display_draw(Display *x_display, int x_application_window, int i_screen, o
  *
  */
 
-int i_display_resize(odisplay *h_display, float f_scale)  /* Resize display based on original geometery */
+int i_display_resize(struct odisplay *h_display, float f_scale)  /* Resize display based on original geometery */
 {
    int i_count;
 
@@ -309,7 +309,7 @@ int i_display_resize(odisplay *h_display, float f_scale)  /* Resize display base
  *
  */
 
-int i_display_update(odisplay *h_display, oprocessor *h_processor)
+int i_display_update(struct odisplay *h_display, oprocessor *h_processor)
 {
 #if defined(HP67) || defined(HP19c)
    int i_count;

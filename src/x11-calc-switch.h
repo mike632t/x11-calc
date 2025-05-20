@@ -23,10 +23,12 @@
  * 21 Oct 23         - Updated switch parameters to accomodate a 3 position
  *                     switch - MT
  * 22 Oct 23         - Added method to update state when clicked - MT
+ * 20 May 25         - Tidied up data structure definitions - MT
  *
  */
 
-typedef struct { /* Calculator switch structure */
+struct oswitch /* Calculator switch structure */
+{
    int index;
    XRectangle switch_position;   /* Current switch position */
    XRectangle switch_geometry;   /* Original switch position */
@@ -38,17 +40,17 @@ typedef struct { /* Calculator switch structure */
    unsigned int colour; /* Colour */
    unsigned int alternate_colour; /* Colour */
    XFontStruct* text_font; /* Pointer to font */
-} oswitch;
+};
 
-oswitch *h_switch_pressed(oswitch *h_switch, int i_xpos, int i_ypos);
+struct oswitch *h_switch_pressed(struct oswitch *h_switch, int i_xpos, int i_ypos);
 
-oswitch *h_switch_create(int i_index, char* s_on, char* s_mid, char* s_off,
+struct oswitch *h_switch_create(int i_index, char* s_on, char* s_mid, char* s_off,
    XFontStruct *h_normal_font,
    int i_left, int i_top, int i_width, int i_height, char b_state,
    unsigned int i_colour, unsigned int i_alternate_colour);
 
-int i_switch_resize(oswitch *h_switch, float f_scale);
+int i_switch_resize(struct oswitch *h_switch, float f_scale);
 
-int i_switch_draw(Display *h_display, int x_application_window, int i_screen, oswitch *h_switch);
+int i_switch_draw(Display *h_display, int x_application_window, int i_screen, struct oswitch *h_switch);
 
-int i_switch_click(oswitch *h_switch);
+int i_switch_click(struct oswitch *h_switch);
