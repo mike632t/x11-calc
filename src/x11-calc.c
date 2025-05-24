@@ -312,6 +312,7 @@
  * 15 Jun 24         - Sets the application icon to the X windows logo - MT
  * 24 Jul 24         - Updated release meta data - MT
  * 20 May 25         - Tidied up data structure definitions - MT
+ * 25 may 25         - Changed normal exit status to EXIT_SUCCESS - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Add verbose option.
@@ -323,8 +324,8 @@
 
 #define  NAME          "x11-calc"
 #define  VERSION       "0.14"
-#define  BUILD         "0158"
-#define  DATE          "24 Jul 24"
+#define  BUILD         "0160"
+#define  DATE          "25 May 25"
 #define  AUTHOR        "MT"
 
 #define  DEBUG
@@ -375,7 +376,7 @@ void v_version()  /* Display version information */
       __DATE__[0], __DATE__[1], __DATE__[2], &__DATE__[9], __TIME__ );
 }
 
-void v_warning(const char *s_format, ...)  /* Print formatted warning message and exit */
+void v_warning(const char *s_format, ...)  /* Print formatted warning message */
 {
    va_list t_args;
    va_start(t_args, s_format);
@@ -592,12 +593,12 @@ int main(int argc, char *argv[])
                   {
                      v_version();  /* Display version information */
                      fprintf(stdout, h_msg_licence, &__DATE__[7], AUTHOR);
-                     exit(0);
+                     exit(EXIT_SUCCESS);
                   }
                   else if (!strncmp(argv[i_count], "--help", i_index))
                   {
                      fprintf(stdout, c_msg_usage, FILENAME);
-                     exit(0);
+                     exit(EXIT_SUCCESS);
                   }
                   else  /* If we get here then the we have an invalid long option */
                      v_error(EINVAL, h_err_unrecognised_option, argv[i_count]);
@@ -649,12 +650,12 @@ int main(int argc, char *argv[])
          {
             v_version;  /* Display version information */
             fprintf(stdout, h_msg_licence, &__DATE__[7], AUTHOR);
-            exit(0);
+            exit(EXIT_SUCCESS);
          }
          else if ((!strncmp(argv[i_count], "/HELP", i_index)) | (!strncmp(argv[i_count], "/?", i_index)))
          {
             fprintf(stdout, c_msg_usage, FILENAME);
-            exit(0);
+            exit(EXIT_SUCCESS);
          }
          else /* If we get here then the we have an invalid option */
             v_error(EINVAL, h_err_invalid_option, argv[i_count]);
@@ -1007,5 +1008,5 @@ int main(int argc, char *argv[])
    XDestroyWindow(x_display, x_application_window);  /* Close connection to server */
    XCloseDisplay(x_display);
 
-   exit(0);
+   exit(EXIT_SUCCESS);
 }
