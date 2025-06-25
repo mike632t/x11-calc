@@ -390,6 +390,9 @@
  *                   - Fixed array subscript and string operation  compiler
  *                     warnings -MT
  * 23 Apr 24         - Separated out prototypes for error handlers - MT
+ * 19 Apr 25         - Modified the mnemonics for some if statements to put
+ *                     the operands first - MT
+ * 20 May 25         - Tidied up data structure definitions - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -1265,8 +1268,8 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                h_processor->status[i_opcode >> 6] = True;
                if (h_processor->trace) v_fprint_status(stdout, h_processor);
                break;
-            case 01: /* if 0 = s(n) */
-               if (h_processor->trace) fprintf(stdout, "if 0 = s(%d) ", i_opcode >> 6);
+            case 01: /* if s(n) = 0 */
+               if (h_processor->trace) fprintf(stdout, "if s(%d) = 0", i_opcode >> 6);
                h_processor->flags[CARRY] = !h_processor->status[i_opcode >> 6];
                v_op_goto(h_processor);
                break;
@@ -1549,11 +1552,12 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   break;
                case 00120: /* keys -> a[2:1] (0 001 010 000) */
                   if (h_processor->trace) fprintf(stdout, "keys -> a\t\t");
-                  /* The HP10 and HP19C use this to get the state of the printer mode switch */
-#if defined(HP10)
+                  /* The HP10, HP19C and HP97 use this to get the state of the printer mode switch */
                   /* HP10 - All = 1, Print = 2 (print with display off), Display = 4 */
                   /* HP19C/97 - Trace = 1, Normal = 2 (print with display off), Manual = 4 */
-                  h_processor->reg[A_REG]->nibble[1] = h_processor->print;
+#if defined(HP10)
+                  if (h_processor->print)
+                     h_processor->reg[A_REG]->nibble[1] = 0x1; /* HP10 - All = 1, Print = 2 (print with display off), Display = 4 */
 #else
                   h_processor->reg[A_REG]->nibble[2] = (h_processor->code >> 4); /* Put keycode in A_REG */
                   h_processor->reg[A_REG]->nibble[1] = (h_processor->code & 0x0f);
@@ -1722,17 +1726,17 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   break;
                case 01260: /* clear data registers */
                   {
-#if (defined(HP25) || defined(HP25c)) && defined(CONTINIOUS)
-                     /* Ignore the instruction */
-#else
-                     int i_count;
                      if (h_processor->trace) fprintf(stdout, "clear data registers");
+#if (defined(HP25) || defined(HP25c)) && defined(CONTINIOUS)
+                      /* For an HP25C with continuous memory this instruction should be ignored!! */
+#else
 #if (defined(HP67)) && defined(CONTINIOUS)
                      if (h_processor->crc[READY])
                         h_processor->crc[READY]++;
                      else
 #endif
                      {
+                        int i_count;
                         h_processor->first = 0; h_processor->last = REG_SIZE - 1;
                         for (i_count = h_processor->addr & ~0x0f; i_count < (h_processor->addr & ~0x0f) + 16; i_count++)
                         {
@@ -1797,8 +1801,8 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                h_processor->status[i_opcode >> 6] = True;
                if (h_processor->trace) v_fprint_status(stdout, h_processor);
                break;
-            case 01: /* if 1 = s(n) */
-               if (h_processor->trace) fprintf(stdout, "if 1 = s(%d)", i_opcode >> 6);
+            case 01: /* if s(n) = 1 */
+               if (h_processor->trace) fprintf(stdout, "if s(%d) = 1", i_opcode >> 6);
                h_processor->flags[CARRY] = h_processor->status[i_opcode >> 6];
                v_op_goto(h_processor);
                break;
@@ -2038,8 +2042,8 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                h_processor->status[i_opcode >> 6] = False;
                if (h_processor->trace) v_fprint_status(stdout, h_processor);
                break;
-            case 01: /* if 0 = s(n) */
-               if (h_processor->trace) fprintf(stdout, "if 0 = s(%d) ", i_opcode >> 6);
+            case 01: /* if s(n) = 0 */
+               if (h_processor->trace) fprintf(stdout, "if s(%d) = 0", i_opcode >> 6);
                h_processor->flags[CARRY] = !h_processor->status[i_opcode >> 6];
                v_op_goto(h_processor);
                break;

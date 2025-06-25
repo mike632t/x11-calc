@@ -101,7 +101,7 @@
  *
  */
 
-obutton *h_button_key_pressed(obutton *h_button, char c_key){
+struct obutton *h_button_key_pressed(struct obutton *h_button, char c_key){
 
    if (h_button != NULL) {
       if (h_button->key != '\000') {
@@ -113,7 +113,7 @@ obutton *h_button_key_pressed(obutton *h_button, char c_key){
 }
 /* button_pressed (button, x, y) */
 
-obutton *h_button_pressed(obutton *h_button, int i_xpos, int i_ypos){
+struct obutton *h_button_pressed(struct obutton *h_button, int i_xpos, int i_ypos){
 
    int i_indent, i_extent, i_upper, i_lower;
 
@@ -136,7 +136,7 @@ obutton *h_button_pressed(obutton *h_button, int i_xpos, int i_ypos){
  *                state, colour)
  */
 
-obutton *h_button_create(int i_index, char c_key,
+struct obutton *h_button_create(int i_index, char c_key,
    char* s_text, char* s_function ,char* s_alternate ,char* s_label,
    XFontStruct *h_normal_font, XFontStruct *h_shift_font, XFontStruct *h_label_font,
    int i_left, int i_top, int i_width, int i_height,
@@ -144,7 +144,7 @@ obutton *h_button_create(int i_index, char c_key,
    unsigned int i_colour, unsigned int i_function_colour,
    unsigned int i_shifted_colour, unsigned int i_label_colour) {
 
-   obutton *h_button; /* Ponter to button. */
+   struct obutton *h_button; /* Ponter to button. */
 
    /* Attempt to allocate memory for a button. */
    if ((h_button = malloc (sizeof(*h_button)))==NULL) v_error(errno, h_err_memmory_alloc, __FILE__, __LINE__);
@@ -182,7 +182,7 @@ obutton *h_button_create(int i_index, char c_key,
  *
  */
 
-int i_button_resize(obutton *h_button, float f_scale)
+int i_button_resize(struct obutton *h_button, float f_scale)
 {
    h_button->button_position.x = h_button->button_geometry.x * f_scale;
    h_button->button_position.y = h_button->button_geometry.y * f_scale;
@@ -195,7 +195,7 @@ int i_button_resize(obutton *h_button, float f_scale)
 
 /* button_draw (display, window, screen, button) */
 
-int i_button_draw(Display *h_display, int x_application_window, int i_screen, obutton *h_button) {
+int i_button_draw(Display *h_display, int x_application_window, int i_screen, struct obutton *h_button) {
 
    int i_indent, i_extent, i_upper, i_lower;
    int i_offset;

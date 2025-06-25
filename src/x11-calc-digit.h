@@ -41,20 +41,21 @@
 #define SEG_COMMA      0x0100
 #define SEG_COLON      0x0200
 
-typedef struct { /* Calculator 7 segment display structure. */
+struct odigit /* Calculator 7 segment display structure. */
+{
    int index;
    XRectangle digit_position;    /* Current digit position */
    XRectangle digit_geometry;    /* Original digit position */
    int mask;
    unsigned int foreground;
    unsigned int background;
-} odigit;
+};
 
-odigit *h_digit_create(int i_index, int i_mask, int i_left, int i_top,
+struct odigit *h_digit_create(int i_index, int i_mask, int i_left, int i_top,
    int i_width, int i_height, unsigned int i_foreground, unsigned int i_background);
 
-int i_digit_resize(odigit *h_digit, float f_scale);
+int i_digit_resize(struct odigit *h_digit, float f_scale);
 
-int i_digit_draw(Display *h_display, int x_application_window, int i_screen,odigit *h_digit);
+int i_digit_draw(Display *h_display, int x_application_window, int i_screen,struct odigit *h_digit);
 
 

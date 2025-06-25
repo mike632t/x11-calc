@@ -24,6 +24,7 @@
  *                     as external - MT
  * 29 Jan 22         - Added an optional bezel to the display - MT
  * 30 Mar 24         - Corrected number of switches - MT
+ * 20 May 25         - Tidied up data structure definitions - MT
  *
  */
 
@@ -65,8 +66,8 @@
 
 extern int i_rom [ROM_SIZE];
 
-void v_init_labels(olabel *h_label[]);
+void v_init_labels(struct olabel *h_label[]);
 
-void v_init_switches(oswitch *h_label[]);
+void v_init_switches(struct oswitch *h_label[]);
 
-void v_init_buttons(obutton *h_button[]);
+void v_init_buttons(struct obutton *h_button[]);

@@ -1,9 +1,11 @@
 # Registers
 
+
 ## Program Counter
 
 Logically this is a 13-bit counter in the range 000000 - 017777 (octal)  or
 0x0000 - 0x1fff (hexadecimal).
+
 
 ### Classic
 
@@ -22,6 +24,7 @@ Incrementing the program counter only changes the 8-bit address field which
 is reset to zero if it overflows.
 
 Selecting an address in ROM 0 resets the bank number to zero.
+
 
 ### Woodstock and later
 
@@ -42,6 +45,7 @@ reached.
 
 Selecting an address in ROM 0 resets the bank number to zero.
 
+
 ## Arithmetic Registers
 
      13  12  11  10   9   8   7   6   5   4   3   2   1   0
@@ -55,6 +59,7 @@ Selecting an address in ROM 0 resets the bank number to zero.
     Y, Z, T:   Stack registers.
     M, N:      Memory registers.
 
+
 ## Special purpose registers
 
     F:         F register.
@@ -63,6 +68,7 @@ Selecting an address in ROM 0 resets the bank number to zero.
     DATA:      An 8-bit register holding the memory address used to read or
                write to memory from the C register.
     SP:        Stack pointer
+
 
 ## Processor flags
 
@@ -80,6 +86,7 @@ Ten processor flags are available (F 0 - F 9)
 
     F 8        Timer.
     F 9        ???
+
 
 ## Processor status word
 
@@ -105,19 +112,42 @@ Comprises of 16 status bits (S 0 - S 15)
     S 14       Set if EEX has been pressed?
     S 15 *     Set if any key is pressed.
 
+
 # Instruction set
 
 There are some similarities between the instruction set used in the Classic
 and Woodstock series, but they use different sets of opcodes for the Type 0
 and Type 2 instructions.
 
-## Type 1 - Jump subroutine (n nnn nnn n01)
 
-            x xxx xxx x01     jsb
+## Type 1 - Conditional Jump (n nnn nnn n01)
+
+Subroutine and long conditional jumps use two word opcodes.
+
+      9   8   7   6   5   4   3   2   1   0       9   8   7   6   5   4   3   2   1   0
+    +---+---+---+---+---+---+---+---+---+---+   +---+---+---+---+---+---+---+---+---+---+
+    | l | l | l | l | l | l | l | l | 0 | 1 |   | h | h | h | h | h | h | h | h | n | n |
+    +---+---+---+---+---+---+---+---+---+---+   +---+---+---+---+---+---+---+---+---+---+
+
+    Octal   Binary            Binary            Mnemonic
+            x xxx xx xx 01    x xxx xx xx nn    ? nc gsb                    (subroutine call if carry clear)
+            x xxx xx xx 01    x xxx xx xx nn    ? c gsb                     (subroutine call if carry set)
+            x xxx xx xx 01    x xxx xx xx nn    ? nc goto                   (long jump if carry clear)
+            x xxx xx xx 01    x xxx xx xx nn    ? c goto                    (long jump call if carry set)
+
 
 ## Type 3 - Conditional branch (n nnn nnn n11)
 
-            n nnn nnn n11  if n/c goto nnnnnnnn
+Short jumps
+
+      9   8   7   6   5   4   3   2   1   0
+    +---+---+---+---+---+---+---+---+---+---+
+    | n | n | n | n | n | n | n | n | 1 | 1 |
+    +---+---+---+---+---+---+---+---+---+---+
+
+    Octal   Binary            Mnemonic
+            n nnn nn nn 11    if n/c goto nnnnnnnn
+
 
 ## Type 0 - Special operations (n nnn nnn n00)
 
@@ -129,8 +159,10 @@ and Type 2 instructions.
 All the Type 0 instructions can be further sub-categorised by splitting the
 least significant six bits of each opcode into three groups as shown below.
 
+
 ### Classic series
 
+    Octal   Binary            Mnemonic
     00000   0 000 00 00 00    no operation
 
     00100   0 001 00 00 00    buffer -> rom address
@@ -175,14 +207,15 @@ least significant six bits of each opcode into three groups as shown below.
     00034   0 000 01 11 00    p - 1 -> p
     0nn54   n nnn 10 11 00    if p != n
     00074   0 000 11 11 00    p + 1 -> p
-
     01064   1 000 11 01 00    delayed select group 0
     01264   1 010 11 01 00    delayed select group 1
 
     0nx64   n nn1 11 01 00    delayed select rom n
 
-### Woodstock (and Spice) series
 
+### Woodstock/Spice series
+
+    Octal   Binary            Mnemonic
     00000   0 000 00 00 00    no operation
 
     00020   0 000 01 00 00    keys -> rom address
@@ -212,10 +245,10 @@ least significant six bits of each opcode into three groups as shown below.
     00110   0 001 00 10 00    clear status
     00210   0 010 00 10 00    display toggle
     00310   0 011 00 10 00    display off
-    00410   0 100 00 10 00    m1 exch c
-    00510   0 101 00 10 00    m1 -> c
-    00610   0 110 00 10 00    m2 exch c
-    00710   0 111 00 10 00    m2 -> c
+    00410   0 100 00 10 00    m exch c
+    00510   0 101 00 10 00    m -> c
+    00610   0 110 00 10 00    n exch c
+    00710   0 111 00 10 00    n -> c
 
     01010   1 000 00 10 00    stack -> a
     01110   1 001 00 10 00    down rotate
@@ -229,18 +262,22 @@ least significant six bits of each opcode into three groups as shown below.
     0nn50   n nnn 10 10 00    c -> data register(n)
     01160 * 1 001 11 00 00    c -> data address
     00070 * 0 000 11 10 00    data -> c
-    0nn70 * n nnn 11 10 00    data register(n)-> c       (where n > 0)
+    0nn70 * n nnn 11 10 00    data register(n)-> c                          (where n > 0)
 
     0nn14   n nnn 00 11 00    0 -> s(n)
     0nn34   n nnn 01 11 00    if 0 = s(n)
     0nn54   n nnn 10 11 00    if p != n
-    (where  nnnn = 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15
-            p  =  14,  4,  7,  8, 11,  2, 10, 12,  1,  3, 13,  6,  0,  9,  5, 14)
-    0nn74   n nnn 11 11 00    n -> p
-    (where  nnnn = 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15
-               p = 4,  8, 12,  2,  9,  1,  6,  3,  1, 13,  5,  0, 11, 10,  7,  4)
 
-Card Reader Circuit instructions
+    nnnn =  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15
+      p  = 14,  4,  7,  8, 11,  2, 10, 12,  1,  3, 13,  6,  0,  9,  5, 14
+
+    0nn74   n nnn 11 11 00    n -> p
+
+    nnnn = 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15
+       p = 4,  8, 12,  2,  9,  1,  6,  3,  1, 13,  5,  0, 11, 10,  7,  4
+
+
+#### Card Reader Circuit Instructions
 
 The CRC chip (Card Reader Controller) has twelve flags (f0 - f11).
 
@@ -249,19 +286,19 @@ that flag 0 can only be tested.
 
 Five of the flags control and monitor the card reader hardware:
 
-    f0   buffer ready
-    f7   data valid
-    f9   motor enable
-    f10  card inserted
-    f11  write mode
+    f0   Buffer ready
+    f7   Data valid
+    f9   Motor enable
+    f10  Card inserted
+    f11  Write mode
 
 Four of the flags sense other hardware inputs, of which only one is used in
 the 67:
 
     f1   PRGM mode (67/97)
-    f2   printer MAN mode (97), unused (67)
-    f3   printer NORM mode (97), unused (67)
-    f4   keyboard sensing for SST, BST, R/S (97), unused (67)
+    f2   Printer MAN mode (97), unused (67)
+    f3   Printer NORM mode (97), unused (67)
+    f4   Keyboard sensing for SST, BST, R/S (97), unused (67)
 
 The other three flags appear to have no dedicated hardware function and are
 used by the microocde.
@@ -270,7 +307,7 @@ On the 67/97 these are used as follows:
 
     f5   MERGE
     f6   PAUSE
-    f8   display-related
+    f8   Display-related
 
     00060   0 000 11 00 00    crc sf 8    Set display digits
     00100   0 000 00 10 00    crc fs?c 0  Test ready
@@ -299,8 +336,9 @@ On the 67/97 these are used as follows:
     01700   1 111 00 00 00    crc fs?c 7  Read/Write data to/from card via RAM $99 and $9B
 
 
+#### Printer Interface Control and Keyboard Instructions
 
-Printer Interface Control and Keyboard buffer instructions
+PICK chip instructions
 
     01120   1 001 01 00 00    pik1120     Printer ready (Sets S3 if printer is ready)
     01220   1 010 01 00 00    pik1220     Out of paper (Sets S3 if out of paper)
@@ -312,79 +350,77 @@ Printer Interface Control and Keyboard buffer instructions
 
     Notes:  HP67 - s15 is set whern a key is pressed.
 
-
-
 The printer character codes are:
 
-    char       code  data (5 bit x 7 rows)
-                     (hex)
-     N         00    17, 17, 25, 21, 19, 17, 17
-     Y         01    17, 17, 10, 04, 04, 04, 04
-     =         02    00, 00, 31, 00, 31, 00, 00
-     0         03    14, 17, 19, 21, 25, 17, 14
-     L         04    16, 16, 16, 16, 16, 16, 31
-     M         05    17, 27, 21, 21, 17, 17, 17
-     NE        06    01, 02, 31, 04, 31, 08, 16
-     1         07    04, 12, 04, 04, 04, 04, 14
-     G         08    14, 17, 16, 23, 17, 17, 14
-     s-1       09    01, 01, 29, 01, 00, 00, 00
-     >         0a    08, 04, 02, 01, 02, 04, 08
-     2         0b    14, 17, 01, 02, 04, 08, 31
-     O         0c    14, 17, 17, 17, 17, 17, 14
-     H         0d    17, 17, 17, 31, 17, 17, 17
-     <=        0e    01, 02, 04, 08, 31, 00, 31
-     3         0f    31, 02, 04, 02, 01, 17, 14
-     P         10    30, 17, 17, 30, 16, 16, 16
-     SQRT      11    07, 04, 04, 04, 04, 20, 08
-     X         12    17, 17, 10, 04, 10, 17, 17
-     4         13    02, 06, 10, 18, 31, 02, 02
-     Q         ??    14, 17, 17, 17, 21, 18, 13
-     R         14    30, 17, 17, 30, 20, 18, 17
-     F         15    31, 16, 16, 30, 16, 16, 16
-     Z         16    31, 01, 02, 04, 08, 16, 31
-     V         ??    17, 17, 17, 17, 17, 10, 04
-     U         ??    17, 17, 17, 17, 17, 17, 14
-     5         17    31, 16, 30, 01, 01, 17, 14
-     S         18    14, 17, 16, 14, 01, 17, 14
-     ?         19    14, 17, 01, 02, 04, 00, 04
-     XBAR      1a    31, 00, 17, 10, 04, 10, 17
-     6         1b    06, 08, 16, 30, 17, 17, 14
-     T         1c    31, 04, 04, 04, 04, 04, 04
-     RTARROW   1d    00, 04, 02, 31, 02, 04, 00
-     <>        1e    02, 31, 02, 00, 08, 31, 08
-     7         1f    31, 01, 02, 02, 04, 04, 04
-     PERCENT   20    24, 25, 02, 04, 08, 19, 03
-     s2        21    12, 18, 04, 08, 30, 00, 00
-     SIG       22    31, 17, 08, 04, 08, 17, 31
-     8         23    14, 17, 17, 14, 17, 17, 14
-     J         24    07, 02, 02, 02, 02, 18, 12
-     sX        25    20, 08, 20, 00, 00, 00, 00
-     >         26    02, 04, 08, 16, 08, 04, 02
-     9         27    14, 17, 17, 15, 01, 02, 12
-     A         28    04, 10, 17, 17, 31, 17, 17
-     #         29    10, 10, 31, 10, 31, 10, 10
-     K         2a    17, 18, 20, 24, 20, 18, 17
-     DP        2b    00, 00, 00, 00, 00, 12, 12
-     B         2c    30, 17, 17, 30, 17, 17, 30
-     b         2d
-     /         2e    00, 01, 02, 04, 08, 16, 00
-     MINUS     2f    00, 00, 00, 31, 00, 00, 00
-     C         30    14, 17, 16, 16, 16, 17, 14
-     c         31
-     DIVIDE    32    00, 04, 00, 31, 00, 04, 00
-     PLUS      33    00, 04, 04, 31, 04, 04, 00
-     D         34    30, 17, 17, 17, 17, 17, 30
-     d         35
-     UPARROW   36    04, 14, 31, 04, 04, 04, 04
-     *         37    04, 21, 14, 04, 14, 21, 04
-     E         38    31, 16, 16, 30, 16, 16, 31
-     e         39    00, 00, 14, 17, 31, 16, 14
-     DNARROW   3a    04, 04, 04, 04, 31, 14, 04
-     BLANK     3b    00, 00, 00, 00, 00, 00, 00
-     I         3c    14, 04, 04, 04, 04, 04, 14
-     i         3d    06, 06, 00, 06, 06, 06, 06
-     MULT      3e    00, 17, 10, 04, 10, 17, 00
-     EOL       3f    00, 00, 00, 00, 00, 00, 00
+    Code           Data                   Bitmap (5 bits x 7 rows)
+
+     N              00          0x17, 0x17, 0x25, 0x21, 0x19, 0x17, 0x17
+     Y              01          0x17, 0x17, 0x10, 0x04, 0x04, 0x04, 0x04
+     =              02          0x00, 0x00, 0x31, 0x00, 0x31, 0x00, 0x00
+     0              03          0x14, 0x17, 0x19, 0x21, 0x25, 0x17, 0x14
+     L              04          0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x31
+     M              05          0x17, 0x27, 0x21, 0x21, 0x17, 0x17, 0x17
+     NE             06          0x01, 0x02, 0x31, 0x04, 0x31, 0x08, 0x16
+     1              07          0x04, 0x12, 0x04, 0x04, 0x04, 0x04, 0x14
+     G              08          0x14, 0x17, 0x16, 0x23, 0x17, 0x17, 0x14
+     s-1            09          0x01, 0x01, 0x29, 0x01, 0x00, 0x00, 0x00
+     >              0a          0x08, 0x04, 0x02, 0x01, 0x02, 0x04, 0x08
+     2              0b          0x14, 0x17, 0x01, 0x02, 0x04, 0x08, 0x31
+     O              0c          0x14, 0x17, 0x17, 0x17, 0x17, 0x17, 0x14
+     H              0d          0x17, 0x17, 0x17, 0x31, 0x17, 0x17, 0x17
+     <=             0e          0x01, 0x02, 0x04, 0x08, 0x31, 0x00, 0x31
+     3              0f          0x31, 0x02, 0x04, 0x02, 0x01, 0x17, 0x14
+     P              10          0x30, 0x17, 0x17, 0x30, 0x16, 0x16, 0x16
+     Square Root    11          0x07, 0x04, 0x04, 0x04, 0x04, 0x20, 0x08
+     X              12          0x17, 0x17, 0x10, 0x04, 0x10, 0x17, 0x17
+     4              13          0x02, 0x06, 0x10, 0x18, 0x31, 0x02, 0x02
+     Q              ??          0x14, 0x17, 0x17, 0x17, 0x21, 0x18, 0x13
+     R              14          0x30, 0x17, 0x17, 0x30, 0x20, 0x18, 0x17
+     F              15          0x31, 0x16, 0x16, 0x30, 0x16, 0x16, 0x16
+     Z              16          0x31, 0x01, 0x02, 0x04, 0x08, 0x16, 0x31
+     V              ??          0x17, 0x17, 0x17, 0x17, 0x17, 0x10, 0x04
+     U              ??          0x17, 0x17, 0x17, 0x17, 0x17, 0x17, 0x14
+     5              17          0x31, 0x16, 0x30, 0x01, 0x01, 0x17, 0x14
+     S              18          0x14, 0x17, 0x16, 0x14, 0x01, 0x17, 0x14
+     ?              19          0x14, 0x17, 0x01, 0x02, 0x04, 0x00, 0x04
+     xbar           1a          0x31, 0x00, 0x17, 0x10, 0x04, 0x10, 0x17
+     6              1b          0x06, 0x08, 0x16, 0x30, 0x17, 0x17, 0x14
+     T              1c          0x31, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04
+     Right Arrow    1d          0x00, 0x04, 0x02, 0x31, 0x02, 0x04, 0x00
+     <>             1e          0x02, 0x31, 0x02, 0x00, 0x08, 0x31, 0x08
+     7              1f          0x31, 0x01, 0x02, 0x02, 0x04, 0x04, 0x04
+     Percent        20          0x24, 0x25, 0x02, 0x04, 0x08, 0x19, 0x03
+     s2             21          0x12, 0x18, 0x04, 0x08, 0x30, 0x00, 0x00
+     Sigma          22          0x31, 0x17, 0x08, 0x04, 0x08, 0x17, 0x31
+     8              23          0x14, 0x17, 0x17, 0x14, 0x17, 0x17, 0x14
+     J              24          0x07, 0x02, 0x02, 0x02, 0x02, 0x18, 0x12
+     sX             25          0x20, 0x08, 0x20, 0x00, 0x00, 0x00, 0x00
+     >              26          0x02, 0x04, 0x08, 0x16, 0x08, 0x04, 0x02
+     9              27          0x14, 0x17, 0x17, 0x15, 0x01, 0x02, 0x12
+     A              28          0x04, 0x10, 0x17, 0x17, 0x31, 0x17, 0x17
+     #              29          0x10, 0x10, 0x31, 0x10, 0x31, 0x10, 0x10
+     K              2a          0x17, 0x18, 0x20, 0x24, 0x20, 0x18, 0x17
+     DP             2b          0x00, 0x00, 0x00, 0x00, 0x00, 0x12, 0x12
+     B              2c          0x30, 0x17, 0x17, 0x30, 0x17, 0x17, 0x30
+     b              2d
+     /              2e          0x00, 0x01, 0x02, 0x04, 0x08, 0x16, 0x00
+     Minus          2f          0x00, 0x00, 0x00, 0x31, 0x00, 0x00, 0x00
+     C              30          0x14, 0x17, 0x16, 0x16, 0x16, 0x17, 0x14
+     c              31
+     Divide         32          0x00, 0x04, 0x00, 0x31, 0x00, 0x04, 0x00
+     Plus           33          0x00, 0x04, 0x04, 0x31, 0x04, 0x04, 0x00
+     D              34          0x30, 0x17, 0x17, 0x17, 0x17, 0x17, 0x30
+     d              35
+     Up Arrow       36          0x04, 0x14, 0x31, 0x04, 0x04, 0x04, 0x04
+     *              37          0x04, 0x21, 0x14, 0x04, 0x14, 0x21, 0x04
+     E              38          0x31, 0x16, 0x16, 0x30, 0x16, 0x16, 0x31
+     e              39          0x00, 0x00, 0x14, 0x17, 0x31, 0x16, 0x14
+     Down Arrow     3a          0x04, 0x04, 0x04, 0x04, 0x31, 0x14, 0x04
+     Space          3b          0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+     I              3c          0x14, 0x04, 0x04, 0x04, 0x04, 0x04, 0x14
+     i              3d          0x06, 0x06, 0x00, 0x06, 0x06, 0x06, 0x06
+     Multiply       3e          0x00, 0x17, 0x10, 0x04, 0x10, 0x17, 0x00
+     EOL            3f          0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 
 e.g:
 
@@ -396,96 +432,95 @@ e.g:
 
       3f     3b     3b     3b     38     14     14     0c     14
 
-      EOL   BLANK  BLANK  BLANK   E      R      R      O      R
+      EOL    Space  Space  Space  E      R      R      O      R
 
 
+### Voyager/Coconut series (NUT processor)
 
-### Voyager series (NUT processor)
+    Octal   Binary            Mnemonic              Mnemonic (classic)
+    00n00   0 nnn 00 00 00    nop                   nop
+    01n00   1 nnn 00 00 00    hpil n,c
 
-    00n00   0 nnn 00 00 00    NOP
-    01n00   1 nnn 00 00 00    HPIL n,C
+    0nn04   n nnn 00 01 00    st = 0 n              0 -> s(n)               (n:0..14 uses scrambled n)
 
-    0nn04   n nnn 00 01 00    ST=0 n               (n:0..14) uses scrambled n
+    01704   1 111 00 01 00    clrst                 clear status            (first 8 bits only)
 
-    01304   1 111 00 01 00    CLRST                (first 8 bits only)
+    0nn10   n nnn 00 10 00    st = 1 n              1 -> s(n)               (n:0..14 uses scrambled n)
+    01710   1 111 00 10 00    rstkb                 reset keyboard
 
-    0nn10   n nnn 00 10 00    ST=1 n               (n:0..14) uses scrambled n
-    01710   1 111 00 10 00    RSTKB
+    0nn14   n nnn 00 11 00    ? st = 1 n                                    (n:0..14 uses scrambled n)
+    01714   1 111 00 11 00    chkkb                 check keyboard
 
-    0nn14   n nnn 00 11 00    ?ST=1 n              (n:0..14) uses scrambled n
-    01714   1 111 00 11 00    CHKKB
+    0nn20   n nnn 01 00 00    lc n c[r] = n ,r++
 
-    0nn20   n nnn 01 00 00    LC n C[R] = n ,R++
+    0nn24   n nnn 01 01 00    ? pt = n                                      (n:0..14 uses scrambled n)
+    01724   1 111 01 01 00    r = r-1
 
-    0nn24   n nnn 01 01 00    ?PT = n              uses scrambled n
-    01724   1 111 01 01 00    R=R-1
+    00030   0 000 01 10 00                                                  (nop ?)
+    00130   0 001 01 10 00    g = c[r]
+    00230   0 010 01 10 00    c[r] = g
+    00330   0 011 01 10 00    c[r]exg
+    00430   0 100 01 10 00                                                  (nop ?)
+    00530   0 101 01 10 00    m = c
+    00630   0 110 01 10 00    c = m
+    00730   0 111 01 10 00    cmex
+    01030   1 000 01 10 00                                                  (nop ?)
+    01130   1 001 01 10 00    f = sb                                        (output port(0..7) = st(0..7)
+    01230   1 010 01 10 00    sb = f                                        (st(0..7) = output port(0..7))
+    01330   1 011 01 10 00    fsbex                                         (exchange st(0..7) with output port(0..7)
+    01430   1 100 01 10 00                                                  (nop ?)
+    01530   1 101 01 10 00    st = c(0..7)
+    01630   1 110 01 10 00    c = st(0..7)
+    01730   1 111 01 10 00    cstex(0..7)
 
-    00030   0 000 01 10 00                         nop?
-    00130   0 001 01 10 00    G=C[R]
-    00230   0 010 01 10 00    C[R]=G
-    00330   0 011 01 10 00    C[R]EXG
-    00430   0 100 01 10 00                         nop?
-    00530   0 101 01 10 00    M=C
-    00630   0 110 01 10 00    C=M
-    00730   0 111 01 10 00    CMEX
-    01030   1 000 01 10 00                         nop?
-    01130   1 001 01 10 00    F=SB                 (output port(7..0) = ST(7..0)
-    01230   1 010 01 10 00    SB=F                 ST(7..0) = output port(7..0)
-    01330   1 011 01 10 00    FSBEX ST(7..0)       xchg output port(7..0)
-    01430   1 100 01 10 00                         nop?
-    01530   1 101 01 10 00    ST=C(7..0)
-    01630   1 110 01 10 00    C=ST(7..0)
-    01730   1 111 01 10 00    CSTEX(7..0)
+    0nn34   n nnn 01 11 00    pt = n                                        (n: 0..14 uses scrambled n)
+    01734   1 111 01 11 00    pt = pt + 1
 
-    0nn34   n nnn 01 11 00    PT=n                 (n: 0..14) uses scrambled n
-    01734   1 111 01 11 00    PT=PT+1
+    00040   0 000 10 00 00    spopnd
+    00140   0 001 10 00 00    pwroff
+    00240   0 010 10 00 00    selp
+    00340   0 011 10 00 00    selq
+    00440   0 100 10 00 00    ? p = q
+    00540   0 101 10 00 00    lld                                           (Battery status to C register 0 OK 1 low)
+    00640   0 110 10 00 00    clrabc
+    00740   0 111 10 00 00    goto c
+    01040   1 000 10 00 00    c = keys
+    01140   1 001 10 00 00    sethex
+    01240   1 010 10 00 00    setdec
+    01340   1 011 10 00 00    dspoff
+    01440   1 100 10 00 00    dsptogggle
+    01540   1 101 10 00 00    rtnc
+    01640   1 110 10 00 00    rtnnc
+    01740   1 111 10 00 00    rtn
 
-    00040   0 000 10 00 00    SPOPND
-    00140   0 001 10 00 00    PWROFF
-    00240   0 010 10 00 00    SELP
-    00340   0 011 10 00 00    SELQ
-    00440   0 100 10 00 00    ?P=Q
-    00540   0 101 10 00 00    LLD                  Battery status to C 0 OK 1 low
-    00640   0 110 10 00 00    CLRABC
-    00740   0 111 10 00 00    GOTOC
-    01040   1 000 10 00 00    C=KEYS
-    01140   1 001 10 00 00    SETHEX
-    01240   1 010 10 00 00    SETDEC
-    01340   1 011 10 00 00    DSPOFF
-    01440   1 100 10 00 00    DSPTOGGLE
-    01540   1 101 10 00 00    RTNC
-    01640   1 110 10 00 00    RTNNC
-    01740   1 111 10 00 00    RTN
+    0nn44   n nnn 10 01 00    selpf n
 
-    0nn44   n nnn 10 01 00    SELPF n
+    0nn50   n nnn 10 10 00    regn = c n
 
-    0nn50   n nnn 10 10 00    REGN=C n
+    0nn54   n nnn 10 11 00    ? f n = 1
 
-    0nn54   n nnn 10 11 00    ?Fx=1                uses scrambled n
+    00060   0 000 11 00 00    hexpak
+    00160   0 001 11 00 00    n = c
+    00260   0 010 11 00 00    c = n
+    00360   0 011 11 00 00    cnex
+    00460   0 100 11 00 00    ldi nnn
+    00560   0 101 11 00 00    stk = c
+    00660   0 110 11 00 00    c = stk
+    00760   0 111 11 00 00    wptog
+    01060   1 000 11 00 00    gokeys
+    01160   1 001 11 00 00    dadd = c
+    01260   1 010 11 00 00    clerregs
+    01360   1 011 11 00 00    data = c
+    01460   1 100 11 00 00    cxisa
+    01560   1 101 11 00 00    c = c ! a
+    01660   1 110 11 00 00    c = c & a
+    01760   1 111 11 00 00    pfad = c
 
-    00060   0 000 11 00 00    HEXPAK
-    00160   0 001 11 00 00    N=C
-    00260   0 010 11 00 00    C=N
-    00360   0 011 11 00 00    CNEX
-    00460   0 100 11 00 00    LDI nnn
-    00560   0 101 11 00 00    STK=C
-    00660   0 110 11 00 00    C=STK
-    00760   0 111 11 00 00    WPTOG                (HEXPAK)
-    01060   1 000 11 00 00    GOKEYS
-    01160   1 001 11 00 00    DADD=C
-    01260   1 010 11 00 00    CLRREGS
-    01360   1 011 11 00 00    DATA=C
-    01460   1 100 11 00 00    CXISA
-    01560   1 101 11 00 00    C=C!A
-    01660   1 110 11 00 00    C=C&A
-    01760   1 111 11 00 00    PFAD=C               peripheral address
+    00070   0 000 11 10 00    c = data
+    0nn70   n nnn 11 10 00    c = reg nn                                    (n:0..14 14 = 0 uses scrambled n)
 
-    00070   0 000 11 10 00    C=DATA
-    0nn70   n nnn 11 10 00    C=REGn
-
-    0nn74   n nnn 11 11 00    RCR n                (n:0..14) 14 = 0 uses scrambled n
+    0nn74   n nnn 11 11 00    rcr n                                         (n:0..14 14 = 0 uses scrambled n)
     01774   1 111 11 11 00    Display Compensation
-
 
 
 ## Type 2 - Arithmetic operations (n nnn nnn n10)
@@ -504,7 +539,7 @@ Where fff is the field modifier.
 
 The field modifier is used to select which part of the register to use.
 
-### Woodstock (and Spice) series
+### Woodstock Spice and Voyager series
 
     000   P : determined by P register             ([P])
     001  WP : word up to and including P register  ([0 .. P])
@@ -593,83 +628,13 @@ The field modifier is used to select which part of the register to use.
             1 111 1 fff 10    a + 1 -> a[f]
 
 
+## Opcode listing
 
--- Subroutine and long conditional jumps, two words opcodes
---   9   8   7   6   5   4   3   2   1   0       9   8   7   6   5   4   3   2   1   0
--- +---+---+---+---+---+---+---+---+---+---+   +---+---+---+---+---+---+---+---+---+---+
--- | l | l | l | l | l | l | l | l | 0 | 1 |   | h | h | h | h | h | h | h | h | t | t |
--- +---+---+---+---+---+---+---+---+---+---+   +---+---+---+---+---+---+---+---+---+---+
---
--- type (tt) :
--- 00 GOSUBNC subroutine call if carry clear
--- 01 GOSUBC  subroutine call if carry set
--- 10 GOLNC   long jump if carry clear
--- 11 GOLC    long jump call if carry set
---
--- Target address PC = hhll (absolute)
---
---   9   8   7   6   5   4   3   2   1   0
--- +---+---+---+---+---+---+---+---+---+---+
--- | o | o | o | o | o | f | f | f | 1 | 0 | Arithmetic
--- +---+---+---+---+---+---+---+---+---+---+
--- field type (fff):
--- 000  P : PQ..PQ (uses actual pointer)
--- 001  X :  2..0
--- 010 WP : PQ..0
--- 011  W : 13..0
--- 100 PQ :  Q..P, if Q > P then uses 13 as left position
--- 101 XS :  2..2
--- 110  M : 12..3
--- 111  S : 13..13
---
--- arithmetic operation on selected field
--- 00000 : A = 0
--- 00001 : B = 0
--- 00010 : C = 0
--- 00011 : AEXB
--- 00100 : B = A
--- 00101 : AEXC
--- 00110 : C = B
--- 00111 : BEXC
--- 01000 : A = C
--- 01001 : A = A + B
--- 01010 : A = A + C
--- 01011 : A = A + 1
--- 01100 : A = A - B
--- 01101 : A = A - 1
--- 01110 : A = A - C
--- 01111 : C = C + C
--- 10000 : C = A + C
--- 10001 : C = C + 1
--- 10010 : C = A - C
--- 10011 : C = C - 1
--- 10100 : C = 0 - C
--- 10101 : C = 0 - C - 1
--- 10110 : ?0#B
--- 10111 : ?0#C
--- 11000 : ?A<C
--- 11001 : ?A<B
--- 11010 : ?0#A
--- 11011 : ?A#C
--- 11100 : ASR
--- 11101 : BSR
--- 11110 : CSR
--- 11111 : ASL
---
--- Short jumps
---   9   8   7   6   5   4   3   2   1   0
--- +---+---+---+---+---+---+---+---+---+---+
--- |   |   |   |   |   |   |   |   | 1 | 1 |
--- +---+---+---+---+---+---+---+---+---+---+
---
-
-
-
-Instruction              HP-01     Classic   Woodstock   Voyager
+Mnemonic (classic)       HP-01    Classic  Woodstock  Voyager
 0 - c - 1 -> c[m]        0346      0346      1266
 0 - c - 1 -> c[ms]       0366      0366      1276
 0 - c - 1 -> c[p]        0342      0342      1242
-0 - c - 1 -> c[s]        0376      0376      1262
+0 - c - 1 -> c[s]        0376      0376      1262      1276
 0 - c - 1 -> c[w]        0356      0356      1272
 0 - c - 1 -> c[wp]       0362      0362      1246
 0 - c - 1 -> c[x]        0352      0352      1256
@@ -715,49 +680,49 @@ Instruction              HP-01     Classic   Woodstock   Voyager
 0 -> f6                  N/A       1540      N/A
 0 -> f7                  N/A       1740      N/A
 0 -> p                   0314      0014      1474
-0 -> s0                  0044      0044      0014
-0 -> s1                  0144      0144      0114
-0 -> s1-7                0020      N/A       N/A
-0 -> s10                 1244      1244      1214
-0 -> s11                 1344      1344      1314
-0 -> s12                 1444      N/A       1414
-0 -> s13                 1544      N/A       1514
-0 -> s14                 1644      N/A       1614
-0 -> s15                 1744      N/A       1714
-0 -> s2                  0244      0244      0214
-0 -> s3                  0344      0344      0314
-0 -> s4                  0444      0444      0414
-0 -> s5                  0544      0544      0514
-0 -> s6                  0644      0644      0614
-0 -> s7                  0744      0744      0714
-0 -> s8                  1044      1044      1014
-0 -> s8-15               0120      N/A       N/A
-0 -> s9                  1144      1144      1114
+0 -> s(0)                0044      0044      0014      1604
+0 -> s(1)                0144      0144      0114      1404
+0 -> s(1-7)              0020      N/A       N/A       N/A
+0 -> s(10)               1244      1244      1214      0304
+0 -> s(11)               1344      1344      1314      0604
+0 -> s(12)               1444      N/A       1414      1504
+0 -> s(13)               1544      N/A       1514      1304
+0 -> s(14)               1644      N/A       1614      N/A ?
+0 -> s(15)               1744      N/A       1714      0704
+0 -> s(2)                0244      0244      0214      1004
+0 -> s(3)                0344      0344      0314      0004
+0 -> s(4)                0444      0444      0414      0104
+0 -> s(5)                0544      0544      0514      0204
+0 -> s(6)                0644      0644      0614      0504
+0 -> s(7)                0744      0744      0714      1204
+0 -> s(8)                1044      1044      1014      0404
+0 -> s(8-15)             0120      N/A       N/A       N/A
+0 -> s(9)                1144      1144      1114      1104
 1 -> f0                  N/A       0040      N/A
 1 -> f1                  N/A       0240      N/A
 1 -> f2                  N/A       0440      N/A
 1 -> f3                  N/A       0640      N/A
-1 -> f4                  N/A       1040      N/A
+1 -> f4                  N/A       1040      N/A/
 1 -> f5                  N/A       1240      N/A
 1 -> f6                  N/A       1440      N/A
 1 -> f7                  N/A       1640      N/A
 1 -> p                   0714      0114      1074
-1 -> s0                  0004      0004      0004
-1 -> s1                  0104      0104      0104
-1 -> s10                 1204      1204      1204
-1 -> s11                 1304      1304      1304
-1 -> s12                 1404      N/A       1404
-1 -> s13                 1504      N/A       1504
-1 -> s14                 1604      N/A       1604
-1 -> s15                 1704      N/A       1704
-1 -> s2                  0204      0204      0204
-1 -> s3                  0304      0304      0304
-1 -> s4                  0404      0404      0404
-1 -> s5                  0504      0504      0504
-1 -> s6                  0604      0604      0604
-1 -> s7                  0704      0704      0704
-1 -> s8                  1004      1004      1004
-1 -> s9                  1104      1104      1104
+1 -> s(0)                0004      0004      0004      1610
+1 -> s(1)                0104      0104      0104      1410
+1 -> s(10)               1204      1204      1204      0310
+1 -> s(11)               1304      1304      1304      0610
+1 -> s(12)               1404      N/A       1404      1510
+1 -> s(13)               1504      N/A       1504      1310
+1 -> s(14)               1604      N/A       1604      N/A ?
+1 -> s(15)               1704      N/A       1704      0710
+1 -> s(2)                0204      0204      0204      1010
+1 -> s(3)                0304      0304      0304      0010
+1 -> s(4)                0404      0404      0404      0110
+1 -> s(5)                0504      0504      0504      0210
+1 -> s(6)                0604      0604      0604      0510
+1 -> s(7)                0704      0704      0704      1210
+1 -> s(8)                1004      1004      1004      0410
+1 -> s(9)                1104      1104      1104      1110
 10 -> p                  1614      1214      0674
 11 -> p                  0114      1314      0474
 12 -> p                  N/A       1414      0774
@@ -850,22 +815,22 @@ a -> clrs                0174      N/A       N/A
 a -> dsp                 1374      N/A       N/A
 a -> rom address         N/A       N/A       0220
 a -> sw                  0674      N/A       N/A
-a exchange b[m]          1246      1446      0126
-a exchange b[ms]         1266      1466      0136
-a exchange b[p]          1242      1442      0102
-a exchange b[s]          1276      1476      0122
-a exchange b[w]          1256      1456      0132
-a exchange b[wp]         1262      1462      0106
-a exchange b[x]          1252      1452      0116
-a exchange b[xs]         1272      1472      0112
-a exchange c[m]          0406      1646      0226
-a exchange c[ms]         0426      1666      0236
-a exchange c[p]          0402      1642      0202
-a exchange c[s]          0436      1676      0222
-a exchange c[w]          0416      1656      0232
-a exchange c[wp]         0422      1662      0206
-a exchange c[x]          0412      1652      0216
-a exchange c[xs]         0432      1672      0212
+a exch b[m]              1246      1446      0126
+a exch b[ms]             1266      1466      0136
+a exch b[p]              1242      1442      0102
+a exch b[s]              1276      1476      0122
+a exch b[w]              1256      1456      0132
+a exch b[wp]             1262      1462      0106
+a exch b[x]              1252      1452      0116
+a exch b[xs]             1272      1472      0112
+a exch c[m]              0406      1646      0226
+a exch c[ms]             0426      1666      0236
+a exch c[p]              0402      1642      0202
+a exch c[s]              0436      1676      0222
+a exch c[w]              0416      1656      0232
+a exch c[wp]             0422      1662      0206
+a exch c[x]              0412      1652      0216
+a exch c[xs]             0432      1672      0212
 a[p] -> f                1334      N/A       N/A
 a[p]=0                   0030      N/A       N/A
 a[p]=1                   0130      N/A       N/A
@@ -893,14 +858,14 @@ b -> c[w]                1516      0216      0332
 b -> c[wp]               1522      0222      0306
 b -> c[x]                1512      0212      0316
 b -> c[xs]               1532      0232      0312
-b exchange c[m]          1546      1046      0366
-b exchange c[ms]         1566      1066      0376
-b exchange c[p]          1542      1042      0342
-b exchange c[s]          1576      1076      0362
-b exchange c[w]          1556      1056      0372
-b exchange c[wp]         1562      1062      0346
-b exchange c[x]          1552      1052      0356
-b exchange c[xs]         1572      1072      0352
+b exch c[m]              1546      1046      0366
+b exch c[ms]             1566      1066      0376
+b exch c[p]              1542      1042      0342
+b exch c[s]              1576      1076      0362
+b exch c[w]              1556      1056      0372
+b exch c[wp]             1562      1062      0346
+b exch c[x]              1552      1052      0356
+b exch c[xs]             1572      1072      0352
 bank switch              N/A       N/A       1060
 binary                   N/A       N/A       0420
 blink                    1134      N/A       N/A
@@ -957,12 +922,12 @@ c -> data register 8     N/A       N/A       1050
 c -> data register 9     N/A       N/A       1150
 c -> m                   0434      N/A       N/A
 c -> stack               N/A       0450      1310
-c exchange d             0134      N/A       N/A
-c exchange m             N/A       0250      N/A
+c exch d                 0134      N/A       N/A
+check keyboard           N/A       N/A       N/A       1714
 cl -> a                  0074      N/A       N/A
 clear data registers     N/A       N/A       1260
 clear registers          0034      1650      0010
-clear status             N/A       0064      0110
+clear status             N/A       0064      0110      1704*               * (first 8 bits only)
 crc 100                  N/A       N/A       0100
 crc 1000                 N/A       N/A       1000
 crc 1100                 N/A       N/A       1100
@@ -1030,7 +995,7 @@ dsscwp                   1534      N/A       N/A
 enscwp                   1434      N/A       N/A
 f -> a                   N/A       N/A       1610
 f -> a[p]                1234      N/A       N/A
-f exchange a             N/A       N/A       1710
+f exch a                 N/A       N/A       1710
 go to $00                0003      0003      0003
 go to $01                0007      0007      0007
 go to $02                0013      0013      0013
@@ -1307,21 +1272,21 @@ if a >= c[wp]            0622      0122      1406
 if a >= c[x]             0612      0112      1416
 if a >= c[xs]            0632      0132      1412
 if a[m] >= 1             0646      1146      1526
-if a[m] # 0              0646      1146      1526
+if a[m] != 0             0646      1146      1526
 if a[ms] >= 1            0666      1166      1536
-if a[ms] # 0             0666      1166      1536
+if a[ms] != 0            0666      1166      1536
 if a[p] >= 1             0642      1142      1502
-if a[p] # 0              0642      1142      1502
+if a[p] != 0             0642      1142      1502
 if a[s] >= 1             0676      1176      1522
-if a[s] # 0              0676      1176      1522
+if a[s] != 0             0676      1176      1522
 if a[w] >= 1             0656      1156      1532
-if a[w] # 0              0656      1156      1532
+if a[w] != 0             0656      1156      1532
 if a[wp] >= 1            0662      1162      1506
-if a[wp] # 0             0662      1162      1506
+if a[wp] != 0            0662      1162      1506
 if a[x] >= 1             0652      1152      1516
-if a[x] # 0              0652      1152      1516
+if a[x] != 0             0652      1152      1516
 if a[xs] >= 1            0672      1172      1512
-if a[xs] # 0             0672      1172      1512
+if a[xs] != 0            0672      1172      1512
 if b[m] = 0              1446      0006      1326
 if b[ms] = 0             1466      0026      1336
 if b[p] = 0              1442      0002      1302
@@ -1332,44 +1297,44 @@ if b[x] = 0              1452      0012      1316
 if b[xs] = 0             1472      0032      1312
 if c[m] = 0              0006      0646      1366
 if c[m] >= 1             0206      0146      1566
-if c[m] # 0              0206      0146      1566
+if c[m] != 0             0206      0146      1566
 if c[ms] = 0             0026      0666      1376
 if c[ms] >= 1            0226      0166      1576
-if c[ms] # 0             0226      0166      1576
+if c[ms] != 0            0226      0166      1576
 if c[p] = 0              0002      0642      1342
 if c[p] >= 1             0202      0142      1542
-if c[p] # 0              0202      0142      1542
+if c[p] != 0             0202      0142      1542
 if c[s] = 0              0036      0676      1362
 if c[s] >= 1             0236      0176      1562
-if c[s] # 0              0236      0176      1562
+if c[s] != 0             0236      0176      1562
 if c[w] = 0              0016      0656      1372
 if c[w] >= 1             0216      0156      1572
-if c[w] # 0              0216      0156      1572
+if c[w] != 0             0216      0156      1572
 if c[wp] = 0             0022      0662      1346
 if c[wp] >= 1            0222      0162      1546
-if c[wp] # 0             0222      0162      1546
+if c[wp] != 0            0222      0162      1546
 if c[x] = 0              0012      0652      1356
 if c[x] >= 1             0212      0152      1556
-if c[x] # 0              0212      0152      1556
+if c[x] != 0             0212      0152      1556
 if c[xs] = 0             0032      0672      1352
 if c[xs] >= 1            0232      0172      1552
-if c[xs] # 0             0232      0172      1552
-if p # 0                 0354      0054      1354
-if p # 1                 0754      0154      0554
-if p # 10                1654      1254      1554
-if p # 11                0154      1354      1454
-if p # 12                N/A       1454      0254
-if p # 13                N/A       1554      1154
-if p # 14                N/A       1654      N/A
-if p # 15                N/A       1754      N/A
-if p # 2                 1154      0254      0354
-if p # 3                 1354      0354      0754
-if p # 4                 1054      0454      0054
-if p # 5                 0454      0554      1254
-if p # 6                 1554      0654      0654
-if p # 7                 1454      0754      1654
-if p # 8                 0254      1054      0154
-if p # 9                 0654      1154      0454
+if c[xs] != 0            0232      0172      1552
+if p != 0                0354      0054      1354
+if p != 1                0754      0154      0554
+if p != 10               1654      1254      1554
+if p != 11               0154      1354      1454
+if p != 12               N/A       1454      0254
+if p != 13               N/A       1554      1154
+if p != 14               N/A       1654      N/A
+if p != 15               N/A       1754      N/A
+if p != 2                1154      0254      0354
+if p != 3                1354      0354      0754
+if p != 4                1054      0454      0054
+if p != 5                0454      0554      1254
+if p != 6                1554      0654      0654
+if p != 7                1454      0754      1654
+if p != 8                0254      1054      0154
+if p != 9                0654      1154      0454
 if p = 0                 N/A       N/A       1344
 if p = 1                 N/A       N/A       0544
 if p = 10                N/A       N/A       1544
@@ -1384,54 +1349,54 @@ if p = 6                 N/A       N/A       0644
 if p = 7                 N/A       N/A       1644
 if p = 8                 N/A       N/A       0144
 if p = 9                 N/A       N/A       0444
-if s0 # 1                0024      0024      0034
-if s0 = 0                0024      0024      0034
-if s0 = 1                N/A       N/A       0024
-if s1 # 1                0124      0124      0134
-if s1 = 0                0124      0124      0134
-if s1 = 1                N/A       N/A       0124
-if s10 # 1               1224      1224      1234
-if s10 = 0               1224      1224      1234
-if s10 = 1               N/A       N/A       1224
-if s11 # 1               1324      1324      1334
-if s11 = 0               1324      1324      1334
-if s11 = 1               N/A       N/A       1324
-if s12 # 1               1424      1424      1434
-if s12 = 0               1424      1424      1434
-if s12 = 1               N/A       N/A       1424
-if s13 # 1               1524      1524      1534
-if s13 = 0               1524      1524      1534
-if s13 = 1               N/A       N/A       1524
-if s14 # 1               1624      1624      1634
-if s14 = 0               1624      1624      1634
-if s14 = 1               N/A       N/A       1624
-if s15 # 1               1724      1724      1734
-if s15 = 0               1724      1724      1734
-if s15 = 1               N/A       N/A       1724
-if s2 # 1                0224      0224      0234
-if s2 = 0                0224      0224      0234
-if s2 = 1                N/A       N/A       0224
-if s3 # 1                0324      0324      0334
-if s3 = 0                0324      0324      0334
-if s3 = 1                N/A       N/A       0324
-if s4 # 1                0424      0424      0434
-if s4 = 0                0424      0424      0434
-if s4 = 1                N/A       N/A       0424
-if s5 # 1                0524      0524      0534
-if s5 = 0                0524      0524      0534
-if s5 = 1                N/A       N/A       0524
-if s6 # 1                0624      0624      0634
-if s6 = 0                0624      0624      0634
-if s6 = 1                N/A       N/A       0624
-if s7 # 1                0724      0724      0734
-if s7 = 0                0724      0724      0734
-if s7 = 1                N/A       N/A       0724
-if s8 # 1                1024      1024      1034
-if s8 = 0                1024      1024      1034
-if s8 = 1                N/A       N/A       1024
-if s9 # 1                1124      1124      1134
-if s9 = 0                1124      1124      1134
-if s9 = 1                N/A       N/A       1124
+if s(0) != 1             0024      0024      0034
+if s(0) = 0              0024      0024      0034
+if s(0) = 1              N/A       N/A       0024
+if s(1) != 1             0124      0124      0134
+if s(1) = 0              0124      0124      0134
+if s(1) = 1              N/A       N/A       0124
+if s(10) != 1            1224      1224      1234
+if s(10) = 0             1224      1224      1234
+if s(10) = 1             N/A       N/A       1224
+if s(11) != 1            1324      1324      1334
+if s(11) = 0             1324      1324      1334
+if s(11) = 1             N/A       N/A       1324
+if s(12) != 1            1424      1424      1434
+if s(12) = 0             1424      1424      1434
+if s(12) = 1             N/A       N/A       1424
+if s(13) != 1            1524      1524      1534
+if s(13) = 0             1524      1524      1534
+if s(13) = 1             N/A       N/A       1524
+if s(14) != 1            1624      1624      1634
+if s(14) = 0             1624      1624      1634
+if s(14) = 1             N/A       N/A       1624
+if s(15) != 1            1724      1724      1734
+if s(15) = 0             1724      1724      1734
+if s(15) = 1             N/A       N/A       1724
+if s(2) != 1             0224      0224      0234
+if s(2) = 0              0224      0224      0234
+if s(2) = 1              N/A       N/A       0224
+if s(3) != 1             0324      0324      0334
+if s(3) = 0              0324      0324      0334
+if s(3) = 1              N/A       N/A       0324
+if s(4) != 1             0424      0424      0434
+if s(4) = 0              0424      0424      0434
+if s(4) = 1              N/A       N/A       0424
+if s(5) != 1             0524      0524      0534
+if s(5) = 0              0524      0524      0534
+if s(5) = 1              N/A       N/A       0524
+if s(6) != 1             0624      0624      0634
+if s(6) = 0              0624      0624      0634
+if s(6) = 1              N/A       N/A       0624
+if s(7) != 1             0724      0724      0734
+if s(7) = 0              0724      0724      0734
+if s(7) = 1              N/A       N/A       0724
+if s(8) != 1             1024      1024      1034
+if s(8) = 0              1024      1024      1034
+if s(8) = 1              N/A       N/A       1024
+if s(9) != 1             1124      1124      1134
+if s(9) = 0              1124      1124      1134
+if s(9) = 1              N/A       N/A       1124
 jsb $00                  0001      0001      0001
 jsb $01                  0005      0005      0005
 jsb $02                  0011      0011      0011
@@ -1689,6 +1654,7 @@ jsb $FD                  1765      1765      1765
 jsb $FE                  1771      1771      1771
 jsb $FF                  1775      1775      1775
 keys -> a                N/A       N/A       0120
+keys -> c                N/A       N/A       N/A       1040
 keys -> rom address      N/A       0320      0020
 load constant 0          N/A       0030      0030
 load constant 1          N/A       0130      0130
@@ -1707,20 +1673,21 @@ load constant 7          N/A       0730      0730
 load constant 8          N/A       1030      1030
 load constant 9          N/A       1130      1130
 m -> c                   0234      1250      N/A
-m1 -> c                  N/A       N/A       0510
-m1 exchange c            N/A       N/A       0410
-m2 -> c                  N/A       N/A       0710
-m2 exchange c            N/A       N/A       0610
+m -> c                   N/A       N/A       0510
+m exch c                 N/A       0250      0410
+n -> c                   N/A       N/A       0710
+n exch c                 N/A       N/A       0610
 mark and search          N/A       0400      N/A
 memory delete            N/A       0600      N/A
 memory full -> a         N/A       0745      N/A
 memory initialize        N/A       1600      N/A
 memory insert            N/A       0200      N/A
-no operation             0000      0000      0000
+no operation             0000      0000      0000      0000
 p + 1 -> p               0320      1374      0720
 p - 1 -> p               0420      1334      0620
 pointer advance          N/A       1400      N/A
 return                   0520      0060      1020
+reset keyboard           N/A       N/A       N/A       1710
 rotate a left            N/A       N/A       0520
 search for label         N/A       1200      N/A
 select rom 0             N/A       0020      0040
@@ -1775,7 +1742,7 @@ sleep                    0620      N/A       N/A
 stack -> a               N/A       0650      1010
 sw -> a                  0574      N/A       N/A
 sw+                      1274      N/A       N/A
-sw-                      1074      N/A       N/A
+sw-                      1074      N/A       N/A1742
 swstop                   1674      N/A       N/A
 swstrt                   1574      N/A       N/A
 y -> a                   N/A       N/A       1210

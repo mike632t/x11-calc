@@ -17,6 +17,8 @@
 
 - [x] Update README (document new options).
 
+- [x] Tidy up data structure definitions.
+
 - [ ] Use variables for all error messages, and add missing translations.
 
   [https://superuser.com/questions/392439/lang-and-language-environment-variable-in-debian-based-systems]::

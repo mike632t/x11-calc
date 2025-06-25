@@ -38,9 +38,7 @@
  * 11 Jan 22         - Removed ROM_BANKS - MT
  * 12 Feb 22         - Updated layout and separated the initialisation code
  *                     for buttons and switches into two functions - MT
- * 21 Oct 23         - Updated switch parameters to accomodate a 3 position
- *                     switch - MT
- * 04 May 24         - Do not define unused switches - MT
+ * 20 May 25         - Tidied up data structure definitions - MT
  *
  */
 
@@ -70,12 +68,12 @@
 
 oregister o_mem[MEMORY_SIZE];
 
-void v_init_switches(oswitch *h_switch[]) /* Define the switches. */
+void v_init_switches(struct oswitch *h_switch[]) /* Define the switches. */
 {
    h_switch[0] = h_switch_create(00000, "OFF", "", "ON ", h_alternate_font, KBD_LEFT, KBD_TOP, 2 * KEY_WIDTH + KEY_GAP, SWITCH_HEIGHT, True, MID_GREY, DARK_GREY);
 }
 
-void v_init_buttons(obutton *h_button[]) {
+void v_init_buttons(struct obutton *h_button[]) {
    int i_left, i_top;
 
    /* Define top row of keys. */

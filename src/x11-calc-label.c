@@ -62,7 +62,7 @@
 
 /* label_pressed (label, x, y) */
 
-olabel *h_label_pressed(olabel *h_label, int i_xpos, int i_ypos)
+struct olabel *h_label_pressed(struct olabel *h_label, int i_xpos, int i_ypos)
 {
 
    int i_indent, i_extent, i_upper, i_lower;
@@ -80,12 +80,12 @@ olabel *h_label_pressed(olabel *h_label, int i_xpos, int i_ypos)
 
 /* label_create (index, text, font, left, top, width, height, colour) */
 
-olabel *h_label_create(int i_index, char* s_text, XFontStruct *h_font,
+struct olabel *h_label_create(int i_index, char* s_text, XFontStruct *h_font,
    int i_left, int i_top, int i_width, int i_height,
    unsigned int i_colour, unsigned int i_background, int i_state)
 {
 
-   olabel *h_label; /* Ponter to label. */
+   struct olabel *h_label; /* Ponter to label. */
 
    /* Attempt to allcoate memory for a label. */
    if ((h_label = malloc (sizeof(*h_label)))==NULL) v_error(errno, h_err_memmory_alloc, __FILE__, __LINE__);
@@ -116,7 +116,7 @@ olabel *h_label_create(int i_index, char* s_text, XFontStruct *h_font,
  *
  */
 
-int i_label_resize(olabel *h_label, float f_scale)
+int i_label_resize(struct olabel *h_label, float f_scale)
 {
    h_label->label_position.x = h_label->label_geometry.x * f_scale;
    h_label->label_position.y = h_label->label_geometry.y * f_scale;
@@ -133,7 +133,7 @@ int i_label_resize(olabel *h_label, float f_scale)
  *
  */
 
-int i_label_draw(Display *h_display, int x_application_window, int i_screen, olabel *h_label)
+int i_label_draw(Display *h_display, int x_application_window, int i_screen, struct olabel *h_label)
 {
 
    int i_indent, i_upper, i_offset;

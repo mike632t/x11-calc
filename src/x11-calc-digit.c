@@ -32,21 +32,21 @@
  * You  should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * 14 Jul 13         - Initial verson - MT
+ * 14 Jul 13         - Initial version - MT
  * 16 Jul 13         - Draws a 7 segment display based on mask - MT
  * 18 Jul 13         - Added decimal point and comma (using shading) - MT
- *                   - Reversed the order of the segments in the bit mask,
+ *                   - Reversed  the order of the segments in the bit mask,
  *                     segment A is now bit 1, and segment G bit 7 - MT
- * 19 Jul 13         - Added shading to the display segments and reduced
- *                     the number times the foreground colour is set by
- *                     drawing all the background elements for every segment
+ * 19 Jul 13         - Added  shading  to the display segments and  reduced
+ *                     the  number  times the foreground colour is  set  by
+ *                     drawing all the background elements for each segment
  *                     before filling in the foreground - MT
  * 15 Dec 18         - Changed debug macro and added an error macro - MT
  * 08 Aug 21         - Tidied up spelling errors in the comments - MT
  * 03 Jan 21         - Changed debug() macro so that debug code is executed
  *                     when DEBUG is defined (doesn't need to be true) - MT
  * 08 Feb 22         - Include header for labels - MT
- * 14 Oct 23         - Don't draw a seperate background behind digits on an
+ * 14 Oct 23         - Don't draw a separate background behind digits on an
  *                     ARM  based system (unless it is an Apple) as the new
  *                     Wayand compositor's performance on a Raspberry Pi is
  *                     far too slow even on a Pi 4 - MT
@@ -55,7 +55,7 @@
  *                     both tcc and clang - MT
  * 25 Feb 24         - Modified the display to show the background for each
  *                     digit for all processor types - MT
- *                   - Does not attempt draw a seperate background for each
+ *                   - Does not attempt draw a separate background for each
  *                     digit on alpha based systems processors - MT
  * 03 Mar 24         - Updated error handling (now passes the  error number
  *                     to the error handler) - MT
@@ -63,7 +63,7 @@
  *                     x11-calc-digit - MT
  * 23 Apr 24         - Separated out prototypes for error handlers - MT
  *
- * TO DO :           - Optimize drawing of display digits.
+ * TO DO :           - Optimise drawing of display digits.
  ^
  */
 
@@ -103,10 +103,10 @@
  *
  */
 
-odigit *h_digit_create(int i_index, int i_mask, int i_left, int i_top,
+struct odigit *h_digit_create(int i_index, int i_mask, int i_left, int i_top,
    int i_width, int i_height, unsigned int i_foreground, unsigned int i_background){
 
-   odigit *h_digit; /* Ponter to digit */
+   struct odigit *h_digit; /* Ponter to digit */
 
    /* Attempt to allocate memory for a digit */
    if ((h_digit = malloc (sizeof(*h_digit)))==NULL) v_error(errno, "Memory allocation failed!");
@@ -134,7 +134,7 @@ odigit *h_digit_create(int i_index, int i_mask, int i_left, int i_top,
  *
  */
 
-int i_digit_resize(odigit *h_digit, float f_scale) /* Resize digit based on original geometery */
+int i_digit_resize(struct odigit *h_digit, float f_scale) /* Resize digit based on original geometry */
 {
    h_digit->digit_position.x = h_digit->digit_geometry.x * f_scale;
    h_digit->digit_position.y = h_digit->digit_geometry.y * f_scale;
@@ -144,7 +144,7 @@ int i_digit_resize(odigit *h_digit, float f_scale) /* Resize digit based on orig
    return 0;
 }
 
-int i_digit_draw(Display *h_display, int x_application_window, int i_screen, odigit *h_digit){ /* Draws all the digits */
+int i_digit_draw(Display *h_display, int x_application_window, int i_screen, struct odigit *h_digit){ /* Draws all the digits */
 
    int i_left, i_right, i_upper, i_lower;
    int i_offset;

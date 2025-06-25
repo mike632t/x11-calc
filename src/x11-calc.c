@@ -206,8 +206,8 @@
  *                   - Reduced the length of time that the off button  must
  *                     be held down to exit - MT
  * 26 May 22         - Blank line after an error message not needed - MT
- * 11 Dec 22         - Renamed models with continious memory and added HP25,
- *                     HP33E, and HP38E - MT
+ * 11 Dec 22         - Renamed models with continious memory and added HP25
+ *                     HP33E and HP38E - MT
  * 24 Dec 22         - Command line parsing routine now uses the same macro
  *                     definitions as the the error message definitions.
  *                   - Execution  speed  now uses VOYAGER and  SPICE  macro
@@ -309,9 +309,12 @@
  * 03 May 24         - Sets the abort flag and interval counter immediately
  *                     before the main loop - MT
  * 04 May 24         - Do not define unused switches - MT
+ * 19 May 24         - Remove unnecessary call to set windows size - MT
  * 15 Jun 24         - Sets the application icon to the X windows logo - MT
  * 24 Jul 24         - Updated release meta data - MT
  * 07 Nov 24         - Tidied up comments - MT
+ * 20 May 25         - Tidied up data structure definitions - MT
+ * 25 may 25         - Changed normal exit status to EXIT_SUCCESS - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Add verbose option.
@@ -323,8 +326,8 @@
 
 #define  NAME          "x11-calc"
 #define  VERSION       "0.14"
-#define  BUILD         "0156"
-#define  DATE          "24 Jul 24"
+#define  BUILD         "0160"
+#define  DATE          "25 May 25"
 #define  AUTHOR        "MT"
 
 #define  INTERVAL 25   /* Number of ticks to execute before updating the display */
@@ -332,7 +335,7 @@
 
 #include <errno.h>     /* errno */
 
-#include <stdarg.h>    /* strlen(), etc */
+#include <stdarg.h>    /* vargs(), etc */
 #include <string.h>    /* strlen(), etc */
 #include <stdio.h>     /* fprintf(), etc */
 #include <stdlib.h>    /* getenv(), etc */
@@ -373,7 +376,7 @@ void v_version()  /* Display version information */
       __DATE__[0], __DATE__[1], __DATE__[2], &__DATE__[9], __TIME__ );
 }
 
-void v_warning(const char *s_format, ...)  /* Print formatted warning message and exit */
+void v_warning(const char *s_format, ...)  /* Print formatted warning message */
 {
    va_list t_args;
    va_start(t_args, s_format);
@@ -414,9 +417,9 @@ int main(int argc, char *argv[])
    Atom wm_delete;
    XRectangle o_window_position;
    XRectangle o_window_geometry;
-   obutton *h_button[BUTTONS];   /* Array to hold pointers to buttons */
-   obutton *h_pressed = NULL;
-   odisplay *h_display;          /* Pointer to display structure */
+   struct obutton *h_button[BUTTONS];   /* Array to hold pointers to buttons */
+   struct obutton *h_pressed = NULL;
+   struct odisplay *h_display;          /* Pointer to display structure */
    oprocessor *h_processor;
 
    char *s_display_name = "";    /* Just use the default display */
@@ -451,11 +454,11 @@ int main(int argc, char *argv[])
    int i_ticks = -1;
 
 #if defined(SWITCHES)
-   oswitch *h_switch[SWITCHES];
+   struct oswitch *h_switch[SWITCHES];
 #endif
 
 #if defined(LABELS)
-   olabel *h_label[LABELS];
+   struct olabel *h_label[LABELS];
 #endif
 
 #if defined(__linux__) || defined(__NetBSD__) || defined(__FreeBSD__)
@@ -590,12 +593,12 @@ int main(int argc, char *argv[])
                   {
                      v_version();  /* Display version information */
                      fprintf(stdout, h_msg_licence, &__DATE__[7], AUTHOR);
-                     exit(0);
+                     exit(EXIT_SUCCESS);
                   }
                   else if (!strncmp(argv[i_count], "--help", i_index))
                   {
                      fprintf(stdout, c_msg_usage, FILENAME);
-                     exit(0);
+                     exit(EXIT_SUCCESS);
                   }
                   else  /* If we get here then the we have an invalid long option */
                      v_error(EINVAL, h_err_unrecognised_option, argv[i_count]);
@@ -647,12 +650,12 @@ int main(int argc, char *argv[])
          {
             v_version;  /* Display version information */
             fprintf(stdout, h_msg_licence, &__DATE__[7], AUTHOR);
-            exit(0);
+            exit(EXIT_SUCCESS);
          }
          else if ((!strncmp(argv[i_count], "/HELP", i_index)) | (!strncmp(argv[i_count], "/?", i_index)))
          {
             fprintf(stdout, c_msg_usage, FILENAME);
-            exit(0);
+            exit(EXIT_SUCCESS);
          }
          else /* If we get here then the we have an invalid option */
             v_error(EINVAL, h_err_invalid_option, argv[i_count]);
@@ -904,7 +907,7 @@ int main(int argc, char *argv[])
             break;
 #endif
          case ButtonPress :
-            debug(printf("Mouse button [%d] pressed.\n", x_event.xbutton.button));
+            /** debug(printf("Mouse button [%d] pressed.\n", x_event.xbutton.button)); */
             if (x_event.xbutton.button == 1)
             {
                int i_count;
@@ -1005,5 +1008,5 @@ int main(int argc, char *argv[])
    XDestroyWindow(x_display, x_application_window);  /* Close connection to server */
    XCloseDisplay(x_display);
 
-   exit(0);
+   exit(EXIT_SUCCESS);
 }
