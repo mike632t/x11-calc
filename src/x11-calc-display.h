@@ -44,6 +44,7 @@
  *                     and the current position of the display - MT
  *                   - Finally renamed x11-calc-segment to the more correct
  *                     x11-calc-digit - MT
+ * 24 Jun 25         - Fixed storage overflow error display - MT
  *
  */
 
@@ -74,6 +75,7 @@
 #define DISPLAY_d          0x007c
 #define DISPLAY_P          0x0067
 #define DISPLAY_E          0x004f
+#define DISPLAY_F          0x0047
 #define DISPLAY_TEST       0x01ff
 
 #endif

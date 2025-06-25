@@ -87,12 +87,13 @@
  *                     on the display (fixed segmentation fault) - MT
  * 22 Apr 24         - Shortened long lines - MT
  * 23 Apr 24         - Separated out prototypes for error handlers - MT
+ * 24 Jun 25         - Fixed storage overflow error display - MT
  *
  */
 
 #define NAME           "x11-calc-display"
-#define BUILD          "0035"
-#define DATE           "09 Apr 24"
+#define BUILD          "0039"
+#define DATE           "24 Jun 25"
 #define AUTHOR         "MT"
 
 #include <errno.h>     /* errno */
@@ -602,7 +603,7 @@ int i_display_update(struct odisplay *h_display, oprocessor *h_processor)
    static int c_digits [] =
    {
       DISPLAY_ZERO, DISPLAY_ONE, DISPLAY_TWO, DISPLAY_THREE, DISPLAY_FOUR, DISPLAY_FIVE, DISPLAY_SIX, DISPLAY_SEVEN,
-      DISPLAY_EIGHT, DISPLAY_NINE, DISPLAY_r, DISPLAY_c, DISPLAY_o, DISPLAY_P, DISPLAY_E, DISPLAY_SPACE
+      DISPLAY_EIGHT, DISPLAY_NINE, DISPLAY_r, DISPLAY_F, DISPLAY_o, DISPLAY_P, DISPLAY_E, DISPLAY_SPACE
    };
 
    for (i_count = 0; i_count < DIGITS; i_count++)
