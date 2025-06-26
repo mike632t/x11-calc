@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright 2024 macmpi/mike632t -->
+<!-- Copyright 2025 macmpi/mike632t -->
 
 <component type="desktop-application">
   <id>io.github.mike632t.x11-calc</id>
@@ -15,7 +15,7 @@
   <project_license>GPL-3.0-or-later</project_license>
 
   <description>
-      <p>Enjoy using your favorite classic HP calculator on your desktop, with this simulator:</p>
+      <p>Enjoy using your favourite classic HP calculator on your desktop, with this simulator:</p>
       <ul>
           <li>Classic series: HP 35, HP 80, HP 45, HP 70</li>
           <li>Woodstock series: HP 21, HP 22, HP 25, HP 25c, HP 27, HP 29c</li>
@@ -60,6 +60,11 @@
   </screenshots>
 
   <releases>
+  <release version="0.15.0161" date="2025-06-26">
+    <description>
+      <p>Fixed storage overflow error display</p>
+    </description>
+  </release>
   <release version="0.14.0156" date="2024-07-24">
     <description>
       <p>Updated release meta data</p>
