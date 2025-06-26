@@ -315,6 +315,7 @@
  * 07 Nov 24         - Tidied up comments - MT
  * 20 May 25         - Tidied up data structure definitions - MT
  * 25 may 25         - Changed normal exit status to EXIT_SUCCESS - MT
+ * 24 Jun 25         - Fixed storage overflow error display - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Add verbose option.
@@ -325,9 +326,9 @@
  */
 
 #define  NAME          "x11-calc"
-#define  VERSION       "0.14"
-#define  BUILD         "0160"
-#define  DATE          "25 May 25"
+#define  VERSION       "0.15"
+#define  BUILD         "0161"
+#define  DATE          "24 Jun 25"
 #define  AUTHOR        "MT"
 
 #define  INTERVAL 25   /* Number of ticks to execute before updating the display */
