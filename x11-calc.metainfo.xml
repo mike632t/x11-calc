@@ -60,12 +60,12 @@
   </screenshots>
 
   <releases>
-  <release version="0.15.0161" date="2025-06-26">
+  <release version="0.15.161" date="2025-06-26">
     <description>
       <p>Fixed storage overflow error display</p>
     </description>
   </release>
-  <release version="0.14.0156" date="2024-07-24">
+  <release version="0.14.156" date="2024-07-24">
     <description>
       <p>Updated release meta data</p>
     </description>
