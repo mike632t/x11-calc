@@ -297,10 +297,11 @@
  *                     ratio - MT
  * 14 Apr 24         - Fixed zoom validation and checks that zoom value has
  *                     been specified - MT
- *                   - Allows the display seperators on the SPICE series to
- *                     be changed to the use european format, by effectivly
- *                     cutting  the jumper on the power supply board  using
- *                     the '-e, --euro' option - MT
+ *                   - Allows the display on the SPICE series to be changed
+ *                     to the use european format,  effectively cutting the
+ *                     jumper on the power supply board - MT
+ * 29 Jun 25         - Changed command line option for the european display
+ *                     format to '-c' or '--comma' - MT
  *
  * To Do             - Fix vertical button shape when zoomed in
  *                   - Parse command line in a separate routine.
@@ -535,7 +536,7 @@ int main(int argc, char *argv[])
                i_index = strlen(argv[i_count]) - 1;
                break;
 #if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
-            case 'e': /* Start in single step mode */
+            case 'c': /* Use european display format */
                b_euro = True;
                break;
 #endif
@@ -555,9 +556,9 @@ int main(int argc, char *argv[])
                   else if (!strncmp(argv[i_count], "--no-cursor", i_index))
                      b_cursor = False; /* Don't draw a cursor - unless drawn by the window manager */
 #if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
-                  else if (!strncmp(argv[i_count], "--euro", i_index))
+                  else if (!strncmp(argv[i_count], "--comma", i_index))
                      b_euro = True; /* Use european display format */
-                  else if (!strncmp(argv[i_count], "--no-euro", i_index))
+                  else if (!strncmp(argv[i_count], "--no-comma", i_index))
                      b_euro = False; /* Don't use european display format */
 #endif
                   else if (!strncmp(argv[i_count], "--zoom", i_index))

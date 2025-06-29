@@ -55,6 +55,8 @@
  *                     text - MT
  * 14 Apr 14         - Added a new command line option '--euro' to the help
  *                     text - MT
+ * 29 Jun 25         - Changed command line option for the european display
+ *                     format to '-c' or '--comma', and updated text - MT
  *
  */
 
@@ -120,13 +122,13 @@ const char * h_err_missing_argument = "opcion requiere un argumento -- '%s'\n";
 #if defined(unix) || defined(__unix__) || defined(__APPLE__)
 #if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
 const char * c_msg_usage = "Uso: %s [OPCION]... [ARCHIVO]\n\
-Una emulador de emulador RPN para X11.\n\n\
+Un emulador de calculadora RPN para X11.\n\n\
   -b  ADDR                 punto de interrupcion (octal)\n\
   -i  OPCODE               instruccion de trampa (octal)\n\
   -r  FILE                 leer el contenido de la ROM de FILE\n\
   -s                       un paso\n\
   -t                       seguimiento de la ejecucion\n\
-  -e, --euro               use european display format\n\
+  -c, --comma              utiliza una coma como separador decimal\n\
       --cursor             mostrar cursor (default)\n\
       --no-cursor          ocultar cursor\n\
       --zoom ZOOM          ampliar el tamaño de la ventana\n\
@@ -202,7 +204,7 @@ Eine RPN rechner-emulator fur X11.\n\n\
   -r  FILE                 lesen sie den ROM inhalt von FILE\n\
   -s                       einzelschritt\n\
   -t                       ausfuehrung protokollieren\n\
-  -e, --euro               use european display format\n\
+  -c, --comma              dezimaltrennzeichen ist ein komma\n\
       --cursor             cursor anzeigen (default)\n\
       --no-cursor          cursor verbergen\n\
       --zoom ZOOM          fenstergrobe erweitern\n\
@@ -273,13 +275,13 @@ const char * h_err_missing_argument = "l'option necessite un argument -- '%s'\n"
 #if defined(unix) || defined(__unix__) || defined(__APPLE__)
 #if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
 const char * c_msg_usage = "Utilisation : %s [OPTION]... [FICHIER]\n\
-Une émulateur RPN Calculator pour X11.\n\n\
+Une émulateur de RPN calculatrice pour X11.\n\n\
   -b  ADDR                 définir un point d'arrêt (octal)\n\
   -i  OPCODE               définir un piège d'instruction (octal)\n\
   -r  FILE                 lire le contenu de la ROM de FILE\n\
   -s                       single step\n\
   -t                       trace execution\n\
-  -e, --euro               use european display format\n\
+  -c, --comma              utiliser une virgule comme separateur decimal\n\
       --cursor             curseur d'affichage (par défaut)\n\
       --no-cursor          masquer le curseur\n\
       --zoom ZOOM          agrandir la taille de la fenêtre\n\
@@ -356,7 +358,7 @@ An RPN Calculator emulator for X11.\n\n\
   -r  FILE                 read ROM from FILE\n\
   -s                       single step\n\
   -t                       trace\n\
-  -e, --euro               use european display format\n\
+  -c, --comma              use comma instead of decimal point\n\
       --cursor             display cursor\n\
       --no-cursor          hide cursor\n\
       --zoom ZOOM          enlarge window size\n\
