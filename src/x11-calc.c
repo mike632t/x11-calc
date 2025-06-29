@@ -317,7 +317,7 @@
  * 24 Jul 24         - Updated release meta data - MT
  * 07 Nov 24         - Tidied up comments - MT
  * 20 May 25         - Tidied up data structure definitions - MT
- * 25 may 25         - Changed normal exit status to EXIT_SUCCESS - MT
+ * 25 May 25         - Changed normal exit status to EXIT_SUCCESS - MT
  * 24 Jun 25         - Fixed storage overflow error display - MT
  * 29 Jun 25         - Changed command line option for the european display
  *                     format to '-c' or '--comma' - MT
@@ -332,7 +332,7 @@
 
 #define  NAME          "x11-calc"
 #define  VERSION       "0.15"
-#define  BUILD         "0163"
+#define  BUILD         "0162"
 #define  DATE          "29 Jun 25"
 #define  AUTHOR        "MT"
 

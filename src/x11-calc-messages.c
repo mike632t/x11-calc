@@ -61,8 +61,8 @@
  */
 
 #define NAME           "x11-calc-messages"
-#define BUILD          "0019"
-#define DATE           "16 Feb 24"
+#define BUILD          "0025"
+#define DATE           "29 Jun 25"
 #define AUTHOR         "MT"
 
 #if defined(HP10c) || defined(HP11c) || defined(HP12c)|| defined(HP15c) || defined(HP16c)

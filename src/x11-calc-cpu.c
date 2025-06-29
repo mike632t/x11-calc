@@ -278,7 +278,7 @@
  * 16 Jan 21         - The behaviour of 'p + 1 -> p' on the HP67 is not the
  *                     same as the woodstock series and it actually appears
  *                     to match the later spice series - MT
- * 21 Jan 22         - Moved text messages to a separate file  - MT
+ * 21 Jan 22         - Moved text messages to a separate file - MT
  * 23 Jan 22         - Removed unwanted debug code - MT
  *                   - Updated 'select rom' - MT
  * 30 Jan 22         - Tidied up the conditional code blocks a bit, putting
@@ -317,7 +317,7 @@
  *                     into a temporary unsigned int first allows fscanf to
  *                     be used to read the saved values) - MT
  * 06 Mar 22         - Fixed the issue with the relative jump offset - MT
- *                   - Added 'cstex' instruction (exchange c and st)- MT
+ *                   - Added 'cstex' instruction (exchange c and st) - MT
  *                   - Added 'c =st', 'c = stk', 'c = c and a', and fixed a
  *                     bug in 'cstex' - MT
  * 07 Mar 22         - Removed unused debug code - MT
@@ -331,7 +331,7 @@
  * 03 Dec 22         - Changed the behaviour of the 'p' register in th HP10
  *                     to match the later spice series.
  * 07 Dec 22         - Changed the label used for the 'p' register when the
- *                     registers are displayed  - MT
+ *                     registers are displayed - MT
  *                   - All models now display the modified registers values
  *                     in the trace output - MT
  * 11 Dec 22         - Renamed models with continious memory and added HP25
@@ -402,8 +402,8 @@
  */
 
 #define NAME           "x11-calc-cpu"
-#define BUILD          "0171"
-#define DATE           "29 Mar 24"
+#define BUILD          "0204"
+#define DATE           "20 May 25"
 #define AUTHOR         "MT"
 
 #include <errno.h>     /* errno */
