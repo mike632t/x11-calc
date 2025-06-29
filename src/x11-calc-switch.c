@@ -38,8 +38,8 @@
  */
 
 #define NAME           "x11-calc-switch"
-#define BUILD          "0011"
-#define DATE           "23 Apr 24"
+#define BUILD          "0012"
+#define DATE           "20 May 25"
 #define AUTHOR         "MT"
 
 #include <errno.h>     /* errno */

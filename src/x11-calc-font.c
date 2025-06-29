@@ -35,7 +35,7 @@
  */
 
 #define NAME           "x11-calc-font"
-#define BUILD          "0005"
+#define BUILD          "0006"
 #define DATE           "03 Mar 24"
 #define AUTHOR         "MT"
 

@@ -30,8 +30,8 @@
  */
 
 #define NAME           "x11-calc-colour"
-#define BUILD          "0003"
-#define DATE           "06 Dec 21"
+#define BUILD          "0004"
+#define DATE           "03 Jan 21"
 #define AUTHOR         "MT"
 
 #include "gcc-debug.h"
