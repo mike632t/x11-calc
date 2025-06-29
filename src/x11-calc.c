@@ -298,6 +298,9 @@
  *                     ratio - MT
  * 14 Apr 24         - Fixed zoom validation and checks that zoom value has
  *                     been specified - MT
+ *                   - Allows the display on the SPICE series to be changed
+ *                     to the use european format,  effectively cutting the
+ *                     jumper on the power supply board - MT
  * 18 Apr 24         - Checks for undefined labels when updating indicators
  *                     on the display (fixed segmentation fault) - MT
  * 22 Apr 24         - Define display colour separately - MT
@@ -316,6 +319,8 @@
  * 20 May 25         - Tidied up data structure definitions - MT
  * 25 may 25         - Changed normal exit status to EXIT_SUCCESS - MT
  * 24 Jun 25         - Fixed storage overflow error display - MT
+ * 29 Jun 25         - Changed command line option for the european display
+ *                     format to '-c' or '--comma' - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Add verbose option.
@@ -327,8 +332,8 @@
 
 #define  NAME          "x11-calc"
 #define  VERSION       "0.15"
-#define  BUILD         "0161"
-#define  DATE          "24 Jun 25"
+#define  BUILD         "0163"
+#define  DATE          "29 Jun 25"
 #define  AUTHOR        "MT"
 
 #define  INTERVAL 25   /* Number of ticks to execute before updating the display */
@@ -447,6 +452,9 @@ int main(int argc, char *argv[])
    char b_cursor = True;         /* Draw a cursor */
    char b_run = True;            /* Run flag controls CPU instruction execution in main loop */
    char b_abort = False;         /*Abort flag controls execution of main loop */
+#if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
+   char b_euro = False;
+#endif
 
    int i_offset, i_count, i_index;
    int i_zoom = 0;               /* Zoom level */
@@ -549,6 +557,11 @@ int main(int argc, char *argv[])
                      v_error(EINVAL, h_err_missing_argument, argv[i_count]);
                i_index = strlen(argv[i_count]) - 1;
                break;
+#if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
+            case 'c':  /* Use european display format */
+               b_euro = True;
+               break;
+#endif
             case 's':  /* Start in single step mode */
                b_trace = b_step = True;
                break;
@@ -560,7 +573,17 @@ int main(int argc, char *argv[])
                if (i_index == 2)
                  b_abort = True;  /* '--' terminates command line processing */
                else
-                  if (!strncmp(argv[i_count], "--zoom", i_index))
+                  if (!strncmp(argv[i_count], "--cursor", i_index))
+                     b_cursor = True; /* Draw cursor */
+                  else if (!strncmp(argv[i_count], "--no-cursor", i_index))
+                     b_cursor = False; /* Don't draw a cursor - unless drawn by the window manager */
+#if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
+                  else if (!strncmp(argv[i_count], "--comma", i_index))
+                     b_euro = True; /* Use european display format */
+                  else if (!strncmp(argv[i_count], "--no-comma", i_index))
+                     b_euro = False; /* Don't use european display format */
+#endif
+                  else if (!strncmp(argv[i_count], "--zoom", i_index))
                   {
                      if (i_count + 1 < argc)
                      {
@@ -586,10 +609,6 @@ int main(int argc, char *argv[])
                      else
                         v_error(EINVAL, h_err_missing_argument, argv[i_count]);
                   }
-                  else if (!strncmp(argv[i_count], "--no-cursor", i_index))
-                     b_cursor = False;  /* Don't draw a cursor - unless drawn by the window manager */
-                  else if (!strncmp(argv[i_count], "--cursor", i_index))
-                     b_cursor = True;  /* Draw cursor */
                   else if (!strncmp(argv[i_count], "--version", i_index))
                   {
                      v_version();  /* Display version information */
@@ -734,7 +753,10 @@ int main(int argc, char *argv[])
       DISPLAY_LEFT, DISPLAY_TOP, DISPLAY_WIDTH, DISPLAY_HEIGHT, DIGIT_COLOUR, DIGIT_BACKGROUND,
       DISPLAY_BACKGROUND, BEZEL_COLOUR);  /* Create display */
 
-   v_init_buttons(h_button);  /* Create buttons */
+#if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
+   h_display->euro = b_euro;
+#endif
+   v_init_buttons(h_button); /* Create buttons */
 
 #if defined(SWITCHES)
    v_init_switches(h_switch);

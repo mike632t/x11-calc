@@ -35,6 +35,16 @@ Tru64 Unix.
 <a id="latest"></a>
 ### Latest News <sup>[Back to Top](#top)</sup>
 
+29 Jun 25
+
+   - Allows the display seperators on the SPICE series to be changed to the
+     use european format, effectivly cutting the jumper on the power supply
+     board using the `-e, --euro` option.
+
+26 Jun 25
+
+   - Fixed storage overflow error display.
+
 04 May 24
 
    - Fixed a bug that affected some simulators when compiled on MacOS.

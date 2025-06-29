@@ -45,6 +45,8 @@
  *                   - Finally renamed x11-calc-segment to the more correct
  *                     x11-calc-digit - MT
  * 24 Jun 25         - Fixed storage overflow error display - MT
+ * 29 Jun 25         - Added support for European display formats for SPICE
+ *                     series - MT
  *
  */
 
