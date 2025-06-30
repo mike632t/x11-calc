@@ -77,7 +77,8 @@ ENOCMD=127 # Executable file not found (not official)
 ENOFNT=192 # No font (not official)
 
 # Prototype model list: is to be filled-in by makefile
-_models="hp34c|hp11c"
+# "hp35|hp80|hp45|hp70|hp21|hp22|hp25|hp25c|hp27|hp29c|hp31e|hp32e|hp33e|hp33c|hp34c|hp37e|hp38c|hp38e|hp67|hp10c|hp11c|hp12c|hp15c|hp16c"
+_models=""
 
 #- launch()
 

@@ -240,7 +240,6 @@ do_none: do_copy
 #
 # This target rule is a placeholder for now.
 #
-#
 	@[ -n "$${VERBOSE+x}" ] && echo "No desktop option selected" || true
 	@[ -n "$${VERBOSE+x}" ] && echo "Installing in $(DESTDIR)$(prefix)" || true
 #
