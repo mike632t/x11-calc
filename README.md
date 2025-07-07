@@ -35,11 +35,10 @@ Tru64 Unix.
 <a id="latest"></a>
 ### Latest News <sup>[Back to Top](#top)</sup>
 
-29 Jun 25
+30 Jun 25
 
-   - Allows the display seperators on the SPICE series to be changed to the
-     use european format, effectivly cutting the jumper on the power supply
-     board using the `-e, --euro` option.
+   - Allows the display separators on the SPICE series to be changed to the
+     use european format, using the `-c', or '--comma` option.
 
 26 Jun 25
 
@@ -198,13 +197,31 @@ The following control keys can also be used.
 'Ctrl-Z' Exists the simulator. For models  with  continuous memory 'Ctrl-Z'
 saves the current memory contents.
 
-'Ctrl-C' Resets the simulator to its initial state.
+'Ctrl-C' Resets the simulator to its last saved or initial state.
 
 'Ctrl-T' Toggles tracing of the simulator code execution.
 
 'Ctrl-S' Enable tracing and executes a single instruction.
 
 'Ctrl-Q' Resumes execution (does not disable trace).
+
+#### Command line options
+
+The following command line options are available:
+
+```
+  -b  ADDR                 set break-point (octal)
+  -i  OPCODE               set instruction trap (octal)
+  -r  FILE                 read ROM from FILE
+  -s                       single step
+  -t                       trace
+  -c, --comma              use comma instead of decimal point
+      --cursor             display cursor
+      --no-cursor          hide cursor
+      --zoom ZOOM          enlarge window size
+      --help               display this help and exit
+      --version            output version information and exit
+```
 
 #### Loading and saving
 
@@ -461,7 +478,7 @@ for Flatpak.
 
 - `Macmpi` for packaging and testing the simulators on Alpine Linux
 
-- `Agarza` and `Martin HEPPERLE` for translating the help text.
+- `Agarza` and `Martin HEPPERLE` for helping to translate the help text.
 
 - `Brouhaha` for taking the time to explain the workings of various models.
 
