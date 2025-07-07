@@ -88,9 +88,10 @@
  * 22 Apr 24         - Shortened long lines - MT
  * 23 Apr 24         - Separated out prototypes for error handlers - MT
  * 24 Jun 25         - Fixed storage overflow error display - MT
- * 29 Jun 24         - Simplified the SPICE series display decoder - MT
+ * 29 Jun 25         - Simplified the SPICE series display decoder - MT
  *                   - Added support for European display formats for SPICE
  *                     series - MT
+ * 07 Jul 25         - Fixed regression bug that affected HP12C - MT
  *
  */
 
