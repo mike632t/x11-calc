@@ -326,6 +326,8 @@
  * 24 Jun 25         - Fixed storage overflow error display - MT
  * 29 Jun 25         - Changed command line option for the european display
  *                     format to '-c' or '--comma' - MT
+ * 07 Jul 25         - Fixed regression bug that affected HP12C - MT
+ *             0.16  - Finished adding support for HP10 - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -339,7 +341,7 @@
 
 #define  NAME          "x11-calc"
 #define  VERSION       "0.15"
-#define  BUILD         "0166"
+#define  BUILD         "0172"
 #define  DATE          "29 Jun 25"
 #define  AUTHOR        "MT"
 

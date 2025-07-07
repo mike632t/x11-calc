@@ -60,9 +60,14 @@
   </screenshots>
 
   <releases>
-  <release version="0.15.163" date="2025-06-30">
+  <release version="0.16.172" date="2025-07-07">
     <description>
-      <p>Added support for European display formats for SPICE series</p>
+      <p>Finished adding support for HP10</p>
+    </description>
+  </release>
+  <release version="0.15.171" date="2025-07-07">
+    <description>
+      <p>Fixed regression bug that affected HP12C</p>
     </description>
   </release>
   <release version="0.15.162" date="2025-06-30">
