@@ -66,6 +66,9 @@
 #  01 Apr 24         - _models list to be filled by makefile - macmpi
 #  24 Apr 24         - Made help dialog wider and suppressed echoing of the
 #                      command - MT
+#  07 Jul 25         - Modified changed '_f_conf' to '_configfile' - MT
+#                    - Additional command line options are always passed to
+#                      the emulator (even when running setup) - MT
 #
 
 SUCCESS=0
@@ -77,7 +80,7 @@ ENOCMD=127 # Executable file not found (not official)
 ENOFNT=192 # No font (not official)
 
 # Prototype model list: is to be filled-in by makefile
-# "hp35|hp80|hp45|hp70|hp21|hp22|hp25|hp25c|hp27|hp29c|hp31e|hp32e|hp33e|hp33c|hp34c|hp37e|hp38c|hp38e|hp67|hp10c|hp11c|hp12c|hp15c|hp16c"
+# e.g _models="hp35|hp80|hp45|hp70|hp21|hp22|hp25|hp25c|hp27|hp29c|hp31e|hp32e|hp33e|hp33c|hp34c|hp37e|hp38c|hp38e|hp67|hp10c|hp11c|hp12c|hp15c|hp16c"
 _models=""
 
 #- launch()
@@ -165,11 +168,11 @@ _config (){
          _tmpfile="$(mktemp)"
          if [ "$DROPDOWN" ] # The seperator used by different forms is different!
          then
-            sed "s|^MODEL=.*|MODEL=\"${_selection%|*}\"|" "$_f_conf" > $_tmpfile
-            sed "s|^OPTIONS=.*|OPTIONS=\"${_selection#*|}\"|" $_tmpfile > "$_f_conf"
+            sed "s|^MODEL=.*|MODEL=\"${_selection%|*}\"|" "$_configfile" > $_tmpfile
+            sed "s|^OPTIONS=.*|OPTIONS=\"${_selection#*|}\"|" $_tmpfile > "$_configfile"
          else
-            sed "s|^MODEL=.*|MODEL=\"${_selection%,|*}\"|" "$_f_conf" > $_tmpfile
-            sed "s|^OPTIONS=.*|OPTIONS=\"${_selection#*,|}\"|" $_tmpfile > "$_f_conf"
+            sed "s|^MODEL=.*|MODEL=\"${_selection%,|*}\"|" "$_configfile" > $_tmpfile
+            sed "s|^OPTIONS=.*|OPTIONS=\"${_selection#*,|}\"|" $_tmpfile > "$_configfile"
          fi
          rm -f $_tmpfile
          ;;
@@ -192,13 +195,13 @@ _setup() {
    else
       if command -v nano >/dev/null 2>&1
       then
-         nano "$_f_conf"
+         nano "$_configfile"
       else
-         vi "$_f_conf"
+         vi "$_configfile"
       fi
    fi
 
-   . "$_f_conf" # Reload modified settings from config file
+   . "$_configfile" # Reload modified settings from config file
 }
 
 #- main()
@@ -214,27 +217,27 @@ fi
 if [ -d "$XDG_CONFIG_HOME" ] # Does XDG_CONFIG_HOME exist
 then
    mkdir -p "${XDG_CONFIG_HOME}/x11-calc" # If it does create the application conf directory
-   _f_conf="${XDG_CONFIG_HOME}/x11-calc/x11-calc.conf" # If it does use it
+   _configfile="${XDG_CONFIG_HOME}/x11-calc/x11-calc.conf" # If it does use it
 else
-   _f_conf="${HOME}/.x11-calc.conf" # Otherwise use a hidden file in the home folder
+   _configfile="${HOME}/.x11-calc.conf" # Otherwise use a hidden file in the home folder
 fi
 
 command -v zenity >/dev/null 2>&1
 has_zenity=$?
 _has_zenity() { return "$has_zenity"; }
 
-if [ ! -f "$_f_conf" ]
+if [ ! -f "$_configfile" ]
 then
    ! _has_zenity && echo "`basename $0`: Did you know that installing 'zenity' will give you a graphical setup interface?"
-   mkdir -p "`dirname "${_f_conf}"`"
-   cat <<-EOF >"$_f_conf"
+   mkdir -p "`dirname "${_configfile}"`"
+   cat <<-EOF >"$_configfile"
 #
 # Select which emulator to run by setting the MODEL to one
 # of the following:
 #
 EOF
-   echo "$_models" | sed 's/\(\([^|]*|\)\{8\}\)/\1*/g' | tr '*' '\n' | sed 's/^/# /' >>"$_f_conf"
-   cat <<-EOF >>"$_f_conf"
+   echo "$_models" | sed 's/\(\([^|]*|\)\{8\}\)/\1*/g' | tr '*' '\n' | sed 's/^/# /' >>"$_configfile"
+   cat <<-EOF >>"$_configfile"
 
 MODEL=""
 OPTIONS=""
@@ -249,12 +252,12 @@ OPTIONS=""
 EOF
 fi
 
-echo "`basename $0`: Using '$_f_conf'"
+echo "`basename $0`: Using '$_configfile'"
 
-. "$_f_conf"
+. "$_configfile"
 
 if [ -z "$MODEL" ]; then
-   echo "`basename $0`: Default model not defined - configure using '$0 --setup'"
+   echo "`basename $0`: Default model not defined - running '$0 --setup'"
 fi
 
 if echo "$1" | grep -qwE "$_models" || echo "hp$1" | grep -qwE "$_models"
@@ -267,10 +270,6 @@ then
 fi
 
 case $1 in
-   --setup)
-      _setup
-      _launch
-      ;;
    --help)
       [ -z "$MODEL" ] && _setup
       CMD_OPTS="--help"
@@ -280,6 +279,12 @@ case $1 in
       else
          _launch
       fi
+      ;;
+   --setup)
+      _setup
+      shift
+      CMD_OPTS="$*"
+      _launch
       ;;
    *)
       [ -z "$MODEL" ] && _setup
