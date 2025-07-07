@@ -28,43 +28,48 @@
  * 10 Feb 24         - Added an error message to warn the user that the ROM
  *                     contents are empty - MT
  * 16 Feb 24         - Added 'Can't create' error message - MT
+ * 12 Jun 25         - Added  error messages for the number of  breakpoints
+ *                     and instruction traps - MT
+ *                   - Defined messages as string constants - MT
  *
  */
 
-extern char * h_msg_loading;
-extern char * h_msg_saving;
+extern const char *h_msg_loading;
+extern const char *h_msg_saving;
 
-extern char * h_err_register_alloc;
-extern char * h_err_opening_file;
+extern const char *h_err_register_alloc;
+extern const char *h_err_opening_file;
 
-extern char * h_err_unexpected_opcode;
-extern char * h_err_unexpected_error;
-extern char * h_err_invalid_address;
-extern char * h_err_invalid_register;
-extern char * h_msg_opcode;
-extern char * h_msg_address;
+extern const char *h_err_unexpected_opcode;
+extern const char *h_err_unexpected_error;
+extern const char *h_err_invalid_address;
+extern const char *h_err_invalid_register;
+extern const char *h_msg_opcode;
+extern const char *h_msg_address;
 
-extern char * h_msg_negative_offset;
-extern char * h_msg_positive_offset;
-extern char * h_msg_rom;
+extern const char *h_msg_negative_offset;
+extern const char *h_msg_positive_offset;
+extern const char *h_msg_rom;
 
-extern char * c_msg_usage;
-extern char * h_err_invalid_operand;
-extern char * h_err_invalid_option;
-extern char * h_err_missing_argument;
+extern const char *h_msg_usage;
+extern const char *h_err_invalid_operand;
+extern const char *h_err_invalid_option;
+extern const char *h_err_duplicate_option;
+extern const char *h_err_missing_argument;
 #if defined(unix) || defined(__unix__) || defined(__APPLE__)
-extern char * h_err_unrecognised_option;
-extern char * h_err_invalid_number;
-extern char * h_err_numeric_range;
-extern char * h_err_invalid_argument;
+extern const char *h_err_unrecognised_option;
+extern const char *h_err_invalid_number;
+extern const char *h_err_numeric_range;
+extern const char *h_err_max_breakpoints;
+extern const char *h_err_invalid_argument;
 #endif
 
-extern char * h_msg_licence;
-extern char * h_err_display;
-extern char * h_err_display_properties;
-extern char * h_err_display_colour;
-extern char * h_err_font;
+extern const char *h_msg_licence;
+extern const char *h_err_display;
+extern const char *h_err_display_properties;
+extern const char *h_err_display_colour;
+extern const char *h_err_font;
 
-extern char * h_err_creating_file;
-extern char * h_err_memmory_alloc;
-extern const char * h_err_ROM;
+extern const char *h_err_creating_file;
+extern const char *h_err_memmory_alloc;
+extern const char *h_err_ROM;

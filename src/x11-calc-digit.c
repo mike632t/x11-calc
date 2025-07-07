@@ -62,14 +62,15 @@
  * 09 Apr 24         - Finally renamed x11-calc-segment to the more correct
  *                     x11-calc-digit - MT
  * 23 Apr 24         - Separated out prototypes for error handlers - MT
+ * 24 Jun 25         - Debug messages go to stdout - MT
  *
  * TO DO :           - Optimise drawing of display digits.
  ^
  */
 
 #define NAME           "x11-calc-digit"
-#define BUILD          "0013"
-#define DATE           "09 Apr 24"
+#define BUILD          "0017"
+#define DATE           "24 Jun 25"
 #define AUTHOR         "MT"
 
 #include <errno.h>     /* errno */
@@ -98,7 +99,7 @@
  * digit_create (index, text, left, top, width, height, state,
  *                colour)
  *
- * Allocates the memory for a new digit, initializes the digit's properties
+ * Allocates the memory for a new digit, initialises the digit's properties
  * and returns a pointer to the digit.
  *
  */
@@ -163,7 +164,7 @@ int i_digit_draw(Display *h_display, int x_application_window, int i_screen, str
    i_right = h_digit->digit_position.x + h_digit->digit_position.width - 7;
 #endif
 
-   debug(fprintf(stderr, "%4d,%d (%dx%d) %.1X%.1X%.1X%.1X %.1X%.1X%.1X%.1X.\n", \
+   debug(fprintf(stdout, "%4d,%d (%dx%d) %.1X%.1X%.1X%.1X %.1X%.1X%.1X%.1X.\n", \
       h_digit->digit_position.x, h_digit->digit_position.y, h_digit->digit_position.height, h_digit->digit_position.width, \
       h_digit->mask & SEG_DECIMAL && 1, h_digit->mask & SEG_G && 1, \
       h_digit->mask & SEG_F && 1, h_digit->mask & SEG_E && 1, \

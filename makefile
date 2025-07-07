@@ -129,10 +129,11 @@ _date		= `date +'%Y%m%d%H%M'`
 _classic	= hp35 hp45 hp70 hp80
 _woodstock	= hp21 hp22 hp25 hp25c hp27 hp29c
 _topcat		= hp67
+_kiss		= hp10
 _spice		= hp31e hp32e hp33e hp33c hp34c hp37e hp38e hp38c
 _voyager	= hp10c hp11c hp12c hp15c hp16c
 
-MODELS		= $(_classic) $(_woodstock) $(_topcat) $(_spice) $(_voyager)
+MODELS		= $(_classic) $(_woodstock) $(_topcat) $(_spice) $(_voyager) $(_kiss)
 
 # The prefix will only be modified by the installer it it is NOT set on the
 # command  line.  If no prefix is defined on the command line then the most

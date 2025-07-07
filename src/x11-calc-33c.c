@@ -46,8 +46,8 @@
  */
 
 #define NAME           "x11-calc-33c"
-#define BUILD          "0016"
-#define DATE           "21 Oct 23"
+#define BUILD          "0017"
+#define DATE           "20 May 25"
 #define AUTHOR         "MT"
 
 #include <stdarg.h>    /* strlen(), etc. */

@@ -25,7 +25,7 @@
  *
  * On UNIX Compile with 'gcc x11-calc-display.c -c'
  *
- * 14 Jul 13         - Initial verson - MT
+ * 14 Jul 13         - Initial version - MT
  * 15 Dec 18         - Changed debug macro and added an error macro - MT
  * 23 Aug 20         - Removed the error macro - MT
  * 30 Aug 20         - Base  the number of display segments on the  maximum
@@ -126,7 +126,7 @@
 /*
  * display_create (index, text, left, top, width, height,
  *                margin, header, footer,
- *                foreground, backgroind, border)
+ *                foreground, background, border)
  *
  * Allocates storage for a seven segment display, sets the properties and
  * returns a pointer to the display, or exits the program if there isn't
@@ -431,73 +431,6 @@ int i_display_update(struct odisplay *h_display, oprocessor *h_processor)
       i_offset--;
    }
 #elif defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
-   /*
-    * The display decoder uses the contents of the A and B registers.
-    *
-    * The A register holds the BCD representation of each digit (0-9, E, r, or
-    * o) in the and the B register is used to indecate if the display contains
-    * a minus sign, period, or comma.
-    *
-    * Display        '_' '0.''0' '0' '0' '0' '_' '_' '_' '_' '_'
-    *
-    * HP31e
-    * A Register  0x  0   0   0   0   0   0   f   f   f   f   f   0   0   0
-    *
-    * B Register  0x  f   1   0   0   0   0   0   0   0   0   0   0   0   0
-    *
-    * HP33e
-    * A Register  0x  0   0   0   0   0   0   f   f   f   f   f   f   f   f
-    *
-    * B Register  0x  0   1   0   0   0   0   0   0   0   0   0   0   0   0
-    *
-    *
-    * Display        '_' '1.''_' '_' '_' '_' '_' '_' '_' '_' '_'
-    *
-    * HP31e
-    * A Register  0x  0   1   f   f   f   f   f   f   f   f   f   0   0   0
-    *
-    * B Register  0x  f   1   0   0   0   0   0   0   0   0   0   0   0   0
-    *
-    * HP33e
-    * A Register  0x  0   1   f   f   f   f   f   f   f   f   f   f   f   f
-    *
-    * B Register  0x  0   1   0   0   0   0   0   0   0   0   0   0   0   0
-    *
-    *
-    * Display        '-' '1.''0' '0' '0' '0' '_' '_' '_' '_' '_'
-    *
-    * HP31e
-    * A Register  0x  0   1   0   0   0   0   f   f   f   f   f   0   0   0
-    *
-    * B Register  0x  f   5   0   0   0   0   0   0   0   0   0   0   0   0
-    *
-    * HP33e
-    * A Register  0x  0   1   0   0   0   0   f   f   f   f   f   0   0   0
-    *
-    * B Register  0x  0   5   0   0   0   0   0   0   0   0   0   0   0   0
-    *
-    *
-    * Display        '-' '1' '2,''3' '4' '5.''6' '7' '8' '9' '_'
-    *
-    * HP31e
-    * A Register  0x  4   1   2   3   4   5   6   7   8   9   f   0   0   0
-    *
-    * B Register  0x  f   4   3   0   0   1   0   0   0   0   0   0   0   0
-    *
-    * HP33e
-    * A Register  0x  4   1   2   3   4   5   6   7   8   9   f   f   f   f
-    *
-    * B Register  0x  4   4   3   0   0   1   0   0   0   0   0   0   0   0
-    *
-    *
-    * Display        '_' '0' '1' '-' '_' '_' '_' '_' '_' '7' '4'
-    *
-    * HP33e
-    * A Register  0x  0   0   1   9   f   f   f   f   f   7   4   7   b   0
-    *
-    * B Register  0x  0   0   0   6   0   0   0   0   0   0   0   0   0   0
-    *
-    */
    int i_count;
    static int c_digits [] =
    {
@@ -532,20 +465,20 @@ int i_display_update(struct odisplay *h_display, oprocessor *h_processor)
                      h_display->digit[i_count]->mask = DISPLAY_SPACE;
                }
             }
-            if ((h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x01) != 0) /* Decimal point OR seperator*/
+            if ((h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x01) != 0) /* Decimal point OR separator*/
             {
                if (i_count != 0) /* Ignore first digit */
                {
                   if (h_display->euro)
                   {
                      h_display->digit[i_count]->mask = (h_display->digit[i_count]->mask & DISPLAY_EIGHT) | DISPLAY_COMMA;
-                     if ((h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x02) != 0) /* Seperator */
+                     if ((h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x02) != 0) /* Separator */
                         h_display->digit[i_count]->mask = (h_display->digit[i_count]->mask & DISPLAY_EIGHT) | DISPLAY_DECIMAL;
                   }
                   else
                   {
                      h_display->digit[i_count]->mask = (h_display->digit[i_count]->mask & DISPLAY_EIGHT) | DISPLAY_DECIMAL;
-                     if ((h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x02) != 0) /* Seperator */
+                     if ((h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x02) != 0) /* Separator */
                         h_display->digit[i_count]->mask = (h_display->digit[i_count]->mask & DISPLAY_EIGHT) | DISPLAY_COMMA;
                   }
                }
@@ -553,7 +486,7 @@ int i_display_update(struct odisplay *h_display, oprocessor *h_processor)
             else
             {
                if (i_count != 0) /* Ignore first digit */
-                  if ((h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x02) != 0) /* Seperator*/
+                  if ((h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x02) != 0) /* Separator*/
                      if ((h_processor->reg[B_REG]->nibble[REG_SIZE - 1 - i_count] & 0x04) == 0) h_display->digit[i_count]->mask = (h_display->digit[i_count]->mask & DISPLAY_EIGHT) | DISPLAY_COMMA;
 
                if (h_processor->reg[B_REG]->nibble[REG_SIZE - 3] == 0x02) h_display->digit[0]->mask = DISPLAY_MINUS; /* Self test */
@@ -576,7 +509,8 @@ int i_display_update(struct odisplay *h_display, oprocessor *h_processor)
    {
       if (h_display->digit[i_count] != NULL)
       {
-         if (h_processor->flags[DISPLAY_ENABLE] && h_processor->enabled && h_display->enabled) /* Allows print mode to disable display */
+         /** if (h_processor->flags[DISPLAY_ENABLE] && h_processor->enabled && h_display->enabled) /* Allows print mode to disable display */
+         if (h_processor->flags[DISPLAY_ENABLE] && h_processor->enabled)
          {
             if (h_display->digit[i_count] != NULL)
                h_display->digit[i_count]->mask = c_digits[h_processor->reg[A_REG]->nibble[REG_SIZE - i_offset - i_count - 1]];
