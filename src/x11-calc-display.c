@@ -88,9 +88,10 @@
  * 22 Apr 24         - Shortened long lines - MT
  * 23 Apr 24         - Separated out prototypes for error handlers - MT
  * 24 Jun 25         - Fixed storage overflow error display - MT
- * 29 Jun 24         - Simplified the SPICE series display decoder - MT
+ * 29 Jun 25         - Simplified the SPICE series display decoder - MT
  *                   - Added support for European display formats for SPICE
  *                     series - MT
+ * 07 Jul 25         - Fixed regression bug that affected HP12C - MT
  *
  */
 
@@ -264,7 +265,7 @@ int i_display_draw(Display *x_display, int x_application_window, int i_screen, s
 
 #if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c)
    for (i_count = 0; i_count < INDECATORS; i_count++)
-      i_label_draw(x_display, x_application_window, i_screen, h_display->label[i_count]);
+      if (!(h_display->label[i_count] == NULL)) i_label_draw(x_display, x_application_window, i_screen, h_display->label[i_count]);
 #endif
 
   return (True);
@@ -298,9 +299,12 @@ int i_display_resize(struct odisplay *h_display, float f_scale)  /* Resize displ
 #if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c)
    for (i_count = 0; i_count < INDECATORS; i_count++)
    {
-      h_display->label[i_count]->label_position.x = h_display->label[i_count]->label_position.x * f_scale;
-      h_display->label[i_count]->label_position.y = h_display->bezel_position.y + h_display->display_position.height - h_small_font->descent;
-      h_display->label[i_count]->label_position.width = h_display->label[i_count]->label_geometry.width * f_scale;
+      if (!(h_display->label[i_count] == NULL))
+      {
+         h_display->label[i_count]->label_position.x = h_display->label[i_count]->label_position.x * f_scale;
+         h_display->label[i_count]->label_position.y = h_display->bezel_position.y + h_display->display_position.height - h_small_font->descent;
+         h_display->label[i_count]->label_position.width = h_display->label[i_count]->label_geometry.width * f_scale;
+      }
    }
 #endif
    return 0;
