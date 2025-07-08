@@ -340,7 +340,7 @@
  */
 
 #define  NAME          "x11-calc"
-#define  VERSION       "0.15"
+#define  VERSION       "0.16"
 #define  BUILD         "0172"
 #define  DATE          "29 Jun 25"
 #define  AUTHOR        "MT"
