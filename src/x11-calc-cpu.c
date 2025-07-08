@@ -399,6 +399,8 @@
  * 06 Jul 25         - Set buffer pointer when initialising processor - MT
  * 07 Jul 25         - Buffer pointer set when resetting processor (reverts
  *                     last change!) - MT
+ * 08 Jul 25         - Modified  printer character mapping so that multiply
+ *                     is displayed as a lowercase 'x' - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -408,11 +410,11 @@
  */
 
 #define NAME           "x11-calc-cpu"
-#define BUILD          "0207"
-#define DATE           "06 Jul 25"
+#define BUILD          "0209"
+#define DATE           "08 Jul 25"
 #define AUTHOR         "MT"
 
-#define NODEBUG
+#define DEBUG
 
 #include <errno.h>     /* errno */
 
@@ -481,7 +483,7 @@ static void v_fprint_buffer(FILE *h_file, oprocessor *h_processor) /* Display th
 {
    static const unsigned char c_charmap[0x40] = {                                      /* Note - Can't use Unicode characters on non Linux systems */
       ' ', 'Y', '=', '0', 'L', 'M', ' ', '1', 'G', ' ', '>', '2', 'O', 'H', ' ', '3',  /* ' ', ' ', '=', '0', 'L', 'M', '≠', '1', 'G', '¿', '>', '2', 'O', 'H', '≤', '3', */
-      'P', ' ', 'X', '4', 'R', 'F', 'Z', '5', 'S', '?', 'x', '6', 'T', ' ', ' ', '7',  /* 'P', '√', 'X', '4', 'R', 'F', 'Z', '5', 'S', '?', 'x', '6', 'T', '→', '⇔', '7', */
+      'P', ' ', 'x', '4', 'R', 'F', 'Z', '5', 'S', '?', 'x', '6', 'T', ' ', ' ', '7',  /* 'P', '√', 'X', '4', 'R', 'F', 'Z', '5', 'S', '?', 'x', '6', 'T', '→', '⇔', '7', */
       '%', ' ', ' ', '8', 'J', 'X', '>', '9', 'A', '#', 'K', '.', 'B', 'b', '/', '-',  /* '%', ' ', '¿', '8', 'J', 'X', '>', '9', 'A', '#', 'K', '.', 'B', 'b', '/', '-', */
       'C', 'c', '/', '+', 'D', 'd', ' ', '#', 'E', 'e', ' ', ' ', 'I', 'i', 'x', ' '   /* 'C', 'c', '÷', '+', 'D', 'd', '↑', '#', 'E', 'e', '↓', ' ', 'I', 'i', 'x', ' '  */
       };
