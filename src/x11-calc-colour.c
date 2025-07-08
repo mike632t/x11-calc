@@ -24,14 +24,14 @@
  * 02 Jul 13         - Initial version - MT
  * 15 Dec 18         - Changed debug macro and added an error macro - MT
  * 06 Dec 21         - Changed green to a slightly lighter shade - MT
- * 03 Jan 21         - Changed debug() macro so that debug code is executed
+ * 03 Jan 22         - Changed debug() macro so that debug code is executed
  *                     when DEBUG is defined (doesn't need to be true) - MT
  *
  */
 
 #define NAME           "x11-calc-colour"
 #define BUILD          "0004"
-#define DATE           "03 Jan 21"
+#define DATE           "03 Jan 22"
 #define AUTHOR         "MT"
 
 #include "gcc-debug.h"

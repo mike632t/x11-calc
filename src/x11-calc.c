@@ -244,7 +244,6 @@
  *                     before the version number is shown - MT
  * 18 Feb 24         - Updated  version number format to include the  build
  *                     number - MT
- *
  * 19 Feb 24         - Check that stat() was successful before checking the
  *                     if the file is a directory or a file! - MT
  *                   - Closes ROM file after reading - MT
@@ -316,13 +315,23 @@
  * 15 Jun 24         - Sets the application icon to the X windows logo - MT
  * 24 Jul 24         - Updated release meta data - MT
  * 07 Nov 24         - Tidied up comments - MT
- * 20 May 25         - Tidied up data structure definitions - MT
+ * 20 May 25   0.15  - Tidied up data structure definitions - MT
  * 25 May 25         - Changed normal exit status to EXIT_SUCCESS - MT
+ * 11 Jun 25         - Allows multiple breakpoints to be specified - MT
+ * 12 Jun 25         - Simplified linear search function (it didn't need to
+ *                     be able to handle any data type) - MT
+ *                   - Added  error messages for the number of  breakpoints
+ *                     and instruction traps - MT
+ * 14 Jun 25         - Increased the maximum number of breakpoints - MT
  * 24 Jun 25         - Fixed storage overflow error display - MT
  * 29 Jun 25         - Changed command line option for the european display
  *                     format to '-c' or '--comma' - MT
+ * 07 Jul 25         - Fixed regression bug that affected HP12C - MT
+ *             0.16  - Finished adding support for HP10 - MT
  *
  * To Do             - Parse command line in a separate routine.
+ *                   - Must be a better way of handling an arbitrary number
+ *                     of switches
  *                   - Add verbose option.
  *                   - Allow VMS users to set breakpoints?
  *                   - Free up allocated memory on exit.
@@ -331,8 +340,8 @@
  */
 
 #define  NAME          "x11-calc"
-#define  VERSION       "0.15"
-#define  BUILD         "0162"
+#define  VERSION       "0.16"
+#define  BUILD         "0172"
 #define  DATE          "29 Jun 25"
 #define  AUTHOR        "MT"
 
@@ -348,7 +357,7 @@
 
 #include <ctype.h>     /* isprint(), etc */
 
-#include <X11/Xlib.h>  /* XOpenDisplay(), etc */
+#include <X11/Xlib.h>  /* XOpenDisplay(), True/False etc */
 #include <X11/Xutil.h> /* XSizeHints etc */
 #include <X11/cursorfont.h>
 
@@ -406,10 +415,18 @@ void v_set_blank_cursor(Display *x_display, Window x_application_window, Cursor 
 {
    Pixmap x_blank;
    XColor x_Color;
-   char c_pixmap_data[1] = {0};  /* An empty pixmap */
-   x_blank = XCreateBitmapFromData (x_display, x_application_window, c_pixmap_data, 1, 1);  /* Create an empty bitmap */
+   char h_pixmap_data[1] = {0};  /* An empty pixmap */
+   x_blank = XCreateBitmapFromData (x_display, x_application_window, h_pixmap_data, 1, 1);  /* Create an empty bitmap */
    (*x_cursor) = XCreatePixmapCursor(x_display, x_blank, x_blank, &x_Color, &x_Color, 0, 0);  /* Use the empty pixmap to create a blank cursor */
    XFreePixmap (x_display, x_blank);  /* Free up pixmap */
+}
+
+char b_search(int *a, int m, int n) /* Linear search. */
+{
+   for (int i = 0; i < n; i++)
+      if (a[i] == m)
+         return True;
+   return False;
 }
 
 int main(int argc, char *argv[])
@@ -456,9 +473,10 @@ int main(int argc, char *argv[])
    char b_euro = False;
 #endif
 
-   int i_offset, i_count, i_index;
+   int i_breakpoints[] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}; /* Array to hold breakpoints */
+
+   int i_offset, i_count, i_index, i_value, i_size;
    int i_zoom = 0;               /* Zoom level */
-   int i_breakpoint = -1;        /* Break-point */
    int i_trap = -1;              /* Trap instruction */
    int i_ticks = -1;
 
@@ -492,17 +510,24 @@ int main(int argc, char *argv[])
                else
                   if (i_count + 1 < argc)
                   {
-                     i_breakpoint = 0;
+                     i_value = 0;
                      for (i_offset = 0; i_offset < strlen(argv[i_count + 1]); i_offset++)  /* Parse octal number */
                      {
                         if ((argv[i_count + 1][i_offset] < '0') || (argv[i_count + 1][i_offset] > '7'))
                            v_error(EINVAL, h_err_invalid_number, argv[i_count + 1]);
                         else
-                           i_breakpoint = i_breakpoint * 8 + argv[i_count + 1][i_offset] - '0';
+                           i_value = i_value * 8 + argv[i_count + 1][i_offset] - '0';
                      }
-                     if ((i_breakpoint < 0)  || (i_breakpoint > ROM_SIZE) || (i_breakpoint > 07777))  /* Check address range */
+                     if ((i_value < 0)  || (i_value > ROM_SIZE) || (i_value > 07777))  /* Check address range */
                         v_error(EINVAL, h_err_numeric_range, argv[i_count + 1]);
-                     else {
+                     else
+                     {
+                        i_size = sizeof(i_breakpoints) / sizeof(i_breakpoints[0]); /* Find position in the array to store the breakpoint */
+                        for (i_offset = 0; i_offset < i_size && i_breakpoints[i_offset] != i_value && i_breakpoints[i_offset] != -1; i_offset++) {} /* Find the  position in the array */
+                        if (i_offset < i_size) /* Save it - if there is space! */
+                           i_breakpoints[i_offset] = i_value;
+                        else
+                           v_error(EINVAL, h_err_max_breakpoints);
                         if (i_count + 2 < argc)  /* Remove the parameter from the arguments */
                            for (i_offset = i_count + 1; i_offset < argc - 1; i_offset++)
                               argv[i_offset] = argv[i_offset + 1];
@@ -519,18 +544,22 @@ int main(int argc, char *argv[])
                else
                   if (i_count + 1 < argc)
                   {
-                     i_trap = 0;
+                     i_value = 0;
                      for (i_offset = 0; i_offset < strlen(argv[i_count + 1]); i_offset++)  /* Parse octal number */
                      {
                         if ((argv[i_count + 1][i_offset] < '0') || (argv[i_count + 1][i_offset] > '7'))
                            v_error(EINVAL, h_err_invalid_number, argv[i_count + 1]);
                         else
-                           i_trap = i_trap * 8 + argv[i_count + 1][i_offset] - '0';
+                           i_value = i_value * 8 + argv[i_count + 1][i_offset] - '0';
                      }
-                     if ((i_trap < 0) || (i_trap > 01777))  /* Check range */
+                     if ((i_value < 0)  || (i_value > ROM_SIZE) || (i_value > 07777))  /* Check address range */
                         v_error(EINVAL, h_err_numeric_range, argv[i_count + 1]);
                      else
                      {
+                        if (i_trap == -1) /* Save it - if not already defined! */
+                           i_trap = i_value;
+                        else
+                           v_error(EINVAL, h_err_duplicate_option, argv[i_count][i_index]);
                         if (i_count + 2 < argc)  /* Remove the parameter from the arguments */
                            for (i_offset = i_count + 1; i_offset < argc - 1; i_offset++)
                               argv[i_offset] = argv[i_offset + 1];
@@ -617,7 +646,7 @@ int main(int argc, char *argv[])
                   }
                   else if (!strncmp(argv[i_count], "--help", i_index))
                   {
-                     fprintf(stdout, c_msg_usage, FILENAME);
+                     fprintf(stdout, h_msg_usage, FILENAME);
                      exit(EXIT_SUCCESS);
                   }
                   else  /* If we get here then the we have an invalid long option */
@@ -674,7 +703,7 @@ int main(int argc, char *argv[])
          }
          else if ((!strncmp(argv[i_count], "/HELP", i_index)) | (!strncmp(argv[i_count], "/?", i_index)))
          {
-            fprintf(stdout, c_msg_usage, FILENAME);
+            fprintf(stdout, h_msg_usage, FILENAME);
             exit(EXIT_SUCCESS);
          }
          else /* If we get here then the we have an invalid option */
@@ -824,8 +853,28 @@ int main(int argc, char *argv[])
       v_read_state(h_processor, s_pathname);  /* Load user specified settings */
 
 #if defined(SWITCHES)
-   h_processor->enabled = h_switch[0]->state;  /* Allow switches to be undefined if not used */
-   if (SWITCHES == 2) h_processor->mode = h_switch[1]->state;
+   if (h_switch[0] != NULL) h_processor->enabled = h_switch[0]->state; /* Allow switches to be undefined if not used */
+   if (SWITCHES == 2) /** To Do - Must be a better way of handling an arbitrary number of switches */
+   {
+#if defined(HP10)
+      h_processor->print = h_switch[1]->state;
+      switch (h_switch[1]->state)
+      {
+         case 0:
+            h_processor->print = MANUAL;
+            break;
+         case 3:
+         case 1:
+            h_processor->print = NORMAL;
+            break;
+         case 2:
+            h_processor->print = TRACE;
+            break;
+      }
+#else
+      if (h_switch[1] != NULL) h_processor->mode = h_switch[1]->state;
+#endif
+   }
 #endif
 
    b_abort = False;
@@ -850,7 +899,7 @@ int main(int argc, char *argv[])
          if (i_ticks > 0) i_ticks -= 1;
          if (i_ticks == 0) b_abort = True;
       }
-      if (((h_processor->pc & 0xfff) == i_breakpoint) || (h_processor->rom[h_processor->pc] == i_trap))  /* Check for Breakpoint or Instruction Trap */
+      if ( (b_search(i_breakpoints, (h_processor->pc & 0xfff), sizeof(i_breakpoints) / sizeof(i_breakpoints[0]))) || (h_processor->rom[h_processor->pc] == i_trap))  /* Check for Breakpoint or Instruction Trap */
       {
          if (!h_processor->trace || !h_processor->step) fprintf(stderr, "** break **\n");
          h_processor->trace = h_processor->step = True;
@@ -977,11 +1026,28 @@ int main(int argc, char *argv[])
 #endif
                      }
                   }
-                  if (SWITCHES == 2)
+                  if (SWITCHES == 2) /** To Do - Must be a better way of handling an arbitrary number of switches */
                      if (h_switch_pressed(h_switch[1], x_event.xbutton.x, x_event.xbutton.y) != NULL)
                      {
+#if defined(HP10)
+                        switch(i_switch_click(h_switch[1]))
+                        {
+                           case 0:
+                              h_processor->print = MANUAL;
+                              break;
+                           case 3:
+                           case 1:
+                              h_processor->print = NORMAL;
+                              break;
+                           case 2:
+                              h_processor->print = TRACE;
+                              break;
+                        }
+#else
                         h_processor->mode = i_switch_click(h_switch[1]);  /* Update prgm/run switch */
+#endif
                         i_switch_draw(x_display, x_application_window, i_screen, h_switch[1]);
+
                      }
                }
 #endif

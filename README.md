@@ -3,7 +3,7 @@
 
 Simulators for  the HP 35, HP 80, HP 45, HP 70, HP 21, HP 22, HP25, HP 25C,
 HP 27,  HP 29C,  HP 31E, HP 32E, HP 33E, HP 33C,  HP 34C,  HP 37E,  HP 38C,
-HP 38E, HP 67, HP 10C, HP 11C, HP 12C, HP 15C, and HP 16C.
+HP 38E, HP10, HP 67, HP 10C, HP 11C, HP 12C, HP 15C, and HP 16C.
 
 All written in C using X11.
 
@@ -34,6 +34,11 @@ Tru64 Unix.
 
 <a id="latest"></a>
 ### Latest News <sup>[Back to Top](#top)</sup>
+
+08 Jul 25
+
+   - Finally managed to get the HP10 working!!
+   - Fixed regression bug that affected HP12C.
 
 30 Jun 25
 

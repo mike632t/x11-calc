@@ -33,14 +33,14 @@
  *                     need to include stdio.h - MT
  * 27 Feb 24         - Fixed busy loop 'bug' on newer compilers that do not
  *                     set 'linux' when compiling on Linux - MT
- * 22 Apr 22         - Moved  compiler feature macro definitions to generic
+ * 22 Apr 24         - Moved  compiler feature macro definitions to generic
  *                     busy loop - MT
  *
  */
 
 #define NAME           "gcc-wait"
-#define BUILD          "0005"
-#define DATE           "07 Feb 24"
+#define BUILD          "0007"
+#define DATE           "22 Apr 24"
 #define AUTHOR         "MT"
 
 #if defined(linux) || defined(__linux__) || defined(__NetBSD__)

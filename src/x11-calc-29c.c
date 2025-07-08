@@ -42,7 +42,7 @@
  */
 
 #define NAME           "x11-calc-29c"
-#define BUILD          "0015"
+#define BUILD          "0014"
 #define DATE           "21 Oct 23"
 #define AUTHOR         "MT"
 

@@ -392,19 +392,29 @@
  * 23 Apr 24         - Separated out prototypes for error handlers - MT
  * 19 Apr 25         - Modified the mnemonics for some if statements to put
  *                     the operands first - MT
+ *                   - Updated the mnemonics for some conditional and  jump
+ *                     statements - MT
  * 20 May 25         - Tidied up data structure definitions - MT
+ * 12 Jun 25         - Removed unused debug code - MT
+ * 06 Jul 25         - Set buffer pointer when initialising processor - MT
+ * 07 Jul 25         - Buffer pointer set when resetting processor (reverts
+ *                     last change!) - MT
+ * 08 Jul 25         - Modified  printer character mapping so that multiply
+ *                     is displayed as a lowercase 'x' - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
- *                   - Use a dedicated procesor flag for the printer mode.
+ *                   - Use a dedicated processor flag for the printer mode.
  *                   - Figure out how to get the display to blink..?
  *
  */
 
 #define NAME           "x11-calc-cpu"
-#define BUILD          "0204"
-#define DATE           "20 May 25"
+#define BUILD          "0209"
+#define DATE           "08 Jul 25"
 #define AUTHOR         "MT"
+
+#define NODEBUG
 
 #include <errno.h>     /* errno */
 
@@ -425,7 +435,7 @@
 
 #include "x11-calc-cpu.h"
 
-#include "gcc-debug.h"  /* print() */
+#include "gcc-debug.h"  /* debug() */
 #include "gcc-exists.h" /* i_isfile(), i_isdir(), i_exists() */
 
 #if defined(unix) || defined(__unix__) || defined(__APPLE__)
@@ -471,9 +481,9 @@ static void v_fprint_flags(FILE *h_file, oprocessor *h_processor) /* Display the
 #if defined(HP10)
 static void v_fprint_buffer(FILE *h_file, oprocessor *h_processor) /* Display the current processor flags */
 {
-   static const unsigned char c_charmap[0x40] = {
+   static const unsigned char c_charmap[0x40] = {                                      /* Note - Can't use Unicode characters on non Linux systems */
       ' ', 'Y', '=', '0', 'L', 'M', ' ', '1', 'G', ' ', '>', '2', 'O', 'H', ' ', '3',  /* ' ', ' ', '=', '0', 'L', 'M', '≠', '1', 'G', '¿', '>', '2', 'O', 'H', '≤', '3', */
-      'P', ' ', 'X', '4', 'R', 'F', 'Z', '5', 'S', '?', 'x', '6', 'T', ' ', ' ', '7',  /* 'P', '√', 'X', '4', 'R', 'F', 'Z', '5', 'S', '?', 'x', '6', 'T', '→', '⇔', '7', */
+      'P', ' ', 'x', '4', 'R', 'F', 'Z', '5', 'S', '?', 'x', '6', 'T', ' ', ' ', '7',  /* 'P', '√', 'X', '4', 'R', 'F', 'Z', '5', 'S', '?', 'x', '6', 'T', '→', '⇔', '7', */
       '%', ' ', ' ', '8', 'J', 'X', '>', '9', 'A', '#', 'K', '.', 'B', 'b', '/', '-',  /* '%', ' ', '¿', '8', 'J', 'X', '>', '9', 'A', '#', 'K', '.', 'B', 'b', '/', '-', */
       'C', 'c', '/', '+', 'D', 'd', ' ', '#', 'E', 'e', ' ', ' ', 'I', 'i', 'x', ' '   /* 'C', 'c', '÷', '+', 'D', 'd', '↑', '#', 'E', 'e', '↓', ' ', 'I', 'i', 'x', ' '  */
       };
@@ -483,6 +493,10 @@ static void v_fprint_buffer(FILE *h_file, oprocessor *h_processor) /* Display th
       int i_count;
       for (i_count = 0; (i_count < BUFSIZE); i_count++) /* Print the contents of the buffer */
          fprintf(h_file, "%c", c_charmap[h_processor->buffer[i_count]]);
+      debug(
+         for (i_count = 0; (i_count < BUFSIZE); i_count++) /* Print the contents of the buffer */
+            fprintf(stdout, "%02d ", h_processor->buffer[i_count]);
+      );
       fprintf(h_file, "\n");
       h_processor->position = BUFSIZE; /* Clear the buffer contents */
       for (i_count = 0; i_count < BUFSIZE; i_count++)
@@ -802,11 +816,8 @@ void v_write_state(oprocessor *h_processor, char *s_pathname) /* Write processor
 }
 
 #if defined(CONTINIOUS)
-char *v_get_datafile_path(oprocessor *h_processor) /* Returns path the the data file */
+char *v_get_datafile_path(oprocessor *h_processor) /* Return path the the data file */
 /*
- * Returns the path to the data file use to store the machine state when it
- * is 'powered off'.
- *
  *  - If $HOME is defined and the data file already exists in there  return
  *    the pathname of the data file in $HOME to maintain compatibility with
  *    earlier releases.
@@ -850,8 +861,7 @@ char *v_get_datafile_path(oprocessor *h_processor) /* Returns path the the data 
          strcpy(s_pathname, s_directory);
          strcat(s_pathname, "/.local/share");
       }
-      debug(printf("Searching for '%s'\n", s_pathname));
-      if (i_exists(s_pathname) && i_isdir(s_pathname)) /* Check that the selected directory exists, and if it doesn't use  $HOME */
+      if (i_exists(s_pathname) && i_isdir(s_pathname)) /* Check that the selected directory exists, and if it doesn't use $HOME */
       {
          strcat(s_pathname, "/x11-calc");
          if (i_exists(s_pathname) == 0) mkdir(s_pathname, (S_IRWXU|S_IRGRP|S_IXGRP)); /* If the application data folder does not exist attempt to create it (no need to check status here as we check the directory exists below) */
@@ -938,7 +948,7 @@ void v_processor_reset(oprocessor *h_processor) /* Reset processor */
    h_processor->crc[READY] = -4;
 #endif
 #if defined(HP10)
-   h_processor->position = BUFSIZE;
+   h_processor->print = NORMAL;
    for (i_count = 0; i_count < BUFSIZE; i_count++) /* Reset the character buffer contents */
       h_processor->buffer[i_count] = 0x3f;
 #endif
@@ -966,9 +976,6 @@ oprocessor *h_processor_create(int *h_rom) /* Create a new processor 'object' */
    h_processor->trace = False;
    h_processor->step = False;
    v_processor_reset(h_processor);
-#if defined(HP10)
-   h_processor->print = MANUAL;
-#endif
    return(h_processor);
 }
 
@@ -1269,8 +1276,9 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                if (h_processor->trace) v_fprint_status(stdout, h_processor);
                break;
             case 01: /* if s(n) = 0 */
-               if (h_processor->trace) fprintf(stdout, "if s(%d) = 0", i_opcode >> 6);
+               if (h_processor->trace) fprintf(stdout, "if s(%d) = 0\t", i_opcode >> 6);
                h_processor->flags[CARRY] = !h_processor->status[i_opcode >> 6];
+               if (h_processor->trace) v_fprint_status(stdout, h_processor);
                v_op_goto(h_processor);
                break;
             case 02: /* 0 -> s(n) */
@@ -1551,13 +1559,12 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   h_processor->pc += h_processor->code;
                   break;
                case 00120: /* keys -> a[2:1] (0 001 010 000) */
-                  if (h_processor->trace) fprintf(stdout, "keys -> a\t\t");
                   /* The HP10, HP19C and HP97 use this to get the state of the printer mode switch */
                   /* HP10 - All = 1, Print = 2 (print with display off), Display = 4 */
                   /* HP19C/97 - Trace = 1, Normal = 2 (print with display off), Manual = 4 */
+                  if (h_processor->trace) fprintf(stdout, "keys -> a\t\t");
 #if defined(HP10)
-                  if (h_processor->print)
-                     h_processor->reg[A_REG]->nibble[1] = 0x1; /* HP10 - All = 1, Print = 2 (print with display off), Display = 4 */
+                  h_processor->reg[A_REG]->nibble[1] = h_processor->print;
 #else
                   h_processor->reg[A_REG]->nibble[2] = (h_processor->code >> 4); /* Put keycode in A_REG */
                   h_processor->reg[A_REG]->nibble[1] = (h_processor->code & 0x0f);
@@ -1802,8 +1809,9 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                if (h_processor->trace) v_fprint_status(stdout, h_processor);
                break;
             case 01: /* if s(n) = 1 */
-               if (h_processor->trace) fprintf(stdout, "if s(%d) = 1", i_opcode >> 6);
+               if (h_processor->trace) fprintf(stdout, "if s(%d) = 1\t", i_opcode >> 6);
                h_processor->flags[CARRY] = h_processor->status[i_opcode >> 6];
+               if (h_processor->trace) v_fprint_status(stdout, h_processor);
                v_op_goto(h_processor);
                break;
             case 02: /* if p = n */
@@ -2043,8 +2051,9 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                if (h_processor->trace) v_fprint_status(stdout, h_processor);
                break;
             case 01: /* if s(n) = 0 */
-               if (h_processor->trace) fprintf(stdout, "if s(%d) = 0", i_opcode >> 6);
+               if (h_processor->trace) fprintf(stdout, "if s(%d) = 0\t", i_opcode >> 6);
                h_processor->flags[CARRY] = !h_processor->status[i_opcode >> 6];
+               if (h_processor->trace) v_fprint_status(stdout, h_processor);
                v_op_goto(h_processor);
                break;
             case 02: /* if p != n */
@@ -2273,7 +2282,6 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                break;
             default:
                if (h_processor->trace) fprintf(stdout, "\n");
-               /** debug(fprintf(stderr,"%02x\n", (i_opcode >> 6) & 0xf)); */
                v_error(errno, h_err_unexpected_opcode, i_opcode, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
             }
             break;
@@ -2393,7 +2401,6 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                break;
             default:
                if (h_processor->trace) fprintf(stdout, "\n");
-               /** debug(fprintf(stderr,"%02x\n", (i_opcode >> 6) & 0xf)); */
                v_error(errno, h_err_unexpected_opcode, i_opcode, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
             }
             break;
@@ -2530,7 +2537,6 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
 
             default:
                if (h_processor->trace) fprintf(stdout, "\n");
-               /** debug(fprintf(stderr,"%02x\n", (i_opcode >> 6) & 0xf)); */
                v_error(errno, h_err_unexpected_opcode, i_opcode, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
             }
             break;
@@ -2573,7 +2579,6 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
 
          default:
             if (h_processor->trace) fprintf(stdout, "\n");
-            /** debug(fprintf(stderr,"%02x\n", (i_opcode >> 2) & 0xf)); */
             v_error(errno, h_err_unexpected_opcode, i_opcode, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
          }
          break;
@@ -2657,6 +2662,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             if (h_processor->p >= REG_SIZE)
             {
                if (h_processor->trace) fprintf(stdout, "\n");
+               debug(printf ("REG_SIZE = %d, h_processor->p = %d", REG_SIZE, h_processor->p));
                v_error(errno, h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
             }
             break;
@@ -2678,6 +2684,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             if (h_processor->p >= REG_SIZE)
             {
                if (h_processor->trace) fprintf(stdout, "\n");
+               debug(printf ("REG_SIZE = %d, h_processor->p = %d", REG_SIZE, h_processor->p));
                v_error(errno, h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
             }
             break;
@@ -2900,6 +2907,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             if (h_processor->p >= REG_SIZE)
             {
                if (h_processor->trace) fprintf(stdout, "\n");
+               debug(printf ("REG_SIZE = %d, h_processor->p = %d", REG_SIZE, h_processor->p));
                v_error(errno, h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
             }
             break;
@@ -2909,6 +2917,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             if (h_processor->p >= REG_SIZE)
             {
                if (h_processor->trace) fprintf(stdout, "\n");
+               debug(printf ("REG_SIZE = %d, h_processor->p = %d", REG_SIZE, h_processor->p));
                v_error(errno, h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
             }
             break;
@@ -3147,6 +3156,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             if (h_processor->p >= REG_SIZE || h_processor->q >= REG_SIZE)
             {
                if (h_processor->trace) fprintf(stdout, "\n");
+               debug(printf ("REG_SIZE = %d, h_processor->p = %d, h_processor->q = %d", REG_SIZE, h_processor->p, h_processor->q));
                v_error(errno, h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
             }
             break;
@@ -3403,13 +3413,13 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                if (i_offset >= 0x40) i_offset = i_offset - 128; /* Fixed relative jump offset */
                if (i_opcode & 00004)
                {
-                  if (h_processor->trace) fprintf(stdout, "jc ");
+                  if (h_processor->trace) fprintf(stdout, "if carry go to ");
                   if (h_processor->flags[PREV_CARRY])
                      h_processor->pc = ((i_last + i_offset) & 0xffff);
                }
                else
                {
-                  if (h_processor->trace) fprintf(stdout, "jnc ");
+                  if (h_processor->trace) fprintf(stdout, "if no carry go to ");
                   if (!h_processor->flags[PREV_CARRY])
                      h_processor->pc = ((i_last + i_offset) & 0xffff);
                }
@@ -3423,8 +3433,8 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             }
             break;
 #else
-         case 03: /* if nc go to */
-            if (h_processor->trace) {fprintf(stdout, "if nc go to "); fprintf(stdout, h_msg_address, ((h_processor->pc & 0x0f00) | i_opcode >> 2));} /* Note - uses and eight bit address */
+         case 03: /* if nc goto */
+            if (h_processor->trace) {fprintf(stdout, "if no carry go to "); fprintf(stdout, h_msg_address, ((h_processor->pc & 0x0f00) | i_opcode >> 2));} /* Note - uses an eight bit address */
             if (!h_processor->flags[PREV_CARRY])
             {
                h_processor->pc = (h_processor->pc & 0xff00) | i_opcode >> 2;

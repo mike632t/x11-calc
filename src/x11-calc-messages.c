@@ -34,8 +34,8 @@
  * 03 Mar 22         - Updated help text - MT
  * 12 Mar 22         - Updated German translation again - MT
  * 31 Mar 22         - Modified to compile on NetBSD - MT
- * 07 Dec 22         - Didplay register number as a 3 digit value - MT
- * 11 Dec 22         - Renamed models with continious memory and added HP25
+ * 07 Dec 22         - Display register number as a 3 digit value - MT
+ * 11 Dec 22         - Renamed models with continuous memory and added HP25
  *                     HP33e, and HP38e - MT
  * 24 Dec 22         - Added and explicit check for '__APPLE__' in order to
  *                     allow Mac OS  to be handled in the same way as other
@@ -55,13 +55,16 @@
  *                     text - MT
  * 04 May 24         - Updated French translations - macmpi
  * 06 May 24         - Use only 7-bit ASCII characters - MT
+ * 12 Jun 25         - Fixed some spelling mistakes in comments - MT
+ *                   - Added  error messages for the number of  breakpoints
+ *                     and instruction traps - MT
  * 29 Jun 25         - Changed command line option for the european display
  *                     format to '-c' or '--comma', and updated text - MT
  *
  */
 
 #define NAME           "x11-calc-messages"
-#define BUILD          "0025"
+#define BUILD          "0027"
 #define DATE           "29 Jun 25"
 #define AUTHOR         "MT"
 
@@ -80,7 +83,6 @@ const char *h_err_creating_file = "Can't create '%s'.\n";
 const char *h_err_memmory_alloc = "Memory allocation failed in %s line : %d\n";
 const char *h_err_ROM = "Empty ROM - no firmware loaded.\n";
 
-
 #if defined(HEXADECIMAL)
 const char *h_msg_opcode = "%1x-%03x  %03x   ";
 const char *h_msg_address = "%03x";
@@ -96,16 +98,16 @@ const char *h_msg_rom = "%o:%o";
 #endif
 
 #if defined(LANG_es)
-const char *h_msg_loading = "Cargando '%s'.\n";
-const char *h_msg_saving = "Guardando '%s'.\n";
+const char *h_msg_loading = "Cargando '%s'\n";
+const char *h_msg_saving = "Guardando '%s'\n";
 
 const char *h_err_register_alloc = "Error de ejecucion\t: %s linea: %d: iFallo la asignacion de memoria!\n";
-const char *h_err_opening_file = "No se puede abrir '%s'.\n";
+const char *h_err_opening_file = "No se puede abrir '%s'\n";
 
-const char *h_err_display = "No se pudo conectar al servidor X '%s'.\n";
-const char *h_err_display_properties = "No se pudo obtener las propiedades del monitor.\n";
-const char *h_err_display_colour = "Requiere un monitor de %d bits de color.\n";
-const char *h_err_font = "No se pudo cargar la fuente '%s' (x11 base bitmap fonts required).\n";
+const char *h_err_display = "No se pudo conectar al servidor X '%s'\n";
+const char *h_err_display_properties = "No se pudo obtener las propiedades del monitor\n";
+const char *h_err_display_colour = "Requiere un monitor de %d bits de color\n";
+const char *h_err_font = "No se pudo cargar la fuente '%s' (x11 base bitmap fonts required)\n";
 
 #if defined(HEXADECIMAL)
 const char *h_err_unexpected_opcode = "Codigo de operación inesperado (%03x) en %1x-%03x en %s en la línea : %d\n";
@@ -152,12 +154,14 @@ Una emulador de emulador RPN para X11.\n\n\
 #endif
 const char *h_err_invalid_operand = "operando(s) inválido\n";
 const char *h_err_invalid_option = "opcion invalida -- '%c'\n";
+const char *h_err_duplicate_option = "opcion duplicato -- '%c'\n";
 const char *h_err_unrecognised_option = "opcion no reconocida '%s'\n";
-const char *h_err_invalid_number = "no es un numero octal -- '%s' \n";
-const char *h_err_numeric_range = "fuera del rango  -- '%s' \n";
-const char *h_err_invalid_argument = "argumento esperado no es -- '%c' \n";
+const char *h_err_invalid_number = "no es un numero octal -- '%s'\n";
+const char *h_err_numeric_range = "fuera del rango -- '%s'\n";
+const char *h_err_max_breakpoints = "numero maximo de puntos de interrupcion excedido\n";
+const char *h_err_invalid_argument = "argumento esperado no es -- '%c'\n";
 #else
-const char *c_msg_usage = "Uso: %s [OPCION]... [ARCHIVO]\n\
+const char *h_msg_usage = "Uso: %s [OPCION]... [ARCHIVO]\n\
 Una emulador de calculadora RPN para X11.\n\n\
   /cursor                  mostrar cursor (default)\n\
   /nocursor                ocultar cursor\n\
@@ -172,16 +176,16 @@ const char *h_err_invalid_option = "opcion invalida %s\n";
 
 
 #elif defined(LANG_de)
-const char *h_msg_loading = "Lade '%s'.\n";
-const char *h_msg_saving = "Speichere '%s'.\n";
+const char *h_msg_loading = "Lade '%s'\n";
+const char *h_msg_saving = "Speichere '%s'\n";
 
 const char *h_err_register_alloc = "Laufzeitfehler\t: %s Zeile : %d : Speicheranforderung fehlgeschlagen!\n";
-const char *h_err_opening_file = "Kann '%s' nicht oeffnen.\n";
+const char *h_err_opening_file = "Kann '%s' nicht oeffnen\n";
 
-const char *h_err_display = "Kann keine verbindung zum X Server '%s' herstellen..\n";
-const char *h_err_display_properties = "Kann eigenschaften des displays nicht abfragen..\n";
-const char *h_err_display_colour = "Ein %d-bit farbdisplay wird benoetigt.\n";
-const char *h_err_font = "Kann schrift '%s' nicht laden (x11 base bitmap fonts required).\n";
+const char *h_err_display = "Kann keine verbindung zum X Server '%s' herstellen\n";
+const char *h_err_display_properties = "Kann eigenschaften des displays nicht abfragen\n";
+const char *h_err_display_colour = "Ein %d-bit farbdisplay wird benoetigt\n";
+const char *h_err_font = "Kann schrift '%s' nicht laden (x11 base bitmap fonts required)\n";
 
 #if defined(HEXADECIMAL)
 const char *h_err_unexpected_opcode = "Unerwarteter opcode (%03x) an %1x-%03x in %s zeile: %d\n";
@@ -199,7 +203,7 @@ const char *h_err_missing_argument = "option benoetigt ein argument -- '%s'\n";
 
 #if defined(unix) || defined(__unix__) || defined(__APPLE__)
 #if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
-const char * c_msg_usage = "Verwendung: %s [OPTION]... [DATEI]\n\
+const char *h_msg_usage = "Verwendung: %s [OPTION]... [DATEI]\n\
 Eine RPN rechner-emulator fur X11.\n\n\
   -b  ADDR                 haltepunkt an adresse setzen (oktal)\n\
   -i  OPCODE               haltepunkt auf Opcode setzen  (oktal)\n\
@@ -226,14 +230,16 @@ Eine RPN rechner-emulator fur X11.\n\n\
       --help               diese hilfe anzeigen und dann beenden\n\
       --version            versionsinformationen ausgeben und dann beenden\n\n";
 #endif
-const char *h_err_invalid_operand = "ungueltige(r) operand(en)\n";
+const char *h_err_invalid_operand = "uvalor duplicadongueltige(r) operand(en)\n";
 const char *h_err_invalid_option = "ungueltige option -- '%c'\n";
+const char *h_err_duplicate_option = "doppelter option -- '%c'\n";
 const char *h_err_unrecognised_option = "unbekannte option '%s'\n";
-const char *h_err_invalid_number = "keine gueltige oktalzahl -- '%s' \n";
-const char *h_err_numeric_range = "ausserhalb des zahlenbereichs -- '%s' \n";
-const char *h_err_invalid_argument = "argument erwartet, nicht -- '%c' \n";
+const char *h_err_invalid_number = "keine gueltige oktalzahl -- '%s'\n";
+const char *h_err_numeric_range = "ausserhalb des zahlenbereichs -- '%s'\n";
+const char *h_err_max_breakpoints = "maximale anzahl an haltepunkten uberschritten\n";
+const char *h_err_invalid_argument = "argument erwartet, nicht -- '%c'\n";
 #else
-const char *c_msg_usage = "Verwendung: %s [OPTION...] [DATEI]\n\
+const char *h_msg_usage = "Verwendung: %s [OPTION...] [DATEI]\n\
 Eine RPN rechner-emulator fur X11.\n\n\
   /cursor                  cursor anzeigen (default)\n\
   /nocursor                cursor verstecken\n\
@@ -248,16 +254,16 @@ const char *h_err_invalid_option = "ungueltige option %s\n";
 
 
 #elif defined(LANG_fr)
-const char *h_msg_loading = "Chargement de '%s'.\n";
-const char *h_msg_saving = "Enregistrement de '%s'.\n";
+const char *h_msg_loading = "Chargement de '%s'\n";
+const char *h_msg_saving = "Enregistrement de '%s'\n";
 
 const char *h_err_register_alloc = "Erreur d'execution\t : Ligne %s : %d : Echec de l'allocation memoire !\n";
-const char *h_err_opening_file = "Impossible d'ouvrir '%s'.\n";
+const char *h_err_opening_file = "Impossible d'ouvrir '%s'\n";
 
-const char *h_err_display = "Impossible de se connecter au serveur X '%s'.\n";
-const char *h_err_display_properties = "Impossible d'obtenir les proprietes d'affichage.\n";
-const char *h_err_display_colour = "Necessite un affichage couleur %d bits.\n";
-const char *h_err_font = "Impossible de charger la police '%s' (x11 base bitmap fonts required).\n";
+const char *h_err_display = "Impossible de se connecter au serveur X '%s'\n";
+const char *h_err_display_properties = "Impossible d'obtenir les proprietes d'affichage\n";
+const char *h_err_display_colour = "Necessite un affichage couleur %d bits\n";
+const char *h_err_font = "Impossible de charger la police '%s' (x11 base bitmap fonts required)\n";
 
 #if defined(HEXADECIMAL)
 const char *h_err_unexpected_opcode = "Instruction inattendue (%03x) a %1x-%03x , ligne %s : %d\n";
@@ -275,7 +281,7 @@ const char *h_err_missing_argument = "l'option necessite un argument -- '%s'\n";
 
 #if defined(unix) || defined(__unix__) || defined(__APPLE__)
 #if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
-const char * c_msg_usage = "Utilisation : %s [OPTION]... [FICHIER]\n\
+const char *h_msg_usage = "Utilisation : %s [OPTION]... [FICHIER]\n\
 Une émulateur de RPN calculatrice pour X11.\n\n\
   -b  ADDR                 définir un point d'arrêt (octal)\n\
   -i  OPCODE               définir un piège d'instruction (octal)\n\
@@ -289,8 +295,8 @@ Une émulateur de RPN calculatrice pour X11.\n\n\
       --help               afficher cette aide et quitter\n\
       --version            affiche les informations de version et quitte\n\n";
 #else
-const char * c_msg_usage = "Utilisation : %s [OPTION]... [FICHIER]\n\
-Une émulateur RPN Calculator pour X11.\n\n\
+const char *h_msg_usage = "Utilisation : %s [OPTION]... [FICHIER]\n\
+Une émulateur de RPN calculatrice pour X11.\n\n\
   -b  ADDR                 définir un point d'arrêt (octal)\n\
   -i  OPCODE               définir un piège d'instruction (octal)\n\
   -r  FILE                 lire le contenu de la ROM de FILE\n\
@@ -302,57 +308,59 @@ Une émulateur RPN Calculator pour X11.\n\n\
       --help               afficher cette aide et quitter\n\
       --version            affiche les informations de version et quitte\n\n";
 #endif
-const char * h_err_invalid_operand = "opérande(s) invalide(s)\n";
-const char * h_err_invalid_option = "option invalide -- '%c'\n";
-const char * h_err_unrecognised_option = "option non reconnue '%s'\n";
-const char * h_err_invalid_number = "pas un nombre octal -- '%s' \n";
-const char * h_err_numeric_range = "hors de portée -- '%s' \n";
-const char * h_err_invalid_argument = "argument attendu -- '%c' \n";
+const char *h_err_invalid_operand = "operande(s) invalide(s)\n";
+const char *h_err_invalid_option = "option invalide -- '%c'\n";
+const char *h_err_duplicate_option = "valeur en double -- '%c'\n";
+const char *h_err_unrecognised_option = "option non reconnue '%s'\n";
+const char *h_err_invalid_number = "pas un nombre octal -- '%s'\n";
+const char *h_err_numeric_range = "hors de portee -- '%s'\n";
+const char *h_err_max_breakpoints = "nombre maximal de points d'arret depasse\n";
+const char *h_err_invalid_argument = "argument attendu -- '%c'\n";
 #else
-const char * c_msg_usage = "Utilisation : %s [OPTION]... [FICHIER]\n\
-Une émulateur RPN Calculator pour X11.\n\n\
-  /cursor                  curseur d'affichage (par défaut)\n\
+const char *h_msg_usage = "Utilisation : %s [OPTION]... [FICHIER]\n\
+Une émulateur de RPN calculatrice pour X11.\n\n\
+  /cursor                  curseur d'affichage (par defaut)\n\
   /nocursor                masquer le curseur\n\
   /step                    trace execution\n\
   /trace                   trace execution\n\
   /version                 affiche les informations de version et quitte\n\
   /?, /help                afficher cette aide et quitter\n";
 
-const char * h_err_invalid_operand = "parametre(s) invalide(s)\n";
-const char * h_err_invalid_option = "option invalide %s\n";
+const char *h_err_invalid_operand = "parametre(s) invalide(s)\n";
+const char *h_err_invalid_option = "option invalide %s\n";
 #endif /* Unix */
 
 
 #else /* Language defaults to English */
 
-const char * h_msg_loading = "Loading '%s'.\n";
-const char * h_msg_saving = "Saving '%s'.\n";
+const char *h_msg_loading = "Loading '%s'\n";
+const char *h_msg_saving = "Saving '%s'\n";
 
-const char * h_err_register_alloc = "Run-time error\t: %s line : %d : Memory allocation failed!\n";
-const char * h_err_opening_file = "Unable to open '%s'.\n";
+const char *h_err_register_alloc = "Run-time error\t: %s line : %d : Memory allocation failed!\n";
+const char *h_err_opening_file = "Unable to open '%s'\n";
 
-const char * h_err_display = "Cannot connect to X server '%s'.\n";
-const char * h_err_display_properties = "Unable to get display properties.\n";
-const char * h_err_display_colour = "Requires a %d-bit colour display.\n";
-const char * h_err_font = "Cannot load font '%s' (x11 base bitmap fonts required).\n";
+const char *h_err_display = "Cannot connect to X server '%s'\n";
+const char *h_err_display_properties = "Unable to get display properties\n";
+const char *h_err_display_colour = "Requires a %d-bit colour display\n";
+const char *h_err_font = "Cannot load font '%s' (x11 base bitmap fonts required)\n";
 
 #if defined(HEXADECIMAL)
-const char * h_err_unexpected_opcode = "Unexpected opcode (%03x) at %1x-%03x in %s line : %d\n";
-const char * h_err_unexpected_error = "Unexpected error at %1x-%03x in %s line : %d\n";
-const char * h_err_invalid_address = "Address (%04x) out of range at %1x-%03x in %s line : %d\n";
-const char * h_err_invalid_register = "Invalid register (REG[%03d]) at %1x-%03x in %s line : %d\n";
+const char *h_err_unexpected_opcode = "Unexpected opcode (%03x) at %1x-%03x in %s line : %d\n";
+const char *h_err_unexpected_error = "Unexpected error at %1x-%03x in %s line : %d\n";
+const char *h_err_invalid_address = "Address (%04x) out of range at %1x-%03x in %s line : %d\n";
+const char *h_err_invalid_register = "Invalid register (REG[%03d]) at %1x-%03x in %s line : %d\n";
 # else
-const char * h_err_unexpected_opcode = "Unexpected opcode (%04o) at %1o-%04o in %s line : %d\n";
-const char * h_err_unexpected_error = "Unexpected error at %1o-%04o in %s line : %d\n";
-const char * h_err_invalid_address = "Address (%06o) out of range at %1o-%04o in %s line : %d\n";
-const char * h_err_invalid_register = "Invalid register (REG[%03d]) at %1o-%04o in %s line : %d\n";
+const char *h_err_unexpected_opcode = "Unexpected opcode (%04o) at %1o-%04o in %s line : %d\n";
+const char *h_err_unexpected_error = "Unexpected error at %1o-%04o in %s line : %d\n";
+const char *h_err_invalid_address = "Address (%06o) out of range at %1o-%04o in %s line : %d\n";
+const char *h_err_invalid_register = "Invalid register (REG[%03d]) at %1o-%04o in %s line : %d\n";
 #endif /* Hexadecimal */
 
-const char * h_err_missing_argument = "option requires an argument -- '%s'\n";
+const char *h_err_missing_argument = "option requires an argument -- '%s'\n";
 
 #if defined(unix) || defined(__unix__) || defined(__APPLE__)
 #if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
-const char * c_msg_usage = "Usage: %s [OPTION]... [FILE]\n\
+const char *h_msg_usage = "Usage: %s [OPTION]... [FILE]\n\
 An RPN Calculator emulator for X11.\n\n\
   -b  ADDR                 set break-point (octal)\n\
   -i  OPCODE               set instruction trap (octal)\n\
@@ -366,7 +374,7 @@ An RPN Calculator emulator for X11.\n\n\
       --help               display this help and exit\n\
       --version            output version information and exit\n\n";
 #else
-const char * c_msg_usage = "Usage: %s [OPTION]... [FILE]\n\
+const char *h_msg_usage = "Usage: %s [OPTION]... [FILE]\n\
 An RPN Calculator emulator for X11.\n\n\
   -b  ADDR                 set break-point (octal)\n\
   -i  OPCODE               set instruction trap (octal)\n\
@@ -381,12 +389,14 @@ An RPN Calculator emulator for X11.\n\n\
 #endif
 const char *h_err_invalid_operand = "invalid operand(s)\n";
 const char *h_err_invalid_option = "invalid option -- '%c'\n";
+const char *h_err_duplicate_option = "duplicate option -- '%c'\n";
 const char *h_err_unrecognised_option = "unrecognised option '%s'\n";
-const char *h_err_invalid_number = "not an octal number -- '%s' \n";
-const char *h_err_numeric_range = "out of range -- '%s' \n";
-const char *h_err_invalid_argument = "expected argument not -- '%c' \n";
+const char *h_err_invalid_number = "not an octal number -- '%s'\n";
+const char *h_err_numeric_range = "out of range -- '%s'\n";
+const char *h_err_max_breakpoints = "maximum number of breakpoints exceeded\n";
+const char *h_err_invalid_argument = "expected argument not -- '%c'\n";
 #else
-const char *c_msg_usage = "Usage: %s [OPTION...] [FILE]\n\
+const char *h_msg_usage = "Usage: %s [OPTION...] [FILE]\n\
 An RPN Calculator emulator for X11.\n\n\
   /cursor                  display cursor (default)\n\
   /nocursor                hide cursor\n\

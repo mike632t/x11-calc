@@ -22,18 +22,19 @@
  * 10 Oct 21         - Allow use of NULL pointers - MT
  * 03 Jan 21         - Changed debug() macro so that debug code is executed
  *                     when DEBUG is defined (doesn't need to be true) - MT
- * 21 Oct 23         - Updated switch parameters to accomodate a 3 position
- *                     switch - MT
+ * 21 Oct 23         - Updated  switch  parameters to accommodate  a  three
+ *                     position switch - MT
  * 22 Oct 23         - Added method to update state when clicked - MT
  * 23 Oct 23         - Added code to draw three position switches - MT
  * 24 Feb 24         - Do not need to include "x11-font.h" - MT
  * 03 Mar 24         - Updated error handling (now passes the  error number
  *                     to the error handler) - MT
- * 29 Mar 24         - Fixed  compiler 'vairable may be used uninitialized'
+ * 29 Mar 24         - Fixed  compiler 'variable may be used uninitialised'
  *                     warnings - MT
  * 23 Apr 24         - Separated out prototypes for error handlers - MT
  *                   - Removed unnecessary includes - MT
  * 20 May 25         - Tidied up data structure definitions - MT
+ * 07 Jul 25         - Corrected some spellings - MT
  *
  */
 
@@ -87,9 +88,9 @@ struct oswitch *h_switch_create(int i_index, char* s_on, char* s_mid, char* s_of
    int i_left, int i_top, int i_width, int i_height, char b_state,
    unsigned int i_colour, unsigned int i_alternate_colour)
 {
-   struct oswitch *h_switch; /* Ponter to switch. */
+   struct oswitch *h_switch; /* Pointer to switch. */
 
-   /* Attempt to allcoate memory for a switch. */
+   /* Attempt to allocate memory for a switch. */
    if ((h_switch = malloc (sizeof(*h_switch)))==NULL) v_error(errno, h_err_memmory_alloc, __FILE__, __LINE__);
 
    h_switch->index = i_index;
@@ -111,12 +112,7 @@ struct oswitch *h_switch_create(int i_index, char* s_on, char* s_mid, char* s_of
    return(h_switch);
 }
 
-/*
- * switch_resize (display, scale)
- *
- * Resize switch based on original geometery
- *
- */
+/* switch_resize (display, scale) */
 
 int i_switch_resize(struct oswitch *h_switch, float f_scale)
 {
