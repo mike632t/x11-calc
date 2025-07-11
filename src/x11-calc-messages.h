@@ -68,6 +68,7 @@ extern const char *h_msg_licence;
 extern const char *h_err_display;
 extern const char *h_err_display_properties;
 extern const char *h_err_display_colour;
+extern const char *h_err_pixmap;
 extern const char *h_err_font;
 
 extern const char *h_err_creating_file;
