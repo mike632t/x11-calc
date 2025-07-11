@@ -34,6 +34,8 @@
 
 - [x] Finish debugging HP10 instruction set.
 
+- [ ] Add a graphical printer display to the HP10.
+
 - [x] Implement  different styles of digit (to allow for different  decimal
       point positions, and number of segments etc).
 
