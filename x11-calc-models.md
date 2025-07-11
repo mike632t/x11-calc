@@ -36,7 +36,6 @@ HP-55    1975  Lower cost version of the HP-65 without a magnetic card
 HP-21    1975  A smaller less expensive version of the HP-35 with support
                for radians, polar/rectangular conversions, and storage
                arithmetic (using separate keys).
-
 HP-25    1975  Smaller programmable model with 49 program steps.
                First model with fully merged programming steps and an
                engineering display mode.
