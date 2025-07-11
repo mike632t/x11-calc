@@ -638,6 +638,7 @@ The field modifier is used to select which part of the register to use.
 
 ## Opcode listing
 
+```
 Mnemonic (classic)       HP-01    Classic  Woodstock  Voyager
 0 - c - 1 -> c[m]        0346      0346      1266
 0 - c - 1 -> c[ms]       0366      0366      1276
@@ -2024,3 +2025,4 @@ crc testf2               N/A       N/A       N/A
 crc testf3               N/A       N/A       N/A
 crc testf4               N/A       N/A       N/A
 bcd -> c                 N/A       0750      N/A
+```
