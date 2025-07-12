@@ -19,12 +19,12 @@
 
 - [x] Tidy up data structure definitions.
 
-- [ ] Use variables for all error messages, and add missing translations.
+- [X] Use variables for all error messages, and add missing translations.
 
   [https://superuser.com/questions/392439/lang-and-language-environment-variable-in-debian-based-systems]::
 
 - [ ] Fix window resizing.
-      Using window hints to resize the window when doesn't work every where environments
+      Using window hints to resize the window doesn't work in every environment
 
   [https://tronche.com/gui/x/xlib/window/XMoveResizeWindow.html]::
 
@@ -32,11 +32,11 @@
 
 - [ ] Add logic for a  separate 'PIK chip' and move printer code.
 
-- [ ] Finish debugging HP10 instruction set.
+- [x] Finish debugging HP10 instruction set.
 
-- [ ] Add new button styles for HP67 and HP1xC.
+- [ ] Add a graphical printer display to the HP10.
 
-- [ ] Implement  different styles of digit (to allow for different  decimal
+- [x] Implement  different styles of digit (to allow for different  decimal
       point positions, and number of segments etc).
 
 - [ ] Better segregation of common code (switch, label and keyboard).
@@ -55,9 +55,9 @@
 
 - [ ] Implement 16 segment digit display.
 
-- [ ] Add display decoder for HP41C
+- [ ] Add display decoder for HP41C.
 
-- [ ] Add support for HP41C?
+- [ ] Add HP41C.
 
 ### Rejected changes
 

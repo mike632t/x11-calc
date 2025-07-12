@@ -107,6 +107,7 @@ const char *h_err_opening_file = "No se puede abrir '%s'\n";
 const char *h_err_display = "No se pudo conectar al servidor X '%s'\n";
 const char *h_err_display_properties = "No se pudo obtener las propiedades del monitor\n";
 const char *h_err_display_colour = "Requiere un monitor de %d bits de color\n";
+const char *h_err_pixmap = "No se puede crear un pixmap\n";
 const char *h_err_font = "No se pudo cargar la fuente '%s' (x11 base bitmap fonts required)\n";
 
 #if defined(HEXADECIMAL)
@@ -185,6 +186,7 @@ const char *h_err_opening_file = "Kann '%s' nicht oeffnen\n";
 const char *h_err_display = "Kann keine verbindung zum X Server '%s' herstellen\n";
 const char *h_err_display_properties = "Kann eigenschaften des displays nicht abfragen\n";
 const char *h_err_display_colour = "Ein %d-bit farbdisplay wird benoetigt\n";
+const char *h_err_pixmap = "Pixmap kann nicht erstellt werden\n";
 const char *h_err_font = "Kann schrift '%s' nicht laden (x11 base bitmap fonts required)\n";
 
 #if defined(HEXADECIMAL)
@@ -263,6 +265,7 @@ const char *h_err_opening_file = "Impossible d'ouvrir '%s'\n";
 const char *h_err_display = "Impossible de se connecter au serveur X '%s'\n";
 const char *h_err_display_properties = "Impossible d'obtenir les proprietes d'affichage\n";
 const char *h_err_display_colour = "Necessite un affichage couleur %d bits\n";
+const char *h_err_pixmap = "Impossible de creer pixmap\n";
 const char *h_err_font = "Impossible de charger la police '%s' (x11 base bitmap fonts required)\n";
 
 #if defined(HEXADECIMAL)
@@ -342,6 +345,7 @@ const char *h_err_opening_file = "Unable to open '%s'\n";
 const char *h_err_display = "Cannot connect to X server '%s'\n";
 const char *h_err_display_properties = "Unable to get display properties\n";
 const char *h_err_display_colour = "Requires a %d-bit colour display\n";
+const char *h_err_pixmap = "Can't create pixmap\n";
 const char *h_err_font = "Cannot load font '%s' (x11 base bitmap fonts required)\n";
 
 #if defined(HEXADECIMAL)

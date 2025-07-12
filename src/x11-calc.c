@@ -765,7 +765,7 @@ int main(int argc, char *argv[])
    if (i_colour_depth != COLOUR_DEPTH) v_error(errno, h_err_display_colour, COLOUR_DEPTH);  /* Check colour depth */
 
    if  (!(x_logo = XCreateBitmapFromData(x_display, x_application_window, (char*) logo_bits, logo_width, logo_height)))
-      v_error(errno, "Can't create pixmap\n");  /* Check colour depth */
+      v_error(errno, h_err_pixmap);  /* Check colour depth */
 
    if (b_cursor)
       x_cursor = XCreateFontCursor(x_display, XC_arrow);  /* Create a 'default' cursor */
