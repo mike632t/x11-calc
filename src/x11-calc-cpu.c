@@ -403,6 +403,7 @@
  *                     is displayed as a lowercase 'x' - MT
  * 14 Jul 25         - Modified  printer character mapping so that multiply
  *                     is displayed as a '*' - MT
+ *                   - Commented PIK instructions - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -412,8 +413,8 @@
  */
 
 #define NAME           "x11-calc-cpu"
-#define BUILD          "0209"
-#define DATE           "08 Jul 25"
+#define BUILD          "0211"
+#define DATE           "14 Jul 25"
 #define AUTHOR         "MT"
 
 #define NODEBUG
@@ -1623,19 +1624,19 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   h_processor->pc = h_processor->stack[h_processor->sp]; /* Pop program counter from the stack */
                   break;
 #if defined(HP10)
-               case 01120: /* pik1120 */
+               case 01120: /* pik1120 home */
                   if (h_processor->trace) fprintf(stdout, "pik1120\t\t");
                   v_fprint_buffer (stdout, h_processor);
                   h_processor->status[3] = True; /* Set status bit 3 if printer ready (it always will be!) */
                   if (h_processor->trace) v_fprint_status(stdout, h_processor);
                   break;
-               case 01220: /* pik1220 */
+               case 01220: /* pik1220 carriage return */
                   if (h_processor->trace) fprintf(stdout, "pik1220\t\t");
                   v_fprint_buffer (stdout, h_processor);
                   h_processor->status[3] = True; /* Clear status bit 3 if printer is out of paper */
                   if (h_processor->trace) v_fprint_status(stdout, h_processor);
                   break;
-               case 01320: /* pik1320 */
+               case 01320: /* pik1320 check_keycode_available */
                   if (h_processor->trace) fprintf(stdout, "pik1320\t\t");
                   v_fprint_buffer (stdout, h_processor);
                   if (h_processor->keypressed && h_processor->code) h_processor->status[3] = True; /* Set status bit 3 if key is pressed and a key code is pending */
