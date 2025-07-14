@@ -501,7 +501,9 @@ please create a new [issue](https://github.com/mike632t/x11-calc/issues).
 
 Your problem report should contain:
 
-- Architecture (and VM host if applicable);
+- Computer model (or hypervisor);
+
+- Processor architecture;
 
 - Operating System and version;
 
@@ -509,7 +511,9 @@ Your problem report should contain:
 
 - Window Manager and version;
 
-- Compiler and version used;
+- If you are using a pre-built binary (Alpine / Flatpak);
+
+- Compiler and version used (if applicable);
 
 - Commit ID;
 
