@@ -33,7 +33,7 @@ Tru64 Unix.
 - [More screenshots](./img/#top)
 
 <a id="latest"></a>
-### Latest News <sup>[Back to Top](#top)</sup>
+### Latest News <sup><sup>[Back to Top](#top)</sup></sup>
 
 08 Jul 25
 
@@ -93,7 +93,7 @@ Tru64 Unix.
    - Added ability to build using make on MacOS.
 
 <a id="tested"></a>
-### Tested platforms <sup>[Back to Top](#top)</sup>
+### Tested platforms <sup><sup>[Back to Top](#top)</sup></sup>
 
 The simulator has been successfully compiled and tested on:
 
@@ -158,7 +158,7 @@ The simulator has been successfully compiled and tested on:
    - Windows 11 + WSL2, gcc 12.2.0, x64 + arm64
 
 <a id="obtaining"></a>
-### How to get it <sup>[Back to Top](#top)</sup>
+### How to get it <sup><sup>[Back to Top](#top)</sup></sup>
 
 You can either download the source code from GitHub and compile it yourself
 or you can use a pre-compiled package.
@@ -168,7 +168,7 @@ or you can use a pre-compiled package.
    - [Using binary package](#packages)
 
 <a id="using"></a>
-### Using the simulator <sup>[Back to Top](#top)</sup>
+### Using the simulator <sup><sup>[Back to Top](#top)</sup></sup>
 
 If you install the simulator on most modern desktops it should create a new
 menu entry that will start the launcher script by default. When invoked for
@@ -303,7 +303,7 @@ ROM files can therefore be used to load alternative version of the firmware
 for a particular model or apply a patch to the existing firmware.
 
 <a id="building"></a>
-### Building from the source <sup>[Back to Top](#top)</sup>
+### Building from the source <sup><sup>[Back to Top](#top)</sup></sup>
 
 #### Prerequisites
 
@@ -406,7 +406,7 @@ make DESTDIR=/tmp/staging install
 ```
 
 <a id="packages"></a>
-### Using a pre-compiled package <sup>[Back to Top](#top)</sup>
+### Using a pre-compiled package <sup><sup>[Back to Top](#top)</sup></sup>
 
 If you don't want to download an compile the sources yourself you can use a
 pre-compiled binary package compatible with most distros from [Flathub](https://flathub.org/apps/io.github.mike632t.x11-calc) using Flatpak.
@@ -417,7 +417,7 @@ Make sure `community` repo is enabled and then install with `apk add x11-calc`.\
 To leverage GUI for setup, install `apk add zenity`. Optional program saves may be installed with `apk add x11-calc-prg`.
 
 <a id="issues"></a>
-### Known Issues <sup>[Back to Top](#top)</sup>
+### Known Issues <sup><sup>[Back to Top](#top)</sup></sup>
 
 #### General issues
 
@@ -464,7 +464,7 @@ on Xwayland the window manager does not handle this correctly.
 - Not all key legends are shown as the font is missing some characters.
 
 <a id="acknowledgements"></a>
-### Acknowledgements <sup>[Back to Top](#top)</sup>
+### Acknowledgements <sup><sup>[Back to Top](#top)</sup></sup>
 
 There are almost certainly some names I've missed off this list but without
 the help and encouragement from several members of the calculator community
@@ -494,7 +494,7 @@ for Flatpak.
 - `Jonakeys` for getting the simulators working on FreeBSD.
 
 <a id="problems"></a>
-### Problem Reports <sup>[Back to Top](#top)</sup>
+### Problem Reports <sup><sup>[Back to Top](#top)</sup></sup>
 
 If you find problems or have suggestions relating to these simulators, then
 please create a new [issue](https://github.com/mike632t/x11-calc/issues).
