@@ -107,7 +107,7 @@
 struct odigit *h_digit_create(int i_index, int i_mask, int i_left, int i_top,
    int i_width, int i_height, unsigned int i_foreground, unsigned int i_background){
 
-   struct odigit *h_digit; /* Ponter to digit */
+   struct odigit *h_digit; /* Pointer to digit */
 
    /* Attempt to allocate memory for a digit */
    if ((h_digit = malloc (sizeof(*h_digit)))==NULL) v_error(errno, "Memory allocation failed!");
