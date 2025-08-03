@@ -105,6 +105,7 @@
 #  29 Apr 24         - Improve  parallel  make  performance  -  macmpi
 #  12 May 24         - Use a separate makefile for MacOS - MT
 #  31 Jul 25         - Display file names in colour (if possible) - MT
+#   4 Aug 25         - Don't delete the executable files - MT
 #
 
 PROGRAM		=  x11-calc
@@ -182,7 +183,7 @@ $(BIN)/$(PROGRAM): $(SRC)/$(PROGRAM).in
 
 clean:
 	@rm -f $(SRC)/*.o $(SRC)/*.o_*
-	@[ -d "$(BIN)" ] && rm -rf $(BIN) || true
+#	@[ -d "$(BIN)" ] && rm -rf $(BIN) || true
 
 install:
 # Attempt to 'install' the application and data files to the correct target
