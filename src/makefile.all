@@ -28,8 +28,9 @@
 #  28 Mar 24         - Streamlined macros for use on osf1 - macmpi
 #  09 Apr 24         - Finally renamed x11-calc-segment to the more correct
 #                      x11-calc-digit - MT
-#  29 Apr 24         - renamed makefile.all_flavors - macmpi
-#                    - renamed makefile.all - MT
+#  29 Apr 24         - Renamed makefile.all_flavors - macmpi
+#                    - Renamed makefile.all - MT
+#  31 Jul 25         - Display file names in colour (if possible) - MT
 #
 
 MODEL	= 21
@@ -58,7 +59,8 @@ $(BIN)/$(PROGRAM): common $(SHARED:.c=.o_HP$(MODEL)) x11-calc-$(MODEL).o
 		echo "$(CC) $(SHARED:.c=.o_HP$(MODEL)) $(COMMON:.c=.o_cm) x11-calc-$(MODEL).o $(LDFLAGS) $(LDLIBS) $(LDLIBS_ADD) -o $@" \
 		|| true
 	@$(CC) $(SHARED:.c=.o_HP$(MODEL)) $(COMMON:.c=.o_cm) x11-calc-$(MODEL).o $(LDFLAGS) $(LDLIBS) $(LDLIBS_ADD) -o $@
-	@ls $@ | sed "s:$(BIN)/::g"
+	@if ls --color $@ > /dev/null 2>&1 ;then  ls --color $@ | sed "s:$(BIN)/::g"; else ls $@ | sed "s:$(BIN)/::g"; fi
+#	@ls $@ | sed "s:$(BIN)/::g"
 
 common: $(COMMON:.c=.o_cm)
 
