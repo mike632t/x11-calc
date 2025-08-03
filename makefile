@@ -104,6 +104,7 @@
 #                      submakes calls which do the real work. - macmpi
 #  29 Apr 24         - Improve  parallel  make  performance  -  macmpi
 #  12 May 24         - Use a separate makefile for MacOS - MT
+#  31 Jul 25         - Display file names in colour (if possible) - MT
 #
 
 PROGRAM		=  x11-calc
@@ -137,7 +138,7 @@ MODELS		= $(_classic) $(_woodstock) $(_topcat) $(_spice) $(_voyager) $(_kiss)
 
 # The prefix will only be modified by the installer it it is NOT set on the
 # command  line.  If no prefix is defined on the command line then the most
-# approprite  value will be chosen based on the current environment or  the
+# appropriate  value will be chosen based on the current environment or the
 # selected DESKTOP.
 
 DESKTOP		=
@@ -176,7 +177,8 @@ $(BIN)/$(PROGRAM): $(SRC)/$(PROGRAM).in
 	@_mdls=`echo "$(MODELS)" | tr ' ' '|'` ; \
 		sed "s/^_models=\".*/_models=\"$$_mdls\"/" $(SRC)/$(PROGRAM).in > $@
 	@chmod +x $@
-	@ls $@ | sed "s:$(BIN)/::g"
+	@if ls --color $@ > /dev/null 2>&1 ;then  ls --color $@ | sed "s:$(BIN)/::g"; else ls $@ | sed "s:$(BIN)/::g"; fi
+#	@ls $@ | sed "s:$(BIN)/::g"
 
 clean:
 	@rm -f $(SRC)/*.o $(SRC)/*.o_*
@@ -287,7 +289,7 @@ do_env: do_copy $(SRC)/$(PROGRAM).desktop.in $(SRC)/$(PROGRAM).svg
 	@chmod 644 "$(DESTDIR)$(prefix)"/share/icons/hicolor/scalable/apps/$(PROGRAM).svg
 
 backup:
-# Backup known files to a tar archive (with nultiple workarounds to accomodate
+# Backup known files to a tar archive (with multiple workarounds to accommodate
 # tar limitations and maximum line length on Tru64 UNIX)
 	@tar -cf ..\/$(PROGRAM)-$(_date).tar $(_files)
 	@tar -rf ..\/$(PROGRAM)-$(_date).tar $(_source)
