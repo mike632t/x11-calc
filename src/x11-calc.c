@@ -1090,20 +1090,17 @@ int main(int argc, char *argv[])
             {
                int i_count;
                i_display_draw(x_display, x_application_window, i_screen, h_display);/* Draw display */
-               XCopyArea(x_display, x_application_window, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
 #if defined(LABELS)
                for (i_count = 0; i_count < LABELS; i_count++)  /* Draw labels */
                   i_label_draw(x_display, x_application_window, i_screen, h_label[i_count]);
-                  XCopyArea(x_display, x_application_window, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
 #endif
 #if defined(SWITCHES)
                for (i_count = 0; i_count < SWITCHES; i_count++)  /* Draw switches */
                   i_switch_draw(x_display, x_application_window, i_screen, h_switch[i_count]);
-                  XCopyArea(x_display, x_application_window, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
 #endif
                for (i_count = 0; i_count < BUTTONS; i_count++)  /* Draw buttons */
                   i_button_draw(x_display, x_application_window, i_screen, h_button[i_count]);
-                  XCopyArea(x_display, x_application_window, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
+               XCopyArea(x_display, x_application_window, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
             }
             break;
          case ClientMessage :  /* Message from window manager */
