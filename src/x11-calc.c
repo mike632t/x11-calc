@@ -432,7 +432,8 @@ char b_search(int *a, int m, int n) /* Linear search. */
 int main(int argc, char *argv[])
 {
    Display *x_display;           /* Pointer to X display structure */
-   Window x_application_window;  /* Application window structure */
+   Window x_window;              /* Application window structure */
+   Window x_application_window;  /* Back buffer */
    Cursor x_cursor;              /* Application cursor */
    Pixmap x_logo;                /* Application icon */
    XEvent x_event;
@@ -744,16 +745,21 @@ int main(int argc, char *argv[])
 
    o_window_geometry = o_window_position;  /* Save window position */
 
-   x_application_window = XCreateSimpleWindow(x_display, /* Create the application window, as a child of the root window */
+   x_window = XCreateSimpleWindow(x_display, /* Create the application window, as a child of the root window */
       RootWindow(x_display, i_screen),
       o_window_position.x, o_window_position.y,
-      o_window_position.width, /* Window width */
-      o_window_position.height, /* Window height */
+      o_window_position.width * f_scale, /* Window width */
+      o_window_position.height * f_scale, /* Window height */
       i_window_border, /* Border width - ignored ? */
       BlackPixel(x_display, i_screen), /* Preferred method */
       i_background_colour);  /* Background colour */
 
-   if (XGetGeometry(x_display, x_application_window,    /* Get window geometry */
+   x_application_window = XCreatePixmap(x_display, x_window, o_window_position.width * f_scale, o_window_position.height * f_scale, COLOUR_DEPTH);
+
+   XSetForeground(x_display, DefaultGC(x_display, i_screen), i_background_colour);
+   XFillRectangle(x_display, x_application_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width * f_scale, o_window_position.height * f_scale);
+
+   if (XGetGeometry(x_display, x_window,    /* Get window geometry */
          &RootWindow(x_display, i_screen),
          &i_window_left, &i_window_top,
          &i_window_width,
@@ -764,14 +770,14 @@ int main(int argc, char *argv[])
 
    if (i_colour_depth != COLOUR_DEPTH) v_error(errno, h_err_display_colour, COLOUR_DEPTH);  /* Check colour depth */
 
-   if  (!(x_logo = XCreateBitmapFromData(x_display, x_application_window, (char*) logo_bits, logo_width, logo_height)))
+   if  (!(x_logo = XCreateBitmapFromData(x_display, x_window, (char*) logo_bits, logo_width, logo_height)))
       v_error(errno, h_err_pixmap);  /* Check colour depth */
 
    if (b_cursor)
       x_cursor = XCreateFontCursor(x_display, XC_arrow);  /* Create a 'default' cursor */
    else
-      v_set_blank_cursor(x_display, x_application_window, &x_cursor);  /* Get a blank cursor */
-   XDefineCursor(x_display, x_application_window, x_cursor);  /* Define the desired X cursor */
+      v_set_blank_cursor(x_display, x_window, &x_cursor);  /* Get a blank cursor */
+   XDefineCursor(x_display, x_window, x_cursor);  /* Define the desired X cursor */
 
    if (!(h_normal_font = h_get_font(x_display, s_normal_fonts))) v_error(errno, h_err_font, s_normal_fonts[0]);
    if (!(h_small_font = h_get_font(x_display, s_small_fonts))) v_error(errno, h_err_font, s_small_fonts[0]);
@@ -810,7 +816,7 @@ int main(int argc, char *argv[])
    h_size_hint->max_height = o_window_position.height;
    h_size_hint->max_width = o_window_position.width;
 
-   XSetStandardProperties(x_display, x_application_window, s_title, s_title, x_logo, argv, argc, h_size_hint);  /* Set the window title and icon */
+   XSetStandardProperties(x_display, x_window, s_title, s_title, x_logo, argv, argc, h_size_hint);  /* Set the window title and icon */
 
    i_display_resize(h_display, f_scale);  /* Resize display */
 
@@ -831,15 +837,15 @@ int main(int argc, char *argv[])
    h_keyboard = h_keyboard_create(x_display);  /* Only works with Linux */
 #endif
 
-   XSelectInput(x_display, x_application_window, FocusChangeMask | ExposureMask | /* Select kind of events we are interested in */
+   XSelectInput(x_display, x_window, FocusChangeMask | ExposureMask | /* Select kind of events we are interested in */
       KeyPressMask | KeyReleaseMask | ButtonPressMask |
       ButtonReleaseMask | StructureNotifyMask | SubstructureNotifyMask);
 
    wm_delete = XInternAtom(x_display, "WM_DELETE_WINDOW", False);  /* Create a windows delete message 'atom'. */
-   XSetWMProtocols(x_display, x_application_window, &wm_delete, 1);  /* Tell the display to pass wm_delete messages to the application window */
+   XSetWMProtocols(x_display, x_window, &wm_delete, 1);  /* Tell the display to pass wm_delete messages to the application window */
 
-   XMapWindow(x_display, x_application_window);  /* Show window on display */
-   XRaiseWindow(x_display, x_application_window);  /* Raise window - ensures expose event is raised? */
+   XMapWindow(x_display, x_window);  /* Show window on display */
+   XRaiseWindow(x_display, x_window);  /* Raise window - ensures expose event is raised? */
 
    v_version();
    fprintf(stdout, "ROM Size: %4u words \n", ROM_SIZE);
@@ -906,6 +912,7 @@ int main(int argc, char *argv[])
       }
       if (b_run) v_processor_tick(h_processor);
       if (h_processor->step) b_run = False;
+      XCopyArea(x_display, x_application_window, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
 
       while (XPending(x_display))
       {
@@ -1094,7 +1101,7 @@ int main(int argc, char *argv[])
 
    v_save_state(h_processor);  /* Save state */
 
-   XDestroyWindow(x_display, x_application_window);  /* Close connection to server */
+   XDestroyWindow(x_display, x_window);  /* Close connection to server */
    XCloseDisplay(x_display);
 
    exit(EXIT_SUCCESS);
