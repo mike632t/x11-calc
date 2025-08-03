@@ -5,9 +5,9 @@
  *
  * Emulation of various models of HP calculator for X11.
  *
- * Deliberatly does not use 'getopt' or 'argparse' to parse command line in
- * order to minimize the number of dependancies and make it easier to build
- * the code on as many different systems as possible.
+ * Deliberately  does not use 'getopt' or 'argparse' to parse command  line
+ * in  order  to minimize the number of dependencies and make it easier  to
+ * build the code on as many different systems as possible.
  *
  * This  program is free software: you can redistribute it and/or modify it
  * under  the terms of the GNU General Public License as published  by  the
@@ -328,6 +328,9 @@
  *                     format to '-c' or '--comma' - MT
  * 07 Jul 25         - Fixed regression bug that affected HP12C - MT
  *             0.16  - Finished adding support for HP10 - MT
+ *  3 Aug 25   0.17  - Fix display flicker with double buffering - JC
+ *                   - Updates display only when buffer is redrawn - MT
+ *
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -340,9 +343,9 @@
  */
 
 #define  NAME          "x11-calc"
-#define  VERSION       "0.16"
-#define  BUILD         "0172"
-#define  DATE          "29 Jun 25"
+#define  VERSION       "0.17"
+#define  BUILD         "0173"
+#define  DATE          "03 Aug 25"
 #define  AUTHOR        "MT"
 
 #define  INTERVAL 25   /* Number of ticks to execute before updating the display */
@@ -892,6 +895,7 @@ int main(int argc, char *argv[])
       {
          i_display_update(h_display, h_processor);
          i_display_draw(x_display, x_application_window, i_screen, h_display);  /* Redraw display */
+         XCopyArea(x_display, x_application_window, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
          i_count = INTERVAL;
 #if defined(HP67)
          i_wait(INTERVAL / 4);  /* Sleep for ~6.25 ms per tick */
@@ -912,7 +916,6 @@ int main(int argc, char *argv[])
       }
       if (b_run) v_processor_tick(h_processor);
       if (h_processor->step) b_run = False;
-      XCopyArea(x_display, x_application_window, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
 
       while (XPending(x_display))
       {
@@ -924,6 +927,7 @@ int main(int argc, char *argv[])
             {
                h_pressed->state = False;
                i_button_draw(x_display, x_application_window, i_screen, h_pressed);
+               XCopyArea(x_display, x_application_window, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
                h_processor->keypressed = False;  /* Don't clear the status bit here!! */
             }
             break;
@@ -960,6 +964,7 @@ int main(int argc, char *argv[])
                   {
                      h_pressed->state = True;
                      i_button_draw(x_display, x_application_window, i_screen, h_pressed);
+                     XCopyArea(x_display, x_application_window, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
                      h_processor->code = h_pressed->index;
                      h_processor->keypressed = True;
 #if !defined(SWITCHES)
@@ -980,6 +985,7 @@ int main(int argc, char *argv[])
                {
                   h_pressed->state = False;
                   i_button_draw(x_display, x_application_window, i_screen, h_pressed);
+                  XCopyArea(x_display, x_application_window, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
                   h_processor->keypressed = False;  /* Don't clear the status bit here!! */
                }
             }
@@ -997,6 +1003,7 @@ int main(int argc, char *argv[])
                   {
                      h_pressed->state = True;
                      i_button_draw(x_display, x_application_window, i_screen, h_pressed);
+                     XCopyArea(x_display, x_application_window, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
                      h_processor->code = h_pressed->index;
                      h_processor->keypressed = True;
 #if !defined(SWITCHES)
@@ -1013,6 +1020,7 @@ int main(int argc, char *argv[])
                   {
                      h_switch[0]->state = !(h_switch[0]->state);  /* Toggle switch */
                      i_switch_draw(x_display, x_application_window, i_screen, h_switch[0]);
+                     XCopyArea(x_display, x_application_window, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
                      if (h_switch[0]->state)
                      {
                         v_processor_reset(h_processor);  /* Reset the processor */
@@ -1054,6 +1062,7 @@ int main(int argc, char *argv[])
                         h_processor->mode = i_switch_click(h_switch[1]);  /* Update prgm/run switch */
 #endif
                         i_switch_draw(x_display, x_application_window, i_screen, h_switch[1]);
+                        XCopyArea(x_display, x_application_window, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
 
                      }
                }
@@ -1067,6 +1076,7 @@ int main(int argc, char *argv[])
                {
                   h_pressed->state = False;
                   i_button_draw(x_display, x_application_window, i_screen, h_pressed);
+                  XCopyArea(x_display, x_application_window, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
                   h_processor->keypressed = False;  /* Don't clear the status bit here!! */
                }
 #if defined(SWITCHES)
@@ -1080,16 +1090,20 @@ int main(int argc, char *argv[])
             {
                int i_count;
                i_display_draw(x_display, x_application_window, i_screen, h_display);/* Draw display */
+               XCopyArea(x_display, x_application_window, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
 #if defined(LABELS)
                for (i_count = 0; i_count < LABELS; i_count++)  /* Draw labels */
                   i_label_draw(x_display, x_application_window, i_screen, h_label[i_count]);
+                  XCopyArea(x_display, x_application_window, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
 #endif
 #if defined(SWITCHES)
                for (i_count = 0; i_count < SWITCHES; i_count++)  /* Draw switches */
                   i_switch_draw(x_display, x_application_window, i_screen, h_switch[i_count]);
+                  XCopyArea(x_display, x_application_window, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
 #endif
                for (i_count = 0; i_count < BUTTONS; i_count++)  /* Draw buttons */
                   i_button_draw(x_display, x_application_window, i_screen, h_button[i_count]);
+                  XCopyArea(x_display, x_application_window, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
             }
             break;
          case ClientMessage :  /* Message from window manager */
