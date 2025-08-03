@@ -3,26 +3,6 @@
 
 ### Planned changes
 
-- [x] Fix segmentation fault in display code (HP12C).
-
-- [x] Update build instruction for Tru64 UNIX.
-
-- [x] Update screenshots.
-
-- [x] Implement display jumper setting in SPICE series.
-
-- [x] Update help text.
-
-- [x] Fix launcher help text display.
-
-- [x] Update README (document new options).
-
-- [x] Tidy up data structure definitions.
-
-- [X] Use variables for all error messages, and add missing translations.
-
-  [https://superuser.com/questions/392439/lang-and-language-environment-variable-in-debian-based-systems]::
-
 - [ ] Fix window resizing.
       Using window hints to resize the window doesn't work in every environment
 
@@ -59,8 +39,29 @@
 
 - [ ] Add HP41C.
 
+### Completed changes
+
+- [x] Fix segmentation fault in display code (HP12C).
+
+- [x] Update build instruction for Tru64 UNIX.
+
+- [x] Update screenshots.
+
+- [x] Implement display jumper setting in SPICE series.
+
+- [x] Update help text.
+
+- [x] Fix launcher help text display.
+
+- [x] Update README (document new options).
+
+- [x] Tidy up data structure definitions.
+
+- [X] Use variables for all error messages, and add missing translations.
+
+  [https://superuser.com/questions/392439/lang-and-language-environment-variable-in-debian-based-systems]::
+
 ### Rejected changes
 
-- [ ] Allow any _programmable_ model to load a saved program.
-      (Not possible without modifying the firmware)
+- [ ] Allow any _programmable_ model to load a saved program. (Unfortunatly is isn't possible without modifying the firmware).
 
