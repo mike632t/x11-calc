@@ -35,6 +35,10 @@ Tru64 Unix.
 <a id="latest"></a>
 ### Latest News <sup><sup>[Back to Top](#top)</sup></sup>
 
+03 Aug 25
+
+   - Use double buffering when updating the display.
+
 08 Jul 25
 
    - Finally managed to get the HP10 working!!
