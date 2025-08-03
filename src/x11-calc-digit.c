@@ -63,14 +63,16 @@
  *                     x11-calc-digit - MT
  * 23 Apr 24         - Separated out prototypes for error handlers - MT
  * 24 Jun 25         - Debug messages go to stdout - MT
+ *  3 Aug 25         - Temporarily  changed to draw the background to  each
+ *                     segment on all systems for testing - MT
  *
  * TO DO :           - Optimise drawing of display digits.
  ^
  */
 
 #define NAME           "x11-calc-digit"
-#define BUILD          "0017"
-#define DATE           "24 Jun 25"
+#define BUILD          "0018"
+#define DATE           "03 Aug 25"
 #define AUTHOR         "MT"
 
 #include <errno.h>     /* errno */
@@ -176,7 +178,7 @@ int i_digit_draw(Display *h_display, int x_application_window, int i_screen, str
    XFillRectangle(h_display, x_application_window, DefaultGC(h_display, i_screen), h_digit->digit_position.x, h_digit->digit_position.y, h_digit->digit_position.width, h_digit->digit_position.height);
    XDrawRectangle(h_display, x_application_window, DefaultGC(h_display, i_screen), h_digit->digit_position.x, h_digit->digit_position.y, h_digit->digit_position.width, h_digit->digit_position.height);
 
-#if !(defined(__aarch64__) || defined(__aarch__) || defined(__arm__) || defined(__arm64__) || defined(__alpha)) || defined(__APPLE__)
+/** #if !(defined(__aarch64__) || defined(__aarch__) || defined(__arm__) || defined(__arm64__) || defined(__alpha)) || defined(__APPLE__) */
    /* Fill in the background for each active display digit */
    XSetForeground(h_display, DefaultGC(h_display, i_screen), i_shade(h_digit->foreground));
 
@@ -235,7 +237,7 @@ int i_digit_draw(Display *h_display, int x_application_window, int i_screen, str
    }
 #endif
 
-#endif
+/** #endif */
 
    /* Draw the in the foreground elements */
    XSetForeground(h_display, DefaultGC(h_display, i_screen), h_digit->foreground);
