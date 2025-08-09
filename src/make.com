@@ -26,14 +26,16 @@ $!                     enclosed in quotes - MT
 $! 01 Nov 23         - Executable files created in [-.BIN] - MT
 $!                   - Create [-.BIN] folder if it doesn't exist - MT
 $! 04 Mar 24         - Compile and link with x11-calc-font -MT
-$!                   - Do not attempt to build HP10 and delete any previous
-$!                     versions from the correct folder - MT
+$!                   - Updated  to  delete any previous versions  from  the
+$!                     correct folder - MT
 $! 03 Aug 25         - Remembered to rename x11-calc-segment to x11-calc-digit - MT
+$! 09 Aug 25         - Added DEBUG option temporarily - MT
+$!                   - Added HP10 - MT
 $!
 $  _message_status = f$environment("MESSAGE")
 $  on error then goto _done
 $  on control_Y then goto _done
-$  _list = "35,45,70,80,21,22,25,25c,27,29c,31e,32e,33e,33c,34c,37e,38c,67,10c,11c,12c,15c,16c"
+$  _list = "35,45,70,80,10,21,22,25,25c,27,29c,31e,32e,33e,33c,34c,37e,38c,67,10c,11c,12c,15c,16c"
 $  _count = 0
 $  if "''P1'" .eqs "" then goto _check_folder
 $  if "''P1'" .eqs "ALL" then goto _check_folder
@@ -49,6 +51,8 @@ $  if _model .eqs. "," then goto _done
 $  write sys$output "x11-calc-''_model'"
 $  if f$search("[.-.bin]x11-calc''_model'.exe") .nes. "" then delete "[.-.bin]x11-calc''_model'.exe;*" /nolog /noconfirm
 $  if f$search("*.obj") .nes. "" then delete *.obj;* /nolog /noconfim
+$! cc /debug/define="HP''_model'" x11-calc-'_model, x11-calc, x11-calc-cpu, x11-calc-digit, x11-calc-display, x11-calc-button, x11-calc-colour, x11-calc-switch, x11-calc-label, x11-calc-font, x11-calc-messages, gcc-wait
+$! link /debug/exec=[-.bin]x11-calc-'_model x11-calc-'_model, x11-calc, x11-calc-cpu, x11-calc-digit, x11-calc-display, x11-calc-button, x11-calc-colour, x11-calc-switch, x11-calc-label, x11-calc-font, x11-calc-messages, gcc-wait, x11-lib.opt/opt
 $  cc /define="HP''_model'" x11-calc-'_model, x11-calc, x11-calc-cpu, x11-calc-digit, x11-calc-display, x11-calc-button, x11-calc-colour, x11-calc-switch, x11-calc-label, x11-calc-font, x11-calc-messages, gcc-wait
 $  link /exec=[-.bin]x11-calc-'_model x11-calc-'_model, x11-calc, x11-calc-cpu, x11-calc-digit, x11-calc-display, x11-calc-button, x11-calc-colour, x11-calc-switch, x11-calc-label, x11-calc-font, x11-calc-messages, gcc-wait, x11-lib.opt/opt
 $  if f$search("*.obj") .nes. "" then delete *.obj;* /nolog /noconfim
