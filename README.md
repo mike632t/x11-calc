@@ -38,6 +38,7 @@ Tru64 Unix.
 09 Aug 25
 
    - Use double buffering when updating the display.
+   - Minor changes to fix compilation issues on VAX and DEC Windows.
 
 08 Jul 25
 
