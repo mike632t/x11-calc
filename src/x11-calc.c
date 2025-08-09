@@ -330,6 +330,9 @@
  *             0.16  - Finished adding support for HP10 - MT
  *  3 Aug 25   0.17  - Fix display flicker with double buffering - JC
  *                   - Updates display only when buffer is redrawn - MT
+ *  9 Aug 25         - Minor changes to fix compilation issues on VAXC - MT
+ *                   - Fixed issues with window sizing on DEC Windows - MT
+ *            (0177) - Removed redundant variable - MT
  *
  *
  * To Do             - Parse command line in a separate routine.
@@ -344,7 +347,7 @@
 
 #define  NAME          "x11-calc"
 #define  VERSION       "0.17"
-#define  BUILD         "0173"
+#define  BUILD         "0177"
 #define  DATE          "03 Aug 25"
 #define  AUTHOR        "MT"
 
@@ -414,19 +417,20 @@ void v_error(int i_errno, const char *s_format, ...)  /* Print formatted error m
    exit(i_errno);
 }
 
-void v_set_blank_cursor(Display *x_display, Window x_application_window, Cursor *x_cursor)
+void v_set_blank_cursor(Display *x_display, Window x_window, Cursor *x_cursor)
 {
    Pixmap x_blank;
    XColor x_Color;
    char h_pixmap_data[1] = {0};  /* An empty pixmap */
-   x_blank = XCreateBitmapFromData (x_display, x_application_window, h_pixmap_data, 1, 1);  /* Create an empty bitmap */
+   x_blank = XCreateBitmapFromData (x_display, x_window, h_pixmap_data, 1, 1);  /* Create an empty bitmap */
    (*x_cursor) = XCreatePixmapCursor(x_display, x_blank, x_blank, &x_Color, &x_Color, 0, 0);  /* Use the empty pixmap to create a blank cursor */
    XFreePixmap (x_display, x_blank);  /* Free up pixmap */
 }
 
 char b_search(int *a, int m, int n) /* Linear search. */
 {
-   for (int i = 0; i < n; i++)
+   int i;
+   for (i = 0; i < n; i++)
       if (a[i] == m)
          return True;
    return False;
@@ -434,38 +438,38 @@ char b_search(int *a, int m, int n) /* Linear search. */
 
 int main(int argc, char *argv[])
 {
-   Display *x_display;           /* Pointer to X display structure */
-   Window x_window;              /* Application window structure */
-   Window x_application_window;  /* Back buffer */
-   Cursor x_cursor;              /* Application cursor */
-   Pixmap x_logo;                /* Application icon */
+   Display *x_display;                 /* Pointer to display structure */
+   Window x_window;                    /* Application window structure */
+   Pixmap x_buffer;                    /* Display buffer */
+   Cursor x_cursor;                    /* Application cursor */
+   Pixmap x_logo;                      /* Application icon */
    XEvent x_event;
    XSizeHints *h_size_hint;
    Atom wm_delete;
    XRectangle o_window_position;
    XRectangle o_window_geometry;
-   struct obutton *h_button[BUTTONS];   /* Array to hold pointers to buttons */
+
+   struct obutton *h_button[BUTTONS];  /* Array to hold pointers to buttons */
    struct obutton *h_pressed = NULL;
-   struct odisplay *h_display;          /* Pointer to display structure */
+   struct odisplay *h_display;         /* Pointer to display structure */
    oprocessor *h_processor;
 
-   char *s_display_name = "";    /* Just use the default display */
-   char *s_title = TITLE;        /* Windows title */
+   char *s_display_name = "";          /* Just use the default display */
+   char *s_title = TITLE;              /* Windows title */
    char *s_pathname = NULL;
-
-   int i_window_top;             /* Window top */
-   int i_window_left;            /* Window left */
-   unsigned int i_window_width;  /* Window width */
-   unsigned int i_window_height; /* Window height */
 
    float f_scale = 1.0;
 
-   unsigned int i_screen_width;  /* Screen width */
-   unsigned int i_screen_height; /* Screen height */
+   unsigned int i_screen_width;        /* Screen width */
+   unsigned int i_screen_height;       /* Screen height */
 
-   unsigned int i_background_colour = BACKGROUND;  /* Window's background colour */
-   unsigned int i_window_border = 4;  /* Window's border width */
-   unsigned int i_colour_depth;  /* Window's colour depth */
+   int i_window_top;                   /* Window top */
+   int i_window_left;                  /* Window left */
+   unsigned int i_window_width;        /* Window width */
+   unsigned int i_window_height;       /* Window height */
+
+   unsigned int i_window_border = 4;   /* Window's border width */
+   unsigned int i_colour_depth;        /* Window's colour depth */
    int i_screen;                 /* Default screen number */
 
    char b_trace = False;         /* Trace flag */
@@ -735,32 +739,28 @@ int main(int argc, char *argv[])
    while ((i_count > 0) && (i_rom[--i_count] == 0));  /* Check that the ROM isn't empty */
    if (i_count == 0) v_error (ENODATA, h_err_ROM);
 
-   if (!(x_display = XOpenDisplay(s_display_name))) v_error (errno, h_err_display, s_display_name);  /* Open the display and create a new window */
+   if (!(x_display = XOpenDisplay(s_display_name))) v_error (errno, h_err_display, s_display_name);  /* Open the default display */
 
    i_screen = DefaultScreen(x_display);  /* Get the default screen for our X server */
    i_screen_width = DisplayWidth(x_display, i_screen);
    i_screen_height = DisplayHeight(x_display, i_screen);
 
-   o_window_position.width = WIDTH;  /* Window width in pixels */
-   o_window_position.height = HEIGHT;  /* Window height in pixels */
+   o_window_position.width = (int)(WIDTH * f_scale);  /* Window width in pixels */
+   o_window_position.height = (int)(HEIGHT * f_scale);  /* Window height in pixels */
    o_window_position.x = (i_screen_width - o_window_position.width) / 2 ;  /* Centre window on screen - ignored by most window managers but useful in kiosk mode */
    o_window_position.y = (i_screen_height - o_window_position.height) / 2;
 
    o_window_geometry = o_window_position;  /* Save window position */
 
    x_window = XCreateSimpleWindow(x_display, /* Create the application window, as a child of the root window */
-      RootWindow(x_display, i_screen),
-      o_window_position.x, o_window_position.y,
-      o_window_position.width * f_scale, /* Window width */
-      o_window_position.height * f_scale, /* Window height */
+      XDefaultRootWindow(x_display),
+      o_window_position.x, o_window_position.y, /* Windows position */
+      o_window_position.width, /* Window width */
+      o_window_position.height, /* Window height */
       i_window_border, /* Border width - ignored ? */
-      BlackPixel(x_display, i_screen), /* Preferred method */
-      i_background_colour);  /* Background colour */
+      BlackPixel(x_display, i_screen), /* Border colour - ignored ? */
+      WhitePixel(x_display, i_screen)); /* Background colour */
 
-   x_application_window = XCreatePixmap(x_display, x_window, o_window_position.width * f_scale, o_window_position.height * f_scale, COLOUR_DEPTH);
-
-   XSetForeground(x_display, DefaultGC(x_display, i_screen), i_background_colour);
-   XFillRectangle(x_display, x_application_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width * f_scale, o_window_position.height * f_scale);
 
    if (XGetGeometry(x_display, x_window,    /* Get window geometry */
          &RootWindow(x_display, i_screen),
@@ -773,8 +773,12 @@ int main(int argc, char *argv[])
 
    if (i_colour_depth != COLOUR_DEPTH) v_error(errno, h_err_display_colour, COLOUR_DEPTH);  /* Check colour depth */
 
-   if  (!(x_logo = XCreateBitmapFromData(x_display, x_window, (char*) logo_bits, logo_width, logo_height)))
-      v_error(errno, h_err_pixmap);  /* Check colour depth */
+   if  (!(x_logo = XCreateBitmapFromData(x_display, x_window, (char*) logo_bits, logo_width, logo_height))) v_error(errno, h_err_pixmap);  /* Check colour depth */
+
+   if (!(h_normal_font = h_get_font(x_display, s_normal_fonts))) v_error(errno, h_err_font, s_normal_fonts[0]);
+   if (!(h_small_font = h_get_font(x_display, s_small_fonts))) v_error(errno, h_err_font, s_small_fonts[0]);
+   if (!(h_alternate_font = h_get_font(x_display, s_alternate_fonts))) v_error(errno, h_err_font, s_alternate_fonts[0]);
+   if (!(h_large_font = h_get_font(x_display, s_large_fonts))) v_error(errno, h_err_font, s_large_fonts[0]);
 
    if (b_cursor)
       x_cursor = XCreateFontCursor(x_display, XC_arrow);  /* Create a 'default' cursor */
@@ -782,10 +786,9 @@ int main(int argc, char *argv[])
       v_set_blank_cursor(x_display, x_window, &x_cursor);  /* Get a blank cursor */
    XDefineCursor(x_display, x_window, x_cursor);  /* Define the desired X cursor */
 
-   if (!(h_normal_font = h_get_font(x_display, s_normal_fonts))) v_error(errno, h_err_font, s_normal_fonts[0]);
-   if (!(h_small_font = h_get_font(x_display, s_small_fonts))) v_error(errno, h_err_font, s_small_fonts[0]);
-   if (!(h_alternate_font = h_get_font(x_display, s_alternate_fonts))) v_error(errno, h_err_font, s_alternate_fonts[0]);
-   if (!(h_large_font = h_get_font(x_display, s_large_fonts))) v_error(errno, h_err_font, s_large_fonts[0]);
+   x_buffer = XCreatePixmap(x_display, x_window, o_window_position.width, o_window_position.height, COLOUR_DEPTH);
+   XSetForeground(x_display, DefaultGC(x_display, i_screen), BACKGROUND); /* Set background colour */
+   XFillRectangle(x_display, x_buffer, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height);
 
    h_display = h_display_create(0, BEZEL_LEFT, BEZEL_TOP, BEZEL_WIDTH, BEZEL_HEIGHT,
       DISPLAY_LEFT, DISPLAY_TOP, DISPLAY_WIDTH, DISPLAY_HEIGHT, DIGIT_COLOUR, DIGIT_BACKGROUND,
@@ -807,8 +810,8 @@ int main(int argc, char *argv[])
    /* Resize application window */
    o_window_position.x = o_window_geometry.x * f_scale;
    o_window_position.y = o_window_geometry.y * f_scale;
-   o_window_position.width = o_window_geometry.width * f_scale;
-   o_window_position.height = o_window_geometry.height * f_scale;
+   o_window_position.width = o_window_geometry.width;
+   o_window_position.height = o_window_geometry.height;
 
    h_size_hint = XAllocSizeHints();  /* Set application window size */
    h_size_hint->flags = PMinSize | PMaxSize;
@@ -894,8 +897,8 @@ int main(int argc, char *argv[])
       if (i_count < 0)
       {
          i_display_update(h_display, h_processor);
-         i_display_draw(x_display, x_application_window, i_screen, h_display);  /* Redraw display */
-         XCopyArea(x_display, x_application_window, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
+         i_display_draw(x_display, x_buffer, i_screen, h_display);  /* Redraw display */
+         XCopyArea(x_display, x_buffer, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
          i_count = INTERVAL;
 #if defined(HP67)
          i_wait(INTERVAL / 4);  /* Sleep for ~6.25 ms per tick */
@@ -926,8 +929,8 @@ int main(int argc, char *argv[])
             if (!(h_pressed == NULL))
             {
                h_pressed->state = False;
-               i_button_draw(x_display, x_application_window, i_screen, h_pressed);
-               XCopyArea(x_display, x_application_window, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
+               i_button_draw(x_display, x_buffer, i_screen, h_pressed);
+               XCopyArea(x_display, x_buffer, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
                h_processor->keypressed = False;  /* Don't clear the status bit here!! */
             }
             break;
@@ -963,8 +966,8 @@ int main(int argc, char *argv[])
                   if (h_pressed != NULL)
                   {
                      h_pressed->state = True;
-                     i_button_draw(x_display, x_application_window, i_screen, h_pressed);
-                     XCopyArea(x_display, x_application_window, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
+                     i_button_draw(x_display, x_buffer, i_screen, h_pressed);
+                     XCopyArea(x_display, x_buffer, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
                      h_processor->code = h_pressed->index;
                      h_processor->keypressed = True;
 #if !defined(SWITCHES)
@@ -984,8 +987,8 @@ int main(int argc, char *argv[])
                if (h_keyboard->key == h_pressed->key)
                {
                   h_pressed->state = False;
-                  i_button_draw(x_display, x_application_window, i_screen, h_pressed);
-                  XCopyArea(x_display, x_application_window, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
+                  i_button_draw(x_display, x_buffer, i_screen, h_pressed);
+                  XCopyArea(x_display, x_buffer, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
                   h_processor->keypressed = False;  /* Don't clear the status bit here!! */
                }
             }
@@ -1002,8 +1005,8 @@ int main(int argc, char *argv[])
                   if (!(h_pressed == NULL))
                   {
                      h_pressed->state = True;
-                     i_button_draw(x_display, x_application_window, i_screen, h_pressed);
-                     XCopyArea(x_display, x_application_window, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
+                     i_button_draw(x_display, x_buffer, i_screen, h_pressed);
+                     XCopyArea(x_display, x_buffer, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
                      h_processor->code = h_pressed->index;
                      h_processor->keypressed = True;
 #if !defined(SWITCHES)
@@ -1019,8 +1022,8 @@ int main(int argc, char *argv[])
                   if (!(h_switch_pressed(h_switch[0], x_event.xbutton.x, x_event.xbutton.y) == NULL))
                   {
                      h_switch[0]->state = !(h_switch[0]->state);  /* Toggle switch */
-                     i_switch_draw(x_display, x_application_window, i_screen, h_switch[0]);
-                     XCopyArea(x_display, x_application_window, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
+                     i_switch_draw(x_display, x_buffer, i_screen, h_switch[0]);
+                     XCopyArea(x_display, x_buffer, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
                      if (h_switch[0]->state)
                      {
                         v_processor_reset(h_processor);  /* Reset the processor */
@@ -1061,8 +1064,8 @@ int main(int argc, char *argv[])
 #else
                         h_processor->mode = i_switch_click(h_switch[1]);  /* Update prgm/run switch */
 #endif
-                        i_switch_draw(x_display, x_application_window, i_screen, h_switch[1]);
-                        XCopyArea(x_display, x_application_window, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
+                        i_switch_draw(x_display, x_buffer, i_screen, h_switch[1]);
+                        XCopyArea(x_display, x_buffer, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
 
                      }
                }
@@ -1075,8 +1078,8 @@ int main(int argc, char *argv[])
                if (!(h_pressed == NULL))
                {
                   h_pressed->state = False;
-                  i_button_draw(x_display, x_application_window, i_screen, h_pressed);
-                  XCopyArea(x_display, x_application_window, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
+                  i_button_draw(x_display, x_buffer, i_screen, h_pressed);
+                  XCopyArea(x_display, x_buffer, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
                   h_processor->keypressed = False;  /* Don't clear the status bit here!! */
                }
 #if defined(SWITCHES)
@@ -1089,18 +1092,18 @@ int main(int argc, char *argv[])
          case Expose :  /* Draw or redraw the window */
             {
                int i_count;
-               i_display_draw(x_display, x_application_window, i_screen, h_display);/* Draw display */
+               i_display_draw(x_display, x_buffer, i_screen, h_display);/* Draw display */
 #if defined(LABELS)
                for (i_count = 0; i_count < LABELS; i_count++)  /* Draw labels */
-                  i_label_draw(x_display, x_application_window, i_screen, h_label[i_count]);
+                  i_label_draw(x_display, x_buffer, i_screen, h_label[i_count]);
 #endif
 #if defined(SWITCHES)
                for (i_count = 0; i_count < SWITCHES; i_count++)  /* Draw switches */
-                  i_switch_draw(x_display, x_application_window, i_screen, h_switch[i_count]);
+                  i_switch_draw(x_display, x_buffer, i_screen, h_switch[i_count]);
 #endif
                for (i_count = 0; i_count < BUTTONS; i_count++)  /* Draw buttons */
-                  i_button_draw(x_display, x_application_window, i_screen, h_button[i_count]);
-               XCopyArea(x_display, x_application_window, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
+                  i_button_draw(x_display, x_buffer, i_screen, h_button[i_count]);
+               XCopyArea(x_display, x_buffer, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
             }
             break;
          case ClientMessage :  /* Message from window manager */
