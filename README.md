@@ -106,11 +106,11 @@ The simulator has been successfully compiled and tested on:
 
    - Alpine 3.19, gcc 13.2.1, x64 + arm64 *
 
-   - Debian 12 (Bookworm), clang 14.0.6, x64 + arm64 *
+   - Debian 12 (Bookworm), clang 14.0.6, x64 + arm64
 
-   - Debian 12 (Bookworm), tcc 0.9.27, x64 + arm64 *
+   - Debian 12 (Bookworm), tcc 0.9.27, x64 + arm64
 
-   - Debian 12 (Bookworm), gcc 12.2.0, x64 + arm64 *
+   - Debian 12 (Bookworm), gcc 12.2.0, x64 + arm64
 
    - Debian 11 (Bullseye), clang 11.0.1-2, x64 *
 
@@ -154,8 +154,6 @@ The simulator has been successfully compiled and tested on:
 
    - Tru64 5.1, cc cc 6.5-011, alpha
 
-   - VMS 5.4-3, vaxc 3.2-044, VAX
-
    - Ubuntu 20.04, gcc 9.3.0, aarch64
 
    - Ubuntu 20.04, tcc 0.9.27, aarch64
@@ -166,7 +164,7 @@ The simulator has been successfully compiled and tested on:
 
    - Ubuntu 20.04, tcc 0.9.27, x64 *
 
-   - VMS 5.4-3, VAX C 3.2, VAX (simh) *
+   - VMS 5.4-3, VAX C 3.2, VAX (simh)
 
    - VMS 7.3-2, cc 6.5-001, alpha *
 
