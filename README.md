@@ -35,7 +35,7 @@ Tru64 Unix.
 <a id="latest"></a>
 ### Latest News <sup><sup>[Back to Top](#top)</sup></sup>
 
-03 Aug 25
+09 Aug 25
 
    - Use double buffering when updating the display.
 
