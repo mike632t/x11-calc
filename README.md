@@ -129,7 +129,7 @@ The simulator has been successfully compiled and tested on:
    - Debian 5 (Lenny), gcc 4.2.4, alpha *
 
    - Fedora 34, gcc 11.2.1, x64 *
-
+   - 
    - Fedora 35, gcc 11.3.1, x64 *
 
    - Fedora 35, clang 13.0.1, x64 *
@@ -509,6 +509,8 @@ for Flatpak.
 - `Mark SHIN` for testing on MacOS.
 
 - `Jonakeys` for getting the simulators working on FreeBSD.
+
+- `Quozl` for helping with double buffering display changes.
 
 <a id="problems"></a>
 ### Problem Reports <sup><sup>[Back to Top](#top)</sup></sup>
