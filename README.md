@@ -102,9 +102,9 @@ Tru64 Unix.
 
 The simulator has been successfully compiled and tested on:
 
-   - Alpine 3.20, gcc 13.2.1, x64 + arm64 *
+   - Alpine 3.20, gcc 13.2.1, x64 + arm64 **
 
-   - Alpine 3.19, gcc 13.2.1, x64 + arm64 *
+   - Alpine 3.19, gcc 13.2.1, x64 + arm64 **
 
    - Debian 12 (Bookworm), clang 14.0.6, x64 + arm64
 
@@ -112,11 +112,11 @@ The simulator has been successfully compiled and tested on:
 
    - Debian 12 (Bookworm), gcc 12.2.0, x64 + arm64
 
-   - Debian 11 (Bullseye), clang 11.0.1-2, x64 *
+   - Debian 11 (Bullseye), clang 11.0.1-2, x64 **
 
-   - Debian 11 (Bullseye), gcc 10.2.1, x64 *
+   - Debian 11 (Bullseye), gcc 10.2.1, x64 **
 
-   - Debian 10 (Buster), gcc 8.3.0, arm *
+   - Debian 10 (Buster), gcc 8.3.0, arm **
 
    - Debian 10 (Buster), gcc 8.3.0, x64
 
@@ -124,33 +124,33 @@ The simulator has been successfully compiled and tested on:
 
    - Debian 10 (Buster), tcc 0.9.27, x64
 
-   - Debian 9 (Stretch), gcc 6.3.0, arm **
+   - Debian 9 (Stretch), gcc 6.3.0, arm ***
 
-   - Debian 5 (Lenny), gcc 4.2.4, alpha *
+   - Debian 5 (Lenny), gcc 4.2.4, alpha **
 
-   - Fedora 34, gcc 11.2.1, x64 *
+   - Fedora 34, gcc 11.2.1, x64 **
 
-   - Fedora 35, gcc 11.3.1, x64 *
+   - Fedora 35, gcc 11.3.1, x64 **
 
-   - Fedora 35, clang 13.0.1, x64 *
+   - Fedora 35, clang 13.0.1, x64 **
 
-   - Fedora 39, gcc 13.2.1, x64 *
+   - Fedora 39, gcc 13.2.1, x64 **
 
-   - FreeBSD 14.0, clang 16.0.6, x64 *
+   - FreeBSD 14.0, clang 16.0.6, x64 **
 
-   - Gentoo, gcc 11.2.0, x64 *
+   - Gentoo, gcc 11.2.0, x64 **
 
-   - MacOS 10 (Catalina), clang 12.0.0, x64 *
+   - MacOS 10 (Catalina), clang 12.0.0, x64 **
 
-   - MacOS 13.4.1 (Ventura), clang 14.0.3, arm64 *
+   - MacOS 13.4.1 (Ventura), clang 14.0.3, arm64 **
 
-   - MacOS 14.4.1 (Sonoma), clang 15.0.0, arm46 *
+   - MacOS 14.4.1 (Sonoma), clang 15.0.0, arm46 **
 
-   - NetBSD 9.2, gcc 7.5.0, x64 *
+   - NetBSD 9.2, gcc 7.5.0, x64 **
 
-   - SUSE 15.4, clang 13. 0.1, x64 *
+   - SUSE 15.4, clang 13. 0.1, x64 **
 
-   - SUSE 15.4, gcc 7.5.0, x64 *
+   - SUSE 15.4, gcc 7.5.0, x64 **
 
    - Tru64 5.1, cc 6.5-011, alpha
 
@@ -158,23 +158,23 @@ The simulator has been successfully compiled and tested on:
 
    - Ubuntu 20.04, tcc 0.9.27, aarch64
 
-   - Ubuntu 20.04, gcc 9.4.0, x64 *
+   - Ubuntu 20.04, gcc 9.4.0, x64 **
 
-   - Ubuntu 20.04, clang 10.0.0, x64 *
+   - Ubuntu 20.04, clang 10.0.0, x64 **
 
-   - Ubuntu 20.04, tcc 0.9.27, x64 *
+   - Ubuntu 20.04, tcc 0.9.27, x64 **
 
    - VMS 5.4-3, VAX C 3.2, VAX (simh)
 
    - VMS 7.3-2, C 6.5-001, alpha
 
-   - VMS 9.2-1, C 7.4-726, x64 *
+   - VMS 9.2-1, C 7.4-726, x64 **
 
-   - Windows 11 + WSL2, gcc 12.2.0, x64 + arm64 *
+   - Windows 11 + WSL2, gcc 12.2.0, x64 + arm64 **
 
-* Not yet retested with this build.
+** Not yet retested with this build.
 
-** Previously tested but no plans to retest.
+*** Previously tested but no plans to retest.
 
 <a id="obtaining"></a>
 ### How to get it <sup><sup>[Back to Top](#top)</sup></sup>
