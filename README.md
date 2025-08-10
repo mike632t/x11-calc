@@ -463,8 +463,8 @@ command line).
 
 - On some systems the Xwayland display server can consume a lot of the  CPU
 resources making the whole system unresponsive.
-- The application window size should be fixed size (the initial size can be
-modified using '--zoom'), but Xwayland does not handle this correctly.
+- The application window should be a fixed size (this can be modified using
+'--zoom'), but Xwayland does not handle this correctly.
 
 #### VMS
 
