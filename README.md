@@ -510,6 +510,8 @@ for Flatpak.
 
 - `Jonakeys` for getting the simulators working on FreeBSD.
 
+- `Quozl` for helping with double buffering fix for flickering.
+
 <a id="problems"></a>
 ### Problem Reports <sup><sup>[Back to Top](#top)</sup></sup>
 
