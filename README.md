@@ -166,7 +166,7 @@ The simulator has been successfully compiled and tested on:
 
    - VMS 5.4-3, VAX C 3.2, VAX (simh)
 
-   - VMS 7.3-2, cc 6.5-001, alpha *
+   - VMS 7.3-2, cc 6.5-001, alpha
 
    - VMS 9.2-1, cc 7.4-726, x64 *
 
