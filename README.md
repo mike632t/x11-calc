@@ -124,12 +124,12 @@ The simulator has been successfully compiled and tested on:
 
    - Debian 10 (Buster), tcc 0.9.27, x64
 
-   - Debian 9 (Stretch), gcc 6.3.0, arm *
+   - Debian 9 (Stretch), gcc 6.3.0, arm **
 
    - Debian 5 (Lenny), gcc 4.2.4, alpha *
 
    - Fedora 34, gcc 11.2.1, x64 *
-   - 
+
    - Fedora 35, gcc 11.3.1, x64 *
 
    - Fedora 35, clang 13.0.1, x64 *
@@ -152,7 +152,7 @@ The simulator has been successfully compiled and tested on:
 
    - SUSE 15.4, gcc 7.5.0, x64 *
 
-   - Tru64 5.1, cc cc 6.5-011, alpha
+   - Tru64 5.1, cc 6.5-011, alpha
 
    - Ubuntu 20.04, gcc 9.3.0, aarch64
 
@@ -166,13 +166,15 @@ The simulator has been successfully compiled and tested on:
 
    - VMS 5.4-3, VAX C 3.2, VAX (simh)
 
-   - VMS 7.3-2, cc 6.5-001, alpha
+   - VMS 7.3-2, C 6.5-001, alpha
 
-   - VMS 9.2-1, cc 7.4-726, x64 *
+   - VMS 9.2-1, C 7.4-726, x64 *
 
    - Windows 11 + WSL2, gcc 12.2.0, x64 + arm64 *
 
 * Not yet retested with this build.
+
+** Previously tested but no plans to retest.
 
 <a id="obtaining"></a>
 ### How to get it <sup><sup>[Back to Top](#top)</sup></sup>
@@ -457,27 +459,21 @@ To leverage GUI for setup, install `apk add zenity`. Optional program saves may 
 - Has  continuous memory (which allows saved programs to be loaded from the
 command line).
 
-#### Raspberry Pi Specific Issues
+#### Wayland
 
-- The code uses a simplified display on Arm based systems (except Apple) to
-avoid the display refresh issues seen on the Raspberry Pi if either FKMS or
-KMS overlays are enabled. (Note- Do not disable KMS on the latest Raspberry
-Pi OS release).
+- On some systems the Xwayland display server can consume a lot of the  CPU
+resources making the whole system unresponsive.
+- The application window size should be fixed size (the initial size can be
+modified using '--zoom'), but Xwayland does not handle this correctly.
 
-#### Wayland specific Issues
+#### VMS
 
-- Updating the display under Xwayland is very slow and even though all  the
-simulators  work well on a Raspberry Pi3 using X11, on a Raspberry Pi4 with
-Xwayland  it cannot redraw the display quickly enough to allow the  display
-segments to be drawn with a shaded background.  As a result the display has
-been simplified to make it work.
-- The simulator window is supposed to be a fixed size. However when running
-on Xwayland the window manager does not handle this correctly.
-
-#### VMS Specific Issues
-
-- Colour palette assumes a black and white display.
-- Not all text is visible due to the limited colour palette.
+- Colour palette assumes a black and white display (simh with QVSS). If the
+system's  colour depth is different you must modify COLOUR_DEPTH to  match.
+Note that the display will still only use two colours!
+(You can modify x11-calc-colour.h and x11-calc.h to change `vms` to `oldvms` if
+you do have a 24-bit colour display).
+- Not all text is visible if not using 24-bit colour.
 - Not all key legends are shown as the font is missing some characters.
 
 <a id="acknowledgements"></a>
@@ -495,8 +491,7 @@ to figure out most of what should happen when each instruction is executed.
 
 - `Agarza` for providing the details of the voyager displays.
 
-- `Macmpi` for completely rewriting the makefiles and packaging the simulator
-for Flatpak.
+- `Macmpi` for completely rewriting the makefiles and packaging the simulator for Flatpak.
 
 - `Macmpi` for packaging and testing the simulators on Alpine Linux
 
