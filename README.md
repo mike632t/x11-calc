@@ -129,7 +129,7 @@ The simulator has been successfully compiled and tested on:
    - Debian 5 (Lenny), gcc 4.2.4, alpha *
 
    - Fedora 34, gcc 11.2.1, x64 *
-
+   - 
    - Fedora 35, gcc 11.3.1, x64 *
 
    - Fedora 35, clang 13.0.1, x64 *
@@ -166,7 +166,7 @@ The simulator has been successfully compiled and tested on:
 
    - VMS 5.4-3, VAX C 3.2, VAX (simh)
 
-   - VMS 7.3-2, cc 6.5-001, alpha *
+   - VMS 7.3-2, cc 6.5-001, alpha
 
    - VMS 9.2-1, cc 7.4-726, x64 *
 
@@ -510,7 +510,7 @@ for Flatpak.
 
 - `Jonakeys` for getting the simulators working on FreeBSD.
 
-- `Quozl` for helping with double buffering fix for flickering.
+- `Quozl` for helping with double buffering display changes.
 
 <a id="problems"></a>
 ### Problem Reports <sup><sup>[Back to Top](#top)</sup></sup>

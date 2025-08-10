@@ -25,8 +25,7 @@
  * 13 Jun 13   0.1   - Initial version - MT
  * 16 Jun 13         - Can use predefined button colours - MT
  *                   - Added text to buttons - MT
- *                   - Defined  all  the font names and colours  defined as
- *                     constants - MT
+ *                   - Defined all font names and colours as constants - MT
  * 17 Jun 13         - All fonts now loaded in main routine - MT
  * 18 Jun 13         - Added font attributes to each button - MT
  * 23 Jun 13         - Added  button_create to create a button and return a
