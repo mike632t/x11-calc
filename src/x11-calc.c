@@ -332,8 +332,12 @@
  *  9 Aug 25         - Minor changes to fix compilation issues on VAXC - MT
  *                   - Fixed issues with window sizing on DEC Windows - MT
  *                   - Removed redundant variable - MT
- * 11 Aug 25  (0178) - Print the program version details before any warning
+ * 11 Aug 25         - Print the program version details before any warning
  *                     messages - MT
+ *            (0179) - Increased  the number of ticks between each  display
+ *                     update to make the user interface more responsive as
+ *                     well as making the number of ticks a multiple of 2 3
+ *                     and 4 - MT
  *
  *
  * To Do             - Parse command line in a separate routine.
@@ -348,12 +352,12 @@
 
 #define  NAME          "x11-calc"
 #define  VERSION       "0.17"
-#define  BUILD         "0178"
+#define  BUILD         "0179"
 #define  DATE          "11 Aug 25"
 #define  AUTHOR        "MT"
 
-#define  INTERVAL 25   /* Number of ticks to execute before updating the display */
-#define  DELAY 50      /* Number of intervals to wait before exiting */
+#define  INTERVAL 48   /* Number of ticks to execute before updating the display */
+#define  DELAY 48      /* Number of intervals to wait before exiting */
 
 #include <errno.h>     /* errno */
 
