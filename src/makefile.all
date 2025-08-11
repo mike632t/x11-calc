@@ -31,6 +31,7 @@
 #  29 Apr 24         - Renamed makefile.all_flavors - macmpi
 #                    - Renamed makefile.all - MT
 #  31 Jul 25         - Display file names in colour (if possible) - MT
+#  11 Aug 25         - Do not use -Wno-builtin-macro-redefined - MT
 #
 
 MODEL	= 21
@@ -46,9 +47,8 @@ DEBUG	=
 
 LDLIBS_ADD	= -lX11 -lm
 
-CFLAGS_ADD	= -fcommon -Wall -pedantic -std=gnu99 \
-			-Wno-comment -Wno-deprecated-declarations -Wno-builtin-macro-redefined \
-			-D$(LANG) $(DEBUG)
+CFLAGS_ADD	= -D$(LANG) $(DEBUG) -fcommon -Wall -pedantic -std=gnu99 \
+			-Wno-comment -Wno-deprecated-declarations # -Wno-builtin-macro-redefined
 
 all: $(BIN)/$(PROGRAM)
 

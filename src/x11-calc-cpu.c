@@ -404,6 +404,7 @@
  * 14 Jul 25         - Modified  printer character mapping so that multiply
  *                     is displayed as a '*' - MT
  *                   - Commented PIK instructions - MT
+ * 11 Aug 25         - Initialize field name - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -413,8 +414,8 @@
  */
 
 #define NAME           "x11-calc-cpu"
-#define BUILD          "0211"
-#define DATE           "14 Jul 25"
+#define BUILD          "0212"
+#define DATE           "11 Aug 25"
 #define AUTHOR         "MT"
 
 #define NODEBUG
@@ -1140,7 +1141,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
    unsigned int i_last; /* Save the current PC */
    unsigned int i_opcode;
    unsigned int i_field; /* Field modifier */
-   const char *s_field; /* Holds pointer to field name */
+   const char *s_field = ""; /* Holds pointer to field name */
 
    if (h_processor->enabled && !h_processor->sleep)
    {
