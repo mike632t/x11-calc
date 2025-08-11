@@ -331,7 +331,9 @@
  *                   - Updates display only when buffer is redrawn - MT
  *  9 Aug 25         - Minor changes to fix compilation issues on VAXC - MT
  *                   - Fixed issues with window sizing on DEC Windows - MT
- *            (0177) - Removed redundant variable - MT
+ *                   - Removed redundant variable - MT
+ * 11 Aug 25  (0178) - Print the program version details before any warning
+ *                     messages - MT
  *
  *
  * To Do             - Parse command line in a separate routine.
@@ -346,8 +348,8 @@
 
 #define  NAME          "x11-calc"
 #define  VERSION       "0.17"
-#define  BUILD         "0177"
-#define  DATE          "03 Aug 25"
+#define  BUILD         "0178"
+#define  DATE          "11 Aug 25"
 #define  AUTHOR        "MT"
 
 #define  INTERVAL 25   /* Number of ticks to execute before updating the display */
@@ -731,6 +733,9 @@ int main(int argc, char *argv[])
 #else
    if (argc > 1) v_error(EINVAL, h_err_invalid_operand);  /* There shouldn't any command line parameters */
 #endif
+
+   v_version();
+   fprintf(stdout, "ROM Size: %4u words \n", ROM_SIZE);
    i_wait(200);  /* Sleep for 200 milliseconds to 'debounce' keyboard! */
 
    i_count = ROM_SIZE;
@@ -851,9 +856,6 @@ int main(int argc, char *argv[])
 
    XMapWindow(x_display, x_window);  /* Show window on display */
    XRaiseWindow(x_display, x_window);  /* Raise window - ensures expose event is raised? */
-
-   v_version();
-   fprintf(stdout, "ROM Size: %4u words \n", ROM_SIZE);
 
    h_processor->trace = b_trace;
    h_processor->step = b_step;
