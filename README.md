@@ -112,9 +112,9 @@ The simulator has been successfully compiled and tested on:
 
    - Debian 12 (Bookworm), gcc 12.2.0, x64 + arm64
 
-   - Debian 11 (Bullseye), clang 11.0.1-2, x64 **
+   - Debian 11 (Bullseye), clang 11.0.1-2, x64 ***
 
-   - Debian 11 (Bullseye), gcc 10.2.1, x64 **
+   - Debian 11 (Bullseye), gcc 10.2.1, x64 ***
 
    - Debian 10 (Buster), gcc 8.3.0, arm **
 
@@ -126,7 +126,7 @@ The simulator has been successfully compiled and tested on:
 
    - Debian 9 (Stretch), gcc 6.3.0, arm ***
 
-   - Debian 5 (Lenny), gcc 4.2.4, alpha **
+   - Debian 5 (Lenny), gcc 4.2.4, alpha
 
    - Fedora 34, gcc 11.2.1, x64 **
 
