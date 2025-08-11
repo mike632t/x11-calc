@@ -35,14 +35,17 @@
  *                     set 'linux' when compiling on Linux - MT
  * 22 Apr 24         - Moved  compiler feature macro definitions to generic
  *                     busy loop - MT
+ * 11 Aug 25         - Warn if busy loop used (requires stdio.h) - MT
  *
  */
 
 #define NAME           "gcc-wait"
-#define BUILD          "0007"
-#define DATE           "22 Apr 24"
+#define BUILD          "0008"
+#define DATE           "11 Aug 25"
 #define AUTHOR         "MT"
 
+#define  False          0
+#define  True           !(False)
 #if defined(linux) || defined(__linux__) || defined(__NetBSD__)
 #include <unistd.h>
 #include <sys/types.h>
@@ -54,6 +57,8 @@
 #include <sys/timeb.h>
 #endif
 
+#include <stdio.h>
+
 /*
  * wait (milliseconds)
  *
@@ -62,6 +67,7 @@
  * 16 Aug 20         - Initial version taken from gcc-cat.c - MT
  * 04 Sep 21         - Fixed formatting in debug code - MT
  * 07 Feb 24         - Removed any windows specific or debug code - MT
+ * 11 Aug 25         - Warn if busy loop used (requires stdio.h) - MT
  *
  */
 int i_wait(long l_delay)
@@ -76,9 +82,11 @@ return (lib$wait(&f_seconds)); /* Use VMS LIB$WAIT */
 /** #define _DEFAULT_SOURCE /* Possibly required for busy loop more testing needed */
 /** #define _BSD_SOURCE /* Possibly required for busy loop more testing needed */
 struct timeb o_start, o_end;
+static int b_busy = True;
+if (b_busy) b_busy = !(printf("Busy loop in use..!\n"));
 ftime(&o_start);
 ftime(&o_end);
-while ((1000 * (o_end.time - o_start.time) + o_end.millitm - o_start.millitm) < l_delay) /* Use a portable but very inefficent busy loop */
+while ((1000 * (o_end.time - o_start.time) + o_end.millitm - o_start.millitm) < l_delay) /* Use a portable but very inefficient busy loop */
 {
    ftime(&o_end);
 }
