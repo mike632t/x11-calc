@@ -3,8 +3,19 @@
 
 ### Planned changes
 
-- [ ] Fix window resizing.
-      Using window hints to resize the window doesn't work in every environment
+- [ ] Map numeric keys on keypad (don't require NUMLOCK).
+
+- [ ] Add a graphical printer display to the HP10.
+
+- [ ] Optional menu (load/save/exit) if GTK is installed
+
+- [ ] Add proper card reader to HP67
+
+- [ ] Support for very high resolution screens (select zoom based on screen
+resolution if none specified?)
+
+- [ ] Fix window resizing.  Using window hints to resize the window doesn't
+work in every environment
 
   [https://tronche.com/gui/x/xlib/window/XMoveResizeWindow.html]::
 
@@ -12,12 +23,7 @@
 
 - [ ] Add logic for a  separate 'PIK chip' and move printer code.
 
-- [x] Finish debugging HP10 instruction set.
-
-- [ ] Add a graphical printer display to the HP10.
-
-- [x] Implement  different styles of digit (to allow for different  decimal
-      point positions, and number of segments etc).
+- [ ] A graphical representation of the switch states.
 
 - [ ] Better segregation of common code (switch, label and keyboard).
 
@@ -41,11 +47,16 @@
 
 ### Completed changes
 
+- [x] Addded HP10.
+
 - [x] Fix segmentation fault in display code (HP12C).
 
 - [x] Update build instruction for Tru64 UNIX.
 
 - [x] Update screenshots.
+
+- [x] Implement  different styles of digit (to allow for different  decimal
+point positions, and number of segments etc).
 
 - [x] Implement display jumper setting in SPICE series.
 
