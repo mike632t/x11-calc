@@ -128,13 +128,15 @@ The simulator has been successfully compiled and tested on:
 
    - Debian 5 (Lenny), gcc 4.2.4, alpha
 
-   - Fedora 34, gcc 11.2.1, x64 **
+   - Fedora 34, gcc 11.2.1, x64 ***
 
-   - Fedora 35, gcc 11.3.1, x64 **
+   - Fedora 35, gcc 11.3.1, x64
 
-   - Fedora 35, clang 13.0.1, x64 **
+   - Fedora 35, clang 13.0.1, x64
 
-   - Fedora 39, gcc 13.2.1, x64 **
+   - Fedora 39, gcc 13.2.1, x64
+
+   - Fedora 39, clang 17.0.6, x64
 
    - FreeBSD 14.0, clang 16.0.6, x64 **
 
