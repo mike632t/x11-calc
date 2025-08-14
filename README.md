@@ -148,6 +148,8 @@ The simulator has been successfully compiled and tested on:
 
    - NetBSD 9.2, gcc 7.5.0, x64 **
 
+   - SunOS 5.10, gcc 3.4.3, x86
+
    - SUSE 15.4, clang 13. 0.1, x64 **
 
    - SUSE 15.4, gcc 7.5.0, x64 **
@@ -388,6 +390,16 @@ $ make CC=clang hp11c
 
 $ make CC=tcc
 ```
+
+##### Solaris 10
+
+In order to use the GNU tools you need to specify the full path names.
+```
+$ /usr/sfw/bin/gmake CC=/usr/sfw/bin/gcc  hp11c
+
+$ /usr/sfw/bin/gmake CC=/usr/sfw/bin/gcc
+```
+
 ##### VMS
 
 On VMS unzip the source code archive, change the default directory and then
