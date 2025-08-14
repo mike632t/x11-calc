@@ -334,10 +334,11 @@
  *                   - Removed redundant variable - MT
  * 11 Aug 25         - Print the program version details before any warning
  *                     messages - MT
- *            (0179) - Increased  the number of ticks between each  display
+ *                   - Increased  the number of ticks between each  display
  *                     update to make the user interface more responsive as
  *                     well as making the number of ticks a multiple of 2 3
  *                     and 4 - MT
+ * 14 Aug 25  (0180) - Fixed compiler warnings with clang 17.0.6 - MT
  *
  *
  * To Do             - Parse command line in a separate routine.
@@ -352,7 +353,7 @@
 
 #define  NAME          "x11-calc"
 #define  VERSION       "0.17"
-#define  BUILD         "0179"
+#define  BUILD         "0180"
 #define  DATE          "11 Aug 25"
 #define  AUTHOR        "MT"
 
@@ -394,7 +395,7 @@
 #include "gcc-debug.h" /* debug() */
 #include "gcc-wait.h"  /* i_wait() */
 
-void v_version()  /* Display version information */
+void v_version(void)  /* Display version information */
 {
    fprintf(stdout, "%s: Version %s.%s %s", FILENAME, VERSION, BUILD, COMMIT_ID);
    if (__DATE__[4] == ' ') fprintf(stdout, " 0"); else fprintf(stdout, " %c", __DATE__[4]);
@@ -710,7 +711,7 @@ int main(int argc, char *argv[])
          }
          else if (!strncmp(argv[i_count], "/VERSION", i_index))
          {
-            v_version;  /* Display version information */
+            v_version();  /* Display version information */
             fprintf(stdout, h_msg_licence, &__DATE__[7], AUTHOR);
             exit(EXIT_SUCCESS);
          }

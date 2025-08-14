@@ -19,6 +19,7 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * 23 Apr 24         - Initial version - MT
+ * 14 Aug 25  (0820) - Fixed compiler warnings with clang 17.0.6 - MT
  *
  * TO DO :           -
  */
@@ -55,8 +56,8 @@
 #define ENOFNT      192
 #endif
 
-void v_version(); /* Display version information */
+void v_version(void);  /* Display version information */
 
-void v_error(int i_errno, const char *s_fmt, ...); /* Print formatted error message */
+void v_error(int i_errno, const char *s_fmt, ...);  /* Print formatted error message */
 
-void v_warning(const char *s_fmt, ...); /* Print formatted warning message */
+void v_warning(const char *s_fmt, ...);  /* Print formatted warning message */
