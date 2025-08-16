@@ -338,7 +338,8 @@
  *                     update to make the user interface more responsive as
  *                     well as making the number of ticks a multiple of 2 3
  *                     and 4 - MT
- * 14 Aug 25  (0180) - Fixed compiler warnings with clang 17.0.6 - MT
+ * 14 Aug 25         - Fixed compiler warnings with clang 17.0.6 - MT
+ * 16 Aug 25  (0181) - Added command line option to ignore numlock - MT
  *
  *
  * To Do             - Parse command line in a separate routine.
@@ -353,8 +354,8 @@
 
 #define  NAME          "x11-calc"
 #define  VERSION       "0.17"
-#define  BUILD         "0180"
-#define  DATE          "11 Aug 25"
+#define  BUILD         "0181"
+#define  DATE          "16 Aug 25"
 #define  AUTHOR        "MT"
 
 #define  INTERVAL 48   /* Number of ticks to execute before updating the display */
@@ -481,8 +482,9 @@ int main(int argc, char *argv[])
    char b_trace = False;         /* Trace flag */
    char b_step = False;          /* Single step flag flag */
    char b_cursor = True;         /* Draw a cursor */
+   Bool b_numlock = False;       /* Use number pad - even if numlock is off */
    char b_run = True;            /* Run flag controls CPU instruction execution in main loop */
-   char b_abort = False;         /*Abort flag controls execution of main loop */
+   char b_abort = False;         /* Abort flag controls execution of main loop */
 #if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
    char b_euro = False;
 #endif
@@ -617,15 +619,17 @@ int main(int argc, char *argv[])
                  b_abort = True;  /* '--' terminates command line processing */
                else
                   if (!strncmp(argv[i_count], "--cursor", i_index))
-                     b_cursor = True; /* Draw cursor */
+                     b_cursor = True;  /* Draw cursor */
                   else if (!strncmp(argv[i_count], "--no-cursor", i_index))
-                     b_cursor = False; /* Don't draw a cursor - unless drawn by the window manager */
+                     b_cursor = False;  /* Don't draw a cursor - unless drawn by the window manager */
 #if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
                   else if (!strncmp(argv[i_count], "--comma", i_index))
                      b_euro = True; /* Use european display format */
                   else if (!strncmp(argv[i_count], "--no-comma", i_index))
-                     b_euro = False; /* Don't use european display format */
+                     b_euro = False;  /* Don't use european display format */
 #endif
+                  else if (!strncmp(argv[i_count], "--numlock", i_index))
+                     b_numlock = True;  /* Use number pad - even if numlock is off */
                   else if (!strncmp(argv[i_count], "--zoom", i_index))
                   {
                      if (i_count + 1 < argc)
@@ -942,7 +946,7 @@ int main(int argc, char *argv[])
             break;
 #if defined(__linux__) || defined(__NetBSD__) || defined(__FreeBSD__)
          case KeyPress :
-            h_key_pressed(h_keyboard, x_display, x_event.xkey.keycode, x_event.xkey.state);  /* Attempts to translate a key code into a character */
+            h_key_pressed(h_keyboard, x_display, x_event.xkey.keycode, x_event.xkey.state, b_numlock);  /* Attempts to translate a key code into a character */
             if (h_keyboard->key == (XK_BackSpace & 0x1f)) h_keyboard->key = XK_Escape & 0x1f;  /* Map backspace to escape */
             if (h_keyboard->key == (XK_Z & 0x1f))  /* Ctrl-Z to exit */
                b_abort = True;
@@ -986,7 +990,7 @@ int main(int argc, char *argv[])
             }
             break;
          case KeyRelease :
-            h_key_released(h_keyboard, x_display, x_event.xkey.keycode, x_event.xkey.state);
+            h_key_released(h_keyboard, x_display, x_event.xkey.keycode, x_event.xkey.state, b_numlock);
             if (h_keyboard->key == (XK_BackSpace & 0x1f)) h_keyboard->key = XK_Escape & 0x1f;  /* Map backspace to escape */
             if (h_pressed != NULL)
             {
