@@ -3,9 +3,7 @@
 
 ### Planned changes
 
-- [ ] Map numeric keys on keypad (don't require NUMLOCK).
-
-- [ ] Add a graphical printer display to the HP10.
+- [ ] Add a graphical printer display to the HP10
 
 - [ ] Optional menu (load/save/exit) if GTK is installed
 
@@ -21,58 +19,60 @@ work in every environment
 
 - [ ] Allow user to resize the window at runtime (scroll wheel?).
 
-- [ ] Add logic for a  separate 'PIK chip' and move printer code.
+- [ ] Add logic for a  separate 'PIK chip' and move printer code
 
-- [ ] A graphical representation of the switch states.
+- [ ] A graphical representation of the switch states
 
-- [ ] Better segregation of common code (switch, label and keyboard).
+- [ ] Better segregation of common code (switch, label and keyboard)
 
-- [ ] Translate README.
+- [ ] Translate README
 
-- [ ] Move VMS make script to top level directory.
+- [ ] Move VMS make script to top level directory
 
-- [ ] Implement the display decoder as a separate 'chip'.
+- [ ] Implement the display decoder as a separate 'chip'
 
-- [ ] Expand tilde (~) in filenames.
+- [ ] Expand tilde (~) in filenames
 
   [https://stackoverflow.com/questions/40128376/how-to-expand-tilde-in-path]::
 
-- [ ] Add HP19C.
+- [ ] Add HP19C
 
-- [ ] Implement 16 segment digit display.
+- [ ] Implement 16 segment digit display
 
-- [ ] Add display decoder for HP41C.
+- [ ] Add display decoder for HP41C
 
-- [ ] Add HP41C.
+- [ ] Add HP41C
 
 ### Completed changes
 
-- [x] Addded HP10.
+- [x] Optionally allow numeric keypad to be used if NumLock is off (`--numlock`)
 
-- [x] Fix segmentation fault in display code (HP12C).
+- [x] Added HP10
 
-- [x] Update build instruction for Tru64 UNIX.
+- [x] Fix segmentation fault in display code (HP12C)
 
-- [x] Update screenshots.
+- [x] Update build instruction for Tru64 UNIX
+
+- [x] Update screenshots
 
 - [x] Implement  different styles of digit (to allow for different  decimal
-point positions, and number of segments etc).
+point positions, and number of segments etc)
 
-- [x] Implement display jumper setting in SPICE series.
+- [x] Implement display jumper setting in SPICE series
 
-- [x] Update help text.
+- [x] Update help text
 
-- [x] Fix launcher help text display.
+- [x] Fix launcher help text display
 
-- [x] Update README (document new options).
+- [x] Update README (document new options)
 
-- [x] Tidy up data structure definitions.
+- [x] Tidy up data structure definitions
 
-- [X] Use variables for all error messages, and add missing translations.
+- [X] Use variables for all error messages, and add missing translations
 
   [https://superuser.com/questions/392439/lang-and-language-environment-variable-in-debian-based-systems]::
 
 ### Rejected changes
 
-- [ ] Allow any _programmable_ model to load a saved program. (Unfortunatly is isn't possible without modifying the firmware).
+- [ ] Allow any _programmable_ model to load a saved program. (Unfortunately is isn't possible without modifying the firmware)
 
