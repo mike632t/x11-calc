@@ -22,10 +22,11 @@
 #
 #  14 Aug 25         - Initial version (copied makefile.osf) - MT
 #  17 Aug 25         - Fixed locale issue - MT
+#                    - Define __solaris__ (since gcc doesn't) - MT
 #
 
 LANG	=  $(shell (echo $$LANG | cut -f 1 -d '.'))
-CFLAGS	=
+CFLAGS	= -D__solaris__
 LDFLAGS	=
 LDLIBS	=
 
