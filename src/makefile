@@ -25,16 +25,17 @@
 #  24 Mar 24         - Pass model number - MT
 #  29 Mar 24         - Use linux/bsd/osf1 makefiles -macmpi
 #  12 May 24         - Use a separate makefile for MacOS - MT
+#  16 Aug 25         - Modified for Solaris 10 - MT
 #
 
 MODEL	= 21
 
 all:
-	@_os="`uname -s | tr '[:upper:]' '[:lower:]'`"; \
-	echo "$$_os" | grep -qwE "freebsd|netbsd" && _os=bsd; \
+	@_os="`uname -s | tr '[A-Z]' '[a-z]'`"; \
+	case "$$_os" in netbsd|freebsd) echo '**** bsd'; _os=bsd ;; esac;\
 	$(MAKE) -s -f "makefile.$$_os" MODEL=$(MODEL) $@
 
 .DEFAULT:
-	@_os="`uname -s | tr '[:upper:]' '[:lower:]'`"; \
-	echo "$$_os" | grep -qwE "freebsd|netbsd" && _os=bsd; \
+	@_os="`uname -s | tr '[A-Z]' '[a-z]'`"; \
+	case "$$_os" in netbsd|freebsd) echo '**** bsd'; _os=bsd ;; esac;\
 	$(MAKE) -s -f "makefile.$$_os" MODEL=$(MODEL) $@
