@@ -393,9 +393,9 @@ $ make CC=tcc
 
 In order to use the GNU tools you need to specify the full path names.
 ```
-$ /usr/sfw/bin/gmake CC=/usr/sfw/bin/gcc hp21
+$ /usr/sfw/bin/gmake CC=/usr/sfw/bin/gcc clean hp21
 
-$ /usr/sfw/bin/gmake CC=/usr/sfw/bin/gcc
+$ /usr/sfw/bin/gmake CC=/usr/sfw/bin/gcc clean all
 ```
 
 ##### VMS
