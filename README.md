@@ -33,11 +33,19 @@ Tru64 Unix.
 - [More screenshots](./img/#top)
 
 <a id="latest"></a>
-### Latest News <sup>[Back to Top](#top)</sup>
+### Latest News <sup><sup>[Back to Top](#top)</sup></sup>
+
+09 Aug 25
+
+   - Improved display updates (using double buffering).
+   - Minor changes to fix compilation issues on VAX and DEC Windows.
 
 08 Jul 25
 
    - Finally managed to get the HP10 working!!
+
+07 Jul 25
+
    - Fixed regression bug that affected HP12C.
 
 30 Jun 25
@@ -93,13 +101,13 @@ Tru64 Unix.
    - Added ability to build using make on MacOS.
 
 <a id="tested"></a>
-### Tested platforms <sup>[Back to Top](#top)</sup>
+### Tested platforms <sup><sup>[Back to Top](#top)</sup></sup>
 
 The simulator has been successfully compiled and tested on:
 
-   - Alpine 3.20, gcc 13.2.1, x64 + arm64
+   - Alpine 3.20, gcc 13.2.1, x64 + arm64 **
 
-   - Alpine 3.19, gcc 13.2.1, x64 + arm64
+   - Alpine 3.19, gcc 13.2.1, x64 + arm64 ***
 
    - Debian 12 (Bookworm), clang 14.0.6, x64 + arm64
 
@@ -107,21 +115,21 @@ The simulator has been successfully compiled and tested on:
 
    - Debian 12 (Bookworm), gcc 12.2.0, x64 + arm64
 
-   - Debian 11 (Bullseye), clang 11.0.1-2, x64
+   - Debian 11 (Bullseye), clang 11.0.1-2, x64 ***
 
-   - Debian 11 (Bullseye), gcc 10.2.1, x64
+   - Debian 11 (Bullseye), gcc 10.2.1, x64 ***
 
-   - Debian 11 (Bullseye), tcc 0.9.27, x64
+   - Debian 10 (Buster), gcc 8.3.0, arm **
 
-   - Debian 10 (Buster), gcc 8.3.0, x64 + arm
+   - Debian 10 (Buster), gcc 8.3.0, x64
 
    - Debian 10 (Buster), clang 7.0.1, x64
 
-   - Debian 9 (Stretch), gcc 6.3.0, arm
+   - Debian 10 (Buster), tcc 0.9.27, x64
+
+   - Debian 9 (Stretch), gcc 6.3.0, arm ***
 
    - Debian 5 (Lenny), gcc 4.2.4, alpha
-
-   - Fedora 34, gcc 11.2.1, x64
 
    - Fedora 35, gcc 11.3.1, x64
 
@@ -129,36 +137,50 @@ The simulator has been successfully compiled and tested on:
 
    - Fedora 39, gcc 13.2.1, x64
 
-   - FreeBSD 14.0, clang 16.0.6, x64
+   - Fedora 39, clang 17.0.6, x64
 
-   - Gentoo, gcc 11.2.0, x64
+   - FreeBSD 14.0, clang 16.0.6, x64 **
 
-   - MacOS 10 (Catalina), clang 12.0.0, x64
+   - Gentoo, gcc 11.2.0, x64 **
 
-   - MacOS 13.4.1 (Ventura), clang 14.0.3, arm64
+   - MacOS 10 (Catalina), clang 12.0.0, x64 **
 
-   - MacOS 14.4.1 (Sonoma), clang 15.0.0, arm46
+   - MacOS 13.4.1 (Ventura), clang 14.0.3, arm64 **
 
-   - NetBSD 9.2, gcc 7.5.0, x64
+   - MacOS 14.4.1 (Sonoma), clang 15.0.0, arm46 **
+
+   - NetBSD 9.2, gcc 7.5.0, x86
+
+   - NetBSD 9.2, clang 16.0.6, x86
+
+   - SunOS 5.10, gcc 3.4.3, x86
 
    - SUSE 15.4, clang 13. 0.1, x64
 
    - SUSE 15.4, gcc 7.5.0, x64
 
-   - Ubuntu 20.04, gcc 9.4.0, x64
+   - Tru64 5.1, cc 6.5-011, alpha
 
-   - Ubuntu 20.04, clang 10.0.0, x64
+   - Ubuntu 20.04, gcc 9.4.0, x64 + aarch64
 
-   - Ubuntu 20.04, tcc 0.9.27, x64
+   - Ubuntu 20.04, clang 10.0.0, x64 + aarch64
 
-   - VAX/VMS 5.4-3, VAX C 3.2, VAX (simh)
+   - Ubuntu 20.04, tcc 0.9.27, x64 + aarch64
 
-   - OpenVMS 9.2-1, VSI C 7.4-726, x64
+   - VMS 5.4-3, VAX C 3.2, VAX (simh)
 
-   - Windows 11 + WSL2, gcc 12.2.0, x64 + arm64
+   - VMS 7.3-2, C 6.5-001, alpha
+
+   - VMS 9.2-1, C 7.4-726, x64 ***
+
+   - Windows 11 + WSL2, gcc 12.2.0, x64 + arm64 **
+
+** Not yet retested with this build.
+
+*** Previously tested but no plans to retest.
 
 <a id="obtaining"></a>
-### How to get it <sup>[Back to Top](#top)</sup>
+### How to get it <sup><sup>[Back to Top](#top)</sup></sup>
 
 You can either download the source code from GitHub and compile it yourself
 or you can use a pre-compiled package.
@@ -168,7 +190,7 @@ or you can use a pre-compiled package.
    - [Using binary package](#packages)
 
 <a id="using"></a>
-### Using the simulator <sup>[Back to Top](#top)</sup>
+### Using the simulator <sup><sup>[Back to Top](#top)</sup></sup>
 
 If you install the simulator on most modern desktops it should create a new
 menu entry that will start the launcher script by default. When invoked for
@@ -303,7 +325,7 @@ ROM files can therefore be used to load alternative version of the firmware
 for a particular model or apply a patch to the existing firmware.
 
 <a id="building"></a>
-### Building from the source <sup>[Back to Top](#top)</sup>
+### Building from the source <sup><sup>[Back to Top](#top)</sup></sup>
 
 #### Prerequisites
 
@@ -369,6 +391,16 @@ $ make CC=clang hp11c
 
 $ make CC=tcc
 ```
+
+##### Solaris 10
+
+In order to use the GNU tools you need to specify the full path names.
+```
+$ /usr/sfw/bin/gmake CC=/usr/sfw/bin/gcc clean hp21
+
+$ /usr/sfw/bin/gmake CC=/usr/sfw/bin/gcc clean all
+```
+
 ##### VMS
 
 On VMS unzip the source code archive, change the default directory and then
@@ -406,7 +438,7 @@ make DESTDIR=/tmp/staging install
 ```
 
 <a id="packages"></a>
-### Using a pre-compiled package <sup>[Back to Top](#top)</sup>
+### Using a pre-compiled package <sup><sup>[Back to Top](#top)</sup></sup>
 
 If you don't want to download an compile the sources yourself you can use a
 pre-compiled binary package compatible with most distros from [Flathub](https://flathub.org/apps/io.github.mike632t.x11-calc) using Flatpak.
@@ -417,7 +449,7 @@ Make sure `community` repo is enabled and then install with `apk add x11-calc`.\
 To leverage GUI for setup, install `apk add zenity`. Optional program saves may be installed with `apk add x11-calc-prg`.
 
 <a id="issues"></a>
-### Known Issues <sup>[Back to Top](#top)</sup>
+### Known Issues <sup><sup>[Back to Top](#top)</sup></sup>
 
 #### General issues
 
@@ -440,31 +472,25 @@ To leverage GUI for setup, install `apk add zenity`. Optional program saves may 
 - Has  continuous memory (which allows saved programs to be loaded from the
 command line).
 
-#### Raspberry Pi Specific Issues
+#### Wayland
 
-- The code uses a simplified display on Arm based systems (except Apple) to
-avoid the display refresh issues seen on the Raspberry Pi if either FKMS or
-KMS overlays are enabled. (Note- Do not disable KMS on the latest Raspberry
-Pi OS release).
+- On some systems the Xwayland display server can consume a lot of the  CPU
+resources making the whole system unresponsive.
+- The application window should be a fixed size (this can be modified using
+'--zoom'), but Xwayland does not handle this correctly.
 
-#### Wayland specific Issues
+#### VMS
 
-- Updating the display under Xwayland is very slow and even though all  the
-simulators  work well on a Raspberry Pi3 using X11, on a Raspberry Pi4 with
-Xwayland  it cannot redraw the display quickly enough to allow the  display
-segments to be drawn with a shaded background.  As a result the display has
-been simplified to make it work.
-- The simulator window is supposed to be a fixed size. However when running
-on Xwayland the window manager does not handle this correctly.
-
-#### VMS Specific Issues
-
-- Colour palette assumes a black and white display.
-- Not all text is visible due to the limited colour palette.
+- Colour palette assumes a black and white display (simh with QVSS). If the
+system's  colour depth is different you must modify COLOUR_DEPTH to  match.
+Note that the display will still only use two colours!
+(You can modify x11-calc-colour.h and x11-calc.h to change `vms` to `oldvms` if
+you do have a 24-bit colour display).
+- Not all text is visible if not using 24-bit colour.
 - Not all key legends are shown as the font is missing some characters.
 
 <a id="acknowledgements"></a>
-### Acknowledgements <sup>[Back to Top](#top)</sup>
+### Acknowledgements <sup><sup>[Back to Top](#top)</sup></sup>
 
 There are almost certainly some names I've missed off this list but without
 the help and encouragement from several members of the calculator community
@@ -478,8 +504,7 @@ to figure out most of what should happen when each instruction is executed.
 
 - `Agarza` for providing the details of the voyager displays.
 
-- `Macmpi` for completely rewriting the makefiles and packaging the simulator
-for Flatpak.
+- `Macmpi` for completely rewriting the makefiles and packaging the simulator for Flatpak.
 
 - `Macmpi` for packaging and testing the simulators on Alpine Linux
 
@@ -493,15 +518,19 @@ for Flatpak.
 
 - `Jonakeys` for getting the simulators working on FreeBSD.
 
+- `Quozl` for helping with double buffering display changes.
+
 <a id="problems"></a>
-### Problem Reports <sup>[Back to Top](#top)</sup>
+### Problem Reports <sup><sup>[Back to Top](#top)</sup></sup>
 
 If you find problems or have suggestions relating to these simulators, then
 please create a new [issue](https://github.com/mike632t/x11-calc/issues).
 
 Your problem report should contain:
 
-- Architecture (and VM host if applicable);
+- Computer model (or hypervisor);
+
+- Processor architecture;
 
 - Operating System and version;
 
@@ -509,7 +538,9 @@ Your problem report should contain:
 
 - Window Manager and version;
 
-- Compiler and version used;
+- If you are using a pre-built binary (Alpine / Flatpak);
+
+- Compiler and version used (if applicable);
 
 - Commit ID;
 

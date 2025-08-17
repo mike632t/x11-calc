@@ -22,6 +22,7 @@
  * 19 Sep 13         - Initial version - MT
  * 22 Apr 24         - Tidied up data types - MT
  * 23 Apr 24         - More changes to data types - MT
+ * 16 Aug 25         - Added flag to optionally ignore numlock - MT
  *
  */
 
@@ -33,9 +34,9 @@ typedef struct { /* Calculator button structure. */
    char key;
 } okeyboard;
 
-void h_key_pressed(okeyboard *h_keyboard, Display *x_display, KeyCode x_keycode, unsigned int i_keystate);
+void h_key_pressed(okeyboard *h_keyboard, Display *x_display, KeyCode x_keycode, unsigned int i_keystate, Bool b_numlock);
 
-void h_key_released(okeyboard *h_keyboard, Display *x_display, KeyCode x_keycode, unsigned int i_keystate);
+void h_key_released(okeyboard *h_keyboard, Display *x_display, KeyCode x_keycode, unsigned int i_keystate, Bool b_numlock);
 
 okeyboard *h_keyboard_create(Display *x_display);
 
