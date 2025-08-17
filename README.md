@@ -37,12 +37,15 @@ Tru64 Unix.
 
 09 Aug 25
 
-   - Use double buffering when updating the display.
+   - Improved display updates (using double buffering).
    - Minor changes to fix compilation issues on VAX and DEC Windows.
 
 08 Jul 25
 
    - Finally managed to get the HP10 working!!
+
+07 Jul 25
+
    - Fixed regression bug that affected HP12C.
 
 30 Jun 25
