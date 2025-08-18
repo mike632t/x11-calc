@@ -399,6 +399,7 @@
 void v_version(void)  /* Display version information */
 {
    fprintf(stdout, "%s: Version %s.%s %s", FILENAME, VERSION, BUILD, COMMIT_ID);
+   if (strlen(__compiler__)) fprintf(stdout, " "__compiler__);  /* Include compiler version if defined */
    if (__DATE__[4] == ' ') fprintf(stdout, " 0"); else fprintf(stdout, " %c", __DATE__[4]);
    fprintf(stdout, "%c %c%c%c %s %s\n", __DATE__[5],
       __DATE__[0], __DATE__[1], __DATE__[2], &__DATE__[9], __TIME__ );
