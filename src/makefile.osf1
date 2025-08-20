@@ -35,10 +35,11 @@
 #                      seperate tasks (which is up to be 18% quicker) - MT
 #  27 Mar 24         - Aligned rules with the generic makefile - MT
 #  31 Mar 24         - Leverage src/makefile.common
+#  18 Aug 25         - Define __osf__ (as the compiler doesn't) - MT
 #
 
 LANG	=  LANG_en
-CFLAGS	=
+CFLAGS	= -D__osf__
 LDFLAGS	=
 LDLIBS	=
 
