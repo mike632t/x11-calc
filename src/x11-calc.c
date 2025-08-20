@@ -340,7 +340,7 @@
  *                     and 4 - MT
  * 14 Aug 25         - Fixed compiler warnings with clang 17.0.6 - MT
  * 16 Aug 25  (0181) - Added command line option to ignore numlock - MT
- *
+ * 20 Aug 25         - Added ability to load a saved state from a file -MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -951,17 +951,21 @@ int main(int argc, char *argv[])
             if (h_keyboard->key == (XK_BackSpace & 0x1f)) h_keyboard->key = XK_Escape & 0x1f;  /* Map backspace to escape */
             if (h_keyboard->key == (XK_Z & 0x1f))  /* Ctrl-Z to exit */
                b_abort = True;
-            else if (h_keyboard->key == (XK_Q & 0x1f))  /* Ctrl-Q to resume */
-               h_processor->step = !(b_run  = True);
-            else if (h_keyboard->key == (XK_S & 0x1f))  /* Ctrl-S or space to single step */
-               h_processor->trace = h_processor->step = b_run = True;
             else if (h_keyboard->key == (XK_T & 0x1f))  /* Ctrl-T to toggle tracing */
                h_processor->trace = !h_processor->trace;
+            else if (h_keyboard->key == (XK_S & 0x1f))  /* Ctrl-S or space to single step */
+               h_processor->trace = h_processor->step = b_run = True;
             else if (h_keyboard->key == (XK_R & 0x1f))  /* Ctrl-R to display internal CPU registers */
                v_fprint_registers(stdout, h_processor);
+            else if (h_keyboard->key == (XK_Q & 0x1f))  /* Ctrl-Q to resume */
+               h_processor->step = !(b_run  = True);
+            else if (h_keyboard->key == (XK_L & 0x1f))  /* Ctrl-L to load saved state  */
+            {
+               v_load_state(h_processor);  /* Load current saved settings (resets calculator unless cancelled) */
+               b_run = True;
+            }
             else if (h_keyboard->key == (XK_C & 0x1f))  /* Ctrl-C to reset */
             {
-               v_processor_reset(h_processor);
                if (s_pathname == NULL)
                   v_restore_state(h_processor);  /* Load current saved settings */
                else

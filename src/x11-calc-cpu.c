@@ -405,20 +405,24 @@
  *                     is displayed as a '*' - MT
  *                   - Commented PIK instructions - MT
  * 11 Aug 25         - Initialize field name - MT
+ * 20 Aug 25         - Added ability to load a saved state from a file - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
+ *                   - Instead of allocating a fixed buffer size that could
+ *                     hold a filename with maximum path length, resize the
+ *                     the buffer in blocks of 32 characters as required.
  *                   - Use a dedicated processor flag for the printer mode.
  *                   - Figure out how to get the display to blink..?
  *
  */
 
-#define NAME           "x11-calc-cpu"
-#define BUILD          "0212"
-#define DATE           "11 Aug 25"
-#define AUTHOR         "MT"
+#define  NAME          "x11-calc-cpu"
+#define  BUILD         "0212"
+#define  DATE          "11 Aug 25"
+#define  AUTHOR        "MT"
 
-#define NODEBUG
+#define  NODEBUG
 
 #include <errno.h>     /* errno */
 
@@ -735,6 +739,7 @@ void v_read_state(oprocessor *h_processor, char *s_pathname) /* Read processor s
    int i_count, i_counter;
 
    if ((h_processor != NULL) && (s_pathname != NULL)) { /* Check processor and pathname are defined */
+      v_processor_reset(h_processor);
       h_file = fopen(s_pathname, "r");
       if (h_file !=NULL) { /* If file exists and can be opened restore state */
          fprintf(stderr,h_msg_loading, s_pathname);
@@ -900,6 +905,49 @@ char *v_get_datafile_path(oprocessor *h_processor) /* Return path the the data f
 }
 #endif
 
+char* s_getfilename(Bool b_save)
+/*
+ * Uses 'zenity' to allow the user to browse for and select a file name.
+ *
+ * To Do             - Instead of allocating a fixed buffer size that could
+ *                     hold a filename with maximum path length, resize the
+ *                     the buffer in blocks of 32 characters as required.
+ *                   - Check path for either zenity of kdialog..?
+ *
+ * https://stackoverflow.com/questions/2693776/
+ *
+ */
+
+#define  BUFFER_SIZE   256
+{
+   FILE *h_file;
+   char *s_command ;
+   char *s_filename;
+
+   char *s_directory = getenv("HOME");
+
+   if (s_directory == NULL) s_directory = "";  /* Use current folder if HOME not defined */
+
+   if (b_save)
+      s_command = "zenity --file-selection . --file-filter=\" *.dat  | *.dat \" --save 2>&1"; /* Redirect stderr to stdout */
+   else
+      s_command = "zenity --file-selection . --file-filter=\" *.dat  | *.dat \" 2>&1";
+
+   if ((s_filename = malloc(sizeof(*s_filename) * BUFFER_SIZE)) == NULL) v_error(errno, h_err_memmory_alloc, __FILE__, __LINE__);
+
+   if ((h_file = popen(s_command, "r")) != NULL)  /* Fail silently */
+   {
+      if ((s_filename = fgets(s_filename, BUFFER_SIZE, h_file)) != NULL)
+      {
+         if (pclose(h_file))
+            s_filename = NULL;  /* There was an error */
+         else
+            s_filename[strcspn(s_filename, "\n\r")] = '\0';  /* Remove trailing newline characters */
+      }
+   }
+   return s_filename;
+}
+
 void v_save_state(oprocessor *h_processor) /* Restore saved processor state */
 {
 #if defined(CONTINIOUS)
@@ -909,8 +957,18 @@ void v_save_state(oprocessor *h_processor) /* Restore saved processor state */
 #endif
 }
 
+void v_load_state(oprocessor *h_processor) /* Restore saved processor state */
+{
+#if defined(CONTINIOUS)
+   char *s_pathname = s_getfilename(False);
+   v_read_state(h_processor, s_pathname); /* Load settings */
+   free(s_pathname); /* Free up pathname */
+#endif
+}
+
 void v_restore_state(oprocessor *h_processor) /* Restore saved processor state */
 {
+   v_processor_reset(h_processor);
 #if defined(CONTINIOUS)
    char *s_pathname = v_get_datafile_path(h_processor);
    v_read_state(h_processor, s_pathname); /* Load settings */

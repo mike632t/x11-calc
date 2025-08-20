@@ -35,6 +35,10 @@ Tru64 Unix.
 <a id="latest"></a>
 ### Latest News <sup><sup>[Back to Top](#top)</sup></sup>
 
+20 Aug 25
+
+   - Can now load program data files using Ctrl-L.
+
 09 Aug 25
 
    - Improved display updates (using double buffering).
@@ -221,16 +225,21 @@ shifted or not).
 
 The following control keys can also be used.
 
-'Ctrl-Z' Exists the simulator. For models  with  continuous memory 'Ctrl-Z'
-saves the current memory contents.
+Note - Only models with continuous memory can load or save state.
 
 'Ctrl-C' Resets the simulator to its last saved or initial state.
 
-'Ctrl-T' Toggles tracing of the simulator code execution.
+'Ctrl-L' Load a saved data file.
+
+'Ctrl-R' Prints the register contents.
 
 'Ctrl-S' Enable tracing and executes a single instruction.
 
+'Ctrl-T' Toggles tracing of the simulator code execution.
+
 'Ctrl-Q' Resumes execution (does not disable trace).
+
+'Ctrl-Z' Exits the simulator.
 
 #### Command line options
 

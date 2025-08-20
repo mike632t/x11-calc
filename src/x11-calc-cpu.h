@@ -56,6 +56,7 @@
  *                     print - MT
  * 06 Jun 23         - Removed unused references to HP91c and HP97 - MT
  * 21 Oct 23         - Defined MANUAL, NORMAL, and TRACE print modes - MT
+ * 20 Aug 25         - Added ability to load a saved state from a file -MT
  *
  */
 
@@ -170,6 +171,8 @@ void v_read_rom(oprocessor *h_processor, char *s_pathname);
 void v_read_state(oprocessor *h_processor, char *s_pathname);
 
 void v_restore_state(oprocessor *h_processor);
+
+void v_load_state(oprocessor *h_processor);
 
 void v_save_state(oprocessor *h_processor);
 
