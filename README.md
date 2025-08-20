@@ -394,11 +394,15 @@ $ make CC=tcc
 
 ##### Solaris 10
 
-In order to use the GNU tools you need to specify the full path names.
-```
-$ /usr/sfw/bin/gmake CC=/usr/sfw/bin/gcc clean hp21
+In order to use the GNU tools you need to add their location to your path.
 
-$ /usr/sfw/bin/gmake CC=/usr/sfw/bin/gcc clean all
+```
+$ PATH=$PATH:/usr/sfw/bin/
+$ gmake CC=gcc clean hp21
+```
+```
+$ PATH=$PATH:/usr/sfw/bin/
+$ gmake CC=gcc clean all
 ```
 
 ##### VMS
