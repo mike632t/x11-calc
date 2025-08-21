@@ -3,9 +3,9 @@
 
 ### Planned changes
 
-- [ ] Add a graphical printer display to the HP10
+- [ ] Formatted program listings (using python script)
 
-- [ ] Optional menu (load/save/exit) if GTK is installed
+- [ ] Add a graphical printer display to the HP10
 
 - [ ] Add proper card reader to HP67
 
@@ -21,7 +21,9 @@ work in every environment
 
 - [ ] Add logic for a  separate 'PIK chip' and move printer code
 
-- [ ] A graphical representation of the switch states
+- [ ] A graphical representation of the switch statesI just tried testing this using an initial value of 14 and was surprised to find that it find a solution.. (Particularly as the program will factorise 7, 21, and 28 correctly).
+
+Is there an error in my transcription or does the original version really not work for an initial value of 14...?
 
 - [ ] Better segregation of common code (switch, label and keyboard)
 
@@ -44,6 +46,8 @@ work in every environment
 - [ ] Add HP41C
 
 ### Completed changes
+
+- [X] Optional menu (load/save) if GTK is installed
 
 - [x] Optionally allow numeric keypad to be used if NumLock is off (`--numlock`)
 
