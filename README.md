@@ -522,7 +522,7 @@ to figure out most of what should happen when each instruction is executed.
 
 - `Macmpi` for completely rewriting the makefiles and packaging the simulator for Flatpak.
 
-- `Macmpi` for packaging and testing the simulators on Alpine Linux
+- `Macmpi` for packaging and testing the simulators on Alpine Linux.
 
 - `Agarza` and `Martin HEPPERLE` for helping to translate the help text.
 
@@ -535,6 +535,8 @@ to figure out most of what should happen when each instruction is executed.
 - `Jonakeys` for getting the simulators working on FreeBSD.
 
 - `Quozl` for helping with double buffering display changes.
+
+- 'Kjellc' for reasons that may not yet be obvious.
 
 <a id="problems"></a>
 ### Problem Reports <sup><sup>[Back to Top](#top)</sup></sup>
