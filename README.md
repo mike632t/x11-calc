@@ -35,9 +35,12 @@ Tru64 Unix.
 <a id="latest"></a>
 ### Latest News <sup><sup>[Back to Top](#top)</sup></sup>
 
-20 Aug 25
+21 Aug 25
 
-   - Can now load program data files using Ctrl-L.
+   - Loading  or saving the current state can now be done by right clicking
+on  the application window.  In run mode the user will be prompted to  load
+the state from a previously saved copy, while in prgm mode the user will be
+prompted to save the current state to a file - MT
 
 09 Aug 25
 

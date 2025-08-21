@@ -57,6 +57,12 @@
  * 06 Jun 23         - Removed unused references to HP91c and HP97 - MT
  * 21 Oct 23         - Defined MANUAL, NORMAL, and TRACE print modes - MT
  * 20 Aug 25         - Added ability to load a saved state from a file -MT
+ * 21 Aug 25         - Loading  or saving the current machine state can  be
+ *                     done by right clicking on the application window. In
+ *                     run mode the user will be prompted to load the state
+ *                     from a previously saved copy, while in prgm mode the
+ *                     user will be prompted to save the current state to a
+ *                     file - MT
  *
  */
 
@@ -169,6 +175,10 @@ void v_processor_reset(oprocessor *h_processor);
 void v_read_rom(oprocessor *h_processor, char *s_pathname);
 
 void v_read_state(oprocessor *h_processor, char *s_pathname);
+
+void v_write_state(oprocessor *h_processor, char *s_pathname);
+
+void v_backup_state(oprocessor *h_processor);
 
 void v_restore_state(oprocessor *h_processor);
 

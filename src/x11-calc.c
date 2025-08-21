@@ -341,6 +341,12 @@
  * 14 Aug 25         - Fixed compiler warnings with clang 17.0.6 - MT
  * 16 Aug 25  (0181) - Added command line option to ignore numlock - MT
  * 20 Aug 25         - Added ability to load a saved state from a file -MT
+ * 21 Aug 25         - Loading  or saving the current machine state can  be
+ *                     done by right clicking on the application window. In
+ *                     run mode the user will be prompted to load the state
+ *                     from a previously saved copy, while in prgm mode the
+ *                     user will be prompted to save the current state to a
+ *                     file - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -959,11 +965,6 @@ int main(int argc, char *argv[])
                v_fprint_registers(stdout, h_processor);
             else if (h_keyboard->key == (XK_Q & 0x1f))  /* Ctrl-Q to resume */
                h_processor->step = !(b_run  = True);
-            else if (h_keyboard->key == (XK_L & 0x1f))  /* Ctrl-L to load saved state  */
-            {
-               v_load_state(h_processor);  /* Load current saved settings (resets calculator unless cancelled) */
-               b_run = True;
-            }
             else if (h_keyboard->key == (XK_C & 0x1f))  /* Ctrl-C to reset */
             {
                if (s_pathname == NULL)
@@ -1046,7 +1047,7 @@ int main(int argc, char *argv[])
                      }
                      else
                      {
-                        v_save_state(h_processor);  /* Save current settings */
+                        v_backup_state(h_processor);  /* Save current settings */
                         h_processor->enabled = False;  /* Disable the processor */
 #if defined(HP67)
                         i_ticks = DELAY * 4;  /* Set count down */
@@ -1103,6 +1104,16 @@ int main(int argc, char *argv[])
                      i_ticks = -1;
 #endif
             }
+#if defined(CONTINIOUS) || defined (HP67)
+            if (x_event.xbutton.button == 3)  /* Right mouse button */
+            {
+               if (h_processor->mode )
+                  v_load_state(h_processor);  /* Load saved state (resets calculator unless cancelled) */
+               else
+                  v_save_state(h_processor);  /* Save current state */
+               b_run = True;
+            }
+#endif
             break;
          case Expose :  /* Draw or redraw the window */
             {
@@ -1128,7 +1139,7 @@ int main(int argc, char *argv[])
       }
    }
 
-   v_save_state(h_processor);  /* Save state */
+   v_backup_state(h_processor);  /* Save state */
 
    XDestroyWindow(x_display, x_window);  /* Close connection to server */
    XCloseDisplay(x_display);
