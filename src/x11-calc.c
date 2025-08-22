@@ -347,8 +347,12 @@
  *                     from a previously saved copy, while in prgm mode the
  *                     user will be prompted to save the current state to a
  *                     file - MT
- * 22 Aug 25  (0184) - Use the PRGM label to set the processor mode for the
+ * 22 Aug 25         - Use the PRGM label to set the processor mode for the
  *                     Voyager models (as they don't have a switch)
+ *            (0185) - Clear any pending events after loading or saving the
+ *                     machine state, this stops the application closing if
+ *                     the user tries to close the window when a dialog box
+ *                     is open - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -362,8 +366,8 @@
 
 #define  NAME          "x11-calc"
 #define  VERSION       "0.17"
-#define  BUILD         "0184"
-#define  DATE          "16 Aug 25"
+#define  BUILD         "0185"
+#define  DATE          "22 Aug 25"
 #define  AUTHOR        "MT"
 
 #define  INTERVAL 48   /* Number of ticks to execute before updating the display */
@@ -1114,6 +1118,8 @@ int main(int argc, char *argv[])
                else
                   v_save_state(h_processor);  /* Save current state */
                b_run = True;
+               while (XPending(x_display))
+                  XNextEvent(x_display, &x_event);  /* Clear the event queue */
             }
 #endif
             break;
