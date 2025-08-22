@@ -568,7 +568,6 @@ int i_display_update(struct odisplay *h_display, oprocessor *h_processor)
       h_display->label[5]->state = False;                                     /* D.MY - not used */
       h_display->label[6]->state = False;                                     /* C - not used */
       h_display->label[7]->state = (h_processor->mem[9]->nibble[4] & 0x4);    /* PRGM */
-      h_processor->mode = ! h_display->label[7]->state;
    }
 #else
    static int i_map [DIGITS][9][3] =
@@ -606,6 +605,7 @@ int i_display_update(struct odisplay *h_display, oprocessor *h_processor)
       h_display->label[6]->state = (h_processor->mem[10]->nibble[8] & 0x1);   /* C */
       h_display->label[7]->state = (h_processor->mem[10]->nibble[10] & 0x1);  /* PRGM */
    }
+   h_processor->mode = ! h_display->label[7]->state;
 #endif
    for (i_count = 0; i_count < DIGITS; i_count++)
    {
