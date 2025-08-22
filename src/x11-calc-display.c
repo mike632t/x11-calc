@@ -92,6 +92,8 @@
  *                   - Added support for European display formats for SPICE
  *                     series - MT
  * 07 Jul 25         - Fixed regression bug that affected HP12C - MT
+ * 22 Aug 25         - Use the PRGM label to set the processor mode for the
+ *                     Voyager models (as they don't have a switch) - MT
  *
  */
 
@@ -566,6 +568,7 @@ int i_display_update(struct odisplay *h_display, oprocessor *h_processor)
       h_display->label[5]->state = False;                                     /* D.MY - not used */
       h_display->label[6]->state = False;                                     /* C - not used */
       h_display->label[7]->state = (h_processor->mem[9]->nibble[4] & 0x4);    /* PRGM */
+      h_processor->mode = ! h_display->label[7]->state;
    }
 #else
    static int i_map [DIGITS][9][3] =

@@ -347,6 +347,8 @@
  *                     from a previously saved copy, while in prgm mode the
  *                     user will be prompted to save the current state to a
  *                     file - MT
+ * 22 Aug 25  (0184) - Use the PRGM label to set the processor mode for the
+ *                     Voyager models (as they don't have a switch)
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -360,7 +362,7 @@
 
 #define  NAME          "x11-calc"
 #define  VERSION       "0.17"
-#define  BUILD         "0181"
+#define  BUILD         "0184"
 #define  DATE          "16 Aug 25"
 #define  AUTHOR        "MT"
 
@@ -484,14 +486,14 @@ int main(int argc, char *argv[])
 
    unsigned int i_window_border = 4;   /* Window's border width */
    unsigned int i_colour_depth;        /* Window's colour depth */
-   int i_screen;                 /* Default screen number */
+   int i_screen;                       /* Default screen number */
 
-   char b_trace = False;         /* Trace flag */
-   char b_step = False;          /* Single step flag flag */
-   char b_cursor = True;         /* Draw a cursor */
-   Bool b_numlock = False;       /* Use number pad - even if numlock is off */
-   char b_run = True;            /* Run flag controls CPU instruction execution in main loop */
-   char b_abort = False;         /* Abort flag controls execution of main loop */
+   char b_trace = False;               /* Trace flag */
+   char b_step = False;                /* Single step flag flag */
+   char b_cursor = True;               /* Draw a cursor */
+   Bool b_numlock = False;             /* Use number pad - even if numlock is off */
+   char b_run = True;                  /* Run flag controls CPU instruction execution in main loop */
+   char b_abort = False;               /* Abort flag controls execution of main loop */
 #if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
    char b_euro = False;
 #endif
@@ -1107,7 +1109,7 @@ int main(int argc, char *argv[])
 #if defined(CONTINIOUS) || defined (HP67)
             if (x_event.xbutton.button == 3)  /* Right mouse button */
             {
-               if (h_processor->mode )
+               if (h_processor->mode)
                   v_load_state(h_processor);  /* Load saved state (resets calculator unless cancelled) */
                else
                   v_save_state(h_processor);  /* Save current state */
