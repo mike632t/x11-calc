@@ -93,14 +93,16 @@
  *                     series - MT
  * 07 Jul 25         - Fixed regression bug that affected HP12C - MT
  * 22 Aug 25         - Use the PRGM label to set the processor mode for the
- *                     Voyager models (as they don't have a switch) - MT
+ *                     HP10C, HP11C, HP12C, HP15C and HP16C (since they  do
+ *                     not have a mode switch) - MT
  * 23 Aug 25         - Disable display when printer is in TRACE mode - MT
- *            (0045) - Deleted 'Enabled' property as it isn't needed - MT
+ *                   - Deleted 'Enabled' property as it isn't needed - MT
+ *            (0046) - Sets processor mode correctly - MT
  *
  */
 
 #define NAME           "x11-calc-display"
-#define BUILD          "0045"
+#define BUILD          "0046"
 #define DATE           "23 Aug 25"
 #define AUTHOR         "MT"
 
@@ -159,7 +161,6 @@ struct odisplay *h_display_create(int i_index, int i_left, int i_top, int i_widt
    h_display->display_position.y = i_display_top;
    h_display->display_position.width = i_display_width;
    h_display->display_position.height = i_display_height;
-//   h_display->enabled = True;
 #if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
    h_display->euro = False;
 #endif
@@ -606,7 +607,6 @@ int i_display_update(struct odisplay *h_display, oprocessor *h_processor)
       h_display->label[6]->state = (h_processor->mem[10]->nibble[8] & 0x1);   /* C */
       h_display->label[7]->state = (h_processor->mem[10]->nibble[10] & 0x1);  /* PRGM */
    }
-   h_processor->mode = ! h_display->label[7]->state;
 #endif
    for (i_count = 0; i_count < DIGITS; i_count++)
    {
@@ -624,6 +624,9 @@ int i_display_update(struct odisplay *h_display, oprocessor *h_processor)
          }
       }
    }
+
+   h_processor->mode = ! h_display->label[7]->state;
+
 #else
    int i_count;
    static int c_digits [] =
