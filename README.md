@@ -35,12 +35,14 @@ Tru64 Unix.
 <a id="latest"></a>
 ### Latest News <sup><sup>[Back to Top](#top)</sup></sup>
 
-21 Aug 25
+24 Aug 25
 
+   - HP37E now passes self test.
    - Loading  or saving the current state can now be done by right clicking
 on  the application window.  In run mode the user will be prompted to  load
 the state from a previously saved copy, while in prgm mode the user will be
-prompted to save the current state to a file - MT
+prompted to save the current state to a file.
+
 
 09 Aug 25
 
@@ -479,10 +481,6 @@ To leverage GUI for setup, install `apk add zenity`. Optional program saves may 
 ##### HP 11C + HP 12C + HP 15C + HP 16C
 
 - Keyboard test is successful but these models do not pass the self-test.
-
-##### HP 37E
-
-- Fails self-test.
 
 ##### HP 67
 
