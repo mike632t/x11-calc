@@ -3,11 +3,13 @@
 
 ### Planned changes
 
-- [ ] Formatted program listings (using python script)
+- [ ] Formatted program listings (using a separate python script)
 
 - [ ] Add a graphical printer display to the HP10
 
 - [ ] Add proper card reader to HP67
+
+- [ ] Draw switches showing position (and not just labels)
 
 - [ ] Support for very high resolution screens (select zoom based on screen
 resolution if none specified?)
@@ -19,19 +21,11 @@ work in every environment
 
 - [ ] Allow user to resize the window at runtime (scroll wheel?).
 
-- [ ] Add logic for a  separate 'PIK chip' and move printer code
-
-- [ ] A graphical representation of the switch statesI just tried testing this using an initial value of 14 and was surprised to find that it find a solution.. (Particularly as the program will factorise 7, 21, and 28 correctly).
-
-Is there an error in my transcription or does the original version really not work for an initial value of 14...?
-
 - [ ] Better segregation of common code (switch, label and keyboard)
 
-- [ ] Translate README
+- [ ] Translate README - Volunteers needed!
 
 - [ ] Move VMS make script to top level directory
-
-- [ ] Implement the display decoder as a separate 'chip'
 
 - [ ] Expand tilde (~) in filenames
 
@@ -78,5 +72,8 @@ point positions, and number of segments etc)
 
 ### Rejected changes
 
-- [ ] Allow any _programmable_ model to load a saved program. (Unfortunately is isn't possible without modifying the firmware)
+- [ ] Allow any _programmable_ model to load a saved program - Not possible without modifying the firmware
 
+- [ ] Add logic for a  separate 'PIK chip' and move printer code - Not worth the effort to separate chip functions (yet)
+
+- [ ] Implement the display decoder as a separate 'chip' - Not worth the effort to separate chip functions (yet)
