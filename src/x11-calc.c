@@ -353,6 +353,7 @@
  *                     machine state, this stops the application closing if
  *                     the user tries to close the window when a dialog box
  *                     is open - MT
+ * 23 Aug 25         - Disable display when printer is in TRACE mode - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -1072,16 +1073,16 @@ int main(int argc, char *argv[])
 #if defined(HP10)
                         switch(i_switch_click(h_switch[1]))
                         {
-                           case 0:
-                              h_processor->print = MANUAL;
-                              break;
-                           case 3:
-                           case 1:
-                              h_processor->print = NORMAL;
-                              break;
-                           case 2:
-                              h_processor->print = TRACE;
-                              break;
+                        case 0:
+                           h_processor->print = MANUAL;
+                           break;
+                        case 3:
+                        case 1:
+                           h_processor->print = NORMAL;
+                           break;
+                        case 2:
+                           h_processor->print = TRACE;
+                           break;
                         }
 #else
                         h_processor->mode = i_switch_click(h_switch[1]);  /* Update prgm/run switch */

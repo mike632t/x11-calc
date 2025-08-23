@@ -94,12 +94,14 @@
  * 07 Jul 25         - Fixed regression bug that affected HP12C - MT
  * 22 Aug 25         - Use the PRGM label to set the processor mode for the
  *                     Voyager models (as they don't have a switch) - MT
+ * 23 Aug 25         - Disable display when printer is in TRACE mode - MT
+ *            (0045) - Deleted 'Enabled' property as it isn't needed - MT
  *
  */
 
 #define NAME           "x11-calc-display"
-#define BUILD          "0040"
-#define DATE           "29 Jun 25"
+#define BUILD          "0045"
+#define DATE           "23 Aug 25"
 #define AUTHOR         "MT"
 
 #include <errno.h>     /* errno */
@@ -157,7 +159,7 @@ struct odisplay *h_display_create(int i_index, int i_left, int i_top, int i_widt
    h_display->display_position.y = i_display_top;
    h_display->display_position.width = i_display_width;
    h_display->display_position.height = i_display_height;
-   h_display->enabled = False;
+//   h_display->enabled = True;
 #if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
    h_display->euro = False;
 #endif
@@ -515,8 +517,7 @@ int i_display_update(struct odisplay *h_display, oprocessor *h_processor)
    {
       if (h_display->digit[i_count] != NULL)
       {
-         /** if (h_processor->flags[DISPLAY_ENABLE] && h_processor->enabled && h_display->enabled) /* Allows print mode to disable display */
-         if (h_processor->flags[DISPLAY_ENABLE] && h_processor->enabled)
+         if (h_processor->flags[DISPLAY_ENABLE] && h_processor->enabled && (h_processor->print != TRACE))  /* Display is disabled in TRACE mode */
          {
             if (h_display->digit[i_count] != NULL)
                h_display->digit[i_count]->mask = c_digits[h_processor->reg[A_REG]->nibble[REG_SIZE - i_offset - i_count - 1]];
