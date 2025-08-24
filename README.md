@@ -16,7 +16,7 @@ Tru64 Unix.
 
 ![HP10](./img/x11-calc-10c.png) ![HP11](./img/x11-calc-11c.png)
 
-- [Latest News](#latest)
+- [Changes](#changes)
 
 - [What will it run on](#tested)
 
@@ -32,17 +32,18 @@ Tru64 Unix.
 
 - [More screenshots](./img/#top)
 
-<a id="latest"></a>
-### Latest News <sup><sup>[Back to Top](#top)</sup></sup>
+<a id="changes"></a>
+### Changes <sup><sup>[Back to Top](#top)</sup></sup>
+
+Details of the latest/important changes.
 
 24 Aug 25
 
    - HP37E now passes self test.
    - Loading  or saving the current state can now be done by right clicking
-on  the application window.  In run mode the user will be prompted to  load
-the state from a previously saved copy, while in prgm mode the user will be
-prompted to save the current state to a file.
-
+     on  the application window.  In `run` mode the user will be prompted  to
+     load the state from a previously saved `.dat` (data) file, while in `prgm`
+     mode the user will be prompted to save the current state.
 
 09 Aug 25
 
@@ -52,6 +53,9 @@ prompted to save the current state to a file.
 08 Jul 25
 
    - Finally managed to get the HP10 working!!
+     Note that there is no graphical display for the printer, the output is
+     to `stdout` on the comsole.  This allows the output from the printer  to
+     be redirected to a file if required.
 
 07 Jul 25
 
@@ -59,18 +63,8 @@ prompted to save the current state to a file.
 
 30 Jun 25
 
-   - Allows the display separators on the SPICE series to be changed to the
-     use european format, using the `-c', or '--comma` option.
-
-26 Jun 25
-
-   - Fixed storage overflow error display.
-
-04 May 24
-
-   - Fixed a bug that affected some simulators when compiled on MacOS.
-   - Updated this README with more details of the keyboard shortcuts.
-   - Added some much needed acknowledgements.
+   - Enable the use of the `-c`, or `--comma` command line option to modify
+     the state of the hardware link that controls decimal point format.
 
 14 Apr 24
 
@@ -82,6 +76,7 @@ prompted to save the current state to a file.
    - Embedded missing firmware.
 
 24 Feb 24
+
    - By default the application will attempt to use the X11 base fonts. But
      if these are not available it will try to select an suitable alternate
      font instead from a predefined list.
@@ -90,8 +85,10 @@ prompted to save the current state to a file.
      the X11 base fonts are installed (see prerequisites).
 
 16 Feb 24
+
    - For UNIX based systems the default location used to store the state of
      the machine when it is powered off has changed.
+
      If the data file already exists in `$HOME` then this will always be used
      by default, but if it does not exist then if `$XDG_DATA_HOME` is defined
      the program will create a sub directory in this location for the  data
@@ -99,15 +96,9 @@ prompted to save the current state to a file.
      does not exist. If `$HOME/.local/share/` does not exist then the program
      will use `$HOME` as before.
 
-01 Nov 23
-   - Updated DCL make script.
+13 Jun 13
 
-14 Oct 23
-   - Updated build instructions.
-   - Uses a simpler display on ARM (excluding Apple).
-
-22 Sep 23
-   - Added ability to build using make on MacOS.
+   - Initial version can draw the application window using X11!
 
 <a id="tested"></a>
 ### Tested platforms <sup><sup>[Back to Top](#top)</sup></sup>
@@ -146,7 +137,7 @@ The simulator has been successfully compiled and tested on:
 
    - Fedora 39, gcc 13.2.1, x64
 
-   - Fedora 39, clang 17.0.6, x64
+   - Fedora 39, clang 17.0.6, x64list
 
    - FreeBSD 14.0, clang 16.0.6, x64 **
 
@@ -258,7 +249,7 @@ The following command line options are available:
   -r  FILE                 read ROM from FILE
   -s                       single step
   -t                       trace
-  -c, --comma              use comma instead of decimal point
+  -c, --comma              use a comma instead of a decimal point
       --cursor             display cursor
       --no-cursor          hide cursor
       --zoom ZOOM          enlarge window size
@@ -274,15 +265,19 @@ the  window is closed.  The current state of the simulator will be saved in
 either `$HOME/.local/share/x11-calc/` or in a hidden file in the user's  HOME
 directory if `$HOME/.local/` does not exist.
 
-Resetting the simulator using 'Ctrl-C' will reload the saved state.
-```
-~/.x11-calc-nn.dat
-```
+Where  an on/off slide switch exists switching the calculator off will save
+the current state.
+
 When  starting the simulator the name of the data file used to restore  the
-saved state can be specified on the command line allowing previously  saved
+saved state can be specified on the command line, allowing previously saved
 copies of programs to be loaded automatically when the simulator starts  or
-the  simulator is reset using 'Ctrl-C'.  However, any changes will be
-saved in the hidden data file.
+the  simulator is reset using `Ctrl-C`.
+
+To load or save a program right click anywhere in the application window to
+open  a dialog box.  This will prompt for the name of an existing data file
+in `run` mode and allow the current simulator state to be saved in `prgm` mode.
+
+Resetting the simulator using `Ctrl-C` will restore it to it's initial state.
 
 #### Exiting
 
@@ -536,7 +531,9 @@ to figure out most of what should happen when each instruction is executed.
 
 - `Quozl` for helping with double buffering display changes.
 
-- 'Kjellc' for reasons that may not yet be obvious.
+- `Kjellc for reasons that may not yet be obvious.
+
+- 'Vttoth` for allowing me to include some of his example programs.
 
 <a id="problems"></a>
 ### Problem Reports <sup><sup>[Back to Top](#top)</sup></sup>
