@@ -412,6 +412,8 @@
  *                     from a previously saved copy, while in prgm mode the
  *                     user will be prompted to save the current state to a
  *                     file - MT
+ * 24 Aug            - When loading or saving files use the location of the
+ *                     configuration files as the default directory - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -738,7 +740,8 @@ void v_read_rom(oprocessor *h_processor, char *s_pathname) /* Load rom from 'obj
 }
 
 #if defined(CONTINIOUS)
-char *v_get_datafile_path(oprocessor *h_processor) /* Return path the the data file */
+
+char *s_get_datafile_path() /* Return path the the data file */
 /*
  *  - If $HOME is defined and the data file already exists in there  return
  *    the pathname of the data file in $HOME to maintain compatibility with
@@ -830,34 +833,44 @@ char* s_getfilename(Bool b_save)
  *
  */
 
-#define  BUFFER_SIZE   256
 {
+#if defined(unix) || defined(__unix__) || defined(__APPLE__)
+#define  BUFFER_SIZE   256
+
    FILE *h_file;
-   char *s_command ;
-   char *s_filename;
+   char *s_dirname;
+   char *s_basename;
+   char *s_format;
+   char *s_command;
+   char *s_pathname;
 
-   char *s_directory = getenv("HOME");
-
-   if (s_directory == NULL) s_directory = "";  /* Use current folder if HOME not defined */
+   s_dirname = s_get_datafile_path();  /* Get path */
+   s_basename = strrchr(s_dirname, '/' );  /* Find the base name */
+   *(s_basename++) = '\0';  /* Replace the '/' with a '\0' to split the directory name and base name into two strings */
 
    if (b_save)
-      s_command = "zenity --title=\"Save\" --file-selection . --file-filter=\" *.dat  | *.dat \" --save 2>&1"; /* Redirect stderr to stdout */
+      s_format = "zenity --file-selection --filename \"%s/\" --file-filter=\" *.dat  | "FILENAME"-*.dat \" --file-filter=\"  *.*  | *.* \" --title=\"Save\" --save --confirm-overwrite 2>&1";
    else
-      s_command = "zenity --title=\"Load\" --file-selection . --file-filter=\" *.dat  | *.dat \" 2>&1";
+      s_format = "zenity --file-selection --filename \"%s/\" --file-filter=\" *.dat  | "FILENAME"-*.dat \" --file-filter=\"  *.*  | *.* \" --title=\"Load\" 2>&1";
 
-   if ((s_filename = malloc(sizeof(*s_filename) * BUFFER_SIZE)) == NULL) v_error(errno, h_err_memmory_alloc, __FILE__, __LINE__);
+   if ((s_command = malloc(sizeof(*s_dirname) * (strlen(s_dirname) + strlen(s_format) + 1))) == NULL) v_error(errno, h_err_memmory_alloc, __FILE__, __LINE__);  /* Allocate memory for command */
+   sprintf(s_command, s_format, s_dirname);  /* Insert path name into command */
 
+   if ((s_pathname = malloc(sizeof(*s_pathname) * BUFFER_SIZE)) == NULL) v_error(errno, h_err_memmory_alloc, __FILE__, __LINE__);  /* Allocate memory for path to file (max 256 characters) */
    if ((h_file = popen(s_command, "r")) != NULL)  /* Fail silently */
    {
-      if ((s_filename = fgets(s_filename, BUFFER_SIZE, h_file)) != NULL)
+      if ((s_pathname = fgets(s_pathname, BUFFER_SIZE, h_file)) != NULL)
       {
          if (pclose(h_file))
-            s_filename = NULL;  /* There was an error */
+            s_pathname = NULL;  /* There was an error */
          else
-            s_filename[strcspn(s_filename, "\n\r")] = '\0';  /* Remove trailing newline characters */
+            s_pathname[strcspn(s_pathname, "\n\r")] = '\0';  /* Remove trailing newline characters */
       }
    }
-   return s_filename;
+#else
+   char *s_pathname = NULL;
+#endif
+   return s_pathname;
 }
 #endif
 
@@ -975,7 +988,7 @@ void v_load_state(oprocessor *h_processor) /* Restore saved processor state */
 void v_backup_state(oprocessor *h_processor) /* Restore saved processor state */
 {
 #if defined(CONTINIOUS)
-   char *s_pathname = v_get_datafile_path(h_processor);
+   char *s_pathname = s_get_datafile_path();
    v_write_state(h_processor, s_pathname); /* Save settings */
    free(s_pathname); /* Free up pathname */
 #endif
@@ -985,7 +998,7 @@ void v_restore_state(oprocessor *h_processor) /* Restore saved processor state *
 {
    v_processor_reset(h_processor);
 #if defined(CONTINIOUS)
-   char *s_pathname = v_get_datafile_path(h_processor);
+   char *s_pathname = s_get_datafile_path();
    v_read_state(h_processor, s_pathname); /* Load settings */
    free(s_pathname); /* Free up pathname */
 #endif
