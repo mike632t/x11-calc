@@ -340,7 +340,20 @@
  *                     and 4 - MT
  * 14 Aug 25         - Fixed compiler warnings with clang 17.0.6 - MT
  * 16 Aug 25  (0181) - Added command line option to ignore numlock - MT
- *
+ * 20 Aug 25         - Added ability to load a saved state from a file -MT
+ * 21 Aug 25         - Loading  or saving the current machine state can  be
+ *                     done by right clicking on the application window. In
+ *                     run mode the user will be prompted to load the state
+ *                     from a previously saved copy, while in prgm mode the
+ *                     user will be prompted to save the current state to a
+ *                     file - MT
+ * 22 Aug 25         - Use the PRGM label to set the processor mode for the
+ *                     Voyager models (as they don't have a switch)
+ *            (0185) - Clear any pending events after loading or saving the
+ *                     machine state, this stops the application closing if
+ *                     the user tries to close the window when a dialog box
+ *                     is open - MT
+ * 23 Aug 25   0.18  - Disable display when printer is in TRACE mode - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -353,9 +366,9 @@
  */
 
 #define  NAME          "x11-calc"
-#define  VERSION       "0.17"
-#define  BUILD         "0181"
-#define  DATE          "16 Aug 25"
+#define  VERSION       "0.18"
+#define  BUILD         "0186"
+#define  DATE          "23 Aug 25"
 #define  AUTHOR        "MT"
 
 #define  INTERVAL 48   /* Number of ticks to execute before updating the display */
@@ -399,6 +412,7 @@
 void v_version(void)  /* Display version information */
 {
    fprintf(stdout, "%s: Version %s.%s %s", FILENAME, VERSION, BUILD, COMMIT_ID);
+   if (strlen(__compiler__)) fprintf(stdout, " "__compiler__);  /* Include compiler version if defined */
    if (__DATE__[4] == ' ') fprintf(stdout, " 0"); else fprintf(stdout, " %c", __DATE__[4]);
    fprintf(stdout, "%c %c%c%c %s %s\n", __DATE__[5],
       __DATE__[0], __DATE__[1], __DATE__[2], &__DATE__[9], __TIME__ );
@@ -477,14 +491,14 @@ int main(int argc, char *argv[])
 
    unsigned int i_window_border = 4;   /* Window's border width */
    unsigned int i_colour_depth;        /* Window's colour depth */
-   int i_screen;                 /* Default screen number */
+   int i_screen;                       /* Default screen number */
 
-   char b_trace = False;         /* Trace flag */
-   char b_step = False;          /* Single step flag flag */
-   char b_cursor = True;         /* Draw a cursor */
-   Bool b_numlock = False;       /* Use number pad - even if numlock is off */
-   char b_run = True;            /* Run flag controls CPU instruction execution in main loop */
-   char b_abort = False;         /* Abort flag controls execution of main loop */
+   char b_trace = False;               /* Trace flag */
+   char b_step = False;                /* Single step flag flag */
+   char b_cursor = True;               /* Draw a cursor */
+   Bool b_numlock = False;             /* Use number pad - even if numlock is off */
+   char b_run = True;                  /* Run flag controls CPU instruction execution in main loop */
+   char b_abort = False;               /* Abort flag controls execution of main loop */
 #if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
    char b_euro = False;
 #endif
@@ -950,17 +964,16 @@ int main(int argc, char *argv[])
             if (h_keyboard->key == (XK_BackSpace & 0x1f)) h_keyboard->key = XK_Escape & 0x1f;  /* Map backspace to escape */
             if (h_keyboard->key == (XK_Z & 0x1f))  /* Ctrl-Z to exit */
                b_abort = True;
-            else if (h_keyboard->key == (XK_Q & 0x1f))  /* Ctrl-Q to resume */
-               h_processor->step = !(b_run  = True);
-            else if (h_keyboard->key == (XK_S & 0x1f))  /* Ctrl-S or space to single step */
-               h_processor->trace = h_processor->step = b_run = True;
             else if (h_keyboard->key == (XK_T & 0x1f))  /* Ctrl-T to toggle tracing */
                h_processor->trace = !h_processor->trace;
+            else if (h_keyboard->key == (XK_S & 0x1f))  /* Ctrl-S or space to single step */
+               h_processor->trace = h_processor->step = b_run = True;
             else if (h_keyboard->key == (XK_R & 0x1f))  /* Ctrl-R to display internal CPU registers */
                v_fprint_registers(stdout, h_processor);
+            else if (h_keyboard->key == (XK_Q & 0x1f))  /* Ctrl-Q to resume */
+               h_processor->step = !(b_run  = True);
             else if (h_keyboard->key == (XK_C & 0x1f))  /* Ctrl-C to reset */
             {
-               v_processor_reset(h_processor);
                if (s_pathname == NULL)
                   v_restore_state(h_processor);  /* Load current saved settings */
                else
@@ -1041,7 +1054,7 @@ int main(int argc, char *argv[])
                      }
                      else
                      {
-                        v_save_state(h_processor);  /* Save current settings */
+                        v_backup_state(h_processor);  /* Save current settings */
                         h_processor->enabled = False;  /* Disable the processor */
 #if defined(HP67)
                         i_ticks = DELAY * 4;  /* Set count down */
@@ -1060,16 +1073,16 @@ int main(int argc, char *argv[])
 #if defined(HP10)
                         switch(i_switch_click(h_switch[1]))
                         {
-                           case 0:
-                              h_processor->print = MANUAL;
-                              break;
-                           case 3:
-                           case 1:
-                              h_processor->print = NORMAL;
-                              break;
-                           case 2:
-                              h_processor->print = TRACE;
-                              break;
+                        case 0:
+                           h_processor->print = MANUAL;
+                           break;
+                        case 3:
+                        case 1:
+                           h_processor->print = NORMAL;
+                           break;
+                        case 2:
+                           h_processor->print = TRACE;
+                           break;
                         }
 #else
                         h_processor->mode = i_switch_click(h_switch[1]);  /* Update prgm/run switch */
@@ -1098,6 +1111,18 @@ int main(int argc, char *argv[])
                      i_ticks = -1;
 #endif
             }
+#if defined(CONTINIOUS) || defined (HP67)
+            if (x_event.xbutton.button == 3)  /* Right mouse button */
+            {
+               if (h_processor->mode)
+                  v_load_state(h_processor);  /* Load saved state (resets calculator unless cancelled) */
+               else
+                  v_save_state(h_processor);  /* Save current state */
+               b_run = True;
+               while (XPending(x_display))
+                  XNextEvent(x_display, &x_event);  /* Clear the event queue */
+            }
+#endif
             break;
          case Expose :  /* Draw or redraw the window */
             {
@@ -1123,7 +1148,7 @@ int main(int argc, char *argv[])
       }
    }
 
-   v_save_state(h_processor);  /* Save state */
+   v_backup_state(h_processor);  /* Save state */
 
    XDestroyWindow(x_display, x_window);  /* Close connection to server */
    XCloseDisplay(x_display);

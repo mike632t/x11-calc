@@ -405,20 +405,32 @@
  *                     is displayed as a '*' - MT
  *                   - Commented PIK instructions - MT
  * 11 Aug 25         - Initialize field name - MT
+ * 20 Aug 25         - Added ability to load a saved state from a file - MT
+ * 21 Aug 25         - Loading  or saving the current machine state can  be
+ *                     done by right clicking on the application window. In
+ *                     run mode the user will be prompted to load the state
+ *                     from a previously saved copy, while in prgm mode the
+ *                     user will be prompted to save the current state to a
+ *                     file - MT
+ * 24 Aug            - When loading or saving files use the location of the
+ *                     configuration files as the default directory - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
+ *                   - Instead of allocating a fixed buffer size that could
+ *                     hold a filename with maximum path length, resize the
+ *                     the buffer in blocks of 32 characters as required.
  *                   - Use a dedicated processor flag for the printer mode.
  *                   - Figure out how to get the display to blink..?
  *
  */
 
-#define NAME           "x11-calc-cpu"
-#define BUILD          "0212"
-#define DATE           "11 Aug 25"
-#define AUTHOR         "MT"
+#define  NAME          "x11-calc-cpu"
+#define  BUILD         "0212"
+#define  DATE          "11 Aug 25"
+#define  AUTHOR        "MT"
 
-#define NODEBUG
+#define  NODEBUG
 
 #include <errno.h>     /* errno */
 
@@ -727,6 +739,141 @@ void v_read_rom(oprocessor *h_processor, char *s_pathname) /* Load rom from 'obj
       v_error(errno, h_err_opening_file, s_pathname); /* Can't open data file */
 }
 
+#if defined(CONTINIOUS)
+
+char *s_get_datafile_path() /* Return path the the data file */
+/*
+ *  - If $HOME is defined and the data file already exists in there  return
+ *    the pathname of the data file in $HOME to maintain compatibility with
+ *    earlier releases.
+ *
+ *  - If the data file in not in the $HOME folder then if $XDG_DATA_HOME is
+ *    defined or $HOME/.local/share/ exists this routine will search for an
+ *    application specific subdirectory in the first of these two locations
+ *    if finds (creating it if necessary) and will use this to generate the
+ *    pathname of the data file.
+ *
+ *  - Otherwise it will use the current directory path to generate the data
+ *    file's pathname.
+ *
+ */
+{
+   char *s_directory = getenv("HOME");
+   char s_filename[] = FILENAME;
+   char s_filetype[] = ".dat";
+   char *s_pathname;
+
+   if (s_directory == NULL) s_directory = ""; /* Use current folder if HOME not defined */
+#if defined(unix) || defined(__unix__) || defined(__APPLE__)
+   s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 2) * sizeof(char*));
+   strcpy(s_pathname, s_directory);
+   strcat(s_pathname, "/.");
+   strcat(s_pathname, s_filename);
+   strcat(s_pathname, s_filetype);
+   if (!(i_isfile(s_pathname))) /* File does not exists in home or current directory continue searching... */
+   {
+      free(s_pathname);
+      s_directory = getenv("XDG_DATA_HOME");
+      if (s_directory) /* XDG_DATA_HOME is defined so atempt to use it */
+      {
+         s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 10) * sizeof(char*));
+         strcpy(s_pathname, s_directory);
+      }
+      else /* Otherwise try to use $HOME/.local/share */
+      {
+         s_directory = getenv("HOME");
+         s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 23) * sizeof(char*));
+         strcpy(s_pathname, s_directory);
+         strcat(s_pathname, "/.local/share");
+      }
+      if (i_exists(s_pathname) && i_isdir(s_pathname)) /* Check that the selected directory exists, and if it doesn't use $HOME */
+      {
+         strcat(s_pathname, "/x11-calc");
+         if (i_exists(s_pathname) == 0) mkdir(s_pathname, (S_IRWXU|S_IRGRP|S_IXGRP)); /* If the application data folder does not exist attempt to create it (no need to check status here as we check the directory exists below) */
+         if (i_isdir(s_pathname) == 0) /* Check the directory exists and if it doesn't just use $HOME */
+         {
+            v_warning(h_err_creating_file, s_pathname); /* Can't create directory */
+            free(s_pathname);
+            s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 2) * sizeof(char*));
+            strcpy(s_pathname, s_directory);
+            strcat(s_pathname, "/.");
+         }
+         else
+            strcat(s_pathname, "/");
+      }
+      else
+      {
+         free(s_pathname);
+         s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 2) * sizeof(char*));
+         strcpy(s_pathname, s_directory);
+         strcat(s_pathname, "/.");
+      }
+      strcat(s_pathname, s_filename);
+      strcat(s_pathname, s_filetype);
+   }
+#else
+   s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype)) * sizeof(char*));
+   strcpy(s_pathname, s_directory);
+   strcat(s_pathname, s_filename);
+   strcat(s_pathname, s_filetype);
+#endif
+   return s_pathname;
+}
+
+char* s_getfilename(Bool b_save)
+/*
+ * Uses 'zenity' to allow the user to browse for and select a file name.
+ *
+ * To Do             - Instead of allocating a fixed buffer size that could
+ *                     hold a filename with maximum path length, resize the
+ *                     the buffer in blocks of 32 characters as required.
+ *                   - Check path for either zenity of kdialog..?
+ *
+ * https://stackoverflow.com/questions/2693776/
+ *
+ */
+
+{
+#if defined(unix) || defined(__unix__) || defined(__APPLE__)
+#define  BUFFER_SIZE   256
+
+   FILE *h_file;
+   char *s_dirname;
+   char *s_basename;
+   char *s_format;
+   char *s_command;
+   char *s_pathname;
+
+   s_dirname = s_get_datafile_path();  /* Get path */
+   s_basename = strrchr(s_dirname, '/' );  /* Find the base name */
+   *(s_basename++) = '\0';  /* Replace the '/' with a '\0' to split the directory name and base name into two strings */
+
+   if (b_save)
+      s_format = "zenity --file-selection --filename \"%s/\" --file-filter=\" *.dat  | "FILENAME"-*.dat \" --file-filter=\"  *.*  | *.* \" --title=\"Save\" --save --confirm-overwrite 2>&1";
+   else
+      s_format = "zenity --file-selection --filename \"%s/\" --file-filter=\" *.dat  | "FILENAME"-*.dat \" --file-filter=\"  *.*  | *.* \" --title=\"Load\" 2>&1";
+
+   if ((s_command = malloc(sizeof(*s_dirname) * (strlen(s_dirname) + strlen(s_format) + 1))) == NULL) v_error(errno, h_err_memmory_alloc, __FILE__, __LINE__);  /* Allocate memory for command */
+   sprintf(s_command, s_format, s_dirname);  /* Insert path name into command */
+
+   if ((s_pathname = malloc(sizeof(*s_pathname) * BUFFER_SIZE)) == NULL) v_error(errno, h_err_memmory_alloc, __FILE__, __LINE__);  /* Allocate memory for path to file (max 256 characters) */
+   if ((h_file = popen(s_command, "r")) != NULL)  /* Fail silently */
+   {
+      if ((s_pathname = fgets(s_pathname, BUFFER_SIZE, h_file)) != NULL)
+      {
+         if (pclose(h_file))
+            s_pathname = NULL;  /* There was an error */
+         else
+            s_pathname[strcspn(s_pathname, "\n\r")] = '\0';  /* Remove trailing newline characters */
+      }
+   }
+#else
+   char *s_pathname = NULL;
+#endif
+   return s_pathname;
+}
+#endif
+
 void v_read_state(oprocessor *h_processor, char *s_pathname) /* Read processor state from file */
 {
 #if defined(CONTINIOUS)
@@ -735,6 +882,7 @@ void v_read_state(oprocessor *h_processor, char *s_pathname) /* Read processor s
    int i_count, i_counter;
 
    if ((h_processor != NULL) && (s_pathname != NULL)) { /* Check processor and pathname are defined */
+      v_processor_reset(h_processor);
       h_file = fopen(s_pathname, "r");
       if (h_file !=NULL) { /* If file exists and can be opened restore state */
          fprintf(stderr,h_msg_loading, s_pathname);
@@ -819,91 +967,28 @@ void v_write_state(oprocessor *h_processor, char *s_pathname) /* Write processor
 #endif
 }
 
-#if defined(CONTINIOUS)
-char *v_get_datafile_path(oprocessor *h_processor) /* Return path the the data file */
-/*
- *  - If $HOME is defined and the data file already exists in there  return
- *    the pathname of the data file in $HOME to maintain compatibility with
- *    earlier releases.
- *
- *  - If the data file in not in the $HOME folder then if $XDG_DATA_HOME is
- *    defined or $HOME/.local/share/ exists this routine will search for an
- *    application specific subdirectory in the first of these two locations
- *    if finds (creating it if necessary) and will use this to generate the
- *    pathname of the data file.
- *
- *  - Otherwise it will use the current directory path to generate the data
- *    file's pathname.
- *
- */
-{
-   char *s_directory = getenv("HOME");
-   char s_filename[] = FILENAME;
-   char s_filetype[] = ".dat";
-   char *s_pathname;
-
-   if (s_directory == NULL) s_directory = ""; /* Use current folder if HOME not defined */
-#if defined(unix) || defined(__unix__) || defined(__APPLE__)
-   s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 2) * sizeof(char*));
-   strcpy(s_pathname, s_directory);
-   strcat(s_pathname, "/.");
-   strcat(s_pathname, s_filename);
-   strcat(s_pathname, s_filetype);
-   if (!(i_isfile(s_pathname))) /* File does not exists in home or current directory continue searching... */
-   {
-      free(s_pathname);
-      s_directory = getenv("XDG_DATA_HOME");
-      if (s_directory) /* XDG_DATA_HOME is defined so atempt to use it */
-      {
-         s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 10) * sizeof(char*));
-         strcpy(s_pathname, s_directory);
-      }
-      else /* Otherwise try to use $HOME/.local/share */
-      {
-         s_directory = getenv("HOME");
-         s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 23) * sizeof(char*));
-         strcpy(s_pathname, s_directory);
-         strcat(s_pathname, "/.local/share");
-      }
-      if (i_exists(s_pathname) && i_isdir(s_pathname)) /* Check that the selected directory exists, and if it doesn't use $HOME */
-      {
-         strcat(s_pathname, "/x11-calc");
-         if (i_exists(s_pathname) == 0) mkdir(s_pathname, (S_IRWXU|S_IRGRP|S_IXGRP)); /* If the application data folder does not exist attempt to create it (no need to check status here as we check the directory exists below) */
-         if (i_isdir(s_pathname) == 0) /* Check the directory exists and if it doesn't just use $HOME */
-         {
-            v_warning(h_err_creating_file, s_pathname); /* Can't create directory */
-            free(s_pathname);
-            s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 2) * sizeof(char*));
-            strcpy(s_pathname, s_directory);
-            strcat(s_pathname, "/.");
-         }
-         else
-            strcat(s_pathname, "/");
-      }
-      else
-      {
-         free(s_pathname);
-         s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 2) * sizeof(char*));
-         strcpy(s_pathname, s_directory);
-         strcat(s_pathname, "/.");
-      }
-      strcat(s_pathname, s_filename);
-      strcat(s_pathname, s_filetype);
-   }
-#else
-   s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype)) * sizeof(char*));
-   strcpy(s_pathname, s_directory);
-   strcat(s_pathname, s_filename);
-   strcat(s_pathname, s_filetype);
-#endif
-   return s_pathname;
-}
-#endif
-
 void v_save_state(oprocessor *h_processor) /* Restore saved processor state */
 {
 #if defined(CONTINIOUS)
-   char *s_pathname = v_get_datafile_path(h_processor);
+   char *s_pathname = s_getfilename(True);
+   v_write_state(h_processor, s_pathname); /* Save settings */
+   free(s_pathname); /* Free up pathname */
+#endif
+}
+
+void v_load_state(oprocessor *h_processor) /* Restore saved processor state */
+{
+#if defined(CONTINIOUS)
+   char *s_pathname = s_getfilename(False);
+   v_read_state(h_processor, s_pathname); /* Load settings */
+   free(s_pathname); /* Free up pathname */
+#endif
+}
+
+void v_backup_state(oprocessor *h_processor) /* Restore saved processor state */
+{
+#if defined(CONTINIOUS)
+   char *s_pathname = s_get_datafile_path();
    v_write_state(h_processor, s_pathname); /* Save settings */
    free(s_pathname); /* Free up pathname */
 #endif
@@ -911,8 +996,9 @@ void v_save_state(oprocessor *h_processor) /* Restore saved processor state */
 
 void v_restore_state(oprocessor *h_processor) /* Restore saved processor state */
 {
+   v_processor_reset(h_processor);
 #if defined(CONTINIOUS)
-   char *s_pathname = v_get_datafile_path(h_processor);
+   char *s_pathname = s_get_datafile_path();
    v_read_state(h_processor, s_pathname); /* Load settings */
    free(s_pathname); /* Free up pathname */
 #endif

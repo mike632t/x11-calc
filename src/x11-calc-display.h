@@ -47,6 +47,7 @@
  * 24 Jun 25         - Fixed storage overflow error display - MT
  * 29 Jun 25         - Added support for European display formats for SPICE
  *                     series - MT
+ * 23 Aug 25         - Deleted 'Enabled' property as it isn't needed - MT
  *
  */
 
@@ -90,7 +91,6 @@ struct odisplay/* Calculator display structure. */
    XRectangle display_position;  /* Current display position */
    XRectangle bezel_geometry;    /* Original bezel position */
    XRectangle display_geometry;  /* Original display position */
-   char enabled;
 #if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
    char euro;
 #endif

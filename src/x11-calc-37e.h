@@ -26,6 +26,7 @@
  * 29 Jan 22         - Added an optional bezel to the display - MT
  * 12 Feb 22         - Updated layout and separated the initialisation code
  *                     for buttons and switches into two functions - MT
+ * 24 Aug 25         - Corrected memory size - MT
  *
  */
 
@@ -70,7 +71,7 @@
 #define SWITCH_HEIGHT      10 * SCALE_HEIGHT
 
 #define ROM_SIZE           05000
-#define MEMORY_SIZE        9
+#define MEMORY_SIZE        16  /* Was 9 */
 
 extern int i_rom [ROM_SIZE];
 
