@@ -15,16 +15,9 @@
   <project_license>GPL-3.0-or-later</project_license>
 
   <description>
-      <p>Enjoy using your favourite classic HP calculator on your desktop, with this simulator:</p>
-      <ul>
-          <li>Classic series: HP 35, HP 80, HP 45, HP 70</li>
-          <li>Woodstock series: HP 21, HP 22, HP 25, HP 25c, HP 27, HP 29c</li>
-          <li>Spice series: HP 31e, HP 32e, HP 33e, HP 33c, HP 34c, HP 37e, HP 38c, HP 38e</li>
-          <li>Voyager series: HP 10c, HP 11c, HP 12c, HP 15c, HP 16c</li>
-          <li>Others: HP10, HP 67</li>
-      </ul>
-    <p>Right-click on desktop icon and select 'Set default calculator' to set default model, or choose one of the available simulators from list. Alternatively you can access the configuration dialog from a terminal using <code>flatpak run io.github.mike632t.x11-calc --setup</code></p>
-    <p><em>Note</em>: For best results the following fonts should be installed: <code>xfonts-base</code> (Debian/Ubuntu), <code>xorg-x11-fonts-base</code> or <code>xorg-x11-fonts-misc</code> (Fedora), <code>font-misc-misc</code> (Gentoo).</p>
+    <p>Simulators for the following HP calculator models HP 35, HP 80, HP 45, HP 70, HP 21, HP 22, HP 25, HP 25C, HP 27, HP 29C, HP 31E, HP 32E, HP 33E, HP 33C, HP 34C, HP 37E, HP 38C, HP 38E, HP10, HP 67, HP 10C, HP 11C, HP 12C, HP 15C, and HP 16C.</p>
+    <p>On KDE and Gnome you can right-click on desktop icon and select 'Set default calculator' to set default model, or choose one of the available simulators from the sub menu. Alternatively you can access the configuration dialog from a terminal using <code>flatpak run io.github.mike632t.x11-calc --setup</code></p>
+    <p><em>Note</em>: To be able to load/save programs by right clicking on the application window you need to have <code>zenity</code> installed, and to get the best results the following fonts should be installed: <code>xfonts-base</code> (Debian/Ubuntu), <code>xorg-x11-fonts-base</code> or <code>xorg-x11-fonts-misc</code> (Fedora), <code>font-misc-misc</code> (Gentoo).</p>
   </description>
 
   <launchable type="desktop-id">io.github.mike632t.x11-calc.desktop</launchable>
@@ -60,6 +53,12 @@
   </screenshots>
 
   <releases>
+  <release version="0.18.0186" date="2025-08-23">
+    <description>
+      <p>Right clicking on the application window will now open a load/save dialog box</p>
+      <p>Users without a NumLock key can now enable the numeric keypad using the <code>--numlock'</code> option</p>
+    </description>
+  </release>
   <release version="0.17.0181" date="2025-08-17">
     <description>
       <p>Improved display updates</p>
