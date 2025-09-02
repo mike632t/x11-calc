@@ -334,6 +334,86 @@ const char *h_err_invalid_option = "option invalide %s\n";
 #endif /* Unix */
 
 
+#elif defined(LANG_se)
+
+const char *h_msg_loading = "Laddar '%s'\n";
+const char *h_msg_saving = "Sparar '%s'\n";
+const char *h_err_register_alloc = "Exekveringsfel\t: %s rad : %d : Fel vid Minnesallokering!\n";
+
+const char *h_err_opening_file = "Kan inte oeppna '%s'\n";
+
+const char *h_err_display = "Kan inte ansluta till X server '%s'\n";
+const char *h_err_display_properties = "Kan inte hamta display-egenskaper\n";
+const char *h_err_display_colour = "Kraever %d-bit faergdjup\n";
+const char *h_err_pixmap = "Kan inte skaps pixmap\n";
+const char *h_err_font = "Kan inte ladda font '%s' (x11 base bitmap fonter kraevs)\n";
+
+#if defined(HEXADECIMAL)
+const char *h_err_unexpected_opcode = "Ovaentad opcode (%03x) vid %1x-%03x i %s rad: %d\n";
+const char *h_err_unexpected_error = "Ovaentat fel vid %1x-%03x i %s rad: %d\n";
+const char *h_err_invalid_address = "Ogiltig adress (%04x) vid %1x-%03x i %s rad: %d\n";
+const char *h_err_invalid_register = "Ogilitigt register (REG[%03d]) vid %1x-%03x i %s rad: %d\n";
+# else
+const char *h_err_unexpected_opcode = "Ovaentad opcode (%04o) vid %1o-%04o i %s rad: %d\n";
+const char *h_err_unexpected_error = "Ovaentat fel vid %1o-%04o i %s rad: %d\n";
+const char *h_err_invalid_address = "Ogiltig adress (%06o) vid %1o-%04o i %s rad: %d\n";
+const char *h_err_invalid_register = "Ogiltigt register (REG[%03d]) vid %1o-%04o i %s rad: %d\n";
+#endif /* Hexadecimal */
+
+const char *h_err_missing_argument = "option requires an argument -- '%s'\n";
+
+#if defined(unix) || defined(__unix__) || defined(__APPLE__)
+#if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
+const char *h_msg_usage = "Anvaendning: %s [OPTION]... [FILE]\n\
+En RPN kalkylator-emulator foer X11.\n\n\
+  -b  ADDR                 definiera en brytpunkt (oktalt)\n\
+  -i  OPCODE               definiera en instruktions-brytpunkt (oktalt)\n\
+  -r  FILE                 ladda fraan en ROM FILE\n\
+  -s                       enkelstega (single step)\n\
+  -t                       logga (trace)\n\
+  -c, --comma              anvaend komma som decimal-avgraensare\n\
+      --cursor             visa markoer (cursor)\n\
+      --no-cursor          doelj markoer (cursor)\n\
+      --zoom ZOOM          oeka fönster-storleken\n\
+      --help               visa denna hjaelp och avsluta\n\
+      --version            visa versions-information och avsluta\n\n";
+#else
+const char *h_msg_usage = "Anvaendning: %s [OPTION]... [FILE]\n\
+En RPN kalkylator-emulator foer X11.\n\n\
+  -b  ADDR                 definiera en brytpunkt (oktalt)\n\
+  -i  OPCODE               definiera en instruktions-brytpunkt (oktalt)\n\
+  -r  FILE                 ladda fraan en ROM FILE\n\
+  -s                       enkelstega (single step)\n\
+  -t                       logga (trace)\n\
+      --cursor             visa markoer (cursor)\n\
+      --no-cursor          doelj markoer (cursor)\n\
+      --zoom ZOOM          oeka fönster-storleken\n\
+      --help               visa denna hjaelp och avsluta\n\
+      --version            visa versions-information och avsluta\n\n";
+#endif
+const char *h_err_invalid_operand = "Felaktig(a) operand(er)\n";
+const char *h_err_invalid_option = "Felaktig option -- '%c'\n";
+const char *h_err_duplicate_option = "Dubblerad option -- '%c'\n";
+const char *h_err_unrecognised_option = "Obekant option '%s'\n";
+const char *h_err_invalid_number = "Inte ett oktalt tal -- '%s'\n";
+const char *h_err_numeric_range = "Felaktigt vaerde -- '%s'\n";
+const char *h_err_max_breakpoints = "Maximalt antal brytpunkter oeverskridet\n";
+const char *h_err_invalid_argument = "Foervaentat argument, inte -- '%c'\n";
+#else
+const char *h_msg_usage = "Anvaendning: %s [OPTION...] [FILE]\n\
+En RPN kalkylator-emulator foer X11.\n\n\
+  /cursor                  visa markoer (default)\n\
+  /nocursor                doelj markoer\n\
+  /step                    enkelstega (single step)\n\
+  /trace                   logga (trace)\n\
+  /version                 visa denna hjaelp och avsluta\n\
+  /?, /help                visa versions-information och avsluta\n\n";
+
+const char *h_err_invalid_operand = "Felaktig(a) parameter(ar)\n";
+const char *h_err_invalid_option = "Felaktig option %s\n";
+#endif /* Unix */
+
+
 #else /* Language defaults to English */
 
 const char *h_msg_loading = "Loading '%s'\n";

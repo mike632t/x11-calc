@@ -510,12 +510,17 @@ have managed to get as far as I have.
 
 - `Teenix` for convincing me that it was possible in the first place.
 
-- `Teenix` and `Panamatik` for their excellent simulators from which I was able
-to figure out most of what should happen when each instruction is executed.
+- `Teenix`  and `Panamatik` for their excellent simulators from which I was
+able  to  figure out most of what should happen when  each  instruction  is
+executed.
 
 - `Agarza` for providing the details of the voyager displays.
 
-- `Macmpi` for completely rewriting the makefiles and packaging the simulator for Flatpak.
+- `Macmpi` for completely rewriting the makefiles and all while maintaining
+backward compatibility with Tru64 UNIX!
+
+- `Macmpi` for packaging the simulator for Flatpak and setting up the build
+so new releases are built automatically.
 
 - `Macmpi` for packaging and testing the simulators on Alpine Linux.
 
@@ -534,6 +539,8 @@ to figure out most of what should happen when each instruction is executed.
 - `Kjellc for reasons that may not yet be obvious.
 
 - 'Vttoth` for allowing me to include some of his example programs.
+
+- `Kjellc for translating the help text (into Swedish).
 
 <a id="problems"></a>
 ### Problem Reports <sup><sup>[Back to Top](#top)</sup></sup>

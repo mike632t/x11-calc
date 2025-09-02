@@ -414,6 +414,9 @@
  *                     file - MT
  * 24 Aug            - When loading or saving files use the location of the
  *                     configuration files as the default directory - MT
+ * 03 Sep 25         - Added a workaround for issues with Flatpak - MT
+ *                   - Do not set printer mode when resetting the processor
+ *                     it is set by the printer mode switch - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -426,8 +429,8 @@
  */
 
 #define  NAME          "x11-calc-cpu"
-#define  BUILD         "0212"
-#define  DATE          "11 Aug 25"
+#define  BUILD         "0216"
+#define  DATE          "03 Sep 25"
 #define  AUTHOR        "MT"
 
 #define  NODEBUG
@@ -834,41 +837,45 @@ char* s_getfilename(Bool b_save)
  */
 
 {
+   char *s_pathname;
+
 #if defined(unix) || defined(__unix__) || defined(__APPLE__)
 #define  BUFFER_SIZE   256
 
-   FILE *h_file;
    char *s_dirname;
    char *s_basename;
    char *s_format;
    char *s_command;
-   char *s_pathname;
+   FILE *h_file;
 
    s_dirname = s_get_datafile_path();  /* Get path */
    s_basename = strrchr(s_dirname, '/' );  /* Find the base name */
    *(s_basename++) = '\0';  /* Replace the '/' with a '\0' to split the directory name and base name into two strings */
 
-   if (b_save)
-      s_format = "zenity --file-selection --filename \"%s/\" --file-filter=\" *.dat  | "FILENAME"-*.dat \" --file-filter=\"  *.*  | *.* \" --title=\"Save\" --save --confirm-overwrite 2>&1";
-   else
-      s_format = "zenity --file-selection --filename \"%s/\" --file-filter=\" *.dat  | "FILENAME"-*.dat \" --file-filter=\"  *.*  | *.* \" --title=\"Load\" 2>&1";
-
-   if ((s_command = malloc(sizeof(*s_dirname) * (strlen(s_dirname) + strlen(s_format) + 1))) == NULL) v_error(errno, h_err_memmory_alloc, __FILE__, __LINE__);  /* Allocate memory for command */
-   sprintf(s_command, s_format, s_dirname);  /* Insert path name into command */
-
-   if ((s_pathname = malloc(sizeof(*s_pathname) * BUFFER_SIZE)) == NULL) v_error(errno, h_err_memmory_alloc, __FILE__, __LINE__);  /* Allocate memory for path to file (max 256 characters) */
-   if ((h_file = popen(s_command, "r")) != NULL)  /* Fail silently */
+   if (strstr(s_dirname , "io.github.mike632t.x11-calc") == NULL) /* Do NOT attempt to run `zenity` if running inside the flatpak sandbox (it will hang) */
    {
-      if ((s_pathname = fgets(s_pathname, BUFFER_SIZE, h_file)) != NULL)
+      if (b_save)
+         s_format = "zenity --file-selection --filename \"%s/\" --file-filter=\" *.dat  | "FILENAME"-*.dat \" --file-filter=\"  *.*  | *.* \" --title=\"Save\" --save --confirm-overwrite 2>&1";
+      else
+         s_format = "zenity --file-selection --filename \"%s/\" --file-filter=\" *.dat  | "FILENAME"-*.dat \" --file-filter=\"  *.*  | *.* \" --title=\"Load\" 2>&1";
+      if ((s_command = malloc(sizeof(*s_dirname) * (strlen(s_dirname) + strlen(s_format) + 1))) == NULL) v_error(errno, h_err_memmory_alloc, __FILE__, __LINE__);  /* Allocate memory for command */
+      sprintf(s_command, s_format, s_dirname);  /* Insert path name into command */
+      if ((s_pathname = malloc(sizeof(*s_pathname) * BUFFER_SIZE)) == NULL) v_error(errno, h_err_memmory_alloc, __FILE__, __LINE__);  /* Allocate memory for path to file (max 256 characters) */
+      if ((h_file = popen(s_command, "r")) != NULL)  /* Fail silently */
       {
-         if (pclose(h_file))
-            s_pathname = NULL;  /* There was an error */
-         else
-            s_pathname[strcspn(s_pathname, "\n\r")] = '\0';  /* Remove trailing newline characters */
+         if ((s_pathname = fgets(s_pathname, BUFFER_SIZE, h_file)) != NULL)
+         {
+            if (pclose(h_file))
+               s_pathname = NULL;  /* There was an error */
+            else
+               s_pathname[strcspn(s_pathname, "\n\r")] = '\0';  /* Remove trailing newline characters */
+         }
       }
    }
+   else
+      s_pathname = NULL;
 #else
-   char *s_pathname = NULL;
+   s_pathname = NULL;
 #endif
    return s_pathname;
 }
@@ -1038,7 +1045,7 @@ void v_processor_reset(oprocessor *h_processor) /* Reset processor */
    h_processor->crc[READY] = -4;
 #endif
 #if defined(HP10)
-   h_processor->print = NORMAL;
+   /** h_processor->print = NORMAL; /* Don't reset printer state it is set from switches */
    for (i_count = 0; i_count < BUFSIZE; i_count++) /* Reset the character buffer contents */
       h_processor->buffer[i_count] = 0x3f;
 #endif

@@ -53,9 +53,8 @@
   </screenshots>
 
   <releases>
-  <release version="0.18.0186" date="2025-08-23">
+  <release version="0.18.0187" date="2025-09-03">
     <description>
-      <p>Right clicking on the application window will now open a load/save dialog box</p>
       <p>Users without a NumLock key can now enable the numeric keypad using the <code>--numlock'</code> option</p>
     </description>
   </release>

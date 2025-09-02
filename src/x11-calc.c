@@ -354,6 +354,7 @@
  *                     the user tries to close the window when a dialog box
  *                     is open - MT
  * 23 Aug 25   0.18  - Disable display when printer is in TRACE mode - MT
+ * 03 Sep 25         - Added a workaround for issues with Flatpak - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -367,8 +368,8 @@
 
 #define  NAME          "x11-calc"
 #define  VERSION       "0.18"
-#define  BUILD         "0186"
-#define  DATE          "23 Aug 25"
+#define  BUILD         "0187"
+#define  DATE          "02 Sep 25"
 #define  AUTHOR        "MT"
 
 #define  INTERVAL 48   /* Number of ticks to execute before updating the display */
