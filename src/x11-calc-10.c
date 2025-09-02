@@ -52,13 +52,15 @@
  *                     extra instruction was inserted at 0-2502 - MT
  * 09 Jun 25         - Fixed error in opcode at 0-2500 - MT
  * 04 Jul 25         - Fixed error in opcode at 0-2661 - MT
+ * 03 Sep 25         - Added  keyboard shortcuts for 'C'/'CE' and  function
+ *                     keys - MT
  *
  * To Do             -
  */
 
 #define VERSION        "0.1"
-#define BUILD          "0018"
-#define DATE           "09 Jun 25"
+#define BUILD          "0020"
+#define DATE           "03 Sep 25"
 #define AUTHOR         "MT"
 
 #include <stdarg.h>    /* strlen(), etc. */
@@ -103,12 +105,12 @@ void v_init_buttons(struct obutton *h_button[]) {
    i_left += (KEY_WIDTH + KEY_GAP);
    h_button[i_count++] = h_button_create(00044, 000, "MR", "CM", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, True, BLACK, YELLOW, BACKGROUND, BACKGROUND);
    i_left += (KEY_WIDTH + KEY_GAP);
-   h_button[i_count++] = h_button_create(00040, 000, "CE", "C", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, True, BLACK, YELLOW, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00040, 033, "CE", "C", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, True, BLACK, YELLOW, BACKGROUND, BACKGROUND);
 
    /* Define second row of keys. */
    i_top += KBD_ROW;
    i_left = KBD_LEFT;
-   h_button[i_count++] = h_button_create(00042, 000, "", "" , "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, True, YELLOW, BACKGROUND, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00042, 'f', "", "" , "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, True, YELLOW, BACKGROUND, BACKGROUND, BACKGROUND);
    i_left += (KEY_WIDTH + KEY_GAP);
    h_button[i_count++] = h_button_create(00062, '%', "%", "", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, True, BLACK, BACKGROUND, BACKGROUND, BACKGROUND);
    i_left += (KEY_WIDTH + KEY_GAP);
