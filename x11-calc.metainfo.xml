@@ -17,7 +17,8 @@
   <description>
     <p>Simulators for the following HP calculator models HP 35, HP 80, HP 45, HP 70, HP 21, HP 22, HP 25, HP 25C, HP 27, HP 29C, HP 31E, HP 32E, HP 33E, HP 33C, HP 34C, HP 37E, HP 38C, HP 38E, HP10, HP 67, HP 10C, HP 11C, HP 12C, HP 15C, and HP 16C.</p>
     <p>On KDE and Gnome you can right-click on desktop icon and select 'Set default calculator' to set default model, or choose one of the available simulators from the sub menu. Alternatively you can access the configuration dialog from a terminal using <code>flatpak run io.github.mike632t.x11-calc --setup</code></p>
-    <p><em>Note</em>: To be able to load/save programs by right clicking on the application window you need to have <code>zenity</code> installed, and to get the best results the following fonts should be installed: <code>xfonts-base</code> (Debian/Ubuntu), <code>xorg-x11-fonts-base</code> or <code>xorg-x11-fonts-misc</code> (Fedora), <code>font-misc-misc</code> (Gentoo).</p>
+    <p>On models with continuous memory right clicking on the application window will open a file selection dialog allowing previously saved programs to be loaded in 'run' mode or saved in 'prgm' mode.</p>
+    <p><em>Note</em> To get the best results the following fonts should be installed: <code>xfonts-base</code> (Debian/Ubuntu), <code>xorg-x11-fonts-base</code> or <code>xorg-x11-fonts-misc</code> (Fedora), <code>font-misc-misc</code> (Gentoo).</p>
   </description>
 
   <launchable type="desktop-id">io.github.mike632t.x11-calc.desktop</launchable>
@@ -53,6 +54,11 @@
   </screenshots>
 
   <releases>
+  <release version="0.18.0188" date="2025-09-05">
+    <description>
+      <p>Implemented file selection dialog using GTK</p>
+    </description>
+  </release>
   <release version="0.18.0187" date="2025-09-03">
     <description>
       <p>Users without a NumLock key can now enable the numeric keypad using the <code>--numlock'</code> option</p>

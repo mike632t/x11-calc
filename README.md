@@ -37,6 +37,11 @@ Tru64 Unix.
 
 Details of the latest/important changes.
 
+05 Sep 25
+
+   - Fixed issues that prevented the file selection dialog from being shown
+     when using Flatpak.
+
 24 Aug 25
 
    - HP37E now passes self test.
