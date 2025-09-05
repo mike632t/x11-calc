@@ -417,6 +417,8 @@
  * 03 Sep 25         - Added a workaround for issues with Flatpak - MT
  *                   - Do not set printer mode when resetting the processor
  *                     it is set by the printer mode switch - MT
+ * 04 Sep 25         - Reorganised load/save routines - MT
+ * 05 Sep 25         - Implemented file selection dialog using GTK - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -429,11 +431,13 @@
  */
 
 #define  NAME          "x11-calc-cpu"
-#define  BUILD         "0216"
-#define  DATE          "03 Sep 25"
+#define  BUILD         "0218"
+#define  DATE          "05 Sep 25"
 #define  AUTHOR        "MT"
 
 #define  NODEBUG
+
+#define __GTK__
 
 #include <errno.h>     /* errno */
 
@@ -459,6 +463,119 @@
 
 #if defined(unix) || defined(__unix__) || defined(__APPLE__)
 #include <sys/stat.h>
+
+#if defined(__GTK__)
+#include <gtk/gtk.h>
+
+char *s_get_filename(char *s_path, char c_mode, char *s_filter, char *s_name)
+{
+   GtkWidget *h_widget = NULL;
+   GtkFileFilter *h_filter = NULL;
+   GtkFileFilter *h_all = NULL;
+   char *s_filename;
+   char *s_basename;
+
+   s_basename = strrchr(s_path, '/' );  /* Find the base name */
+   *(s_basename++) = '\0';  /* Replace the '/' with a '\0' to split the directory name and base name into two strings */
+
+   gtk_init(NULL, NULL);  /* Initialize the GTK environment */
+
+   switch (c_mode)
+   {
+   case 'r':
+      h_widget = gtk_file_chooser_dialog_new("Open", NULL, GTK_FILE_CHOOSER_ACTION_OPEN, "Cancel", GTK_STOCK_QUIT , "Open", GTK_RESPONSE_OK, NULL);
+      break;
+   case 'w':
+      h_widget = gtk_file_chooser_dialog_new("Save", NULL, GTK_FILE_CHOOSER_ACTION_SAVE, "Cancel", GTK_STOCK_QUIT , "Save", GTK_RESPONSE_OK, NULL);
+      gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (h_widget), TRUE);
+      break;
+   default:
+      break;
+   }
+
+   if (s_filter) /* Should the results be filtered */
+   {
+      h_filter = gtk_file_filter_new();
+      gtk_file_filter_add_pattern (h_filter, s_filter);
+      if (s_name)
+         gtk_file_filter_set_name (h_filter, s_name);
+      else
+         gtk_file_filter_set_name (h_filter, s_filter);
+      gtk_file_chooser_add_filter (GTK_FILE_CHOOSER(h_widget), h_filter);  /* Use add_filter() not set_filter() otherwise use won't be able to change it */
+   }
+
+   s_filter = "*.*";  /* Add another filter to allow the user to select all files */
+   s_name = "All Files";
+   h_all = gtk_file_filter_new();
+   gtk_file_filter_add_pattern (h_all, s_filter);
+   gtk_file_filter_set_name (h_all, s_name);
+   gtk_file_chooser_add_filter (GTK_FILE_CHOOSER(h_widget), h_all);
+
+   /** gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(h_widget), "test.dat");  /* Default filename */
+   gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER(h_widget), s_path);  /* Set default path */
+   gtk_widget_show_all(h_widget);
+
+   if (gtk_dialog_run(GTK_DIALOG(h_widget)) == GTK_RESPONSE_OK)
+      s_filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(h_widget));
+   else
+      s_filename = NULL;
+
+   gtk_file_chooser_remove_filter(GTK_FILE_CHOOSER(h_widget), h_all); /* Tidy up */
+   gtk_file_chooser_remove_filter(GTK_FILE_CHOOSER(h_widget), h_filter);
+   gtk_widget_destroy(h_widget);
+
+   while (gtk_events_pending())  /* Clear GTK event queue  */
+      gtk_main_iteration();
+
+   return s_filename;
+}
+#else
+
+#define  BUFFER_SIZE   512
+
+char *s_get_filename(char *s_path, char c_mode, char *s_filter, char *s_name)
+{
+   FILE *h_file;
+   char *s_filename = NULL;
+   char *s_basename = NULL;
+   char *s_command = NULL;
+   char *s_format = NULL;
+
+   s_basename = strrchr(s_path, '/' );  /* Find the base name */
+   *(s_basename++) = '\0';  /* Replace the '/' with a '\0' to split the directory name and base name into two strings */
+
+   if (strstr(s_basename , "io.github.mike632t.x11-calc") == NULL) /* Do NOT attempt to run `zenity` if running inside the flatpak sandbox (it will hang) */
+   {
+      switch (c_mode)
+      {
+      case 'r':
+         s_format = "zenity --file-selection --filename \"%s/\" --file-filter=\" %s  | %s \" --file-filter=\"  All Files  | *.* \" --title=\"Load\" 2>&1";
+         break;
+      case 'w':
+         s_format = "zenity --file-selection --filename \"%s/\" --file-filter=\" %s  | %s \" --file-filter=\"  All Files | *.* \" --title=\"Save\" --save --confirm-overwrite 2>&1";
+         break;
+      default:
+         break;
+      }
+      if ((s_command = malloc(sizeof(*s_path) * (strlen(s_path) + strlen(s_format) + strlen(s_filter) + strlen(s_name) + 1))) == NULL) /* Allocate memory for command */
+         v_error(errno, h_err_memmory_alloc, __FILE__, __LINE__);
+      sprintf(s_command, s_format, s_path, s_name, s_filter);  /* Insert path name into command */
+      if ((s_filename = malloc(sizeof(*s_filename) * BUFFER_SIZE)) == NULL) v_error(errno, h_err_memmory_alloc, __FILE__, __LINE__);  /* Allocate memory for path to file (max 512 characters) */
+      if ((h_file = popen(s_command, "r")) != NULL)  /* Fail silently */
+      {
+         if ((s_filename = fgets(s_filename, BUFFER_SIZE, h_file)) != NULL)
+         {
+            if (pclose(h_file))
+               s_filename = NULL;  /* There was an error */
+            else
+               s_filename[strcspn(s_filename, "\n\r")] = '\0';  /* Remove trailing newline characters */
+         }
+      }
+   }
+   return s_filename;
+}
+#endif
+
 #endif
 
 static void v_fprint_register(FILE *h_file, oregister *h_register) /* Print the contents of a register */
@@ -744,7 +861,7 @@ void v_read_rom(oprocessor *h_processor, char *s_pathname) /* Load rom from 'obj
 
 #if defined(CONTINIOUS)
 
-char *s_get_datafile_path() /* Return path the the data file */
+char *s_get_datafile() /* Return path the the data file */
 /*
  *  - If $HOME is defined and the data file already exists in there  return
  *    the pathname of the data file in $HOME to maintain compatibility with
@@ -819,63 +936,6 @@ char *s_get_datafile_path() /* Return path the the data file */
    strcpy(s_pathname, s_directory);
    strcat(s_pathname, s_filename);
    strcat(s_pathname, s_filetype);
-#endif
-   return s_pathname;
-}
-
-char* s_getfilename(Bool b_save)
-/*
- * Uses 'zenity' to allow the user to browse for and select a file name.
- *
- * To Do             - Instead of allocating a fixed buffer size that could
- *                     hold a filename with maximum path length, resize the
- *                     the buffer in blocks of 32 characters as required.
- *                   - Check path for either zenity of kdialog..?
- *
- * https://stackoverflow.com/questions/2693776/
- *
- */
-
-{
-   char *s_pathname;
-
-#if defined(unix) || defined(__unix__) || defined(__APPLE__)
-#define  BUFFER_SIZE   256
-
-   char *s_dirname;
-   char *s_basename;
-   char *s_format;
-   char *s_command;
-   FILE *h_file;
-
-   s_dirname = s_get_datafile_path();  /* Get path */
-   s_basename = strrchr(s_dirname, '/' );  /* Find the base name */
-   *(s_basename++) = '\0';  /* Replace the '/' with a '\0' to split the directory name and base name into two strings */
-
-   if (strstr(s_dirname , "io.github.mike632t.x11-calc") == NULL) /* Do NOT attempt to run `zenity` if running inside the flatpak sandbox (it will hang) */
-   {
-      if (b_save)
-         s_format = "zenity --file-selection --filename \"%s/\" --file-filter=\" *.dat  | "FILENAME"-*.dat \" --file-filter=\"  *.*  | *.* \" --title=\"Save\" --save --confirm-overwrite 2>&1";
-      else
-         s_format = "zenity --file-selection --filename \"%s/\" --file-filter=\" *.dat  | "FILENAME"-*.dat \" --file-filter=\"  *.*  | *.* \" --title=\"Load\" 2>&1";
-      if ((s_command = malloc(sizeof(*s_dirname) * (strlen(s_dirname) + strlen(s_format) + 1))) == NULL) v_error(errno, h_err_memmory_alloc, __FILE__, __LINE__);  /* Allocate memory for command */
-      sprintf(s_command, s_format, s_dirname);  /* Insert path name into command */
-      if ((s_pathname = malloc(sizeof(*s_pathname) * BUFFER_SIZE)) == NULL) v_error(errno, h_err_memmory_alloc, __FILE__, __LINE__);  /* Allocate memory for path to file (max 256 characters) */
-      if ((h_file = popen(s_command, "r")) != NULL)  /* Fail silently */
-      {
-         if ((s_pathname = fgets(s_pathname, BUFFER_SIZE, h_file)) != NULL)
-         {
-            if (pclose(h_file))
-               s_pathname = NULL;  /* There was an error */
-            else
-               s_pathname[strcspn(s_pathname, "\n\r")] = '\0';  /* Remove trailing newline characters */
-         }
-      }
-   }
-   else
-      s_pathname = NULL;
-#else
-   s_pathname = NULL;
 #endif
    return s_pathname;
 }
@@ -977,7 +1037,7 @@ void v_write_state(oprocessor *h_processor, char *s_pathname) /* Write processor
 void v_save_state(oprocessor *h_processor) /* Restore saved processor state */
 {
 #if defined(CONTINIOUS)
-   char *s_pathname = s_getfilename(True);
+   char *s_pathname = s_get_filename(s_get_datafile(), 'w', FILENAME"-*.dat", "Data Files");
    v_write_state(h_processor, s_pathname); /* Save settings */
    free(s_pathname); /* Free up pathname */
 #endif
@@ -986,7 +1046,7 @@ void v_save_state(oprocessor *h_processor) /* Restore saved processor state */
 void v_load_state(oprocessor *h_processor) /* Restore saved processor state */
 {
 #if defined(CONTINIOUS)
-   char *s_pathname = s_getfilename(False);
+   char *s_pathname = s_get_filename(s_get_datafile(), 'r', FILENAME"-*.dat", "Data Files");
    v_read_state(h_processor, s_pathname); /* Load settings */
    free(s_pathname); /* Free up pathname */
 #endif
@@ -995,7 +1055,7 @@ void v_load_state(oprocessor *h_processor) /* Restore saved processor state */
 void v_backup_state(oprocessor *h_processor) /* Restore saved processor state */
 {
 #if defined(CONTINIOUS)
-   char *s_pathname = s_get_datafile_path();
+   char *s_pathname = s_get_datafile();
    v_write_state(h_processor, s_pathname); /* Save settings */
    free(s_pathname); /* Free up pathname */
 #endif
@@ -1005,7 +1065,7 @@ void v_restore_state(oprocessor *h_processor) /* Restore saved processor state *
 {
    v_processor_reset(h_processor);
 #if defined(CONTINIOUS)
-   char *s_pathname = s_get_datafile_path();
+   char *s_pathname = s_get_datafile();
    v_read_state(h_processor, s_pathname); /* Load settings */
    free(s_pathname); /* Free up pathname */
 #endif

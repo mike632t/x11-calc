@@ -88,6 +88,12 @@ LDLIBS	?=
 LANG	= LANG_$(shell (echo $$LANG | cut -f 1 -d '_'))
 COMMIT	!= git log -1 HEAD --format=%h 2> /dev/null
 
+CFLAGS	+= `pkg-config --cflags gtk+-3.0`
+LDLIBS	+= `pkg-config --libs gtk+-3.0`
+
+#CFLAGS	+= `pkg-config --cflags gtk+-2.0`
+#LDLIBS	+= `pkg-config --libs gtk+-2.0`
+
 ifneq ($(COMMIT),)
 CFLAGS	+= -DCOMMIT_ID='"[Commit Id : $(COMMIT)]"'
 endif
