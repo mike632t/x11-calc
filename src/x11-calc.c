@@ -356,6 +356,9 @@
  * 23 Aug 25   0.18  - Disable display when printer is in TRACE mode - MT
  * 03 Sep 25         - Added a workaround for issues with Flatpak - MT
  * 05 Sep 25         - Implemented file selection dialog using GTK - MT
+ * 06 Sep 25         - Reorganized  continuous memory save/restore routines
+ *                     and defined the conditional code in the main program
+ *                     removing the need for dummy functions - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -479,7 +482,6 @@ int main(int argc, char *argv[])
 
    char *s_display_name = "";          /* Just use the default display */
    char *s_title = TITLE;              /* Windows title */
-   char *s_pathname = NULL;
 
    float f_scale = 1.0;
 
@@ -501,16 +503,21 @@ int main(int argc, char *argv[])
    Bool b_numlock = False;             /* Use number pad - even if numlock is off */
    char b_run = True;                  /* Run flag controls CPU instruction execution in main loop */
    char b_abort = False;               /* Abort flag controls execution of main loop */
+
 #if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
    char b_euro = False;
 #endif
 
-   int i_breakpoints[] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}; /* Array to hold breakpoints */
+   int i_breakpoints[] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};  /* Array to hold breakpoints */
 
    int i_offset, i_count, i_index, i_value, i_size;
-   int i_zoom = 0;               /* Zoom level */
-   int i_trap = -1;              /* Trap instruction */
+   int i_zoom = 0;                     /* Zoom level */
+   int i_trap = -1;                    /* Trap instruction */
    int i_ticks = -1;
+
+#if defined(CONTINIOUS)
+   char *s_pathname = NULL;
+#endif
 
 #if defined(SWITCHES)
    struct oswitch *h_switch[SWITCHES];
@@ -525,6 +532,7 @@ int main(int argc, char *argv[])
 #endif
 
    h_processor = h_processor_create(i_rom);
+
 #if defined(unix) || defined(__unix__) || defined(__APPLE__)  /* Parse UNIX style command line options */
    b_abort = False;  /* Stop processing command line */
    for (i_count = 1; i_count < argc && (b_abort != True); i_count++)
@@ -618,6 +626,7 @@ int main(int argc, char *argv[])
                      v_error(EINVAL, h_err_missing_argument, argv[i_count]);
                i_index = strlen(argv[i_count]) - 1;
                break;
+
 #if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
             case 'c':  /* Use european display format */
                b_euro = True;
@@ -638,6 +647,7 @@ int main(int argc, char *argv[])
                      b_cursor = True;  /* Draw cursor */
                   else if (!strncmp(argv[i_count], "--no-cursor", i_index))
                      b_cursor = False;  /* Don't draw a cursor - unless drawn by the window manager */
+
 #if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
                   else if (!strncmp(argv[i_count], "--comma", i_index))
                      b_euro = True; /* Use european display format */
@@ -882,13 +892,16 @@ int main(int argc, char *argv[])
    XMapWindow(x_display, x_window);  /* Show window on display */
    XRaiseWindow(x_display, x_window);  /* Raise window - ensures expose event is raised? */
 
+   v_processor_reset(h_processor);
    h_processor->trace = b_trace;
    h_processor->step = b_step;
 
+#if defined(CONTINIOUS)
    if (s_pathname == NULL)
       v_restore_state(h_processor);
    else
       v_read_state(h_processor, s_pathname);  /* Load user specified settings */
+#endif
 
 #if defined(SWITCHES)
    if (h_switch[0] != NULL) h_processor->enabled = h_switch[0]->state; /* Allow switches to be undefined if not used */
@@ -976,10 +989,13 @@ int main(int argc, char *argv[])
                h_processor->step = !(b_run  = True);
             else if (h_keyboard->key == (XK_C & 0x1f))  /* Ctrl-C to reset */
             {
+               v_processor_reset(h_processor);
+#if defined(CONTINIOUS)
                if (s_pathname == NULL)
                   v_restore_state(h_processor);  /* Load current saved settings */
                else
                   v_read_state(h_processor, s_pathname);  /* Load user specified settings */
+#endif
                b_run = True;
             }
             else  /* Check for matching button */
@@ -1052,11 +1068,15 @@ int main(int argc, char *argv[])
                      if (h_switch[0]->state)
                      {
                         v_processor_reset(h_processor);  /* Reset the processor */
+#if defined(CONTINIOUS)
                         v_restore_state(h_processor);  /* Restore saved settings */
+#endif
                      }
                      else
                      {
+#if defined(CONTINIOUS)
                         v_backup_state(h_processor);  /* Save current settings */
+#endif
                         h_processor->enabled = False;  /* Disable the processor */
 #if defined(HP67)
                         i_ticks = DELAY * 4;  /* Set count down */
@@ -1113,7 +1133,7 @@ int main(int argc, char *argv[])
                      i_ticks = -1;
 #endif
             }
-#if defined(CONTINIOUS) || defined (HP67)
+#if defined(CONTINIOUS)
             if (x_event.xbutton.button == 3)  /* Right mouse button */
             {
                if (h_processor->mode)
@@ -1150,7 +1170,9 @@ int main(int argc, char *argv[])
       }
    }
 
+#if defined(CONTINIOUS)
    v_backup_state(h_processor);  /* Save state */
+#endif
 
    XDestroyWindow(x_display, x_window);  /* Close connection to server */
    XCloseDisplay(x_display);

@@ -174,6 +174,13 @@ void v_processor_reset(oprocessor *h_processor);
 
 void v_read_rom(oprocessor *h_processor, char *s_pathname);
 
+void v_fprint_registers(FILE *h_file, oprocessor *h_procesor);
+
+void v_fprint_memory(FILE *h_file, oprocessor *h_procesor);
+
+void v_processor_tick(oprocessor *h_procesor);
+
+#if defined(CONTINIOUS)
 void v_read_state(oprocessor *h_processor, char *s_pathname);
 
 void v_write_state(oprocessor *h_processor, char *s_pathname);
@@ -185,10 +192,6 @@ void v_restore_state(oprocessor *h_processor);
 void v_load_state(oprocessor *h_processor);
 
 void v_save_state(oprocessor *h_processor);
+#endif
 
-void v_fprint_registers(FILE *h_file, oprocessor *h_procesor);
-
-void v_fprint_memory(FILE *h_file, oprocessor *h_procesor);
-
-void v_processor_tick(oprocessor *h_procesor);
 #endif

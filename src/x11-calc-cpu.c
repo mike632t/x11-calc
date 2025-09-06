@@ -463,6 +463,9 @@
 
 #if defined(unix) || defined(__unix__) || defined(__APPLE__)
 #include <sys/stat.h>
+#endif
+
+#if defined(CONTINIOUS)
 
 #if defined(__GTK__)
 #include <gtk/gtk.h>
@@ -576,6 +579,199 @@ char *s_get_filename(char *s_path, char c_mode, char *s_filter, char *s_name)
 }
 #endif
 
+char *s_get_datafile() /* Return path the the data file */
+/*
+ *  - If $HOME is defined and the data file already exists in there  return
+ *    the pathname of the data file in $HOME to maintain compatibility with
+ *    earlier releases.
+ *
+ *  - If the data file in not in the $HOME folder then if $XDG_DATA_HOME is
+ *    defined or $HOME/.local/share/ exists this routine will search for an
+ *    application specific subdirectory in the first of these two locations
+ *    if finds (creating it if necessary) and use this as the pathname.
+ *
+ *  - Otherwise it will use the current directory path as the pathname.
+ *
+ */
+{
+   char *s_directory = getenv("HOME");
+   char s_filename[] = FILENAME;
+   char s_filetype[] = ".dat";
+   char *s_pathname;
+
+   if (s_directory == NULL) s_directory = ""; /* Use current folder if HOME not defined */
+#if defined(unix) || defined(__unix__) || defined(__APPLE__)
+   s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 2) * sizeof(char*));
+   strcpy(s_pathname, s_directory);
+   strcat(s_pathname, "/.");
+   strcat(s_pathname, s_filename);
+   strcat(s_pathname, s_filetype);
+   if (!(i_isfile(s_pathname))) /* File does not exists in home or current directory continue searching... */
+   {
+      free(s_pathname);
+      s_directory = getenv("XDG_DATA_HOME");
+      if (s_directory) /* XDG_DATA_HOME is defined so atempt to use it */
+      {
+         s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 10) * sizeof(char*));
+         strcpy(s_pathname, s_directory);
+      }
+      else /* Otherwise try to use $HOME/.local/share */
+      {
+         s_directory = getenv("HOME");
+         s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 23) * sizeof(char*));
+         strcpy(s_pathname, s_directory);
+         strcat(s_pathname, "/.local/share");
+      }
+      if (i_exists(s_pathname) && i_isdir(s_pathname)) /* Check that the selected directory exists, and if it doesn't use $HOME */
+      {
+         strcat(s_pathname, "/x11-calc");
+         if (i_exists(s_pathname) == 0) mkdir(s_pathname, (S_IRWXU|S_IRGRP|S_IXGRP)); /* If the application data folder does not exist attempt to create it (no need to check status here as we check the directory exists below) */
+         if (i_isdir(s_pathname) == 0) /* Check the directory exists and if it doesn't just use $HOME */
+         {
+            v_warning(h_err_creating_file, s_pathname); /* Can't create directory */
+            free(s_pathname);
+            s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 2) * sizeof(char*));
+            strcpy(s_pathname, s_directory);
+            strcat(s_pathname, "/.");
+         }
+         else
+            strcat(s_pathname, "/");
+      }
+      else
+      {
+         free(s_pathname);
+         s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 2) * sizeof(char*));
+         strcpy(s_pathname, s_directory);
+         strcat(s_pathname, "/.");
+      }
+      strcat(s_pathname, s_filename);
+      strcat(s_pathname, s_filetype);
+   }
+#else
+   s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype)) * sizeof(char*));
+   strcpy(s_pathname, s_directory);
+   strcat(s_pathname, s_filename);
+   strcat(s_pathname, s_filetype);
+#endif
+   return s_pathname;
+}
+
+void v_read_state(oprocessor *h_processor, char *s_pathname) /* Read processor state from file */
+{
+   FILE *h_file;
+   unsigned int i_temp;
+   int i_count, i_counter;
+
+   if ((h_processor != NULL) && (s_pathname != NULL)) { /* Check processor and pathname are defined */
+      v_processor_reset(h_processor);
+      h_file = fopen(s_pathname, "r");
+      if (h_file !=NULL) { /* If file exists and can be opened restore state */
+         fprintf(stderr,h_msg_loading, s_pathname);
+#if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c)
+         for (i_count = 0; i_count < FLAGS; i_count++)
+         {
+            if (fscanf(h_file, "%x,", &i_temp)) h_processor->flags[i_count] = i_temp;
+         }
+         for (i_count = 0; i_count < STATUS_BITS; i_count++)
+         {
+            if (fscanf(h_file, "%x,", &i_temp)) h_processor->status[i_count] = i_temp;
+         }
+         for (i_count = 0; i_count < REGISTERS; i_count++)
+            for (i_counter = REG_SIZE - 1; i_counter >= 0 ; i_counter--)
+            {
+               if (fscanf(h_file, "%x,", &i_temp)) h_processor->reg[i_count]->nibble[i_counter] = i_temp;
+            }
+         if (fscanf(h_file, "%x,", &i_temp)) h_processor->p = i_temp;
+         if (fscanf(h_file, "%x,", &i_temp)) h_processor->q = i_temp;
+         if (fscanf(h_file, "%x,", &i_temp)) h_processor->f = i_temp;
+         if (fscanf(h_file, "%x,", &i_temp)) h_processor->g[0] = i_temp;
+         if (fscanf(h_file, "%x,", &i_temp)) h_processor->g[1] = i_temp;
+#endif
+         for (i_count = 0; i_count < MEMORY_SIZE; i_count++)
+            for (i_counter = REG_SIZE - 1; i_counter >= 0 ; i_counter--)
+            {
+               if (fscanf(h_file, "%x,", &i_temp)) h_processor->mem[i_count]->nibble[i_counter] = i_temp;
+            }
+         fclose(h_file);
+      }
+      else
+         v_warning(h_err_opening_file, s_pathname); /* Can't open data file */
+   }
+}
+
+void v_write_state(oprocessor *h_processor, char *s_pathname) /* Write processor state to file */
+{
+   FILE *h_file;
+   int i_count, i_counter;
+
+   if ((h_processor != NULL) && (s_pathname != NULL)) { /* Check processor and path name are defined */
+      h_file = fopen(s_pathname, "w");
+      if (h_file !=NULL) { /* If file exists and can be opened save state */
+         fprintf(stderr,h_msg_saving, s_pathname);
+#if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c)
+         for (i_count = 0; i_count < FLAGS; i_count++)
+         {
+            fprintf(h_file, "%02x,", h_processor->flags[i_count]);
+         }
+         fprintf(h_file,"\n");
+         for (i_count = 0; i_count < STATUS_BITS; i_count++)
+         {
+            fprintf(h_file, "%02x,", h_processor->status[i_count]);
+         }
+         fprintf(h_file,"\n");
+         for (i_count = 0; i_count < REGISTERS; i_count++)
+         {
+            for (i_counter = REG_SIZE - 1; i_counter >= 0 ; i_counter--)
+               fprintf(h_file, "%02x,", h_processor->reg[i_count]->nibble[i_counter]);
+            fprintf(h_file,"\n");
+         }
+         fprintf(h_file, "%02x,", h_processor->p);
+         fprintf(h_file, "%02x,", h_processor->q);
+         fprintf(h_file, "%02x,", h_processor->f);
+         fprintf(h_file, "%02x,", h_processor->g[0]);
+         fprintf(h_file, "%02x,", h_processor->g[1]);
+         fprintf(h_file,"\n");
+#endif
+         for (i_count = 0; i_count < MEMORY_SIZE; i_count++)
+         {
+            for (i_counter = REG_SIZE - 1; i_counter >= 0 ; i_counter--)
+               fprintf(h_file, "%02x,", h_processor->mem[i_count]->nibble[i_counter]);
+            fprintf(h_file,"\n");
+         }
+         fclose(h_file);
+      }
+      else
+         v_warning(h_err_opening_file, s_pathname); /* Can't open data file */
+   }
+}
+
+void v_save_state(oprocessor *h_processor) /* Restore saved processor state */
+{
+   char *s_pathname = s_get_filename(s_get_datafile(), 'w', FILENAME"-*.dat", "Data Files");
+   v_write_state(h_processor, s_pathname); /* Save settings */
+   free(s_pathname); /* Free up pathname */
+}
+
+void v_load_state(oprocessor *h_processor) /* Restore saved processor state */
+{
+   char *s_pathname = s_get_filename(s_get_datafile(), 'r', FILENAME"-*.dat", "Data Files");
+   v_read_state(h_processor, s_pathname); /* Load settings */
+   free(s_pathname); /* Free up pathname */
+}
+
+void v_backup_state(oprocessor *h_processor) /* Restore saved processor state */
+{
+   char *s_pathname = s_get_datafile();
+   v_write_state(h_processor, s_pathname); /* Save settings */
+   free(s_pathname); /* Free up pathname */
+}
+
+void v_restore_state(oprocessor *h_processor) /* Restore saved processor state */
+{
+   char *s_pathname = s_get_datafile();
+   v_read_state(h_processor, s_pathname); /* Load settings */
+   free(s_pathname); /* Free up pathname */
+}
 #endif
 
 static void v_fprint_register(FILE *h_file, oregister *h_register) /* Print the contents of a register */
@@ -857,218 +1053,6 @@ void v_read_rom(oprocessor *h_processor, char *s_pathname) /* Load rom from 'obj
    }
    else
       v_error(errno, h_err_opening_file, s_pathname); /* Can't open data file */
-}
-
-#if defined(CONTINIOUS)
-
-char *s_get_datafile() /* Return path the the data file */
-/*
- *  - If $HOME is defined and the data file already exists in there  return
- *    the pathname of the data file in $HOME to maintain compatibility with
- *    earlier releases.
- *
- *  - If the data file in not in the $HOME folder then if $XDG_DATA_HOME is
- *    defined or $HOME/.local/share/ exists this routine will search for an
- *    application specific subdirectory in the first of these two locations
- *    if finds (creating it if necessary) and will use this to generate the
- *    pathname of the data file.
- *
- *  - Otherwise it will use the current directory path to generate the data
- *    file's pathname.
- *
- */
-{
-   char *s_directory = getenv("HOME");
-   char s_filename[] = FILENAME;
-   char s_filetype[] = ".dat";
-   char *s_pathname;
-
-   if (s_directory == NULL) s_directory = ""; /* Use current folder if HOME not defined */
-#if defined(unix) || defined(__unix__) || defined(__APPLE__)
-   s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 2) * sizeof(char*));
-   strcpy(s_pathname, s_directory);
-   strcat(s_pathname, "/.");
-   strcat(s_pathname, s_filename);
-   strcat(s_pathname, s_filetype);
-   if (!(i_isfile(s_pathname))) /* File does not exists in home or current directory continue searching... */
-   {
-      free(s_pathname);
-      s_directory = getenv("XDG_DATA_HOME");
-      if (s_directory) /* XDG_DATA_HOME is defined so atempt to use it */
-      {
-         s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 10) * sizeof(char*));
-         strcpy(s_pathname, s_directory);
-      }
-      else /* Otherwise try to use $HOME/.local/share */
-      {
-         s_directory = getenv("HOME");
-         s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 23) * sizeof(char*));
-         strcpy(s_pathname, s_directory);
-         strcat(s_pathname, "/.local/share");
-      }
-      if (i_exists(s_pathname) && i_isdir(s_pathname)) /* Check that the selected directory exists, and if it doesn't use $HOME */
-      {
-         strcat(s_pathname, "/x11-calc");
-         if (i_exists(s_pathname) == 0) mkdir(s_pathname, (S_IRWXU|S_IRGRP|S_IXGRP)); /* If the application data folder does not exist attempt to create it (no need to check status here as we check the directory exists below) */
-         if (i_isdir(s_pathname) == 0) /* Check the directory exists and if it doesn't just use $HOME */
-         {
-            v_warning(h_err_creating_file, s_pathname); /* Can't create directory */
-            free(s_pathname);
-            s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 2) * sizeof(char*));
-            strcpy(s_pathname, s_directory);
-            strcat(s_pathname, "/.");
-         }
-         else
-            strcat(s_pathname, "/");
-      }
-      else
-      {
-         free(s_pathname);
-         s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 2) * sizeof(char*));
-         strcpy(s_pathname, s_directory);
-         strcat(s_pathname, "/.");
-      }
-      strcat(s_pathname, s_filename);
-      strcat(s_pathname, s_filetype);
-   }
-#else
-   s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype)) * sizeof(char*));
-   strcpy(s_pathname, s_directory);
-   strcat(s_pathname, s_filename);
-   strcat(s_pathname, s_filetype);
-#endif
-   return s_pathname;
-}
-#endif
-
-void v_read_state(oprocessor *h_processor, char *s_pathname) /* Read processor state from file */
-{
-#if defined(CONTINIOUS)
-   FILE *h_file;
-   unsigned int i_temp;
-   int i_count, i_counter;
-
-   if ((h_processor != NULL) && (s_pathname != NULL)) { /* Check processor and pathname are defined */
-      v_processor_reset(h_processor);
-      h_file = fopen(s_pathname, "r");
-      if (h_file !=NULL) { /* If file exists and can be opened restore state */
-         fprintf(stderr,h_msg_loading, s_pathname);
-#if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c)
-         for (i_count = 0; i_count < FLAGS; i_count++)
-         {
-            if (fscanf(h_file, "%x,", &i_temp)) h_processor->flags[i_count] = i_temp;
-         }
-         for (i_count = 0; i_count < STATUS_BITS; i_count++)
-         {
-            if (fscanf(h_file, "%x,", &i_temp)) h_processor->status[i_count] = i_temp;
-         }
-         for (i_count = 0; i_count < REGISTERS; i_count++)
-            for (i_counter = REG_SIZE - 1; i_counter >= 0 ; i_counter--)
-            {
-               if (fscanf(h_file, "%x,", &i_temp)) h_processor->reg[i_count]->nibble[i_counter] = i_temp;
-            }
-         if (fscanf(h_file, "%x,", &i_temp)) h_processor->p = i_temp;
-         if (fscanf(h_file, "%x,", &i_temp)) h_processor->q = i_temp;
-         if (fscanf(h_file, "%x,", &i_temp)) h_processor->f = i_temp;
-         if (fscanf(h_file, "%x,", &i_temp)) h_processor->g[0] = i_temp;
-         if (fscanf(h_file, "%x,", &i_temp)) h_processor->g[1] = i_temp;
-#endif
-         for (i_count = 0; i_count < MEMORY_SIZE; i_count++)
-            for (i_counter = REG_SIZE - 1; i_counter >= 0 ; i_counter--)
-            {
-               if (fscanf(h_file, "%x,", &i_temp)) h_processor->mem[i_count]->nibble[i_counter] = i_temp;
-            }
-         fclose(h_file);
-      }
-      else
-         v_warning(h_err_opening_file, s_pathname); /* Can't open data file */
-   }
-#endif
-}
-
-void v_write_state(oprocessor *h_processor, char *s_pathname) /* Write processor state to file */
-{
-#if defined(CONTINIOUS)
-   FILE *h_file;
-   int i_count, i_counter;
-
-   if ((h_processor != NULL) && (s_pathname != NULL)) { /* Check processor and path name are defined */
-      h_file = fopen(s_pathname, "w");
-      if (h_file !=NULL) { /* If file exists and can be opened save state */
-         fprintf(stderr,h_msg_saving, s_pathname);
-#if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c)
-         for (i_count = 0; i_count < FLAGS; i_count++)
-         {
-            fprintf(h_file, "%02x,", h_processor->flags[i_count]);
-         }
-         fprintf(h_file,"\n");
-         for (i_count = 0; i_count < STATUS_BITS; i_count++)
-         {
-            fprintf(h_file, "%02x,", h_processor->status[i_count]);
-         }
-         fprintf(h_file,"\n");
-         for (i_count = 0; i_count < REGISTERS; i_count++)
-         {
-            for (i_counter = REG_SIZE - 1; i_counter >= 0 ; i_counter--)
-               fprintf(h_file, "%02x,", h_processor->reg[i_count]->nibble[i_counter]);
-            fprintf(h_file,"\n");
-         }
-         fprintf(h_file, "%02x,", h_processor->p);
-         fprintf(h_file, "%02x,", h_processor->q);
-         fprintf(h_file, "%02x,", h_processor->f);
-         fprintf(h_file, "%02x,", h_processor->g[0]);
-         fprintf(h_file, "%02x,", h_processor->g[1]);
-         fprintf(h_file,"\n");
-#endif
-         for (i_count = 0; i_count < MEMORY_SIZE; i_count++)
-         {
-            for (i_counter = REG_SIZE - 1; i_counter >= 0 ; i_counter--)
-               fprintf(h_file, "%02x,", h_processor->mem[i_count]->nibble[i_counter]);
-            fprintf(h_file,"\n");
-         }
-         fclose(h_file);
-      }
-      else
-         v_warning(h_err_opening_file, s_pathname); /* Can't open data file */
-   }
-#endif
-}
-
-void v_save_state(oprocessor *h_processor) /* Restore saved processor state */
-{
-#if defined(CONTINIOUS)
-   char *s_pathname = s_get_filename(s_get_datafile(), 'w', FILENAME"-*.dat", "Data Files");
-   v_write_state(h_processor, s_pathname); /* Save settings */
-   free(s_pathname); /* Free up pathname */
-#endif
-}
-
-void v_load_state(oprocessor *h_processor) /* Restore saved processor state */
-{
-#if defined(CONTINIOUS)
-   char *s_pathname = s_get_filename(s_get_datafile(), 'r', FILENAME"-*.dat", "Data Files");
-   v_read_state(h_processor, s_pathname); /* Load settings */
-   free(s_pathname); /* Free up pathname */
-#endif
-}
-
-void v_backup_state(oprocessor *h_processor) /* Restore saved processor state */
-{
-#if defined(CONTINIOUS)
-   char *s_pathname = s_get_datafile();
-   v_write_state(h_processor, s_pathname); /* Save settings */
-   free(s_pathname); /* Free up pathname */
-#endif
-}
-
-void v_restore_state(oprocessor *h_processor) /* Restore saved processor state */
-{
-   v_processor_reset(h_processor);
-#if defined(CONTINIOUS)
-   char *s_pathname = s_get_datafile();
-   v_read_state(h_processor, s_pathname); /* Load settings */
-   free(s_pathname); /* Free up pathname */
-#endif
 }
 
 void v_processor_reset(oprocessor *h_processor) /* Reset processor */
