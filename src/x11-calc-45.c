@@ -32,6 +32,7 @@
  * 04 May 24         - Do not define unused switches - MT
  * 20 May 25         - Tidied up data structure definitions - MT
  * 06 Sep 25         - Updated key positions to match HP55 - MT
+ * 07 Sep 25         - Changed key code for ENTER - MT
  *
  */
 
@@ -111,7 +112,7 @@ void v_init_buttons(struct obutton *h_button[]) {
    /* Define fourth row of keys. */
    i_top += KBD_ROW;
    i_left = KBD_LEFT;
-   h_button[i_count++] = h_button_create(00074, 015, "ENTER", "      ", "DEG", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, 2* KEY_WIDTH + KEY_GAP, KEY_HEIGHT, False, True, MID_GREY, BACKGROUND, YELLOW, BACKGROUND);
+   h_button[i_count++] = h_button_create(00076, 015, "ENTER", "      ", "DEG", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, 2* KEY_WIDTH + KEY_GAP, KEY_HEIGHT, False, True, MID_GREY, BACKGROUND, YELLOW, BACKGROUND);
    i_left += (2 * (KEY_WIDTH + KEY_GAP));
    h_button[i_count++] = h_button_create(00073, 'c', "CHS", "RAD", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, True, MID_GREY, YELLOW, BACKGROUND, BACKGROUND);
    i_left += (KEY_WIDTH + KEY_GAP);
