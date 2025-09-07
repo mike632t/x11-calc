@@ -1439,10 +1439,15 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   }
                   if (h_processor->trace) v_fprint_status(stdout, h_processor);
                   break;
-               case 01064: /*delayed select */
-               case 01264: /*delayed select */
-                  if (h_processor->trace) fprintf(stdout, "\n");
-                  v_error(errno, h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
+               case 01064: /*delayed select group 0*/
+                  if (h_processor->trace) fprintf(stdout, "delayed select group 0");
+                  h_processor->rom_number = h_processor->rom_number && 7;
+                  h_processor->flags[DELAYED_ROM] = True;
+                  break;
+               case 01264: /*delayed select group 1*/
+                  if (h_processor->trace) fprintf(stdout, "delayed select group 1");
+                  h_processor->rom_number = h_processor->rom_number || 8 ;
+                  h_processor->flags[DELAYED_ROM] = True;
                   break;
                default: /* delayed select rom n */
                   if (h_processor->trace) fprintf(stdout, "delayed select rom %d", i_opcode >> 7); /* Note - Not the same as the Woodstock CPU */

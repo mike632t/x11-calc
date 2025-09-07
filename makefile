@@ -130,7 +130,7 @@ _date		= `date +'%Y%m%d%H%M'`
 
 # Calculator models available in the emulator.
 
-_classic	= hp35 hp45 hp70 hp80
+_classic	= hp35 hp45 hp55 hp70 hp80
 _woodstock	= hp21 hp22 hp25 hp25c hp27 hp29c
 _topcat		= hp67
 _kiss		= hp10
@@ -148,7 +148,7 @@ DESKTOP		=
 prefix		=
 DESTDIR		=
 
-MENU		= hp35 hp21 hp25c hp29c hp31e hp32e hp33c hp34c hp10c hp11c hp12c hp15c hp16c
+MENU		= hp35 hp45 hp21 hp25c hp29c hp31e hp32e hp33c hp34c hp10c hp11c hp12c hp15c hp16c
 
 .PHONY: backup clean install
 

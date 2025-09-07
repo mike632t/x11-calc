@@ -31,12 +31,13 @@
  * 03 Mar 24         - Updated font sizes for new fonts - MT
  * 04 May 24         - Do not define unused switches - MT
  * 20 May 25         - Tidied up data structure definitions - MT
+ * 06 Sep 25         - Updated key positions to match HP55 - MT
  *
  */
 
 #define NAME           "x11-calc-45"
-#define BUILD          "0009"
-#define DATE           "20 May 25"
+#define BUILD          "0010"
+#define DATE           "206 Sep 25"
 #define AUTHOR         "MT"
 
 #include <stdarg.h>    /* strlen(), etc. */
@@ -62,14 +63,14 @@ oregister o_mem[MEMORY_SIZE];
 
 void v_init_switches(struct oswitch *h_switch[]) /* Define the switches. */
 {
-   h_switch[0] = h_switch_create(00000, "OFF", "", "ON ", h_alternate_font, KBD_LEFT, KBD_TOP, 2 * KEY_WIDTH + KEY_GAP, SWITCH_HEIGHT, True, MID_GREY, DARK_GREY);
+   h_switch[0] = h_switch_create(00000, "OFF", "", "ON ", h_alternate_font, KBD_LEFT, KBD_TOP + SWITCH_HEIGHT/2, 2 * KEY_WIDTH + KEY_GAP, SWITCH_HEIGHT, True, MID_GREY, DARK_GREY);
 }
 
 void v_init_buttons(struct obutton *h_button[]) {
    int i_left, i_top, i_count = 0;
 
    /* Define top row of keys. */
-   i_top = KBD_TOP + 2* (SWITCH_HEIGHT + 1); /* Assumes the function label and switch text use the same font */
+   i_top = KBD_TOP + 3* (SWITCH_HEIGHT + 1); /* Assumes the function label and switch text use the same font */
    i_left = KBD_LEFT;
    h_button[i_count++] = h_button_create(00006, 000, "1/x", "yX", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, True, DIM_GREY, YELLOW, BACKGROUND, BACKGROUND);
    i_left += (KEY_WIDTH + KEY_GAP);
