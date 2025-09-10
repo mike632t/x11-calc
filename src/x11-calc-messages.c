@@ -60,12 +60,13 @@
  *                     and instruction traps - MT
  * 29 Jun 25         - Changed command line option for the european display
  *                     format to '-c' or '--comma', and updated text - MT
+ * 10 Sep 25         - Changed message variable names - MT
  *
  */
 
 #define NAME           "x11-calc-messages"
-#define BUILD          "0027"
-#define DATE           "29 Jun 25"
+#define BUILD          "0028"
+#define DATE           "10 Sep 25"
 #define AUTHOR         "MT"
 
 #if defined(HP10c) || defined(HP11c) || defined(HP12c)|| defined(HP15c) || defined(HP16c)
@@ -85,13 +86,15 @@ const char *h_err_ROM = "Empty ROM - no firmware loaded.\n";
 
 #if defined(HEXADECIMAL)
 const char *h_msg_opcode = "%1x-%03x  %03x   ";
-const char *h_msg_address = "%03x";
+const char *h_msg_address = "%1x-%03x";
+const char *h_msg_number = "%03x";
 const char *h_msg_negative_offset = "-0x%x";
 const char *h_msg_positive_offset = "+0x%x";
 const char *h_msg_rom = "%x:%x";
 #else
 const char *h_msg_opcode = "%1o-%04o %04o  ";
-const char *h_msg_address = "%04o";
+const char *h_msg_address = "%1o-%04o";
+const char *h_msg_number = "%04o";
 const char *h_msg_negative_offset = "-0%o";
 const char *h_msg_positive_offset = "+0%o";
 const char *h_msg_rom = "%o:%o";
