@@ -421,7 +421,13 @@
  * 05 Sep 25         - Implemented file selection dialog using GTK - MT
  * 07 Sep 25         - Fixed indentation of modified values single stepping
  *                     or tracing execution - MT
- *                   - Fixed (unnoticed) bug in 'c -> data address' - MT
+ *                   - Implemented 'delayed select group' instructions - MT
+ * 08 Sep 25         - Fixed 'c -> data address' - MT
+ *                     https://www.sydneysmith.com/wordpress/2086/
+ *                   - Added 'rom address -> buffer' (could have changed it
+ *                     to a nop as it doesn't appear to do anything) - MT
+ * 10 Sep 25         - Fixed 'select rom' - MT
+ *                   - Changed message vairable names - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -434,8 +440,8 @@
  */
 
 #define  NAME          "x11-calc-cpu"
-#define  BUILD         "0220"
-#define  DATE          "07 Sep 25"
+#define  BUILD         "0224"
+#define  DATE          "10 Sep 25"
 #define  AUTHOR        "MT"
 
 #define  NODEBUG
@@ -1254,11 +1260,11 @@ void v_op_goto(oprocessor *h_processor) /* Conditional go to */
    h_processor->flags[PREV_CARRY] = h_processor->flags[CARRY];
    h_processor->flags[CARRY] = False;
 #if defined(HP35) || defined(HP80) || defined(HP45) || defined(HP70) || defined(HP55)
-   if (h_processor->trace) fprintf(stdout, h_msg_address, (h_processor->pc & 0xf00) | (h_processor->rom[h_processor->pc]) >> 2); /* Mask off the bank number and least significant 8 bits*/
+   if (h_processor->trace) fprintf(stdout, h_msg_number, (h_processor->pc & 0xf00) | (h_processor->rom[h_processor->pc]) >> 2); /* Mask off the bank number and least significant 8 bits*/
    if (h_processor->flags[PREV_CARRY])  /* Do if True */
       h_processor->pc = (h_processor->pc & 0xff00) | h_processor->rom[h_processor->pc] >> 2; /* Classic CPU uses a _eight_ bit address */
 #else
-   if (h_processor->trace) fprintf(stdout, h_msg_address, ((h_processor->pc & 0xc00) | h_processor->rom[h_processor->pc] )); /* Mask off the bank number and least significant 10 bits */
+   if (h_processor->trace) fprintf(stdout, h_msg_number, ((h_processor->pc & 0xc00) | h_processor->rom[h_processor->pc] )); /* Mask off the bank number and least significant 10 bits */
    if (h_processor->flags[PREV_CARRY])  /* Do if True */
       h_processor->pc = ((h_processor->pc & 0xfc00) | h_processor->rom[h_processor->pc]); /* Use a _ten_ bit address */
 #endif
@@ -1337,6 +1343,9 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                case 00000: /* nop */
                   if (h_processor->trace) fprintf(stdout, "nop");
                   break;
+               case 01000: /* rom address -> buffer */
+                  if (h_processor->trace) fprintf(stdout, "rom address -> buffer");  /* Ignore as nobody seems to know what this does! */
+                  break;
                default:
                   if (h_processor->trace) fprintf(stdout, "\n");
                   v_error(errno, h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
@@ -1346,8 +1355,9 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                switch ((i_opcode >> 6) & 01)
                {
                case 00: /* Op-Codes matching x xx0 010 000 */ /* select rom */
-                  if (h_processor->trace) fprintf(stdout, "select rom %02o", i_opcode >> 7); /* Note - Not the same as the Woodstock CPU */
-                  h_processor->pc = ((i_opcode >> 7) << 8) + ((h_processor->pc) & 0xff);
+                  if (h_processor->trace) fprintf(stdout, "select rom %o", i_opcode >> 7); /* Note - Not the same as the Woodstock CPU */
+                  h_processor->rom_number = i_opcode >> 7;  /* 08 Sep 25 - Update ROM number */
+                  h_processor->pc = (((i_opcode >> 7) << 8) + ((h_processor->pc) & 0x0ff)) | (h_processor->pc & 0x800); /* 10 Sep 25 - ROM address is relative to */
                   break;
                case 01: /* keys -> rom address */
                   if (h_processor->trace) fprintf(stdout, "keys -> rom address");
@@ -1380,9 +1390,20 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   break;
                case 01160: /* c -> data address */
                   {
-                     int i_addr;
+                     int i_addr = 0;
                      if (h_processor->trace) fprintf(stdout, "c -> data address\t\t");
-                     i_addr = h_processor->reg[C_REG]->nibble[11]; /* 07 Sep 25 - Fixed offset */
+                     switch (h_processor->reg[C_REG]->nibble[0]) /* 08 Sep 25 - Updted to work properly */
+                     {
+                     case 00:
+                        i_addr = h_processor->reg[C_REG]->nibble[12];
+                        break;
+                     case 01:
+                        i_addr = h_processor->reg[C_REG]->nibble[12] * 10 + h_processor->reg[C_REG]->nibble[11];  /* Two digit addressing See https://www.sydneysmith.com/wordpress/2086/hp-55-emulator-bug/ */
+                        break;
+                     default:
+                        if (h_processor->trace) fprintf(stdout, "\n");
+                        v_error(errno, h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
+                     }
                      h_processor->addr = i_addr;
                      if (i_addr < MEMORY_SIZE)
                         h_processor->addr = i_addr;
@@ -1444,17 +1465,17 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   break;
                case 01064: /*delayed select group 0*/
                   if (h_processor->trace) fprintf(stdout, "delayed select group 0");
-                  h_processor->rom_number = h_processor->rom_number && 7;
+                  h_processor->rom_number = h_processor->rom_number & 0x7;
                   h_processor->flags[DELAYED_ROM] = True;
                   break;
                case 01264: /*delayed select group 1*/
                   if (h_processor->trace) fprintf(stdout, "delayed select group 1");
-                  h_processor->rom_number = h_processor->rom_number || 8 ;
+                  h_processor->rom_number = h_processor->rom_number | 0x8;
                   h_processor->flags[DELAYED_ROM] = True;
                   break;
                default: /* delayed select rom n */
-                  if (h_processor->trace) fprintf(stdout, "delayed select rom %d", i_opcode >> 7); /* Note - Not the same as the Woodstock CPU */
-                  h_processor->rom_number = i_opcode >> 7;
+                  if (h_processor->trace) fprintf(stdout, "delayed select rom %d", i_opcode >> 7);  /* Note - Not the same as the Woodstock CPU */
+                  h_processor->rom_number = (h_processor->rom_number & 0x8) | (i_opcode >> 7);  /* 08 Sep 25 - Select rom in current group */
                   h_processor->flags[DELAYED_ROM] = True;
                }
                break;
@@ -2613,7 +2634,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                      fprintf(stdout, "ldi\n");
                      fprintf(stdout, h_msg_opcode, (h_processor->pc >> 12), (h_processor->pc & 0x0fff), h_processor->rom[h_processor->pc]);
                      fprintf(stdout,"  ");
-                     fprintf(stdout, h_msg_address, i_next);
+                     fprintf(stdout, h_msg_number, i_next);
                      fprintf(stdout, "\t\t");
                      v_fprint_register(stdout, h_processor->reg[C_REG]);
                   }
@@ -2760,7 +2781,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                fprintf(stdout, "\n");
                fprintf(stdout, h_msg_opcode, (h_processor->pc >> 12), (h_processor->pc & 0x0fff), h_processor->rom[h_processor->pc]);
                fprintf(stdout,"  ");
-               fprintf(stdout, h_msg_address, i_address);
+               fprintf(stdout, h_msg_number, i_address);
             }
             h_processor->flags[CARRY] = h_processor->flags[PREV_CARRY]; /* Save carry */
             v_op_inc_pc(h_processor); /* Increment program counter */
@@ -2787,7 +2808,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
          break;
 #else
       case 01: /* Type 1 - Jump subroutine */
-         if (h_processor->trace) {fprintf(stdout, "jsb "); fprintf(stdout, h_msg_address, ((h_processor->pc & 0x0f00) | i_opcode >> 2));}
+         if (h_processor->trace) {fprintf(stdout, "jsb "); fprintf(stdout, h_msg_number, ((h_processor->pc & 0x0f00) | i_opcode >> 2));}
          op_jsb(h_processor, (i_opcode >> 2)); /* Note - uses and eight bit address */
          break;
 #endif
@@ -3540,17 +3561,17 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
          switch (i_opcode & 03)
          {
          case 00:
-            if (h_processor->trace) {fprintf(stdout, "call "); fprintf(stdout, h_msg_address, i_opcode >> 2);}
+            if (h_processor->trace) {fprintf(stdout, "call "); fprintf(stdout, h_msg_number, i_opcode >> 2);}
             if (h_processor->trace) fprintf(stdout, "\n");
             v_error(errno, h_err_unexpected_opcode, i_opcode, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
             break;
          case 01:
-            if (h_processor->trace) {fprintf(stdout, "call "); fprintf(stdout, h_msg_address, i_opcode >> 2);}
+            if (h_processor->trace) {fprintf(stdout, "call "); fprintf(stdout, h_msg_number, i_opcode >> 2);}
             if (h_processor->trace) fprintf(stdout, "\n");
             v_error(errno, h_err_unexpected_opcode, i_opcode, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
             break;
          case 02:
-            if (h_processor->trace) {fprintf(stdout, "jump "); fprintf(stdout, h_msg_address, i_opcode >> 2);}
+            if (h_processor->trace) {fprintf(stdout, "jump "); fprintf(stdout, h_msg_number, i_opcode >> 2);}
             if (h_processor->trace) fprintf(stdout, "\n");
             v_error(errno, h_err_unexpected_opcode, i_opcode, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
             break;
@@ -3583,7 +3604,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             break;
 #else
          case 03: /* if nc goto */
-            if (h_processor->trace) {fprintf(stdout, "if no carry go to "); fprintf(stdout, h_msg_address, ((h_processor->pc & 0x0f00) | i_opcode >> 2));} /* Note - uses an eight bit address */
+            if (h_processor->trace) {fprintf(stdout, "if no carry go to "); fprintf(stdout, h_msg_number, ((h_processor->pc & 0x0f00) | i_opcode >> 2));} /* Note - uses an eight bit address */
             if (!h_processor->flags[PREV_CARRY])
             {
                h_processor->pc = (h_processor->pc & 0xff00) | i_opcode >> 2;
