@@ -19,6 +19,7 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * 06 Sep 25         - Initial version derived from HP45 - MT
+ * 08 Sep 25         - Increased number of registers - MT
  *
  */
 
@@ -56,7 +57,7 @@
 #define SWITCH_HEIGHT      10 * SCALE_HEIGHT
 
 #define ROM_SIZE           06000
-#define MEMORY_SIZE        27
+#define MEMORY_SIZE        30
 
 extern int i_rom [ROM_SIZE];
 
