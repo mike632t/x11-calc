@@ -428,6 +428,10 @@
  *                     to a nop as it doesn't appear to do anything) - MT
  * 10 Sep 25         - Fixed 'select rom' - MT
  *                   - Changed message vairable names - MT
+ * 11 Sep 25         - Print values of 'p' when tracing execution - MT
+ * 12 Sep 25         - Updated 'select rom' so that it selects the  correct
+ *                     address when 'delayed select rom' or 'delayed select
+ *                     group' instructions are in effect - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -440,8 +444,8 @@
  */
 
 #define  NAME          "x11-calc-cpu"
-#define  BUILD         "0224"
-#define  DATE          "10 Sep 25"
+#define  BUILD         "0226"
+#define  DATE          "12 Sep 25"
 #define  AUTHOR        "MT"
 
 #define  NODEBUG
@@ -1355,9 +1359,10 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                switch ((i_opcode >> 6) & 01)
                {
                case 00: /* Op-Codes matching x xx0 010 000 */ /* select rom */
-                  if (h_processor->trace) fprintf(stdout, "select rom %o", i_opcode >> 7); /* Note - Not the same as the Woodstock CPU */
-                  h_processor->rom_number = i_opcode >> 7;  /* 08 Sep 25 - Update ROM number */
-                  h_processor->pc = (((i_opcode >> 7) << 8) + ((h_processor->pc) & 0x0ff)) | (h_processor->pc & 0x800); /* 10 Sep 25 - ROM address is relative to */
+                  if (h_processor->trace) fprintf(stdout, "select rom %o*", i_opcode >> 7); /* Note - Not the same as the Woodstock CPU */
+                  h_processor->pc = (((i_opcode >> 7) << 8) + ((h_processor->pc) & 0x0ff)) | (h_processor->pc & 0x800); /* 10 Sep 25 - address is relative to ROM group*/
+                  h_processor->rom_number = i_opcode >> 7 | (h_processor->rom_number & 0x8);  /* 08 Sep 25 - Update ROM number */
+                  v_delayed_rom(h_processor);
                   break;
                case 01: /* keys -> rom address */
                   if (h_processor->trace) fprintf(stdout, "keys -> rom address");
@@ -1608,12 +1613,14 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             switch ((i_opcode >> 4) & 03)
             {
             case 00: /* Op-Codes matching xx xx 00 11 00 */ /* n -> p */
-               if (h_processor->trace) fprintf(stdout, "%d -> p", i_opcode >> 6);
+               if (h_processor->trace) fprintf(stdout, "%d -> p\t\t\t", i_opcode >> 6);
                h_processor->p = i_opcode >> 6;
+               if (h_processor->trace) fprintf(stdout, "p = %d", h_processor->p);
                break;
             case 01: /* Op-Codes matching xx xx 01 11 00 */ /* p - 1 -> p */
-               if (h_processor->trace) fprintf(stdout, "p - 1 -> p");
+               if (h_processor->trace) fprintf(stdout, "p - 1 -> p\t\t\t");
                v_op_dec_p(h_processor);
+               if (h_processor->trace) fprintf(stdout, "p = %d", h_processor->p);
                break;
             case 02: /* Op-Codes matching xx xx 10 11 00 */ /* if p != n */
                if (h_processor->trace) fprintf(stdout, "if p != %d", i_opcode >> 6);
@@ -1621,8 +1628,9 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                v_op_goto(h_processor);
                break;
             case 03: /* Op-Codes matching xx xx 11 11 00 */ /* p + 1 -> p */
-               if (h_processor->trace) fprintf(stdout, "p + 1 -> p");
+               if (h_processor->trace) fprintf(stdout, "p + 1 -> p\t\t\t");
                v_op_inc_p(h_processor);
+               if (h_processor->trace) fprintf(stdout, "p = %d", h_processor->p);
                break;
             default:
                if (h_processor->trace) fprintf(stdout, "\n");
@@ -2851,7 +2859,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
          case 04: /* WP */
             s_field = "wp";
             h_processor->first =  0; h_processor->last =  h_processor->p; /* break; bug in orig??? */
-            if (h_processor->p >= REG_SIZE)
+            if (h_processor->p > REG_SIZE)  /* 12 Sep 25 - Changed to greater than from greater then or equal to */
             {
                if (h_processor->trace) fprintf(stdout, "\n");
                debug(printf ("REG_SIZE = %d, h_processor->p = %d", REG_SIZE, h_processor->p));
