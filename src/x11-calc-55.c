@@ -19,6 +19,7 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * 08 Sep 25         - Initial version derived from HP45 - MT
+ * 12 Sep 25         - Don't set the default switch state twice - MT
  *
  */
 
@@ -50,9 +51,8 @@ oregister o_mem[MEMORY_SIZE];
 
 void v_init_switches(struct oswitch *h_switch[]) /* Define the switches. */
 {
-   h_switch[0] = h_switch_create(00000, "OFF", "", "ON ", h_alternate_font, KBD_LEFT, KBD_TOP + SWITCH_HEIGHT/2, 2 * KEY_WIDTH + KEY_GAP, SWITCH_HEIGHT, True, MID_GREY, DARK_GREY);
-   h_switch[1] = h_switch_create(00000, "TIMER", "PRGM", "RUN", h_alternate_font, KBD_LEFT + 3 * KEY_WIDTH + 2 * KEY_GAP, KBD_TOP, 2 * KEY_WIDTH + KEY_GAP, SWITCH_HEIGHT * 2, False, MID_GREY, DARK_GREY);
-   h_switch[1]->state = 2;
+   h_switch[0] = h_switch_create(00000, "OFF", "", "ON ", h_alternate_font, KBD_LEFT, KBD_TOP + SWITCH_HEIGHT / 2, 2 * KEY_WIDTH + KEY_GAP, SWITCH_HEIGHT, True, MID_GREY, DARK_GREY);
+   h_switch[1] = h_switch_create(00000, "TIMER", "PRGM", "RUN", h_alternate_font, KBD_LEFT + 3 * KEY_WIDTH + 2 * KEY_GAP, KBD_TOP, 2 * KEY_WIDTH + KEY_GAP, SWITCH_HEIGHT * 2, 2, MID_GREY, DARK_GREY);
 }
 
 void v_init_buttons(struct obutton *h_button[]) {
@@ -152,6 +152,7 @@ void v_init_buttons(struct obutton *h_button[]) {
    i_left += (KEY_NUMERIC + 3 * KEY_GAP);
    h_button[i_count++] = h_button_create(00042, 000, "R/S", "", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_NUMERIC, KEY_HEIGHT, False, True, BLACK, BACKGROUND, BACKGROUND, BACKGROUND);
 }
+
 int i_rom[ROM_SIZE] = {
    00575, 01364, 00477, 00564, 00757, 00504, 01414, 00420,
    00742, 01145, 01414, 00530, 00030, 01654, 00057, 01656,

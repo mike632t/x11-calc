@@ -55,13 +55,14 @@
  * 03 Sep 25         - Added  keyboard shortcuts for 'C'/'CE' and  function
  *                     keys - MT
  * 06 Sep 25         - Updated key positions to match HP55 - MT
+ * 12 Sep 25         - Don't set the default switch state twice - MT
  *
  * To Do             -
  */
 
 #define VERSION        "0.1"
-#define BUILD          "0021"
-#define DATE           "06 Sep 25"
+#define BUILD          "0022"
+#define DATE           "12 Sep 25"
 #define AUTHOR         "MT"
 
 #include <stdarg.h>    /* strlen(), etc. */
@@ -88,8 +89,7 @@ oregister o_mem[MEMORY_SIZE];
 void v_init_switches(struct oswitch *h_switch[]) /* Define the switches. */
 {
    h_switch[0] = h_switch_create(00000, "OFF", "", "ON ", h_alternate_font, KBD_LEFT, KBD_TOP + SWITCH_HEIGHT/2, 2 * KEY_WIDTH + KEY_GAP, SWITCH_HEIGHT, True, MID_GREY, DARK_GREY);
-   h_switch[1] = h_switch_create(00000, "DSP", "ALL", "PRT", h_alternate_font, KBD_LEFT + 3 * KEY_WIDTH + 2 * KEY_GAP, KBD_TOP, 2 * KEY_WIDTH + KEY_GAP, SWITCH_HEIGHT * 2, False, MID_GREY, DARK_GREY); /** No option for PRINT only **/
-   h_switch[1]->state = 1;
+   h_switch[1] = h_switch_create(00000, "DSP", "ALL", "PRT", h_alternate_font, KBD_LEFT + 3 * KEY_WIDTH + 2 * KEY_GAP, KBD_TOP, 2 * KEY_WIDTH + KEY_GAP, SWITCH_HEIGHT * 2, 1, MID_GREY, DARK_GREY); /** No option for PRINT only **/
 }
 
 void v_init_buttons(struct obutton *h_button[]) {
