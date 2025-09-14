@@ -41,6 +41,8 @@ work in every environment
 
 ### Completed changes
 
+- [X] Added HP55 with timer mode
+
 - [X] Optional menu (load/save) if GTK is installed
 
 - [x] Optionally allow numeric keypad to be used if NumLock is off (`--numlock`)
