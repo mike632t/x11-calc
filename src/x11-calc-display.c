@@ -101,12 +101,14 @@
  * 14 Sep 25         - Display  decoder for HP35, HP45, HP70, HP80 and HP55
  *                     completely rewritten to handle the timer and program
  *                     modes - MT
+ *                   - HP55 now displays the timer using colons to seperate 
+ *                     hours, minutes and seconds - MT
  *
  */
 
 #define NAME           "x11-calc-display"
-#define BUILD          "0046"
-#define DATE           "23 Aug 25"
+#define BUILD          "0048"
+#define DATE           "14 Sep 25"
 #define AUTHOR         "MT"
 
 #include <errno.h>     /* errno */
@@ -408,7 +410,10 @@ int i_display_update(struct odisplay *h_display, oprocessor *h_processor)
             break;
          case 6:
          case 2: /* Decimal point */
-            h_display->digit[i_count]->mask = DISPLAY_DECIMAL;
+            if (h_processor->reg[B_REG]->nibble[i_offset] == 2)
+               h_display->digit[i_count]->mask = DISPLAY_DECIMAL;
+            else
+               h_display->digit[i_count]->mask = DISPLAY_COLON;
             i_count--;
          case 0: /* Number */
             if (i_count >= 0)
