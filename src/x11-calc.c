@@ -360,6 +360,7 @@
  *                     and defined the conditional code in the main program
  *                     removing the need for dummy functions - MT
  * 12 Sep 25   0.19  - Added HP55 - MT
+ *                   - Improved accuracy of HP55 timer - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -373,12 +374,12 @@
 
 #define  NAME          "x11-calc"
 #define  VERSION       "0.19"
-#define  BUILD         "0190"
+#define  BUILD         "0191"
 #define  DATE          "12 Sep 25"
 #define  AUTHOR        "MT"
 
 #define  INTERVAL 48   /* Number of ticks to execute before updating the display */
-#define  DELAY 48      /* Number of intervals to wait before exiting */
+#define  DELAY 44      /* Number of intervals to wait before exiting */
 
 #include <errno.h>     /* errno */
 
@@ -960,9 +961,7 @@ int main(int argc, char *argv[])
          i_count = INTERVAL;
 #if defined(HP67)
          i_wait(INTERVAL / 4);  /* Sleep for ~6.25 ms per tick */
-#elif defined(VOYAGER)
-         i_wait(INTERVAL / 3);  /* Sleep for ~8.33 ms per tick */
-#elif defined(SPICE)
+#elif defined(VOYAGER) || defined(SPICE) || defined(CLASSIC)
          i_wait(INTERVAL / 3);  /* Sleep for ~8.33 ms per tick */
 #else
          i_wait(INTERVAL / 2);  /* Sleep for ~12.5 ms per tick */
