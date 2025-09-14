@@ -924,7 +924,6 @@ int main(int argc, char *argv[])
             break;
       }
 #elif defined(HP55)
-      //h_switch[1]->state = 2;
       switch (h_switch[1]->state)
       {
          case 0:
@@ -960,11 +959,13 @@ int main(int argc, char *argv[])
          XCopyArea(x_display, x_buffer, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
          i_count = INTERVAL;
 #if defined(HP67)
-         i_wait(INTERVAL / 4);  /* Sleep for ~6.25 ms per tick */
-#elif defined(VOYAGER) || defined(SPICE) || defined(CLASSIC)
-         i_wait(INTERVAL / 3);  /* Sleep for ~8.33 ms per tick */
+         i_wait(INTERVAL / 4);   /* Sleep for ~6.25 ms per tick */
+#elif defined(HP55)
+         i_wait(INTERVAL / 3.1); /* Sleep for ~???? ms per tick */
+#elif defined(VOYAGER) || defined(SPICE)
+         i_wait(INTERVAL / 3);   /* Sleep for ~8.33 ms per tick */
 #else
-         i_wait(INTERVAL / 2);  /* Sleep for ~12.5 ms per tick */
+         i_wait(INTERVAL / 2);   /* Sleep for ~12.5 ms per tick */
 #endif
          if (i_ticks > 0) i_ticks -= 1;
          if (i_ticks == 0) b_abort = True;
