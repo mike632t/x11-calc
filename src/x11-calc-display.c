@@ -98,6 +98,9 @@
  * 23 Aug 25         - Disable display when printer is in TRACE mode - MT
  *                   - Deleted 'Enabled' property as it isn't needed - MT
  *            (0046) - Sets processor mode correctly - MT
+ * 14 Sep 25         - Display  decoder for HP35, HP45, HP70, HP80 and HP55
+ *                     completely rewritten to handle the timer and program
+ *                     modes - MT
  *
  */
 
@@ -391,53 +394,49 @@ int i_display_update(struct odisplay *h_display, oprocessor *h_processor)
       DISPLAY_SIX, DISPLAY_SEVEN, DISPLAY_EIGHT, DISPLAY_NINE
    };
 
-   i_offset = REG_SIZE - 1;
-
-   for (i_count = 0; i_count < DIGITS; i_count++)
+   if (h_processor->flags[DISPLAY_ENABLE] && h_processor->enabled)
    {
-      if (h_display->digit[i_count] != NULL)
+      i_offset = 0;
+      i_count = DIGITS;
+      while ((i_offset < REG_SIZE) && (i_count > 0))
       {
-         if (h_processor->flags[DISPLAY_ENABLE] && h_processor->enabled)
+         i_count--;
+         switch (h_processor->reg[B_REG]->nibble[i_offset])
          {
-            switch (i_count)
-            {
-            case 0:
-               if (h_processor->reg[A_REG]->nibble[REG_SIZE - i_count - 1] == 9)
-                  h_display->digit[i_count]->mask = DISPLAY_MINUS;
-               else
-                  h_display->digit[i_count]->mask = DISPLAY_SPACE;
-            break;
-            case 12:
-               i_offset = 2;
-               if ((h_processor->reg[A_REG]->nibble[REG_SIZE - i_count] == 9) &&
-                  (h_processor->reg[B_REG]->nibble[REG_SIZE - i_count] == 0))
-                  h_display->digit[i_count]->mask = DISPLAY_MINUS;
-               else
-                  h_display->digit[i_count]->mask = DISPLAY_SPACE;
-            break;
-            default:
-               switch (h_processor->reg[B_REG]->nibble[REG_SIZE - i_count] & 0x0F)
-               {
-               case 2: /* Decimal point */
-                  h_display->digit[i_count]->mask = DISPLAY_DECIMAL;
-                  i_offset++;
-                  break;
-               case 9: /* Space */
-                  h_display->digit[i_count]->mask = DISPLAY_SPACE;
-                  break;
-               case 0: /* Number */
-                  if (i_offset >= 0) h_display->digit[i_count]->mask = c_digits[h_processor->reg[A_REG]->nibble[i_offset]];
-                  break;
-               default:
-                  debug(v_fprint_registers(stderr, h_processor);
-                  v_warning("Unexpected output format specified in %s line : %d\n", __FILE__, __LINE__));
-               }
-            }
-         }
-         else
+         case 9: /* Space */
             h_display->digit[i_count]->mask = DISPLAY_SPACE;
+            break;
+         case 6:
+         case 2: /* Decimal point */
+            h_display->digit[i_count]->mask = DISPLAY_DECIMAL;
+            i_count--;
+         case 0: /* Number */
+            if (i_count >= 0)
+               switch (i_count)
+               {
+               case 12:
+               case 0:
+                  if (h_processor->reg[A_REG]->nibble[i_offset] == 9)
+                     h_display->digit[i_count]->mask = DISPLAY_MINUS;
+                  else
+                     h_display->digit[i_count]->mask = DISPLAY_SPACE;
+               break;
+               default:
+                  h_display->digit[i_count]->mask = c_digits[h_processor->reg[A_REG]->nibble[i_offset]];
+               }
+            break;
+         default:
+            debug(v_fprint_registers(stderr, h_processor);
+            v_warning("Unexpected output format specified in %s line : %d\n", __FILE__, __LINE__));
+         }
+         i_offset++;
       }
-      i_offset--;
+   }
+   else /* Blank display when turned off */
+   {
+      for (i_count = 0; i_count < DIGITS; i_count++)
+         if (h_display->digit[i_count] != NULL)
+            h_display->digit[i_count]->mask = DISPLAY_SPACE;
    }
 #elif defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
    int i_count;
