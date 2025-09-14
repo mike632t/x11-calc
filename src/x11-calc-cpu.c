@@ -419,6 +419,19 @@
  *                     it is set by the printer mode switch - MT
  * 04 Sep 25         - Reorganised load/save routines - MT
  * 05 Sep 25         - Implemented file selection dialog using GTK - MT
+ * 07 Sep 25         - Fixed indentation of modified values single stepping
+ *                     or tracing execution - MT
+ *                   - Implemented 'delayed select group' instructions - MT
+ * 08 Sep 25         - Fixed 'c -> data address' - MT
+ *                     https://www.sydneysmith.com/wordpress/2086/
+ *                   - Added 'rom address -> buffer' (could have changed it
+ *                     to a nop as it doesn't appear to do anything) - MT
+ * 10 Sep 25         - Fixed 'select rom' - MT
+ *                   - Changed message vairable names - MT
+ * 11 Sep 25         - Print values of 'p' when tracing execution - MT
+ * 12 Sep 25         - Updated 'select rom' so that it selects the  correct
+ *                     address when 'delayed select rom' or 'delayed select
+ *                     group' instructions are in effect - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -431,8 +444,8 @@
  */
 
 #define  NAME          "x11-calc-cpu"
-#define  BUILD         "0218"
-#define  DATE          "05 Sep 25"
+#define  BUILD         "0226"
+#define  DATE          "12 Sep 25"
 #define  AUTHOR        "MT"
 
 #define  NODEBUG
@@ -1251,11 +1264,11 @@ void v_op_goto(oprocessor *h_processor) /* Conditional go to */
    h_processor->flags[PREV_CARRY] = h_processor->flags[CARRY];
    h_processor->flags[CARRY] = False;
 #if defined(HP35) || defined(HP80) || defined(HP45) || defined(HP70) || defined(HP55)
-   if (h_processor->trace) fprintf(stdout, h_msg_address, (h_processor->pc & 0xf00) | (h_processor->rom[h_processor->pc]) >> 2); /* Mask off the bank number and least significant 8 bits*/
+   if (h_processor->trace) fprintf(stdout, h_msg_number, (h_processor->pc & 0xf00) | (h_processor->rom[h_processor->pc]) >> 2); /* Mask off the bank number and least significant 8 bits*/
    if (h_processor->flags[PREV_CARRY])  /* Do if True */
       h_processor->pc = (h_processor->pc & 0xff00) | h_processor->rom[h_processor->pc] >> 2; /* Classic CPU uses a _eight_ bit address */
 #else
-   if (h_processor->trace) fprintf(stdout, h_msg_address, ((h_processor->pc & 0xc00) | h_processor->rom[h_processor->pc] )); /* Mask off the bank number and least significant 10 bits */
+   if (h_processor->trace) fprintf(stdout, h_msg_number, ((h_processor->pc & 0xc00) | h_processor->rom[h_processor->pc] )); /* Mask off the bank number and least significant 10 bits */
    if (h_processor->flags[PREV_CARRY])  /* Do if True */
       h_processor->pc = ((h_processor->pc & 0xfc00) | h_processor->rom[h_processor->pc]); /* Use a _ten_ bit address */
 #endif
@@ -1334,6 +1347,9 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                case 00000: /* nop */
                   if (h_processor->trace) fprintf(stdout, "nop");
                   break;
+               case 01000: /* rom address -> buffer */
+                  if (h_processor->trace) fprintf(stdout, "rom address -> buffer");  /* Ignore as nobody seems to know what this does! */
+                  break;
                default:
                   if (h_processor->trace) fprintf(stdout, "\n");
                   v_error(errno, h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
@@ -1343,8 +1359,10 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                switch ((i_opcode >> 6) & 01)
                {
                case 00: /* Op-Codes matching x xx0 010 000 */ /* select rom */
-                  if (h_processor->trace) fprintf(stdout, "select rom %02o", i_opcode >> 7); /* Note - Not the same as the Woodstock CPU */
-                  h_processor->pc = ((i_opcode >> 7) << 8) + ((h_processor->pc) & 0xff);
+                  if (h_processor->trace) fprintf(stdout, "select rom %o*", i_opcode >> 7); /* Note - Not the same as the Woodstock CPU */
+                  h_processor->pc = (((i_opcode >> 7) << 8) + ((h_processor->pc) & 0x0ff)) | (h_processor->pc & 0x800); /* 10 Sep 25 - address is relative to ROM group*/
+                  h_processor->rom_number = i_opcode >> 7 | (h_processor->rom_number & 0x8);  /* 08 Sep 25 - Update ROM number */
+                  v_delayed_rom(h_processor);
                   break;
                case 01: /* keys -> rom address */
                   if (h_processor->trace) fprintf(stdout, "keys -> rom address");
@@ -1377,9 +1395,20 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   break;
                case 01160: /* c -> data address */
                   {
-                     int i_addr;
-                     if (h_processor->trace) fprintf(stdout, "c -> data address\t");
-                     i_addr = h_processor->reg[C_REG]->nibble[12];
+                     int i_addr = 0;
+                     if (h_processor->trace) fprintf(stdout, "c -> data address\t\t");
+                     switch (h_processor->reg[C_REG]->nibble[0]) /* 08 Sep 25 - Updted to work properly */
+                     {
+                     case 00:
+                        i_addr = h_processor->reg[C_REG]->nibble[12];
+                        break;
+                     case 01:
+                        i_addr = h_processor->reg[C_REG]->nibble[12] * 10 + h_processor->reg[C_REG]->nibble[11];  /* Two digit addressing See https://www.sydneysmith.com/wordpress/2086/hp-55-emulator-bug/ */
+                        break;
+                     default:
+                        if (h_processor->trace) fprintf(stdout, "\n");
+                        v_error(errno, h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
+                     }
                      h_processor->addr = i_addr;
                      if (i_addr < MEMORY_SIZE)
                         h_processor->addr = i_addr;
@@ -1439,14 +1468,19 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   }
                   if (h_processor->trace) v_fprint_status(stdout, h_processor);
                   break;
-               case 01064: /*delayed select */
-               case 01264: /*delayed select */
-                  if (h_processor->trace) fprintf(stdout, "\n");
-                  v_error(errno, h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
+               case 01064: /*delayed select group 0*/
+                  if (h_processor->trace) fprintf(stdout, "delayed select group 0");
+                  h_processor->rom_number = h_processor->rom_number & 0x7;
+                  h_processor->flags[DELAYED_ROM] = True;
+                  break;
+               case 01264: /*delayed select group 1*/
+                  if (h_processor->trace) fprintf(stdout, "delayed select group 1");
+                  h_processor->rom_number = h_processor->rom_number | 0x8;
+                  h_processor->flags[DELAYED_ROM] = True;
                   break;
                default: /* delayed select rom n */
-                  if (h_processor->trace) fprintf(stdout, "delayed select rom %d", i_opcode >> 7); /* Note - Not the same as the Woodstock CPU */
-                  h_processor->rom_number = i_opcode >> 7;
+                  if (h_processor->trace) fprintf(stdout, "delayed select rom %d", i_opcode >> 7);  /* Note - Not the same as the Woodstock CPU */
+                  h_processor->rom_number = (h_processor->rom_number & 0x8) | (i_opcode >> 7);  /* 08 Sep 25 - Select rom in current group */
                   h_processor->flags[DELAYED_ROM] = True;
                }
                break;
@@ -1579,12 +1613,14 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             switch ((i_opcode >> 4) & 03)
             {
             case 00: /* Op-Codes matching xx xx 00 11 00 */ /* n -> p */
-               if (h_processor->trace) fprintf(stdout, "%d -> p", i_opcode >> 6);
+               if (h_processor->trace) fprintf(stdout, "%d -> p\t\t\t", i_opcode >> 6);
                h_processor->p = i_opcode >> 6;
+               if (h_processor->trace) fprintf(stdout, "p = %d", h_processor->p);
                break;
             case 01: /* Op-Codes matching xx xx 01 11 00 */ /* p - 1 -> p */
-               if (h_processor->trace) fprintf(stdout, "p - 1 -> p");
+               if (h_processor->trace) fprintf(stdout, "p - 1 -> p\t\t\t");
                v_op_dec_p(h_processor);
+               if (h_processor->trace) fprintf(stdout, "p = %d", h_processor->p);
                break;
             case 02: /* Op-Codes matching xx xx 10 11 00 */ /* if p != n */
                if (h_processor->trace) fprintf(stdout, "if p != %d", i_opcode >> 6);
@@ -1592,8 +1628,9 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                v_op_goto(h_processor);
                break;
             case 03: /* Op-Codes matching xx xx 11 11 00 */ /* p + 1 -> p */
-               if (h_processor->trace) fprintf(stdout, "p + 1 -> p");
+               if (h_processor->trace) fprintf(stdout, "p + 1 -> p\t\t\t");
                v_op_inc_p(h_processor);
+               if (h_processor->trace) fprintf(stdout, "p = %d", h_processor->p);
                break;
             default:
                if (h_processor->trace) fprintf(stdout, "\n");
@@ -1850,7 +1887,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                case 01160: /* c -> data address */
                   {
                      int i_addr;
-                     if (h_processor->trace) fprintf(stdout, "c -> data address\t");
+                     if (h_processor->trace) fprintf(stdout, "c -> data address\t\t");
                      i_addr = (h_processor->reg[C_REG]->nibble[1] << 4) + h_processor->reg[C_REG]->nibble[0];
 #if defined(HP10)
                      if ((i_addr < MEMORY_SIZE) || (i_addr == 0xFF)) /* Address 0xFF tells the PIK chip to put the key code on the data bus */
@@ -1870,7 +1907,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                      }
 #endif
                   }
-                  if (h_processor->trace) fprintf(stdout, "\taddr = %d", h_processor->addr);
+                  if (h_processor->trace) fprintf(stdout, "addr = %d", h_processor->addr);
                   break;
                case 01260: /* clear data registers */
                   {
@@ -2331,7 +2368,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                v_error(errno, h_err_unexpected_opcode, i_opcode, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
                break;
             case 0x01: /* c[pt + 1:pt] -> g - Load g from c (00 0101 1000) */
-               if (h_processor->trace) fprintf(stdout, "g = c\t\t");
+               if (h_processor->trace) fprintf(stdout, "g = c\t\t\t");
                h_processor->g[0]  = h_processor->reg[C_REG]->nibble[*h_active_pointer(h_processor)] & 0x0f; /* c[pt] -> g[0] */
                if (*h_active_pointer(h_processor) < (REG_SIZE - 1))  /* Check that pt + 1 is valid */
                   h_processor->g[1] = h_processor->reg[C_REG]->nibble[*h_active_pointer(h_processor) + 1] & 0x0f; /* c[pt + 1] -> g[1] */
@@ -2434,7 +2471,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             }
             if ((i_opcode >> 6) < 15)
             {
-               if (h_processor->trace) fprintf(stdout, "pt = %d", n_map_i[i_opcode >> 6]);
+               if (h_processor->trace) fprintf(stdout, "pt = %d\t", n_map_i[i_opcode >> 6]);
                *h_active_pointer(h_processor) = n_map_i[i_opcode >> 6];
                if (h_processor->trace) fprintf(stdout, "\t\tpt = %02d  ", *h_active_pointer(h_processor));
             }
@@ -2546,7 +2583,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             }
             break;
          case 0x0a: /* {addr[11:4], nnnn} -> addr, c -> reg[addr] - Load register from c (nn nn10 1000) */
-            if (h_processor->trace) fprintf(stdout, "regn = c %-2d", (i_opcode >> 6));
+            if (h_processor->trace) fprintf(stdout, "regn = c %-2d\t", (i_opcode >> 6));
             h_processor->addr = (h_processor->addr & 0xff0) | (i_opcode >> 6);
             h_processor->first = 0;
             h_processor->last = REG_SIZE - 1;
@@ -2605,7 +2642,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                      fprintf(stdout, "ldi\n");
                      fprintf(stdout, h_msg_opcode, (h_processor->pc >> 12), (h_processor->pc & 0x0fff), h_processor->rom[h_processor->pc]);
                      fprintf(stdout,"  ");
-                     fprintf(stdout, h_msg_address, i_next);
+                     fprintf(stdout, h_msg_number, i_next);
                      fprintf(stdout, "\t\t");
                      v_fprint_register(stdout, h_processor->reg[C_REG]);
                   }
@@ -2626,7 +2663,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                h_processor->reg[C_REG]->nibble[6] = (h_processor->stack[h_processor->sp] >> 12) & 0xf;
                break;
             case 0x09: /* {addr[11:4], nnnn} -> addr, c -> reg[addr] - Load register address from c (10 0111 1000) */
-                  if (h_processor->trace) fprintf(stdout, "dadd = c\t\t");
+                  if (h_processor->trace) fprintf(stdout, "dadd = c\t\t\t");
                   h_processor->addr = ((h_processor->reg[C_REG]->nibble[2] << 8) |
                      (h_processor->reg[C_REG]->nibble[1] << 4) |
                      (h_processor->reg[C_REG]->nibble[0])) & 0x3ff; /* Load 12 bit address into address register from c */
@@ -2684,7 +2721,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
          case 0x0e: /* {addr[11:4], nnnn} -> addr, reg[addr] -> c - Load c from register (nn nn11 1000) */
             if (i_opcode >> 6)
             {
-               if (h_processor->trace) fprintf(stdout, "c = regn %-2d", i_opcode >> 6);
+               if (h_processor->trace) fprintf(stdout, "c = regn %-2d\t", i_opcode >> 6);
                h_processor->addr = (h_processor->addr & 0xff0) | (i_opcode >> 6);
             }
             else
@@ -2752,7 +2789,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                fprintf(stdout, "\n");
                fprintf(stdout, h_msg_opcode, (h_processor->pc >> 12), (h_processor->pc & 0x0fff), h_processor->rom[h_processor->pc]);
                fprintf(stdout,"  ");
-               fprintf(stdout, h_msg_address, i_address);
+               fprintf(stdout, h_msg_number, i_address);
             }
             h_processor->flags[CARRY] = h_processor->flags[PREV_CARRY]; /* Save carry */
             v_op_inc_pc(h_processor); /* Increment program counter */
@@ -2779,7 +2816,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
          break;
 #else
       case 01: /* Type 1 - Jump subroutine */
-         if (h_processor->trace) {fprintf(stdout, "jsb "); fprintf(stdout, h_msg_address, ((h_processor->pc & 0x0f00) | i_opcode >> 2));}
+         if (h_processor->trace) {fprintf(stdout, "jsb "); fprintf(stdout, h_msg_number, ((h_processor->pc & 0x0f00) | i_opcode >> 2));}
          op_jsb(h_processor, (i_opcode >> 2)); /* Note - uses and eight bit address */
          break;
 #endif
@@ -2822,7 +2859,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
          case 04: /* WP */
             s_field = "wp";
             h_processor->first =  0; h_processor->last =  h_processor->p; /* break; bug in orig??? */
-            if (h_processor->p >= REG_SIZE)
+            if (h_processor->p > REG_SIZE)  /* 12 Sep 25 - Changed to greater than from greater then or equal to */
             {
                if (h_processor->trace) fprintf(stdout, "\n");
                debug(printf ("REG_SIZE = %d, h_processor->p = %d", REG_SIZE, h_processor->p));
@@ -2872,7 +2909,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[B_REG]);
             break;
          case 005: /* 0 - c -> c[f] */
-            if (h_processor->trace) fprintf(stdout, "0 - c -> c[%s]", s_field);
+            if (h_processor->trace) fprintf(stdout, "0 - c -> c[%s]\t", s_field);
             v_reg_sub(h_processor, h_processor->reg[C_REG], NULL, h_processor->reg[C_REG]);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[C_REG]);
             break;
@@ -2882,13 +2919,13 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[C_REG]);
             break;
          case 007: /* 0 - c - 1 -> c[f] */
-            if (h_processor->trace) fprintf(stdout, "0 - c - 1 -> c[%s]\t\t", s_field);
+            if (h_processor->trace) fprintf(stdout, "0 - c - 1 -> c[%s]\t", s_field);
             h_processor->flags[CARRY] = True; /* Set carry */
             v_reg_sub(h_processor, h_processor->reg[C_REG], NULL, h_processor->reg[C_REG]);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[C_REG]);
             break;
          case 010: /* shift left a[f] */
-            if (h_processor->trace) fprintf(stdout, "shift left a[%s]\t\t", s_field);
+            if (h_processor->trace) fprintf(stdout, "shift left a[%s]\t", s_field);
             v_reg_shl(h_processor, h_processor->reg[A_REG]);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[B_REG]);
             break;
@@ -2898,12 +2935,12 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[B_REG]);
             break;
          case 012: /* a - c -> c[f] */
-            if (h_processor->trace) fprintf(stdout, "a - c -> c[%s]\t\t", s_field);
+            if (h_processor->trace) fprintf(stdout, "a - c -> c[%s]\t", s_field);
             v_reg_sub(h_processor, h_processor->reg[C_REG], h_processor->reg[A_REG], h_processor->reg[C_REG]);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[C_REG]);
             break;
          case 013: /* c - 1 -> c[f] */
-            if (h_processor->trace) fprintf(stdout, "c - 1 -> c[%s]\t\t", s_field);
+            if (h_processor->trace) fprintf(stdout, "c - 1 -> c[%s]\t", s_field);
             h_processor->flags[CARRY] = True; /* Set carry */
             v_reg_sub(h_processor, h_processor->reg[C_REG], h_processor->reg[C_REG], NULL);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[C_REG]);
@@ -2919,12 +2956,12 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             v_op_goto(h_processor);
             break;
          case 016: /* a + c -> c[f] */
-            if (h_processor->trace) fprintf(stdout, "a + c -> c[%s]\t\t", s_field);
+            if (h_processor->trace) fprintf(stdout, "a + c -> c[%s]\t", s_field);
             v_reg_add(h_processor, h_processor->reg[C_REG], h_processor->reg[C_REG], h_processor->reg[A_REG]);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[C_REG]);
             break;
          case 017: /* c + 1 -> c[f] */
-            if (h_processor->trace) fprintf(stdout, "c + 1 -> c[%s]\t\t", s_field);
+            if (h_processor->trace) fprintf(stdout, "c + 1 -> c[%s]\t", s_field);
             v_reg_inc(h_processor, h_processor->reg[C_REG]);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[C_REG]);
             break;
@@ -2935,7 +2972,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             v_op_goto(h_processor);
             break;
          case 021: /* b exchange c[f] */
-            if (h_processor->trace) fprintf(stdout, "b exch c[%s]\t\t", s_field);
+            if (h_processor->trace) fprintf(stdout, "b exch c[%s]\t", s_field);
             v_reg_exch(h_processor, h_processor->reg[B_REG], h_processor->reg[C_REG]);
             if (h_processor->trace)
             {
@@ -3004,7 +3041,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[A_REG]);
             break;
          case 035: /* a exch c[f] */
-            if (h_processor->trace) fprintf(stdout, "a exch c[%s]\t\t", s_field);
+            if (h_processor->trace) fprintf(stdout, "a exch c[%s]\t", s_field);
             v_reg_exch(h_processor, h_processor->reg[A_REG], h_processor->reg[C_REG]);
             if (h_processor->trace)
             {
@@ -3013,12 +3050,12 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             }
             break;
          case 036: /* a + c -> a[a + c -> a[f] */
-            if (h_processor->trace) fprintf(stdout, "a + c -> a[%s]", s_field);
+            if (h_processor->trace) fprintf(stdout, "a + c -> a[%s]\t", s_field);
             v_reg_add(h_processor, h_processor->reg[A_REG], h_processor->reg[A_REG], h_processor->reg[C_REG]);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[A_REG]);
             break;
          case 037: /* a + 1 -> a[f] */
-            if (h_processor->trace) fprintf(stdout, "a + 1 -> a[%s]", s_field);
+            if (h_processor->trace) fprintf(stdout, "a + 1 -> a[%s]\t", s_field);
             v_reg_inc(h_processor, h_processor->reg[A_REG]);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[A_REG]);
             break;
@@ -3409,75 +3446,75 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[A_REG]);
             break;
          case 0x09: /* a + b -> a[f] - Load a with a plus b (01 001f ff10) */
-            if (h_processor->trace) fprintf(stdout, "a = a + b %-3s", s_field);
+            if (h_processor->trace) fprintf(stdout, "a = a + b %-3s\t", s_field);
             v_reg_add(h_processor, h_processor->reg[A_REG], h_processor->reg[A_REG], h_processor->reg[B_REG]);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[A_REG]);
             break;
          case 0x0a: /* a + c -> a[f] - Load a with a plus c (01 010f ff10) */
-            if (h_processor->trace) fprintf(stdout, "a = a + c %-3s", s_field);
+            if (h_processor->trace) fprintf(stdout, "a = a + c %-3s\t", s_field);
             v_reg_add(h_processor, h_processor->reg[A_REG], h_processor->reg[A_REG], h_processor->reg[C_REG]);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[A_REG]);
             break;
          case 0x0b: /* a + 1 -> a[f] - Load a with a plus 1 (01 011f ff10) */
-            if (h_processor->trace) fprintf(stdout, "a = a + 1 %-3s", s_field);
+            if (h_processor->trace) fprintf(stdout, "a = a + 1 %-3s\t", s_field);
             v_reg_inc(h_processor, h_processor->reg[A_REG]);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[A_REG]);
             break;
          case 0x0c: /* a - b -> a[f] - Load a with a minus b (01 100f ff10) */
-            if (h_processor->trace) fprintf(stdout, "a = a - b %-3s", s_field);
+            if (h_processor->trace) fprintf(stdout, "a = a - b %-3s\t", s_field);
             v_reg_sub(h_processor, h_processor->reg[A_REG], h_processor->reg[A_REG], h_processor->reg[B_REG]);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[A_REG]);
             break;
          case 0x0d: /* a - 1 -> a[f] - Load a with a minus 1 (01 101f ff10) */
-            if (h_processor->trace) fprintf(stdout, "a = a - 1 %-3s", s_field);
+            if (h_processor->trace) fprintf(stdout, "a = a - 1 %-3s\t", s_field);
             h_processor->flags[CARRY] = True; /* Set carry */
             v_reg_sub(h_processor, h_processor->reg[A_REG], h_processor->reg[A_REG], NULL);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[A_REG]);
             break;
          case 0x0e: /* a - c -> a[f] - Load a with a minus c (01 110f ff10) */
-            if (h_processor->trace) fprintf(stdout, "a = a - c %-3s", s_field);
+            if (h_processor->trace) fprintf(stdout, "a = a - c %-3s\t", s_field);
             v_reg_sub(h_processor, h_processor->reg[A_REG], h_processor->reg[A_REG], h_processor->reg[C_REG]);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[A_REG]);
             break;
          case 0x0f: /* c + c -> c[f] - Load c with c plus c (01 111f ff10) */
-            if (h_processor->trace) fprintf(stdout, "c = c + c %-3s", s_field);
+            if (h_processor->trace) fprintf(stdout, "c = c + c %-3s\t", s_field);
             v_reg_add(h_processor, h_processor->reg[C_REG], h_processor->reg[C_REG], h_processor->reg[C_REG]);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[C_REG]);
             break;
          case 0x10: /* a + c -> c[f] - Load c with a plus c (10 000f ff10) */
-            if (h_processor->trace) fprintf(stdout, "c = c + a %-3s", s_field);
+            if (h_processor->trace) fprintf(stdout, "c = c + a %-3s\t", s_field);
             v_reg_add(h_processor, h_processor->reg[C_REG], h_processor->reg[C_REG], h_processor->reg[A_REG]);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[C_REG]);
             break;
          case 0x11: /* c + 1 -> c[f] - Load c with c plus 1 (10 001f ff10) */
-            if (h_processor->trace) fprintf(stdout, "c = c + 1 %-3s", s_field);
+            if (h_processor->trace) fprintf(stdout, "c = c + 1 %-3s\t", s_field);
             v_reg_inc(h_processor, h_processor->reg[C_REG]);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[C_REG]);
             break;
          case 0x12: /* c - a -> c[f] - Load c with c minus a (10 010f ff10) */
-            if (h_processor->trace) fprintf(stdout, "c = a - c %-3s", s_field);
+            if (h_processor->trace) fprintf(stdout, "c = a - c %-3s\t", s_field);
             v_reg_sub(h_processor, h_processor->reg[C_REG], h_processor->reg[A_REG], h_processor->reg[C_REG]);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[C_REG]);
             break;
          case 0x13: /* c - 1 -> c[f] - Load c with c minus 1 (10 011f ff10) */
-            if (h_processor->trace) fprintf(stdout, "c = c - 1 %-3s", s_field);
+            if (h_processor->trace) fprintf(stdout, "c = c - 1 %-3s\t", s_field);
             h_processor->flags[CARRY] = True; /* Set carry */
             v_reg_sub(h_processor, h_processor->reg[C_REG], h_processor->reg[C_REG], NULL);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[C_REG]);
             break;
          case 0x14: /* 0 - c -> c f - Load c with 0 minus c (10 100f ff10) */
-            if (h_processor->trace) fprintf(stdout, "c = 0 - c %-3s", s_field);
+            if (h_processor->trace) fprintf(stdout, "c = 0 - c %-3s\t", s_field);
             v_reg_sub(h_processor, h_processor->reg[C_REG], NULL, h_processor->reg[C_REG]);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[C_REG]);
             break;
          case 0x15: /* 0 - c - 1 -> c[f] - Complement c (10 101f ff10) */
-            if (h_processor->trace) fprintf(stdout, "c = - c - 1 %-3s", s_field);
+            if (h_processor->trace) fprintf(stdout, "c = - c - 1 %-3s\t", s_field);
             h_processor->flags[CARRY] = True; /* Set carry */
             v_reg_sub(h_processor, h_processor->reg[C_REG], NULL, h_processor->reg[C_REG]);
             if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[C_REG]);
             break;
          case 0x16: /* ? b[f] != 0 - Test b not equal to zero (10 110f ff10) */
-            if (h_processor->trace) fprintf(stdout, "? b != 0 %-3s", s_field);
+            if (h_processor->trace) fprintf(stdout, "? b != 0 %-3s\t", s_field);
             v_reg_test_ne(h_processor, h_processor->reg[B_REG], NULL);
             break;
          case 0x17: /* ? c != 0 - Test c not equal to zero (10 111f ff10) */
@@ -3485,15 +3522,15 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             v_reg_test_ne(h_processor, h_processor->reg[C_REG], NULL);
             break;
          case 0x18: /* ? a < c - Test a less than c (11 000f ff10) */
-            if (h_processor->trace) fprintf(stdout, "? a < c %-3s", s_field);
+            if (h_processor->trace) fprintf(stdout, "? a < c %-3s\t", s_field);
             v_reg_sub(h_processor, NULL, h_processor->reg[A_REG], h_processor->reg[C_REG]);/* Less than */
             break;
          case 0x19: /* ? a < b - Test a less than b (11 001f ff10) */
-            if (h_processor->trace) fprintf(stdout, "? a < b %-3s", s_field);
+            if (h_processor->trace) fprintf(stdout, "? a < b %-3s\t", s_field);
             v_reg_sub(h_processor, NULL, h_processor->reg[A_REG], h_processor->reg[B_REG]); /* Less than */
             break;
          case 0x1a: /* ? a != 0 - Test a not equal to zero  (11 010f ff10) */
-            if (h_processor->trace) fprintf(stdout, "? a != 0 %-3s", s_field);
+            if (h_processor->trace) fprintf(stdout, "? a != 0 %-3s\t", s_field);
             v_reg_test_ne(h_processor, h_processor->reg[A_REG], NULL);
             break;
          case 0x1b: /* ? a != c - Test a not equal to c (11 011f ff10) */
@@ -3532,17 +3569,17 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
          switch (i_opcode & 03)
          {
          case 00:
-            if (h_processor->trace) {fprintf(stdout, "call "); fprintf(stdout, h_msg_address, i_opcode >> 2);}
+            if (h_processor->trace) {fprintf(stdout, "call "); fprintf(stdout, h_msg_number, i_opcode >> 2);}
             if (h_processor->trace) fprintf(stdout, "\n");
             v_error(errno, h_err_unexpected_opcode, i_opcode, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
             break;
          case 01:
-            if (h_processor->trace) {fprintf(stdout, "call "); fprintf(stdout, h_msg_address, i_opcode >> 2);}
+            if (h_processor->trace) {fprintf(stdout, "call "); fprintf(stdout, h_msg_number, i_opcode >> 2);}
             if (h_processor->trace) fprintf(stdout, "\n");
             v_error(errno, h_err_unexpected_opcode, i_opcode, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
             break;
          case 02:
-            if (h_processor->trace) {fprintf(stdout, "jump "); fprintf(stdout, h_msg_address, i_opcode >> 2);}
+            if (h_processor->trace) {fprintf(stdout, "jump "); fprintf(stdout, h_msg_number, i_opcode >> 2);}
             if (h_processor->trace) fprintf(stdout, "\n");
             v_error(errno, h_err_unexpected_opcode, i_opcode, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
             break;
@@ -3575,7 +3612,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
             break;
 #else
          case 03: /* if nc goto */
-            if (h_processor->trace) {fprintf(stdout, "if no carry go to "); fprintf(stdout, h_msg_address, ((h_processor->pc & 0x0f00) | i_opcode >> 2));} /* Note - uses an eight bit address */
+            if (h_processor->trace) {fprintf(stdout, "if no carry go to "); fprintf(stdout, h_msg_number, ((h_processor->pc & 0x0f00) | i_opcode >> 2));} /* Note - uses an eight bit address */
             if (!h_processor->flags[PREV_CARRY])
             {
                h_processor->pc = (h_processor->pc & 0xff00) | i_opcode >> 2;

@@ -31,6 +31,7 @@
  * 12 Jun 25         - Added  error messages for the number of  breakpoints
  *                     and instruction traps - MT
  *                   - Defined messages as string constants - MT
+ * 10 Sep 25         - Changed message variable names - MT
  *
  */
 
@@ -44,8 +45,9 @@ extern const char *h_err_unexpected_opcode;
 extern const char *h_err_unexpected_error;
 extern const char *h_err_invalid_address;
 extern const char *h_err_invalid_register;
-extern const char *h_msg_opcode;
 extern const char *h_msg_address;
+extern const char *h_msg_opcode;
+extern const char *h_msg_number;
 
 extern const char *h_msg_negative_offset;
 extern const char *h_msg_positive_offset;

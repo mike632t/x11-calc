@@ -359,6 +359,8 @@
  * 06 Sep 25         - Reorganized  continuous memory save/restore routines
  *                     and defined the conditional code in the main program
  *                     removing the need for dummy functions - MT
+ * 12 Sep 25   0.19  - Added HP55 - MT
+ *                   - Improved accuracy of HP55 timer - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -371,13 +373,13 @@
  */
 
 #define  NAME          "x11-calc"
-#define  VERSION       "0.18"
-#define  BUILD         "0188"
-#define  DATE          "05 Sep 25"
+#define  VERSION       "0.19"
+#define  BUILD         "0191"
+#define  DATE          "12 Sep 25"
 #define  AUTHOR        "MT"
 
 #define  INTERVAL 48   /* Number of ticks to execute before updating the display */
-#define  DELAY 48      /* Number of intervals to wait before exiting */
+#define  DELAY 44      /* Number of intervals to wait before exiting */
 
 #include <errno.h>     /* errno */
 
@@ -908,7 +910,6 @@ int main(int argc, char *argv[])
    if (SWITCHES == 2) /** To Do - Must be a better way of handling an arbitrary number of switches */
    {
 #if defined(HP10)
-      h_processor->print = h_switch[1]->state;
       switch (h_switch[1]->state)
       {
          case 0:
@@ -922,8 +923,26 @@ int main(int argc, char *argv[])
             h_processor->print = TRACE;
             break;
       }
+#elif defined(HP55)
+      switch (h_switch[1]->state)
+      {
+         case 0:
+            h_processor->timer = True;
+            h_processor->mode = False;
+            break;
+         case 3:
+         case 1:
+            h_processor->timer = False;
+            h_processor->mode = True;
+            break;
+         case 2:
+            h_processor->timer = False;
+            h_processor->mode = False;
+            break;
+      }
 #else
-      if (h_switch[1] != NULL) h_processor->mode = h_switch[1]->state;
+      if (h_switch[1] != NULL)
+         h_processor->mode = h_switch[1]->state;
 #endif
    }
 #endif
@@ -940,13 +959,13 @@ int main(int argc, char *argv[])
          XCopyArea(x_display, x_buffer, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
          i_count = INTERVAL;
 #if defined(HP67)
-         i_wait(INTERVAL / 4);  /* Sleep for ~6.25 ms per tick */
-#elif defined(VOYAGER)
-         i_wait(INTERVAL / 3);  /* Sleep for ~8.33 ms per tick */
-#elif defined(SPICE)
-         i_wait(INTERVAL / 3);  /* Sleep for ~8.33 ms per tick */
+         i_wait(INTERVAL / 4);   /* Sleep for ~6.25 ms per tick */
+#elif defined(HP55)
+         i_wait(INTERVAL / 3.1); /* Sleep for ~???? ms per tick */
+#elif defined(VOYAGER) || defined(SPICE)
+         i_wait(INTERVAL / 3);   /* Sleep for ~8.33 ms per tick */
 #else
-         i_wait(INTERVAL / 2);  /* Sleep for ~12.5 ms per tick */
+         i_wait(INTERVAL / 2);   /* Sleep for ~12.5 ms per tick */
 #endif
          if (i_ticks > 0) i_ticks -= 1;
          if (i_ticks == 0) b_abort = True;
@@ -1051,7 +1070,7 @@ int main(int argc, char *argv[])
                      h_processor->code = h_pressed->index;
                      h_processor->keypressed = True;
 #if !defined(SWITCHES)
-                     h_processor->enabled = True;  /* Any key press wil wake up the processor */
+                     h_processor->enabled = True;  /* Any key press will wake up the processor */
                      h_processor->sleep = False;
 #endif
                      break;
@@ -1105,6 +1124,23 @@ int main(int argc, char *argv[])
                         case 2:
                            h_processor->print = TRACE;
                            break;
+                        }
+#elif defined(HP55)
+                        switch(i_switch_click(h_switch[1]))
+                        {
+                           case 0:
+                              h_processor->timer = True;
+                              h_processor->mode = False;
+                              break;
+                           case 3:
+                           case 1:
+                              h_processor->timer = False;
+                              h_processor->mode = True;
+                              break;
+                           case 2:
+                              h_processor->timer = False;
+                              h_processor->mode = False;
+                              break;
                         }
 #else
                         h_processor->mode = i_switch_click(h_switch[1]);  /* Update prgm/run switch */

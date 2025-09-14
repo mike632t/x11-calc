@@ -77,7 +77,7 @@ common: $(COMMON:.c=.o_cm)
 	@[ -n "$${VERBOSE+x}" ] && echo && echo "$(CC) $(CFLAGS) $(CFLAGS_ADD) -DHP$(MODEL) -c $< -o $@" || true
 	@$(CC) $(CFLAGS) $(CFLAGS_ADD) -DHP$(MODEL) -c $< -o $@
 
-# COMMON files are NOT supposed to be instanciated per MODEL
+# COMMON files are NOT supposed to be instantiated per MODEL
 .c.o_cm:
 	@[ -n "$${VERBOSE+x}" ] && echo && echo "$(CC) $(CFLAGS) $(CFLAGS_ADD) -c $< -o $@" || true
 	@$(CC) $(CFLAGS) $(CFLAGS_ADD) -c $< -o $@
