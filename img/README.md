@@ -8,7 +8,9 @@ in C using only X11.
 
 ### Screenshots
 
-![HP35](./x11-calc-35.png) ![HP80](./x11-calc-80.png) ![HP45](./x11-calc-45.png) ![HP70](./x11-calc-70.png) ![HP55](./x11-calc-55.png)
+![HP35](./x11-calc-35.png) ![HP80](./x11-calc-80.png) ![HP45](./x11-calc-45.png) ![HP70](./x11-calc-70.png)
+
+![HP55](./x11-calc-55.png)
 
 ![HP21](./x11-calc-21.png) ![HP22](./x11-calc-22.png) ![HP25](./x11-calc-25.png)
 
