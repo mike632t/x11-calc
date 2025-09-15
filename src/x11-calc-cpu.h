@@ -63,6 +63,7 @@
  *                     from a previously saved copy, while in prgm mode the
  *                     user will be prompted to save the current state to a
  *                     file - MT
+ * 15 Sep 25         - Fixed errors when compiling on MacOS - MT
  *
  */
 
@@ -181,6 +182,8 @@ void v_fprint_memory(FILE *h_file, oprocessor *h_procesor);
 void v_processor_tick(oprocessor *h_procesor);
 
 #if defined(CONTINIOUS)
+char *s_get_datafile();
+
 void v_read_state(oprocessor *h_processor, char *s_pathname);
 
 void v_write_state(oprocessor *h_processor, char *s_pathname);

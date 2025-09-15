@@ -361,6 +361,7 @@
  *                     removing the need for dummy functions - MT
  * 12 Sep 25   0.19  - Added HP55 - MT
  *                   - Improved accuracy of HP55 timer - MT
+ * 15 Sep 25         - Fixed errors when compiling on MacOS - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -374,8 +375,8 @@
 
 #define  NAME          "x11-calc"
 #define  VERSION       "0.19"
-#define  BUILD         "0191"
-#define  DATE          "12 Sep 25"
+#define  BUILD         "0192"
+#define  DATE          "15 Sep 25"
 #define  AUTHOR        "MT"
 
 #define  INTERVAL 48   /* Number of ticks to execute before updating the display */
@@ -502,10 +503,11 @@ int main(int argc, char *argv[])
    char b_trace = False;               /* Trace flag */
    char b_step = False;                /* Single step flag flag */
    char b_cursor = True;               /* Draw a cursor */
-   Bool b_numlock = False;             /* Use number pad - even if numlock is off */
    char b_run = True;                  /* Run flag controls CPU instruction execution in main loop */
    char b_abort = False;               /* Abort flag controls execution of main loop */
-
+#if defined(__linux__) || defined(__NetBSD__) || defined(__FreeBSD__)
+   char b_numlock = False;             /* Use number pad - even if numlock is off */
+#endif
 #if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
    char b_euro = False;
 #endif
@@ -656,8 +658,10 @@ int main(int argc, char *argv[])
                   else if (!strncmp(argv[i_count], "--no-comma", i_index))
                      b_euro = False;  /* Don't use european display format */
 #endif
+#if defined(__linux__) || defined(__NetBSD__) || defined(__FreeBSD__)
                   else if (!strncmp(argv[i_count], "--numlock", i_index))
                      b_numlock = True;  /* Use number pad - even if numlock is off */
+#endif
                   else if (!strncmp(argv[i_count], "--zoom", i_index))
                   {
                      if (i_count + 1 < argc)
