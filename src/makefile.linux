@@ -78,7 +78,10 @@
 #  23 Mar 25         - Instantiate without symlinks trick and use std FLAGS
 #                      to maximize use of implicit build rules - macmpi
 #                    - Remove VERBOSE in favor of make --dry-run - macmpi
-#  23 Mar 25         - Rely on makefile.common
+#  23 Mar 25         - Rely on makefile.common - macmpi
+#   5 Sep 25         - Builds with GTK 3.0 to provide support for graphical
+#                      file selection dialog - MT
+# 15 Sep  25         - Detects of GTK 3.0 is available - MT
 #
 
 CFLAGS	?= -O2
@@ -88,12 +91,13 @@ LDLIBS	?=
 LANG	= LANG_$(shell (echo $$LANG | cut -f 1 -d '_'))
 COMMIT	!= git log -1 HEAD --format=%h 2> /dev/null
 
+ifneq ($(shell pkg-config --exists gtk+-3.0 && echo "GTK" || echo ""),)
+CFLAGS	+= -D__GTK__
 CFLAGS	+= `pkg-config --cflags gtk+-3.0`
 LDLIBS	+= `pkg-config --libs gtk+-3.0`
-
 #CFLAGS	+= `pkg-config --cflags gtk+-2.0`
 #LDLIBS	+= `pkg-config --libs gtk+-2.0`
-
+endif
 ifneq ($(COMMIT),)
 CFLAGS	+= -DCOMMIT_ID='"[Commit Id : $(COMMIT)]"'
 endif

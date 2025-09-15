@@ -432,6 +432,8 @@
  * 12 Sep 25         - Updated 'select rom' so that it selects the  correct
  *                     address when 'delayed select rom' or 'delayed select
  *                     group' instructions are in effect - MT
+ * 15 Sep 25         - Detects of GTK 3.0 is available - MT 
+ *                   - Removed 'zenity' fallback - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -449,8 +451,6 @@
 #define  AUTHOR        "MT"
 
 #define  NODEBUG
-
-#define __GTK__
 
 #include <errno.h>     /* errno */
 
@@ -546,49 +546,9 @@ char *s_get_filename(char *s_path, char c_mode, char *s_filter, char *s_name)
    return s_filename;
 }
 #else
-
-#define  BUFFER_SIZE   512
-
-char *s_get_filename(char *s_path, char c_mode, char *s_filter, char *s_name)
+char *s_get_filename(char *s_path, char c_mode, char *s_filter, char *s_name) /* Don't do anything if GTK not installed */
 {
-   FILE *h_file;
-   char *s_filename = NULL;
-   char *s_basename = NULL;
-   char *s_command = NULL;
-   char *s_format = NULL;
-
-   s_basename = strrchr(s_path, '/' );  /* Find the base name */
-   *(s_basename++) = '\0';  /* Replace the '/' with a '\0' to split the directory name and base name into two strings */
-
-   if (strstr(s_basename , "io.github.mike632t.x11-calc") == NULL) /* Do NOT attempt to run `zenity` if running inside the flatpak sandbox (it will hang) */
-   {
-      switch (c_mode)
-      {
-      case 'r':
-         s_format = "zenity --file-selection --filename \"%s/\" --file-filter=\" %s  | %s \" --file-filter=\"  All Files  | *.* \" --title=\"Load\" 2>&1";
-         break;
-      case 'w':
-         s_format = "zenity --file-selection --filename \"%s/\" --file-filter=\" %s  | %s \" --file-filter=\"  All Files | *.* \" --title=\"Save\" --save --confirm-overwrite 2>&1";
-         break;
-      default:
-         break;
-      }
-      if ((s_command = malloc(sizeof(*s_path) * (strlen(s_path) + strlen(s_format) + strlen(s_filter) + strlen(s_name) + 1))) == NULL) /* Allocate memory for command */
-         v_error(errno, h_err_memmory_alloc, __FILE__, __LINE__);
-      sprintf(s_command, s_format, s_path, s_name, s_filter);  /* Insert path name into command */
-      if ((s_filename = malloc(sizeof(*s_filename) * BUFFER_SIZE)) == NULL) v_error(errno, h_err_memmory_alloc, __FILE__, __LINE__);  /* Allocate memory for path to file (max 512 characters) */
-      if ((h_file = popen(s_command, "r")) != NULL)  /* Fail silently */
-      {
-         if ((s_filename = fgets(s_filename, BUFFER_SIZE, h_file)) != NULL)
-         {
-            if (pclose(h_file))
-               s_filename = NULL;  /* There was an error */
-            else
-               s_filename[strcspn(s_filename, "\n\r")] = '\0';  /* Remove trailing newline characters */
-         }
-      }
-   }
-   return s_filename;
+   return NULL;
 }
 #endif
 
