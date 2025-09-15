@@ -29,12 +29,13 @@
  * 22 Apr 24         - Tidied up data types - MT
  * 23 Apr 24         - More changes to data types - MT
  * 16 Aug 25         - Added flag to optionally ignore numlock - MT
+ * 15 Sep 25         - Changed bool to char - MT
  *
  */
 
 #define NAME           "x11-calc-keyboard"
-#define BUILD          "0007"
-#define DATE           "16 Aug 25"
+#define BUILD          "0008"
+#define DATE           "15 Sep 25"
 #define AUTHOR         "MT"
 
 #include <ctype.h>     /* is alpha(), etc. */
@@ -52,7 +53,7 @@
 #if defined(__linux__) || defined(__NetBSD__) || defined (__FreeBSD__)
 
 /* Attempts to translate a key code into a character. */
-static void v_key_decode(okeyboard *h_keyboard, Display *x_display, KeyCode x_keycode, unsigned int i_keystate, Bool b_numlock)
+static void v_key_decode(okeyboard *h_keyboard, Display *x_display, KeyCode x_keycode, unsigned int i_keystate, char b_numlock)
 {
    h_keyboard->keysym = XKeycodeToKeysym(x_display, x_keycode, 0);
    h_keyboard->key = '\000';
