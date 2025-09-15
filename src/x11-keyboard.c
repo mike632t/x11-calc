@@ -161,7 +161,7 @@ static void v_key_decode(okeyboard *h_keyboard, Display *x_display, KeyCode x_ke
 
 /* Update the keyboard state */
 
-void h_key_pressed(okeyboard *h_keyboard, Display *x_display, KeyCode x_keycode, unsigned int i_keystate, Bool b_numlock)
+void h_key_pressed(okeyboard *h_keyboard, Display *x_display, KeyCode x_keycode, unsigned int i_keystate, char b_numlock)
 {
    v_key_decode(h_keyboard, x_display, x_keycode, i_keystate, b_numlock);
    debug(fprintf(stderr, "Key pressed - '%s'.\n", XKeysymToString(h_keyboard->keysym)));
@@ -173,7 +173,7 @@ void h_key_pressed(okeyboard *h_keyboard, Display *x_display, KeyCode x_keycode,
  * Updates the keyboard state when a key is released.
  *
  */
-void h_key_released(okeyboard *h_keyboard, Display *x_display, KeyCode x_keycode, unsigned int i_keystate, Bool b_numlock)
+void h_key_released(okeyboard *h_keyboard, Display *x_display, KeyCode x_keycode, unsigned int i_keystate, char b_numlock)
 {
    v_key_decode(h_keyboard, x_display, x_keycode, i_keystate, b_numlock);
    debug(fprintf(stderr, "Key released - '%s'.\n", XKeysymToString(h_keyboard->keysym)));
