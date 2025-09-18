@@ -7,6 +7,10 @@
 
 - [ ] Add a graphical printer display to the HP10
 
+- [ ] Reorganize x11-calc and simplify the switch handling
+
+- [ ] Add HP65
+
 - [ ] Add proper card reader to HP67
 
 - [ ] Draw switches showing position (and not just labels)
