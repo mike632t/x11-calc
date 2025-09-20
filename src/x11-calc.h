@@ -61,31 +61,14 @@
  * 14 Mar 24         - Allow SCALE_HEIGHT and SCALE_WIDTH to be passed from
  *                     command line at compile time - MT
  * 23 Apr 24         - Separated out prototypes for error handlers - MT
+ * 07 Jul 25         - Finished adding support for HP10 - MT
+ * 12 Sep 25         - Added HP55 - MT
  *
  * TO DO :           -
  */
+
 #if !defined(COMMIT_ID)
 #define COMMIT_ID "[Commit ID: $Format:%h$]"
-#endif
-
-#if defined(HP35) || defined(HP80) || defined(HP45) || defined(HP70) || defined(HP55) || defined(HP10) || defined(HP67)
-
-#if !defined(SCALE_WIDTH)
-#define SCALE_WIDTH     1.15
-#endif
-#if !defined(SCALE_HEIGHT)
-#define SCALE_HEIGHT    1
-#endif
-
-#else
-
-#if !defined(SCALE_WIDTH)
-#define SCALE_WIDTH     1
-#endif
-#if !defined(SCALE_HEIGHT)
-#define SCALE_HEIGHT    1
-#endif
-
 #endif
 
 /** #define __TIME__     "00:00:00" /* Release only */
@@ -99,26 +82,31 @@
 #if defined(HP35)
 #define FILENAME     "x11-calc-35"
 #define TITLE        "RPN calc 35"
+#define CLASSIC
 #include "x11-calc-35.h"
 
 #elif defined(HP80)
 #define FILENAME     "x11-calc-80"
 #define TITLE        "RPN calc 80"
+#define CLASSIC
 #include "x11-calc-80.h"
 
 #elif defined(HP45)
 #define FILENAME     "x11-calc-45"
 #define TITLE        "RPN calc 45"
+#define CLASSIC
 #include "x11-calc-45.h"
 
 #elif defined(HP55)
 #define FILENAME     "x11-calc-55"
 #define TITLE        "RPN calc 55"
+#define CLASSIC
 #include "x11-calc-55.h"
 
 #elif defined(HP70)
 #define FILENAME     "x11-calc-70"
 #define TITLE        "RPN calc 70"
+#define CLASSIC
 #include "x11-calc-70.h"
 
 #elif defined(HP10)
@@ -246,3 +234,25 @@
 #include "x11-calc-16c.h"
 
 #endif
+
+#if defined(CLASSIC) || defined(HP10) || defined(HP67)
+
+#if !defined(SCALE_WIDTH)
+#define SCALE_WIDTH     1.15
+#endif
+#if !defined(SCALE_HEIGHT)
+#define SCALE_HEIGHT    1
+#endif
+
+#else
+
+#if !defined(SCALE_WIDTH)
+#define SCALE_WIDTH     1
+#endif
+#if !defined(SCALE_HEIGHT)
+#define SCALE_HEIGHT    1
+#endif
+
+#endif
+
+
