@@ -52,6 +52,7 @@
 #define GREEN          0xffffff /* Green function keys. */
 #define YELLOW         0xffffff /* Yellow shift key. */
 #define ORANGE         0xffffff /* Yellow shift key. */
+#define DARK_BLUE      0x000000 /* Blue text and function keys. */
 #define MID_BLUE       0x000000 /* Blue text and function keys. */
 #define LIGHT_BLUE     0xffffff /* Blue shift key. */
 #define WHITE          0xffffff /* White. */
@@ -82,6 +83,7 @@
 #define GREEN          0x948639 /* Green function keys. */
 #define YELLOW         0xf5a434 /* Yellow shift key. */
 #define ORANGE         0xe06900 /* Orange function keys. */
+#define DARK_BLUE      0x3784b0 /* Blue text. */
 #define MID_BLUE       0x4096aa /* Blue text and function keys (was 0x3784b0). */
 #define LIGHT_BLUE     0x4aa0b0 /* Blue shift key. */
 #define WHITE          0xffffff /* White. */
