@@ -362,6 +362,8 @@
  * 12 Sep 25   0.19  - Added HP55 - MT
  *                   - Improved accuracy of HP55 timer - MT
  * 15 Sep 25         - Fixed errors when compiling on MacOS - MT
+ * 20 Sep 25         - Explicitly include X11 keyboard symbols - MT
+ *                   - Enable keyboard shortcuts on any UNIX - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -393,6 +395,7 @@
 
 #include <X11/Xlib.h>  /* XOpenDisplay(), True/False etc */
 #include <X11/Xutil.h> /* XSizeHints etc */
+#include <X11/keysym.h>
 #include <X11/cursorfont.h>
 
 #include "x11-calc-messages.h"
@@ -505,7 +508,7 @@ int main(int argc, char *argv[])
    char b_cursor = True;               /* Draw a cursor */
    char b_run = True;                  /* Run flag controls CPU instruction execution in main loop */
    char b_abort = False;               /* Abort flag controls execution of main loop */
-#if defined(__linux__) || defined(__NetBSD__) || defined (__FreeBSD__)
+#if defined (__unix__)
    char b_numlock = False;             /* Use number pad - even if numlock is off */
 #endif
 #if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
@@ -531,7 +534,7 @@ int main(int argc, char *argv[])
    struct olabel *h_label[LABELS];
 #endif
 
-#if defined(__linux__) || defined(__NetBSD__) || defined (__FreeBSD__)
+#if defined (__unix__)
    okeyboard *h_keyboard;
 #endif
 
@@ -658,7 +661,7 @@ int main(int argc, char *argv[])
                   else if (!strncmp(argv[i_count], "--no-comma", i_index))
                      b_euro = False;  /* Don't use european display format */
 #endif
-#if defined(__linux__) || defined(__NetBSD__) || defined (__FreeBSD__)
+#if defined (__unix__)
                   else if (!strncmp(argv[i_count], "--numlock", i_index))
                      b_numlock = True;  /* Use number pad - even if numlock is off */
 #endif
@@ -884,7 +887,7 @@ int main(int argc, char *argv[])
       i_label_resize(h_label[i_count], f_scale);
 #endif
 
-#if defined(__linux__) || defined(__NetBSD__) || defined (__FreeBSD__)
+#if defined (__unix__)
    h_keyboard = h_keyboard_create(x_display);  /* Only works with Linux */
 #endif
 
@@ -996,7 +999,7 @@ int main(int argc, char *argv[])
                h_processor->keypressed = False;  /* Don't clear the status bit here!! */
             }
             break;
-#if defined(__linux__) || defined(__NetBSD__) || defined (__FreeBSD__)
+#if defined (__unix__)
          case KeyPress :
             h_key_pressed(h_keyboard, x_display, x_event.xkey.keycode, x_event.xkey.state, b_numlock);  /* Attempts to translate a key code into a character */
             if (h_keyboard->key == (XK_BackSpace & 0x1f)) h_keyboard->key = XK_Escape & 0x1f;  /* Map backspace to escape */

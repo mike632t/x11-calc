@@ -30,6 +30,8 @@
  * 23 Apr 24         - More changes to data types - MT
  * 16 Aug 25         - Added flag to optionally ignore numlock - MT
  * 15 Sep 25         - Changed bool to char - MT
+ * 20 Sep 25         - Explicitly include X11 keyboard symbols - MT
+ *                   - Enable keyboard on any UNIX - MT
  *
  */
 
@@ -45,12 +47,13 @@
 
 #include <X11/Xlib.h>  /* XOpenDisplay(), etc. */
 #include <X11/Xutil.h> /* XSizeHints etc. */
+#include <X11/keysym.h>
 
 #include "x11-keyboard.h"
 
 #include "gcc-debug.h"
 
-#if defined(__linux__) || defined(__NetBSD__) || defined (__FreeBSD__)
+#if defined (__unix__)
 
 /* Attempts to translate a key code into a character. */
 static void v_key_decode(okeyboard *h_keyboard, Display *x_display, KeyCode x_keycode, unsigned int i_keystate, char b_numlock)
