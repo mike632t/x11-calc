@@ -33,13 +33,14 @@
 #  31 Jul 25         - Display file names in colour (if possible) - MT
 #  11 Aug 25         - Do not use -Wno-builtin-macro-redefined - MT
 #  18 Aug 25         - Attempt to define compiler - MT
+#  20 Sep 25         - Fixed issue with compiler version - MT
 #
 
 MODEL	= 21
 PROGRAM	= x11-calc-$(MODEL)
 BIN		= ../bin
 
-COMPILER	= `$(CC) -v 2>&1 | grep '$(CC) version' | sed -e 's/([^()]*)//g' | sed -e 's/[ \t]*$$//g'`
+COMPILER	= `$(CC) -v 2>&1 | grep ' version ' | sed -e 's/([^()]*)//g' | sed -e 's/[ \t]*$$//g'`
 
 # SHARED sources are model-dependant via HP$(MODEL) #define statements
 SHARED	= x11-calc.c x11-calc-cpu.c x11-calc-display.c x11-calc-digit.c x11-calc-messages.c x11-calc-button.c
