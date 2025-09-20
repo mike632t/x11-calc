@@ -572,6 +572,7 @@ char *s_get_filename(char *s_path, char c_mode, char *s_filter, char *s_name)
       break;
    case 'w':
       h_widget = gtk_file_chooser_dialog_new("Save", NULL, GTK_FILE_CHOOSER_ACTION_SAVE, "Cancel", GTK_STOCK_QUIT , "Save", GTK_RESPONSE_OK, NULL);
+      gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (h_widget), TRUE);
       break;
    default:  /* Invalid mode */
       v_error(errno, h_err_abort, __FILE__, __LINE__);
@@ -600,6 +601,7 @@ char *s_get_filename(char *s_path, char c_mode, char *s_filter, char *s_name)
       gtk_file_chooser_add_filter (GTK_FILE_CHOOSER(h_widget), h_all);  /* Add another filter to allow the user to select all files */
    }
 
+   /** gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(h_widget), "test.dat");  /* Default filename */
    gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER(h_widget), s_path);  /* Set default path */
    gtk_widget_show_all(h_widget);
 
@@ -2292,6 +2294,7 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
                         h_processor->addr = i_addr;
                      else
                      {
+                        h_processor->addr = MEMORY_SIZE - 1;
                         if (h_processor->trace) fprintf(stdout, "\n");
                         v_error(errno, h_err_invalid_register, i_addr, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
                      }

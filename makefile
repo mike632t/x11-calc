@@ -138,7 +138,7 @@ _date		= `date +'%Y%m%d%H%M'`
 
 # Calculator models available in the emulator.
 
-_classic	= hp35 hp45 hp55 hp70 hp80
+_classic	= hp35 hp45 hp55 hp70 hp80 hp65
 _woodstock	= hp21 hp22 hp25 hp25c hp27 hp29c
 _topcat		= hp67
 _kiss		= hp10
