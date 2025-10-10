@@ -3,6 +3,14 @@
 
 ### Planned changes
 
+- [ ] Use a fixed window, display and key sizes (don't use scale with for CLASSIC or  KISS)
+
+- [ ] Fix window resizing.  Using window hints to resize the window doesn't work in every environment
+
+  [https://tronche.com/gui/x/xlib/window/XMoveResizeWindow.html]::
+
+- [ ] Allow user to resize the window at runtime (scroll wheel?).
+
 - [ ] Formatted program listings (using a separate python script)
 
 - [ ] Add a graphical printer display to the HP10
@@ -15,15 +23,7 @@
 
 - [ ] Draw switches showing position (and not just labels)
 
-- [ ] Support for very high resolution screens (select zoom based on screen
-resolution if none specified?)
-
-- [ ] Fix window resizing.  Using window hints to resize the window doesn't
-work in every environment
-
-  [https://tronche.com/gui/x/xlib/window/XMoveResizeWindow.html]::
-
-- [ ] Allow user to resize the window at runtime (scroll wheel?).
+- [ ] Select default zoom based on screen resolution?
 
 - [ ] Better segregation of common code (switch, label and keyboard)
 
