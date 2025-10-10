@@ -63,6 +63,8 @@
  * 23 Apr 24         - Separated out prototypes for error handlers - MT
  * 07 Jul 25         - Finished adding support for HP10 - MT
  * 12 Sep 25         - Added HP55 - MT
+ * 11 Oct 25         - No longer need to scale HP35, HP45, HP55, HP70, HP80
+ *                     or HP67 - MT
  *
  * TO DO :           -
  */
@@ -235,7 +237,7 @@
 
 #endif
 
-#if defined(CLASSIC) || defined(HP10) || defined(HP67)
+#if defined(HP10)
 
 #if !defined(SCALE_WIDTH)
 #define SCALE_WIDTH     1.15
