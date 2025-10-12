@@ -38,6 +38,7 @@
  * 11 Aug 25         - Warn if busy loop used (requires stdio.h) - MT
  * 17 Aug 25         - Solaris (and FreeBSD) can use usleep() - MT
  * 18 Aug 25         - So can Tru64 UNIX - MT
+ * 12 Oct 25         - Added Minix (generic busy loop doesn't work) - MT
  *
  */
 
@@ -48,7 +49,7 @@
 
 #define  False          0
 #define  True           !(False)
-#if defined(linux) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__solaris__) || defined(__osf__)
+#if defined(linux) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__solaris__) || defined(__osf__) || defined(__minix__)
 #include <unistd.h>
 #include <sys/types.h>
 #elif defined(VMS)
@@ -74,7 +75,7 @@
  */
 int i_wait(long l_delay)
 {
-#if defined(linux) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__solaris__) || defined(__osf__)
+#if defined(linux) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__solaris__) || defined(__osf__) || defined(__minix__)
 return (usleep(l_delay * 1000)); /* Use usleep() function */
 #elif defined(VMS)
 float f_seconds;
