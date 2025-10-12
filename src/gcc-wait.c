@@ -43,7 +43,7 @@
  */
 
 #define NAME           "gcc-wait"
-#define BUILD          "0008"
+#define BUILD          "0011"
 #define DATE           "11 Aug 25"
 #define AUTHOR         "MT"
 
