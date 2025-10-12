@@ -363,7 +363,7 @@
  *                   - Improved accuracy of HP55 timer - MT
  * 15 Sep 25         - Fixed errors when compiling on MacOS - MT
  * 20 Sep 25         - Explicitly include X11 keyboard symbols - MT
- *                   - Enable keyboard shortcuts on any UNIX - MT
+ *            (0194) - Enable keyboard shortcuts on any UNIX - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -377,8 +377,8 @@
 
 #define  NAME          "x11-calc"
 #define  VERSION       "0.19"
-#define  BUILD         "0192"
-#define  DATE          "15 Sep 25"
+#define  BUILD         "0194"
+#define  DATE          "12 Oct 25"
 #define  AUTHOR        "MT"
 
 #define  INTERVAL 48   /* Number of ticks to execute before updating the display */
