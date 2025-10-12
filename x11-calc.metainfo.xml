@@ -54,6 +54,11 @@
   </screenshots>
 
   <releases>
+  <release version="0.19.0192" date="2025-10-12">
+    <description>
+      <p>Added HP55</p>
+    </description>
+  </release>
   <release version="0.18.0188" date="2025-09-05">
     <description>
       <p>Implemented file selection dialog using GTK</p>
