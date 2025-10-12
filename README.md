@@ -163,6 +163,8 @@ The simulator has been successfully compiled and tested on:
 
    - MacOS 14.4.1 (Sonoma), clang 15.0.0, arm46 **
 
+   - Minix 3.4.0, clang 3.6, x86
+
    - NetBSD 9.2, gcc 7.5.0, x86
 
    - NetBSD 9.2, clang 16.0.6, x86
