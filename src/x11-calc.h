@@ -237,24 +237,11 @@
 
 #endif
 
-#if defined(HP10)
-
-#if !defined(SCALE_WIDTH)
-#define SCALE_WIDTH     1.15
-#endif
-#if !defined(SCALE_HEIGHT)
-#define SCALE_HEIGHT    1
-#endif
-
-#else
-
 #if !defined(SCALE_WIDTH)
 #define SCALE_WIDTH     1
 #endif
 #if !defined(SCALE_HEIGHT)
 #define SCALE_HEIGHT    1
-#endif
-
 #endif
 
 
