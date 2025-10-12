@@ -1,7 +1,7 @@
 /*
- * x11-calc-70.h - RPN (Reverse Polish) calculator simulator.
+ * x11-calc-55.h - RPN (Reverse Polish) calculator simulator.
  *
- * Copyright(C) 2018   MEJT
+ * Copyright(C) 2025   MEJT
  *
  * Model specific constants and function prototypes.
  *
@@ -18,24 +18,17 @@
  * You  should have received a copy of the GNU General Public License  along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * 05 Jan 22         - Initial version - MT
- * 07 Jan 22         - Fixed number of registers - MT
- * 11 Jan 22         - Removed ROM_BANKS - MT
- * 20 Jan 22         - Fixed compilation warnings on VAXC by defining i_rom
- *                     as external - MT
- * 29 Jan 22         - Added an optional bezel to the display - MT
- * 12 Feb 22         - Updated layout and separated the initialisation code
- *                     for buttons and switches into two functions - MT
- * 30 Mar 24         - Corrected number of switches - MT
- * 20 May 25         - Tidied up data structure definitions - MT
+ * 06 Sep 25         - Initial version derived from HP45 - MT
+ * 08 Sep 25         - Increased number of registers - MT
  * 11 Oct 25         - Modified key layout - MT
  *
  */
 
-#define HEIGHT             450 * SCALE_HEIGHT
+#define HEIGHT             450 * SCALE_HEIGHT /* 389 / 450 */
 #define WIDTH              230 * SCALE_WIDTH
 #define BUTTONS            35
-#define SWITCHES           1
+#define SWITCHES           2
+
 #define DIGITS             15
 
 #define DIGIT_COLOUR       RED
@@ -55,7 +48,7 @@
 
 #define KBD_LEFT           12 * SCALE_WIDTH
 #define KBD_TOP            67 * SCALE_HEIGHT
-#define KBD_ROW            44 * SCALE_HEIGHT
+#define KBD_ROW            44 * SCALE_HEIGHT /* 38 / 45 */
 
 #define KEY_HEIGHT         25 * SCALE_HEIGHT
 #define KEY_WIDTH          39 * SCALE_WIDTH
@@ -64,8 +57,8 @@
 #define KEY_GAP            3 * SCALE_WIDTH
 #define SWITCH_HEIGHT      10 * SCALE_HEIGHT
 
-#define ROM_SIZE           04000
-#define MEMORY_SIZE        10
+#define ROM_SIZE           06000
+#define MEMORY_SIZE        30
 
 extern int i_rom [ROM_SIZE];
 

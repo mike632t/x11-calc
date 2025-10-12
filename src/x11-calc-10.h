@@ -21,11 +21,13 @@
  * 26 Nov 22         - Initial version - MT
  * 24 Dec 22         - Added dummy digit to the HP10 display - MT
  *                   - Made space for the third switch position - MT
+ * 12 Oct 25         - Moved keyboard up (to make border consistent) - MT
+ *                   - Modified keyboard layout - MT
  *
  */
 
 #define HEIGHT             450 * SCALE_HEIGHT
-#define WIDTH              200 * SCALE_WIDTH
+#define WIDTH              230 * SCALE_WIDTH
 #define BUTTONS            24
 #define SWITCHES           2
 #define DIGITS             13
@@ -35,24 +37,23 @@
 #define DISPLAY_BACKGROUND RED_BACKGROUND
 #define BEZEL_COLOUR       WHITE
 
-#define KBD_LEFT           7 * SCALE_WIDTH
-#define KBD_TOP            165 * SCALE_HEIGHT /** 67 */
+#define KBD_LEFT           12 * SCALE_WIDTH
+#define KBD_TOP            164 * SCALE_HEIGHT
 #define KBD_ROW            43 * SCALE_HEIGHT
 
 #define BEZEL_LEFT         0 * SCALE_WIDTH
-#define BEZEL_TOP          102 * SCALE_HEIGHT
-#define BEZEL_WIDTH        200 * SCALE_WIDTH
+#define BEZEL_TOP          101 * SCALE_HEIGHT
+#define BEZEL_WIDTH        230 * SCALE_WIDTH
 #define BEZEL_HEIGHT       61 * SCALE_HEIGHT
 
 #define DISPLAY_LEFT       0 * SCALE_WIDTH
 #define DISPLAY_TOP        0 * SCALE_HEIGHT
-#define DISPLAY_WIDTH      200 * SCALE_WIDTH
+#define DISPLAY_WIDTH      230 * SCALE_WIDTH
 #define DISPLAY_HEIGHT     61 * SCALE_HEIGHT
 
 #define KEY_HEIGHT         30 * SCALE_HEIGHT
-#define KEY_WIDTH          35 * SCALE_WIDTH
-#define KEY_NUMERIC        40 * SCALE_WIDTH
-#define KEY_SMALL          25 * SCALE_WIDTH
+#define KEY_WIDTH          39 * SCALE_WIDTH
+#define KEY_NUMERIC        45 * SCALE_WIDTH
 #define KEY_GAP            3 * SCALE_WIDTH
 #define SWITCH_HEIGHT      10 * SCALE_HEIGHT
 

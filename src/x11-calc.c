@@ -356,6 +356,14 @@
  * 23 Aug 25   0.18  - Disable display when printer is in TRACE mode - MT
  * 03 Sep 25         - Added a workaround for issues with Flatpak - MT
  * 05 Sep 25         - Implemented file selection dialog using GTK - MT
+ * 06 Sep 25         - Reorganized  continuous memory save/restore routines
+ *                     and defined the conditional code in the main program
+ *                     removing the need for dummy functions - MT
+ * 12 Sep 25   0.19  - Added HP55 - MT
+ *                   - Improved accuracy of HP55 timer - MT
+ * 15 Sep 25         - Fixed errors when compiling on MacOS - MT
+ * 20 Sep 25         - Explicitly include X11 keyboard symbols - MT
+ *                   - Enable keyboard shortcuts on any UNIX - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -368,13 +376,13 @@
  */
 
 #define  NAME          "x11-calc"
-#define  VERSION       "0.18"
-#define  BUILD         "0188"
-#define  DATE          "05 Sep 25"
+#define  VERSION       "0.19"
+#define  BUILD         "0192"
+#define  DATE          "15 Sep 25"
 #define  AUTHOR        "MT"
 
 #define  INTERVAL 48   /* Number of ticks to execute before updating the display */
-#define  DELAY 48      /* Number of intervals to wait before exiting */
+#define  DELAY 44      /* Number of intervals to wait before exiting */
 
 #include <errno.h>     /* errno */
 
@@ -387,6 +395,7 @@
 
 #include <X11/Xlib.h>  /* XOpenDisplay(), True/False etc */
 #include <X11/Xutil.h> /* XSizeHints etc */
+#include <X11/keysym.h>
 #include <X11/cursorfont.h>
 
 #include "x11-calc-messages.h"
@@ -479,7 +488,6 @@ int main(int argc, char *argv[])
 
    char *s_display_name = "";          /* Just use the default display */
    char *s_title = TITLE;              /* Windows title */
-   char *s_pathname = NULL;
 
    float f_scale = 1.0;
 
@@ -498,19 +506,25 @@ int main(int argc, char *argv[])
    char b_trace = False;               /* Trace flag */
    char b_step = False;                /* Single step flag flag */
    char b_cursor = True;               /* Draw a cursor */
-   Bool b_numlock = False;             /* Use number pad - even if numlock is off */
    char b_run = True;                  /* Run flag controls CPU instruction execution in main loop */
    char b_abort = False;               /* Abort flag controls execution of main loop */
+#if defined (__unix__)
+   char b_numlock = False;             /* Use number pad - even if numlock is off */
+#endif
 #if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
    char b_euro = False;
 #endif
 
-   int i_breakpoints[] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}; /* Array to hold breakpoints */
+   int i_breakpoints[] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};  /* Array to hold breakpoints */
 
    int i_offset, i_count, i_index, i_value, i_size;
-   int i_zoom = 0;               /* Zoom level */
-   int i_trap = -1;              /* Trap instruction */
+   int i_zoom = 0;                     /* Zoom level */
+   int i_trap = -1;                    /* Trap instruction */
    int i_ticks = -1;
+
+#if defined(CONTINIOUS)
+   char *s_pathname = NULL;
+#endif
 
 #if defined(SWITCHES)
    struct oswitch *h_switch[SWITCHES];
@@ -520,11 +534,12 @@ int main(int argc, char *argv[])
    struct olabel *h_label[LABELS];
 #endif
 
-#if defined(__linux__) || defined(__NetBSD__) || defined(__FreeBSD__)
+#if defined (__unix__)
    okeyboard *h_keyboard;
 #endif
 
    h_processor = h_processor_create(i_rom);
+
 #if defined(unix) || defined(__unix__) || defined(__APPLE__)  /* Parse UNIX style command line options */
    b_abort = False;  /* Stop processing command line */
    for (i_count = 1; i_count < argc && (b_abort != True); i_count++)
@@ -618,6 +633,7 @@ int main(int argc, char *argv[])
                      v_error(EINVAL, h_err_missing_argument, argv[i_count]);
                i_index = strlen(argv[i_count]) - 1;
                break;
+
 #if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
             case 'c':  /* Use european display format */
                b_euro = True;
@@ -638,14 +654,17 @@ int main(int argc, char *argv[])
                      b_cursor = True;  /* Draw cursor */
                   else if (!strncmp(argv[i_count], "--no-cursor", i_index))
                      b_cursor = False;  /* Don't draw a cursor - unless drawn by the window manager */
+
 #if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
                   else if (!strncmp(argv[i_count], "--comma", i_index))
                      b_euro = True; /* Use european display format */
                   else if (!strncmp(argv[i_count], "--no-comma", i_index))
                      b_euro = False;  /* Don't use european display format */
 #endif
+#if defined (__unix__)
                   else if (!strncmp(argv[i_count], "--numlock", i_index))
                      b_numlock = True;  /* Use number pad - even if numlock is off */
+#endif
                   else if (!strncmp(argv[i_count], "--zoom", i_index))
                   {
                      if (i_count + 1 < argc)
@@ -868,7 +887,7 @@ int main(int argc, char *argv[])
       i_label_resize(h_label[i_count], f_scale);
 #endif
 
-#if defined(__linux__) || defined(__NetBSD__) || defined(__FreeBSD__)
+#if defined (__unix__)
    h_keyboard = h_keyboard_create(x_display);  /* Only works with Linux */
 #endif
 
@@ -882,20 +901,22 @@ int main(int argc, char *argv[])
    XMapWindow(x_display, x_window);  /* Show window on display */
    XRaiseWindow(x_display, x_window);  /* Raise window - ensures expose event is raised? */
 
+   v_processor_reset(h_processor);
    h_processor->trace = b_trace;
    h_processor->step = b_step;
 
+#if defined(CONTINIOUS)
    if (s_pathname == NULL)
       v_restore_state(h_processor);
    else
       v_read_state(h_processor, s_pathname);  /* Load user specified settings */
+#endif
 
 #if defined(SWITCHES)
    if (h_switch[0] != NULL) h_processor->enabled = h_switch[0]->state; /* Allow switches to be undefined if not used */
    if (SWITCHES == 2) /** To Do - Must be a better way of handling an arbitrary number of switches */
    {
 #if defined(HP10)
-      h_processor->print = h_switch[1]->state;
       switch (h_switch[1]->state)
       {
          case 0:
@@ -909,8 +930,26 @@ int main(int argc, char *argv[])
             h_processor->print = TRACE;
             break;
       }
+#elif defined(HP55)
+      switch (h_switch[1]->state)
+      {
+         case 0:
+            h_processor->timer = True;
+            h_processor->mode = False;
+            break;
+         case 3:
+         case 1:
+            h_processor->timer = False;
+            h_processor->mode = True;
+            break;
+         case 2:
+            h_processor->timer = False;
+            h_processor->mode = False;
+            break;
+      }
 #else
-      if (h_switch[1] != NULL) h_processor->mode = h_switch[1]->state;
+      if (h_switch[1] != NULL)
+         h_processor->mode = h_switch[1]->state;
 #endif
    }
 #endif
@@ -927,13 +966,13 @@ int main(int argc, char *argv[])
          XCopyArea(x_display, x_buffer, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
          i_count = INTERVAL;
 #if defined(HP67)
-         i_wait(INTERVAL / 4);  /* Sleep for ~6.25 ms per tick */
-#elif defined(VOYAGER)
-         i_wait(INTERVAL / 3);  /* Sleep for ~8.33 ms per tick */
-#elif defined(SPICE)
-         i_wait(INTERVAL / 3);  /* Sleep for ~8.33 ms per tick */
+         i_wait(INTERVAL / 4);   /* Sleep for ~6.25 ms per tick */
+#elif defined(HP55)
+         i_wait(INTERVAL / 3.1); /* Sleep for ~???? ms per tick */
+#elif defined(VOYAGER) || defined(SPICE)
+         i_wait(INTERVAL / 3);   /* Sleep for ~8.33 ms per tick */
 #else
-         i_wait(INTERVAL / 2);  /* Sleep for ~12.5 ms per tick */
+         i_wait(INTERVAL / 2);   /* Sleep for ~12.5 ms per tick */
 #endif
          if (i_ticks > 0) i_ticks -= 1;
          if (i_ticks == 0) b_abort = True;
@@ -960,7 +999,7 @@ int main(int argc, char *argv[])
                h_processor->keypressed = False;  /* Don't clear the status bit here!! */
             }
             break;
-#if defined(__linux__) || defined(__NetBSD__) || defined(__FreeBSD__)
+#if defined (__unix__)
          case KeyPress :
             h_key_pressed(h_keyboard, x_display, x_event.xkey.keycode, x_event.xkey.state, b_numlock);  /* Attempts to translate a key code into a character */
             if (h_keyboard->key == (XK_BackSpace & 0x1f)) h_keyboard->key = XK_Escape & 0x1f;  /* Map backspace to escape */
@@ -976,10 +1015,13 @@ int main(int argc, char *argv[])
                h_processor->step = !(b_run  = True);
             else if (h_keyboard->key == (XK_C & 0x1f))  /* Ctrl-C to reset */
             {
+               v_processor_reset(h_processor);
+#if defined(CONTINIOUS)
                if (s_pathname == NULL)
                   v_restore_state(h_processor);  /* Load current saved settings */
                else
                   v_read_state(h_processor, s_pathname);  /* Load user specified settings */
+#endif
                b_run = True;
             }
             else  /* Check for matching button */
@@ -1035,7 +1077,7 @@ int main(int argc, char *argv[])
                      h_processor->code = h_pressed->index;
                      h_processor->keypressed = True;
 #if !defined(SWITCHES)
-                     h_processor->enabled = True;  /* Any key press wil wake up the processor */
+                     h_processor->enabled = True;  /* Any key press will wake up the processor */
                      h_processor->sleep = False;
 #endif
                      break;
@@ -1052,11 +1094,15 @@ int main(int argc, char *argv[])
                      if (h_switch[0]->state)
                      {
                         v_processor_reset(h_processor);  /* Reset the processor */
+#if defined(CONTINIOUS)
                         v_restore_state(h_processor);  /* Restore saved settings */
+#endif
                      }
                      else
                      {
+#if defined(CONTINIOUS)
                         v_backup_state(h_processor);  /* Save current settings */
+#endif
                         h_processor->enabled = False;  /* Disable the processor */
 #if defined(HP67)
                         i_ticks = DELAY * 4;  /* Set count down */
@@ -1086,6 +1132,23 @@ int main(int argc, char *argv[])
                            h_processor->print = TRACE;
                            break;
                         }
+#elif defined(HP55)
+                        switch(i_switch_click(h_switch[1]))
+                        {
+                           case 0:
+                              h_processor->timer = True;
+                              h_processor->mode = False;
+                              break;
+                           case 3:
+                           case 1:
+                              h_processor->timer = False;
+                              h_processor->mode = True;
+                              break;
+                           case 2:
+                              h_processor->timer = False;
+                              h_processor->mode = False;
+                              break;
+                        }
 #else
                         h_processor->mode = i_switch_click(h_switch[1]);  /* Update prgm/run switch */
 #endif
@@ -1113,7 +1176,7 @@ int main(int argc, char *argv[])
                      i_ticks = -1;
 #endif
             }
-#if defined(CONTINIOUS) || defined (HP67)
+#if defined(CONTINIOUS)
             if (x_event.xbutton.button == 3)  /* Right mouse button */
             {
                if (h_processor->mode)
@@ -1150,7 +1213,9 @@ int main(int argc, char *argv[])
       }
    }
 
+#if defined(CONTINIOUS)
    v_backup_state(h_processor);  /* Save state */
+#endif
 
    XDestroyWindow(x_display, x_window);  /* Close connection to server */
    XCloseDisplay(x_display);

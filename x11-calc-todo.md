@@ -3,23 +3,27 @@
 
 ### Planned changes
 
+- [ ] Use a fixed window, display and key sizes (don't use scale with for CLASSIC or  KISS)
+
+- [ ] Fix window resizing.  Using window hints to resize the window doesn't work in every environment
+
+  [https://tronche.com/gui/x/xlib/window/XMoveResizeWindow.html]::
+
+- [ ] Allow user to resize the window at runtime (scroll wheel?).
+
 - [ ] Formatted program listings (using a separate python script)
 
 - [ ] Add a graphical printer display to the HP10
+
+- [ ] Reorganize x11-calc and simplify the switch handling
+
+- [ ] Add HP65
 
 - [ ] Add proper card reader to HP67
 
 - [ ] Draw switches showing position (and not just labels)
 
-- [ ] Support for very high resolution screens (select zoom based on screen
-resolution if none specified?)
-
-- [ ] Fix window resizing.  Using window hints to resize the window doesn't
-work in every environment
-
-  [https://tronche.com/gui/x/xlib/window/XMoveResizeWindow.html]::
-
-- [ ] Allow user to resize the window at runtime (scroll wheel?).
+- [ ] Select default zoom based on screen resolution?
 
 - [ ] Better segregation of common code (switch, label and keyboard)
 
@@ -40,6 +44,8 @@ work in every environment
 - [ ] Add HP41C
 
 ### Completed changes
+
+- [X] Added HP55 with timer mode
 
 - [X] Optional menu (load/save) if GTK is installed
 

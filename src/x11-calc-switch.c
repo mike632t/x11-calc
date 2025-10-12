@@ -35,12 +35,13 @@
  *                   - Removed unnecessary includes - MT
  * 20 May 25         - Tidied up data structure definitions - MT
  * 07 Jul 25         - Corrected some spellings - MT
+ * 12 Sep 25         - Changed switch state to an integer - MT
  *
  */
 
 #define NAME           "x11-calc-switch"
-#define BUILD          "0012"
-#define DATE           "20 May 25"
+#define BUILD          "0014"
+#define DATE           "12 Sep 25"
 #define AUTHOR         "MT"
 
 #include <errno.h>     /* errno */
@@ -85,7 +86,7 @@ struct oswitch *h_switch_pressed(struct oswitch *h_switch, int i_xpos, int i_ypo
 
 struct oswitch *h_switch_create(int i_index, char* s_on, char* s_mid, char* s_off,
    XFontStruct *h_normal_font,
-   int i_left, int i_top, int i_width, int i_height, char b_state,
+   int i_left, int i_top, int i_width, int i_height, int i_state,
    unsigned int i_colour, unsigned int i_alternate_colour)
 {
    struct oswitch *h_switch; /* Pointer to switch. */
@@ -106,7 +107,7 @@ struct oswitch *h_switch_create(int i_index, char* s_on, char* s_mid, char* s_of
 
    h_switch->switch_geometry = h_switch->switch_position;
 
-   h_switch->state = b_state;
+   h_switch->state = i_state;
    h_switch->colour = i_colour;
    h_switch->alternate_colour = i_alternate_colour;
    return(h_switch);

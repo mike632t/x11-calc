@@ -65,14 +65,16 @@
  * 24 Jun 25         - Debug messages go to stdout - MT
  *  3 Aug 25         - Temporarily  changed to draw the background to  each
  *                     segment on all systems for testing - MT
+ * 14 Sep 25         - HP55 now displays the timer using colons to seperate 
+ *                     hours, minutes and seconds - MT
  *
  * TO DO :           - Optimise drawing of display digits.
  ^
  */
 
 #define NAME           "x11-calc-digit"
-#define BUILD          "0018"
-#define DATE           "03 Aug 25"
+#define BUILD          "0019"
+#define DATE           "14 Sep 25"
 #define AUTHOR         "MT"
 
 #include <errno.h>     /* errno */
@@ -221,6 +223,11 @@ int i_digit_draw(Display *h_display, int x_application_window, int i_screen, str
    if (h_digit->mask & SEG_DECIMAL) { /* Draw a decimal point separator */
       XFillRectangle(h_display, x_application_window, DefaultGC(h_display, i_screen), i_middle - 1 , (i_upper + 3 * (i_lower - i_upper) / 4) - 1, 3, 3);
    }
+
+   if (h_digit->mask & SEG_COLON) { /* Draw a colon separator */
+      XFillRectangle(h_display, x_application_window, DefaultGC(h_display, i_screen), i_middle - 1 , (i_upper + 1 * (i_lower - i_upper) / 4) - 1, 3, 3);
+      XFillRectangle(h_display, x_application_window, DefaultGC(h_display, i_screen), i_middle - 1 , (i_upper + 3 * (i_lower - i_upper) / 4) - 1, 3, 3);
+   }
 #else
    if (h_digit->mask & SEG_DECIMAL) { /* Draw a decimal point separator */
       XFillRectangle(h_display, x_application_window, DefaultGC(h_display, i_screen), i_right + 3, i_lower - 1, 3, 3);
@@ -271,6 +278,12 @@ int i_digit_draw(Display *h_display, int x_application_window, int i_screen, str
 
 #if defined(HP10) || defined(HP67) || defined(HP35) || defined(HP80) || defined(HP45) || defined(HP70) || defined(HP55)
    if (h_digit->mask & SEG_DECIMAL) { /* Draw a decimal point separator */
+      XDrawLine(h_display, x_application_window, DefaultGC(h_display, i_screen), i_middle, (i_upper + 3 * (i_lower - i_upper) / 4) - 1, i_middle, (i_upper + 3 * (i_lower - i_upper) / 4) + 1);
+      XDrawLine(h_display, x_application_window, DefaultGC(h_display, i_screen), i_middle - 1, (i_upper + 3 * (i_lower - i_upper) / 4), i_middle + 1, (i_upper + 3 * (i_lower - i_upper) / 4));
+   }
+   if (h_digit->mask & SEG_COLON) { /* Draw a colon separator */
+      XDrawLine(h_display, x_application_window, DefaultGC(h_display, i_screen), i_middle, (i_upper + 1 * (i_lower - i_upper) / 4) - 1, i_middle, (i_upper + 1 * (i_lower - i_upper) / 4) + 1);
+      XDrawLine(h_display, x_application_window, DefaultGC(h_display, i_screen), i_middle - 1, (i_upper + 1 * (i_lower - i_upper) / 4), i_middle + 1, (i_upper + 1 * (i_lower - i_upper) / 4));
       XDrawLine(h_display, x_application_window, DefaultGC(h_display, i_screen), i_middle, (i_upper + 3 * (i_lower - i_upper) / 4) - 1, i_middle, (i_upper + 3 * (i_lower - i_upper) / 4) + 1);
       XDrawLine(h_display, x_application_window, DefaultGC(h_display, i_screen), i_middle - 1, (i_upper + 3 * (i_lower - i_upper) / 4), i_middle + 1, (i_upper + 3 * (i_lower - i_upper) / 4));
    }

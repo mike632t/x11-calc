@@ -1,9 +1,12 @@
 <a id="top"></a>
+
+[![latest packaged version(s)](https://repology.org/badge/latest-versions/x11-calc.svg)](https://repology.org/project/x11-calc/versions)
+
 ## x11-calc - Another RPN (Reverse Polish) calculator.
 
-Simulators for  the HP 35, HP 80, HP 45, HP 70, HP 21, HP 22, HP25, HP 25C,
-HP 27,  HP 29C,  HP 31E, HP 32E, HP 33E, HP 33C,  HP 34C,  HP 37E,  HP 38C,
-HP 38E, HP10, HP 67, HP 10C, HP 11C, HP 12C, HP 15C, and HP 16C.
+Simulators for  the HP 35, HP 80, HP 45, HP 70, HP 55, HP 21, HP 22,  HP25,
+HP 25C,  HP 27,  HP 29C, HP 31E, HP 32E, HP 33E,  HP 33C,  HP 34C,  HP 37E,
+HP 38C, HP 38E, HP10, HP 67, HP 10C, HP 11C, HP 12C, HP 15C, and HP 16C.
 
 All written in C using X11.
 
@@ -36,6 +39,10 @@ Tru64 Unix.
 ### Changes <sup><sup>[Back to Top](#top)</sup></sup>
 
 Details of the latest/important changes.
+
+14 Sep 25
+
+   - Added the HP55 complete with timer.
 
 05 Sep 25
 
@@ -136,13 +143,15 @@ The simulator has been successfully compiled and tested on:
 
    - Debian 5 (Lenny), gcc 4.2.4, alpha
 
+   - Debian 5 (Lenny), gcc 4.3.2, i686
+
    - Fedora 35, gcc 11.3.1, x64
 
    - Fedora 35, clang 13.0.1, x64
 
    - Fedora 39, gcc 13.2.1, x64
 
-   - Fedora 39, clang 17.0.6, x64list
+   - Fedora 39, clang 17.0.6, x64
 
    - FreeBSD 14.0, clang 16.0.6, x64 **
 
@@ -153,6 +162,8 @@ The simulator has been successfully compiled and tested on:
    - MacOS 13.4.1 (Ventura), clang 14.0.3, arm64 **
 
    - MacOS 14.4.1 (Sonoma), clang 15.0.0, arm46 **
+
+   - Minix 3.4.0, clang 3.6, x86
 
    - NetBSD 9.2, gcc 7.5.0, x86
 

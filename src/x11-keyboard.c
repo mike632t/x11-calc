@@ -29,12 +29,15 @@
  * 22 Apr 24         - Tidied up data types - MT
  * 23 Apr 24         - More changes to data types - MT
  * 16 Aug 25         - Added flag to optionally ignore numlock - MT
+ * 15 Sep 25         - Changed bool to char - MT
+ * 20 Sep 25         - Explicitly include X11 keyboard symbols - MT
+ *                   - Enable keyboard on any UNIX - MT
  *
  */
 
 #define NAME           "x11-calc-keyboard"
-#define BUILD          "0007"
-#define DATE           "16 Aug 25"
+#define BUILD          "0008"
+#define DATE           "15 Sep 25"
 #define AUTHOR         "MT"
 
 #include <ctype.h>     /* is alpha(), etc. */
@@ -44,15 +47,16 @@
 
 #include <X11/Xlib.h>  /* XOpenDisplay(), etc. */
 #include <X11/Xutil.h> /* XSizeHints etc. */
+#include <X11/keysym.h>
 
 #include "x11-keyboard.h"
 
 #include "gcc-debug.h"
 
-#if defined(__linux__) || defined(__NetBSD__) || defined (__FreeBSD__)
+#if defined (__unix__)
 
 /* Attempts to translate a key code into a character. */
-static void v_key_decode(okeyboard *h_keyboard, Display *x_display, KeyCode x_keycode, unsigned int i_keystate, Bool b_numlock)
+static void v_key_decode(okeyboard *h_keyboard, Display *x_display, KeyCode x_keycode, unsigned int i_keystate, char b_numlock)
 {
    h_keyboard->keysym = XKeycodeToKeysym(x_display, x_keycode, 0);
    h_keyboard->key = '\000';
@@ -160,7 +164,7 @@ static void v_key_decode(okeyboard *h_keyboard, Display *x_display, KeyCode x_ke
 
 /* Update the keyboard state */
 
-void h_key_pressed(okeyboard *h_keyboard, Display *x_display, KeyCode x_keycode, unsigned int i_keystate, Bool b_numlock)
+void h_key_pressed(okeyboard *h_keyboard, Display *x_display, KeyCode x_keycode, unsigned int i_keystate, char b_numlock)
 {
    v_key_decode(h_keyboard, x_display, x_keycode, i_keystate, b_numlock);
    debug(fprintf(stderr, "Key pressed - '%s'.\n", XKeysymToString(h_keyboard->keysym)));
@@ -172,7 +176,7 @@ void h_key_pressed(okeyboard *h_keyboard, Display *x_display, KeyCode x_keycode,
  * Updates the keyboard state when a key is released.
  *
  */
-void h_key_released(okeyboard *h_keyboard, Display *x_display, KeyCode x_keycode, unsigned int i_keystate, Bool b_numlock)
+void h_key_released(okeyboard *h_keyboard, Display *x_display, KeyCode x_keycode, unsigned int i_keystate, char b_numlock)
 {
    v_key_decode(h_keyboard, x_display, x_keycode, i_keystate, b_numlock);
    debug(fprintf(stderr, "Key released - '%s'.\n", XKeysymToString(h_keyboard->keysym)));

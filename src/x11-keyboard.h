@@ -23,10 +23,11 @@
  * 22 Apr 24         - Tidied up data types - MT
  * 23 Apr 24         - More changes to data types - MT
  * 16 Aug 25         - Added flag to optionally ignore numlock - MT
+ * 15 Sep 25         - Changed bool to char - MT
  *
  */
 
-#if defined(__linux__) || defined(__NetBSD__) || defined (__FreeBSD__)
+#if defined(__unix__)
 
 typedef struct { /* Calculator button structure. */
    Display* display;
@@ -34,9 +35,9 @@ typedef struct { /* Calculator button structure. */
    char key;
 } okeyboard;
 
-void h_key_pressed(okeyboard *h_keyboard, Display *x_display, KeyCode x_keycode, unsigned int i_keystate, Bool b_numlock);
+void h_key_pressed(okeyboard *h_keyboard, Display *x_display, KeyCode x_keycode, unsigned int i_keystate, char b_numlock);
 
-void h_key_released(okeyboard *h_keyboard, Display *x_display, KeyCode x_keycode, unsigned int i_keystate, Bool b_numlock);
+void h_key_released(okeyboard *h_keyboard, Display *x_display, KeyCode x_keycode, unsigned int i_keystate, char b_numlock);
 
 okeyboard *h_keyboard_create(Display *x_display);
 

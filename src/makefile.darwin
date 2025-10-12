@@ -25,6 +25,10 @@
 #  https://www.gnu.org/software/make/manual/html_node/Prerequisite-Types.html
 #
 #  12 May 24         - Initial version - MT
+#   5 Sep 25         - Builds with GTK 3.0 to provide support for graphical
+#                      file selection dialog - MT
+# 15 Sep  25         - Detects of GTK 3.0 is available - MT
+#                    - Suppress error message if pkg-config not found - MT
 #
 
 CFLAGS	+= -I/opt/X11/include/
@@ -33,6 +37,11 @@ LDLIBS	?=
 
 LANG 	= LANG_en
 
+ifneq ($(shell pkg-config --exists gtk+-3.0 > /dev/null 2>&1 && echo "GTK" || echo ""),)
+CFLAGS	+= -D__GTK__
+CFLAGS	+= `pkg-config --cflags gtk+-3.0`
+LDLIBS	+= `pkg-config --libs gtk+-3.0`
+endif
 ifneq ($(COMMIT),)
 CFLAGS	+= -DCOMMIT_ID='"[Commit Id : $(COMMIT)]"'
 endif
