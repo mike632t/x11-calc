@@ -434,6 +434,7 @@
  *                     group' instructions are in effect - MT
  * 15 Sep 25         - Detects either GTK 2.0 or GTK 3.0 if available - MT
  *                   - Removed 'zenity' fallback - MT
+ * 13 Oct 25         - Fixed get_datafile() function declaration -MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -446,8 +447,8 @@
  */
 
 #define  NAME          "x11-calc-cpu"
-#define  BUILD         "0226"
-#define  DATE          "12 Sep 25"
+#define  BUILD         "0229"
+#define  DATE          "13 Oct 25"
 #define  AUTHOR        "MT"
 
 #define  NODEBUG
@@ -552,7 +553,7 @@ char *s_get_filename(char *s_path, char c_mode, char *s_filter, char *s_name) /*
 }
 #endif
 
-char *s_get_datafile() /* Return path the the data file */
+char *s_get_datafile(void) /* Return path the the data file */
 /*
  *  - If $HOME is defined and the data file already exists in there  return
  *    the pathname of the data file in $HOME to maintain compatibility with
