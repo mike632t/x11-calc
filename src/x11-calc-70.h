@@ -29,6 +29,7 @@
  * 30 Mar 24         - Corrected number of switches - MT
  * 20 May 25         - Tidied up data structure definitions - MT
  * 11 Oct 25         - Modified key layout - MT
+ * 13 Oct 25         - Modified key layout (again) - MT
  *
  */
 
@@ -59,8 +60,8 @@
 
 #define KEY_HEIGHT         25 * SCALE_HEIGHT
 #define KEY_WIDTH          39 * SCALE_WIDTH
-#define KEY_NUMERIC        49 * SCALE_WIDTH
-#define KEY_SMALL          24 * SCALE_WIDTH
+#define KEY_NUMERIC        48 * SCALE_WIDTH
+#define KEY_SMALL          27 * SCALE_WIDTH
 #define KEY_GAP            3 * SCALE_WIDTH
 #define SWITCH_HEIGHT      10 * SCALE_HEIGHT
 
