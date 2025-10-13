@@ -183,6 +183,8 @@ The simulator has been successfully compiled and tested on:
 
    - Ubuntu 20.04, tcc 0.9.27, x64 + aarch64
 
+   - Ubuntu 22.04, gcc 11.4.0, x64
+
    - Ubuntu 24.04, gcc 13.3.0, x64
 
    - VMS 5.4-3, VAX C 3.2, VAX (simh)
