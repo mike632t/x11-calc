@@ -153,6 +153,10 @@ The simulator has been successfully compiled and tested on:
 
    - Fedora 39, clang 17.0.6, x64
 
+   - Fedora 41, gcc 14.3.1, x64
+
+   - Fedora 41, clang 19.1.7, x64 ****
+
    - FreeBSD 14.0, clang 16.0.6, x64 **
 
    - Gentoo, gcc 11.2.0, x64 **
@@ -196,6 +200,8 @@ The simulator has been successfully compiled and tested on:
 ** Not yet retested with this build.
 
 *** Previously tested but no plans to retest.
+
+**** Compiles with warnings
 
 <a id="obtaining"></a>
 ### How to get it <sup><sup>[Back to Top](#top)</sup></sup>
