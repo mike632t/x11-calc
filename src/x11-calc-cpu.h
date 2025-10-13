@@ -64,6 +64,7 @@
  *                     user will be prompted to save the current state to a
  *                     file - MT
  * 15 Sep 25         - Fixed errors when compiling on MacOS - MT
+ * 13 Oct 25         - Fixed get_datafile() function declaration -MT
  *
  */
 
@@ -182,7 +183,7 @@ void v_fprint_memory(FILE *h_file, oprocessor *h_procesor);
 void v_processor_tick(oprocessor *h_procesor);
 
 #if defined(CONTINIOUS)
-char *s_get_datafile();
+char *s_get_datafile(void);
 
 void v_read_state(oprocessor *h_processor, char *s_pathname);
 

@@ -155,7 +155,11 @@ The simulator has been successfully compiled and tested on:
 
    - Fedora 41, gcc 14.3.1, x64
 
-   - Fedora 41, clang 19.1.7, x64 ****
+   - Fedora 41, clang 19.1.7, x64
+
+   - Fedora 42, gcc 15.2.1, x64
+
+   - Fedora 42, clang 20.1.8, x64
 
    - FreeBSD 14.0, clang 16.0.6, x64 **
 
