@@ -377,7 +377,7 @@ following packages must be installed.
 
    - Gentoo : gcc make libc6-dev libx11-dev font-misc-misc
 
-   - MacOS  : [Xcode](https://developer.apple.com/xcode/) [xquartz](https://www.xquartz.org/)
+   - MacOS  : [Xcode](https://developer.apple.com/xcode/)  [Xquartz](https://www.xquartz.org/)
 
    - NetBSD : clang | gcc pmake
 
