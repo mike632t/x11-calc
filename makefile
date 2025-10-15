@@ -108,6 +108,8 @@
 #   4 Aug 25         - Don't delete the executable files - MT
 #  14 Aug 25         - Added bitmap files - MT
 #  17 Aug 25         - Added makefile.sunos to files - MT
+#  15 Oct 25         - Added makefile.minix to files - MT
+#                    - Modified backup and included '.crd' files - MT
 #
 
 PROGRAM		=  x11-calc
@@ -120,13 +122,23 @@ IMG		= img
 
 # Files to be backed up (and the current date).
 
-_files		= `ls makefile makefile.*.[0-9] $(SRC)/makefile $(SRC)/makefile.all $(SRC)/makefile.linux $(SRC)/makefile.darwin $(SRC)/makefile.bsd $(SRC)/makefile.osf1 $(SRC)/makefile.sunos $(SRC)/makefile.*.[0-9] 2>/dev/null || true`
+_files		= `ls makefile makefile.*.[0-9] $(SRC)/makefile $(SRC)/makefile.all $(SRC)/makefile.linux $(SRC)/makefile.darwin $(SRC)/makefile.bsd $(SRC)/makefile.osf1 $(SRC)/makefile.sunos $(SRC)/makefile.minix $(SRC)/makefile.*.[0-9] 2>/dev/null || true`
 _source		= `ls $(SRC)/*.c $(SRC)/*.c.[0-9] $(SRC)/*.h $(SRC)/*.h.[0-9] $(SRC)/*.xbm $(SRC)/*.xbm.[0-9] $(SRC)/*.in $(SRC)/*.in.[0-9] 2>/dev/null || true`
-_data		= `ls $(ROM)/$(PROGRAM)*.rom $(ROM)/$(PROGRAM)*.rom.[0-9] $(PRG)/$(PROGRAM)*.dat $(PRG)/$(PROGRAM)*.dat.[0-9] 2>/dev/null || true`
+_data			= `ls $(ROM)/$(PROGRAM)*.rom $(ROM)/$(PROGRAM)*.rom.[0-9] $(PRG)/$(PROGRAM)*.dat $(PRG)/$(PROGRAM)*.dat.[0-9] $(PRG)/$(PROGRAM)*.crd $(PRG)/$(PROGRAM)*.crd.[0-9] 2>/dev/null || true`
 _images		= `ls $(SRC)/*.ico $(SRC)/*.ico.[0-9] $(SRC)/*.png $(SRC)/*.png.[0-9] $(SRC)/*.svg $(SRC)/*.svg.[0-9] $(IMG)/*.png $(IMG)/*.png.[0-9] 2>/dev/null || true`
 _other		= `ls $(SRC)/make.com  $(SRC)/make.com.[0-9] *.md *.md.[0-9] $(SRC)/*.md $(SRC)/*.md.[0-9] $(IMG)/*.md $(IMG)/*.md.[0-9] .gitignore .gitattributes 2>/dev/null || true`
 
-_date		= `date +'%Y%m%d%H%M'`
+_date			= `date +'%Y%m%d%H%M'`
+
+# Archive name
+
+_branch		=  $(shell git rev-parse --abbrev-ref HEAD > /dev/null 2>&1 && echo `git rev-parse --abbrev-ref HEAD 2>/dev/null` || true)
+
+ifeq ($(_branch),)
+_archive		= $(PROGRAM)-$(_date).tar.gz
+else
+_archive		= $(PROGRAM)-$(_branch)-$(_date).tar.gz
+endif
 
 # Calculator models available in the emulator.
 
@@ -294,9 +306,9 @@ do_env: do_copy $(SRC)/$(PROGRAM).desktop.in $(SRC)/$(PROGRAM).svg
 backup:
 # Backup known files to a tar archive (with multiple workarounds to accommodate
 # tar limitations and maximum line length on Tru64 UNIX)
-	@tar -cf ..\/$(PROGRAM)-$(_date).tar $(_files)
-	@tar -rf ..\/$(PROGRAM)-$(_date).tar $(_source)
-	@tar -rf ..\/$(PROGRAM)-$(_date).tar $(_data)
-	@tar -rf ..\/$(PROGRAM)-$(_date).tar $(_images)
-	@tar -rf ..\/$(PROGRAM)-$(_date).tar $(_other)
-	@echo "$(PROGRAM)-$(_date).tar"
+	@tar -cf ..\/$(_archive) $(_files)
+	@tar -rf ..\/$(_archive) $(_source)
+	@tar -rf ..\/$(_archive) $(_data)
+	@tar -rf ..\/$(_archive) $(_images)
+	@tar -rf ..\/$(_archive) $(_other)
+	@cd .. && ls --color $(_archive) 2>/dev/null || ls $(_archive) || true
