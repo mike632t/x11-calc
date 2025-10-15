@@ -165,7 +165,9 @@ The simulator has been successfully compiled and tested on:
 
    - Gentoo, gcc 11.2.0, x64 **
 
-   - MacOS 10 (Catalina), clang 12.0.0, x64 **
+   - MacOS 10.1.15 (Catalina), clang 12.0.0, x64 **
+
+   - MacOS 12.7.6 (Monterey), clang 14.0.0, x64
 
    - MacOS 13.4.1 (Ventura), clang 14.0.3, arm64 **
 
