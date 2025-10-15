@@ -69,6 +69,7 @@
 #  07 Jul 25         - Modified changed '_f_conf' to '_configfile' - MT
 #                    - Additional command line options are always passed to
 #                      the emulator (even when running setup) - MT
+#  15 Oct 25         - Add prg alias during setup - macmpi
 #
 
 SUCCESS=0
@@ -199,6 +200,11 @@ _setup() {
       else
          vi "$_configfile"
       fi
+   fi
+
+   if ! [ -h "${XDG_DATA_HOME}/x11-calc/prg" ]; then
+      [ -d /usr/share/x11-calc/prg ] && ln -s /usr/share/x11-calc/prg "${XDG_DATA_HOME}/x11-calc/prg"
+      [ -d /app/share/x11-calc/prg ] && ln -s /app/share/x11-calc/prg "${XDG_DATA_HOME}/x11-calc/prg"
    fi
 
    . "$_configfile" # Reload modified settings from config file
