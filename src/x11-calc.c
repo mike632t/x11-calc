@@ -364,6 +364,12 @@
  * 15 Sep 25         - Fixed errors when compiling on MacOS - MT
  * 20 Sep 25         - Explicitly include X11 keyboard symbols - MT
  *            (0194) - Enable keyboard shortcuts on any UNIX - MT
+ * 17 Oct 25         - Added reset option - MT
+ * 18 Oct 25         - Added card reader support - KJC
+ *                   - Extended breakpoint address range - KJC
+ *                   - Retained the (inaccurate) 'continious' memory on the
+ *                     HP67 but right click now prompts the user to  insert
+ *                     a card file - MT 
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -377,8 +383,8 @@
 
 #define  NAME          "x11-calc"
 #define  VERSION       "0.19"
-#define  BUILD         "0194"
-#define  DATE          "12 Oct 25"
+#define  BUILD         "0198"
+#define  DATE          "17 Oct 25"
 #define  AUTHOR        "MT"
 
 #define  INTERVAL 48   /* Number of ticks to execute before updating the display */
@@ -523,6 +529,7 @@ int main(int argc, char *argv[])
    int i_ticks = -1;
 
 #if defined(CONTINIOUS)
+   char b_reset = False;               /* Do not restore state (reset) */
    char *s_pathname = NULL;
 #endif
 
@@ -565,7 +572,7 @@ int main(int argc, char *argv[])
                         else
                            i_value = i_value * 8 + argv[i_count + 1][i_offset] - '0';
                      }
-                     if ((i_value < 0)  || (i_value > ROM_SIZE) || (i_value > 07777))  /* Check address range */
+                     if ((i_value < 0) || (i_value > ROM_SIZE) || (i_value > 017777))  /* Check address range, allow bank - KJC */
                         v_error(EINVAL, h_err_numeric_range, argv[i_count + 1]);
                      else
                      {
@@ -599,7 +606,7 @@ int main(int argc, char *argv[])
                         else
                            i_value = i_value * 8 + argv[i_count + 1][i_offset] - '0';
                      }
-                     if ((i_value < 0)  || (i_value > ROM_SIZE) || (i_value > 07777))  /* Check address range */
+                     if ((i_value < 0)  || (i_value > ROM_SIZE) || (i_value > 017777))  /* Check address range */
                         v_error(EINVAL, h_err_numeric_range, argv[i_count + 1]);
                      else
                      {
@@ -654,8 +661,11 @@ int main(int argc, char *argv[])
                      b_cursor = True;  /* Draw cursor */
                   else if (!strncmp(argv[i_count], "--no-cursor", i_index))
                      b_cursor = False;  /* Don't draw a cursor - unless drawn by the window manager */
-
-#if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
+#if defined(CONTINIOUS)
+                  else if (!strncmp(argv[i_count], "--reset", i_index))
+                     b_reset = True;  /* Reset state */
+#endif
+#if defined(SPICE)
                   else if (!strncmp(argv[i_count], "--comma", i_index))
                      b_euro = True; /* Use european display format */
                   else if (!strncmp(argv[i_count], "--no-comma", i_index))
@@ -906,10 +916,13 @@ int main(int argc, char *argv[])
    h_processor->step = b_step;
 
 #if defined(CONTINIOUS)
-   if (s_pathname == NULL)
-      v_restore_state(h_processor);
-   else
-      v_read_state(h_processor, s_pathname);  /* Load user specified settings */
+   if (!b_reset)  /* Don't restore state if user selects reset */
+   {
+      if (s_pathname == NULL)
+         v_restore_state(h_processor);
+      else
+         v_read_state(h_processor, s_pathname);  /* Load user specified settings */
+   }
 #endif
 
 #if defined(SWITCHES)
@@ -977,7 +990,7 @@ int main(int argc, char *argv[])
          if (i_ticks > 0) i_ticks -= 1;
          if (i_ticks == 0) b_abort = True;
       }
-      if ( (b_search(i_breakpoints, (h_processor->pc & 0xfff), sizeof(i_breakpoints) / sizeof(i_breakpoints[0]))) || (h_processor->rom[h_processor->pc] == i_trap))  /* Check for Breakpoint or Instruction Trap */
+      if ( (b_search(i_breakpoints, (h_processor->pc & 0x1fff), sizeof(i_breakpoints) / sizeof(i_breakpoints[0]))) || (h_processor->rom[h_processor->pc] == i_trap))  /* Check for Breakpoint or Instruction Trap */
       {
          if (!h_processor->trace || !h_processor->step) fprintf(stderr, "** break **\n");
          h_processor->trace = h_processor->step = True;
@@ -1178,6 +1191,12 @@ int main(int argc, char *argv[])
             }
 #if defined(CONTINIOUS)
             if (x_event.xbutton.button == 3)  /* Right mouse button */
+#if defined(HP67)
+            {
+               h_processor->crc[CARD] = True;               /* kjc: cleared at motor start & stop */
+               h_processor->flags[DISPLAY_ENABLE] = False;  /* kjc: disable display during file-choose */
+            }
+#else
             {
                if (h_processor->mode)
                   v_load_state(h_processor);  /* Load saved state (resets calculator unless cancelled) */
@@ -1187,6 +1206,7 @@ int main(int argc, char *argv[])
                while (XPending(x_display))
                   XNextEvent(x_display, &x_event);  /* Clear the event queue */
             }
+#endif
 #endif
             break;
          case Expose :  /* Draw or redraw the window */

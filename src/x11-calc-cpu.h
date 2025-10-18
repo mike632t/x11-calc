@@ -65,6 +65,7 @@
  *                     file - MT
  * 15 Sep 25         - Fixed errors when compiling on MacOS - MT
  * 13 Oct 25         - Fixed get_datafile() function declaration -MT
+ * 18 Oct 25         - Added card reader support - KJC
  *
  */
 
@@ -111,8 +112,10 @@
 #define MOTOR           5              /* Motor on */
 #define FUNCTION        6              /* Default function flag */
 #define READY           7
+#define WRITE           8              /* Write Mode (false = Read Mode) - KJC */
+#define BUFFER          9              /* Card R/W buffer state (true = Ready) - KJC */
 
-#define STATES          8
+#define STATES          10             /* Added two new states - KJC */
 #endif
 
 #if defined(HP10)
@@ -139,6 +142,8 @@ typedef struct {
    unsigned char status[STATUS_BITS];  /* Status (S0 - S15) */
 #if defined(HP67)
    unsigned char crc[STATES];          /* Card reader states */
+   FILE* card_file;                    /* Open card file (NULL = not opened) - KJC */
+   int card_records;                   /* Number of records read/written, cleared at open - KJC */
 #endif
    unsigned int opcode;                /* Last opcode */
    unsigned int pc;                    /* Program counter */

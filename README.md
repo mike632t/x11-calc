@@ -40,6 +40,10 @@ Tru64 Unix.
 
 Details of the latest/important changes.
 
+18 Oct 25
+
+   - Added support for the HP67 card reader (requires GTK)
+
 14 Sep 25
 
    - Added the HP55 complete with timer.
@@ -507,16 +511,8 @@ To leverage GUI for setup, install `apk add zenity`. Optional program saves may 
 
 - Keyboard test is successful but these models do not pass the self-test.
 
-##### HP 67
-
-- Cannot read or write to magnetic cards.
-- Has  continuous memory (which allows saved programs to be loaded from the
-command line).
-
 #### Wayland
 
-- On some systems the Xwayland display server can consume a lot of the  CPU
-resources making the whole system unresponsive.
 - The application window should be a fixed size (this can be modified using
 '--zoom'), but Xwayland does not handle this correctly.
 
@@ -566,11 +562,11 @@ so new releases are built automatically.
 
 - `Quozl` for helping with double buffering display changes.
 
-- `Kjellc for reasons that may not yet be obvious.
+- `Kjellc` for adding support for the HP67 card reader.
 
 - 'Vttoth` for allowing me to include some of his example programs.
 
-- `Kjellc for translating the help text (into Swedish).
+- `Kjellc` for translating the help text (into Swedish).
 
 <a id="problems"></a>
 ### Problem Reports <sup><sup>[Back to Top](#top)</sup></sup>

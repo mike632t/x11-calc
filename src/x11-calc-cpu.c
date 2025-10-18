@@ -434,7 +434,8 @@
  *                     group' instructions are in effect - MT
  * 15 Sep 25         - Detects either GTK 2.0 or GTK 3.0 if available - MT
  *                   - Removed 'zenity' fallback - MT
- * 13 Oct 25         - Fixed get_datafile() function declaration -MT
+ * 13 Oct 25  (0229) - Fixed get_datafile() function declaration -MT
+ * 18 Oct 25         - Added card reader support - KJC
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -447,8 +448,8 @@
  */
 
 #define  NAME          "x11-calc-cpu"
-#define  BUILD         "0229"
-#define  DATE          "13 Oct 25"
+#define  BUILD         "0230"
+#define  DATE          "18 Oct 25"
 #define  AUTHOR        "MT"
 
 #define  NODEBUG
@@ -629,6 +630,113 @@ char *s_get_datafile(void) /* Return path the the data file */
 #endif
    return s_pathname;
 }
+
+#if defined(HP67)
+void v_card_read_write_record(oprocessor* h_processor)
+/*
+ * Called  when the processor executes 'card read write' (01700) to read or
+ * write a block of data to a card (depending on the 'crc[WRITE]' flag).
+ *
+ * 18 Oct 25         - Initial version - KJC
+ *
+ */
+{
+    if (h_processor->card_file)  /* Check if card file was opened successfully */
+    {
+        if (h_processor->crc[BUFFER])  /* Check if buffer is ready */
+        {
+            /* Write a card-record if the buffer address is 0x99 (for standard HP 67) or 0xF9 (for extended HP 67) */
+            if (h_processor->crc[WRITE] && (h_processor->addr == 0x99 || h_processor->addr == 0xF9))
+            {
+                /* Write the 7 most significant nibbles to the card */
+                unsigned char* p_buffer_pointer = &(h_processor->mem[h_processor->addr]->nibble[REG_SIZE - 1]);
+                int record = 0;
+
+                for (int i = 0; i < 7; i++)
+                {
+                    record <<= 4;
+                    record += *p_buffer_pointer--;
+                }
+
+                fprintf(h_processor->card_file, "%07x,", record);
+                if (h_processor->card_records % 8 == 0) fprintf(h_processor->card_file, "\n");
+
+                /** fprintf(stdout, "%07x ", record); /* Debug */
+                /** if (h_processor->card_records % 8 == 0) fprintf(stdout, "\n"); */
+
+                h_processor->card_records++;
+            }
+
+            /* Read a card-record if the buffer address is 0x99/0x9b (for standard HP 67) or 0xf9/0xfb (for extended HP 67) */
+            else if (h_processor->crc[WRITE] == False && (h_processor->addr == 0x99 || h_processor->addr == 0x9b || h_processor->addr == 0xf9 || h_processor->addr == 0xfb ))
+            {
+                /* Read 7 nibbles from file to the most and least (duplicated) significant nibbles from the card */
+                int record = 0;
+                int reg_ptr = (h_processor->addr & 0xf0) + 0x0b;  /* 0x9b or 0xfb */
+                unsigned char* p_buffer_pointer = &(h_processor->mem[reg_ptr]->nibble[REG_SIZE - 1]);
+
+                fscanf(h_processor->card_file, "%x,", (unsigned int*)&record);
+                for (int i = 6; i >= 0; i--)  /* Put record in upper 7 nibbles */
+                    *p_buffer_pointer-- = (record >> i*4) & 0xf;
+
+                for (int i = 6; i >= 0; i--)  /* Put record in lower 7 nibbles as well! */
+                    *p_buffer_pointer-- = (record >> i*4) & 0xf;
+
+                /** fprintf(stdout, "%07x ", record); /* Debug */
+                /** if (h_processor->card_records % 8 == 0) fprintf(stdout, "\n"); */
+
+                h_processor->card_records++;
+            }
+        }
+    }
+}
+
+void v_card_open_file(oprocessor* h_processor)
+/*
+ * Used to open a card file for reading or writing (depending on the  state
+ * of the WRITE flag).
+ *
+ * 18 Oct 25         - Initial version - KJC
+ *
+ */
+{
+    char* s_filename;
+    h_processor->card_file = NULL;
+    h_processor->card_records = 0;
+    if (h_processor->crc[WRITE])
+    {
+        s_filename = s_get_filename(s_get_datafile(), 'w', FILENAME"-*.crd", "Card File");
+        if (s_filename)
+            if ((h_processor->card_file = fopen(s_filename, "w"))) printf("Writing '%s'\n", s_filename);
+    }
+    else
+    {
+        s_filename = s_get_filename(s_get_datafile(), 'r', FILENAME"-*.crd", "Card File");
+        if (s_filename)
+            if ((h_processor->card_file = fopen(s_filename, "r"))) printf("Reading '%s'\n", s_filename);
+    }
+
+    h_processor->crc[CARD] = False ;  /* kjc: Card removed immediately after starting */
+}
+
+void v_card_close_file(oprocessor* h_processor)
+/*
+ * Closes an open card file.
+ *
+ * 18 Oct 25         - Initial version - KJC
+ *
+ */
+{
+    h_processor->crc[CARD] = False;  /* Card removed when motor is stopped */
+    if (h_processor->card_file)
+    {
+        if (h_processor->crc[WRITE]) fprintf(h_processor->card_file, "\n"); /* End file with newline */
+        fclose(h_processor->card_file);
+    }
+    h_processor->card_file = NULL;
+}
+#endif
+
 
 void v_read_state(oprocessor *h_processor, char *s_pathname) /* Read processor state from file */
 {
@@ -832,6 +940,10 @@ void v_fprint_registers(FILE *h_file, oprocessor *h_processor) /* Display curren
       v_fprint_status(h_file, h_processor);
       fprintf(h_file, "\tp = %d\t\t", h_processor->p);
       fprintf(h_file, "  addr = %02d\n", h_processor->addr);
+#if defined(HP67)
+      fprintf(h_file, "\tsp = %d\t\t", h_processor->sp);  /* Added - KJC */
+      fprintf(h_file, "\tf4 = %d\n", h_processor->crc[FUNCTION]);
+#endif
    }
 }
 
@@ -1113,6 +1225,9 @@ static void v_op_inc_pt(oprocessor *h_processor) /* Increment active pointer */
          *h_active_pointer(h_processor) = *h_active_pointer(h_processor) + 1;
       else
       {
+#if defined(HP67)
+         fprintf(h_file, "%02x,\n", h_processor->crc[FUNCTION]);  /* Save the default function-key state (labels if a prgm is loaded, else functions) - KJC */
+#endif
          if (h_processor->opcode != h_processor->rom[h_processor->pc - 1]) /* Literally the only way to work out if the pointer */
             *h_active_pointer(h_processor) = *h_active_pointer(h_processor) + 1; /* should be incremented when it is zero is to check the previous opcode ! */
       }
@@ -1632,10 +1747,10 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                 * 01500   Test waiting for card side 2 flag
                 * 01700   Read/Write data to/from card via RAM $99 and $9B
                 */
-               case 00100: /* test motor on */
-                  if (h_processor->trace) fprintf(stdout, "test motor on");
-                  h_processor->status[3] = True; /* device always ready */
-                  h_processor->crc[CARD] = False;
+               case 00100: /* test/clear motor on (crc buffer ready) */
+                  if (h_processor->trace) fprintf(stdout, "test motor on (crc ready)");
+                  h_processor->status[3] = (h_processor->card_file != NULL);  /* device/buffer ready if not canceled */
+                  h_processor->crc[BUFFER] = True ;  /* Buffer is ready after test/clear */
                   break;
                case 00300: /* test mode flag */
                   if (h_processor->trace) fprintf(stdout, "test mode flag (%d)", !h_processor->flags[MODE] );
@@ -1669,10 +1784,10 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   if (h_processor->crc[MERGE]) h_processor->crc[MERGE] = False;
                   break;
                case 01400: /* set waiting flag */
-                  if (h_processor->trace) fprintf(stdout, "clear waiting flag");
+                  if (h_processor->trace) fprintf(stdout, "set waiting flag");
                   h_processor->crc[PAUSE] = True;
                   break;
-               case 01500: /* test pause flag ? */
+               case 01500: /* test/clear pause flag */
                   if (h_processor->trace) fprintf(stdout, "clear flag 1");
                   h_processor->status[3] = h_processor->crc[PAUSE];
                   if (h_processor->crc[PAUSE]) h_processor->crc[PAUSE] = False;
@@ -1681,6 +1796,8 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   if (h_processor->trace) fprintf(stdout, "card read write");
                   h_processor->status[3] = h_processor->crc[PAUSE];
                   if (h_processor->crc[PAUSE]) h_processor->crc[PAUSE] = False;
+                  v_card_read_write_record(h_processor);   /* read or write one record to/from the buffer register */
+                  h_processor->crc[BUFFER] = False;        /* buffer empty now, must test before next r/w */
                   break;
 #endif
                default:
@@ -1825,9 +1942,12 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   break;
                case 00260: /* card reader motor on */
                   if (h_processor->trace) fprintf(stdout, "motor on");
+                  v_card_open_file(h_processor);  /* Prompt user and open card read or save file  - KJC*/
+                  h_processor->crc[CARD] = False ;  /* Card removed immediately after starting - KJC */
                   break;
                case 00360: /* card reader motor off */
                   if (h_processor->trace) fprintf(stdout, "motor off");
+                  v_card_close_file(h_processor);  /* Card removed, close file - KJC */
                   break;
                case 00560: /* test card inserted */
                   if (h_processor->trace) fprintf(stdout, "test card inserted");
@@ -1835,9 +1955,11 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   break;
                case 00660: /* card reader set write mode */
                   if (h_processor->trace) fprintf(stdout, "set write mode");
+                  h_processor->crc[WRITE] = True;
                   break;
                case 00760: /* card reader set read mode */
                   if (h_processor->trace) fprintf(stdout, "set read mode");
+                  h_processor->crc[WRITE] = False;
                   break;
 #endif
                case 01060: /* bank switch */
@@ -1878,7 +2000,10 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
 #else
 #if (defined(HP67)) && defined(CONTINIOUS)
                      if (h_processor->crc[READY])
-                        h_processor->crc[READY]++;
+                     {
+                        if ((h_processor->addr & ~0x0f) < 0x40)  /* Only count initial clear-data-regs skip for the lower 64 addresses - KJC */
+                           h_processor->crc[READY]++;
+                     }
                      else
 #endif
                      {
@@ -1996,7 +2121,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                               h_processor->status[i_count] = False; /* Clear all bits except bits 1, 2, 5, 15 */
                         }
                   }
-               if (h_processor->trace) v_fprint_status(stdout, h_processor);
+                  if (h_processor->trace) v_fprint_status(stdout, h_processor);
                   break;
                case 00210: /* display toggle */
                   if (h_processor->trace) fprintf(stdout, "display toggle");
