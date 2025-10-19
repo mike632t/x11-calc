@@ -4,7 +4,7 @@
 
 ## x11-calc - Another RPN (Reverse Polish) calculator.
 
-Simulators for  the HP 35, HP 80, HP 45, HP 70, HP 55, HP 21, HP 22, HP 25,
+Emulators  for  the HP 35, HP 80, HP 45, HP 70, HP 55, HP 21, HP 22, HP 25,
 HP 25C,  HP 27,  HP 29C, HP 31E, HP 32E, HP 33E,  HP 33C,  HP 34C,  HP 37E,
 HP 38C, HP 38E, HP10, HP 67, HP 10C, HP 11C, HP 12C, HP 15C, and HP 16C.
 
@@ -14,20 +14,23 @@ Use  of any language extensions or non standard language features has  been
 avoided in order to try to make the code as portable as possible.
 
 The  aim  is to have the same source code compile without  modification  on
-as  many systems and architectures as possible including Linux, VAX/VMS and
-Tru64 Unix.
+as  many  systems  and architectures as possible including  Linux,  NetBSD,
+MacOS, VMS, Solaris and Tru64 Unix.
 
-![HP10](./img/x11-calc-10c.png) ![HP11](./img/x11-calc-11c.png)
+ ![HP67](./img/x11-calc-67.png) ![HP25](./img/x11-calc-25.png) ![HP34C](./img/x11-calc-34c.png)
+ ![HP10](./img/x11-calc-10c.png) ![HP11](./img/x11-calc-11c.png)
+
+### Contents <sup><sup>[Back to Top](#top)</sup></sup>
 
 - [Changes](#changes)
 
-- [What will it run on](#tested)
+- [Building/Installing](#obtaining)
 
-- [How to get it](#obtaining)
+- [Tested Systems](#tested)
 
-- [Using it](#using)
+- [User Guide](./USERGUIDE.md/#top)
 
-- [Known issues](#issues)
+- [Known issues](./USERGUIDE.md#issues)
 
 - [Acknowledgements](#acknowledgements)
 
@@ -116,10 +119,188 @@ Details of the latest/important changes.
 
    - Initial version can draw the application window using X11!
 
-<a id="tested"></a>
-### Tested platforms <sup><sup>[Back to Top](#top)</sup></sup>
+<a id="obtaining"></a>
+### Building/Installing <sup><sup>[Back to Top](#top)</sup></sup>
 
-The simulator has been successfully compiled and tested on:
+You can either download the source code from GitHub and compile it yourself
+or you can use a pre-compiled package.
+
+   - [Building from the source](#building)
+
+   - [Using binary package](#packages)
+
+<a id="building"></a>
+### Building from the source <sup><sup>[Back to Top](#top)</sup></sup>
+
+#### Prerequisites
+
+If you want to compile the emulators from the source code yourself then the
+following packages must be installed.
+
+   - Alpine   : gcc | clang | tcc  make libc6-dev libx11-dev xorg-x11-fonts-base [gtk+3.0-dev]
+
+   - Debian   : gcc | clang | tcc  make libc6-dev libx11-dev xfonts-base [libgtk-3-dev | libgtk2.0-dev]
+
+   - Fedora   : gcc | clang  make glibc-devel libX11-devel xorg-x11-fonts-base | xorg-x11-fonts-misc [gtk3-devel]
+
+   - Gentoo   : gcc make libc6-dev libx11-dev font-misc-misc [x11-libs/gtk+]
+
+   - MacOS    : [Xcode](https://developer.apple.com/xcode/) [Xquartz](https://www.xquartz.org/)
+
+   - NetBSD   : clang | gcc pmake
+
+   - SUSE     : gcc | clang make libX11-devel
+
+   - Solaris 10 : SUNWgcc SUNWgccruntime SUNWtoo SUNWhea SUNWxwhl SUNWgmake
+
+   - Ubuntu : gcc | clang make libc6-dev libx11-dev xfonts-base [libgtk-3-dev]
+
+   - Windows 11 + WSL2 : gcc make libc6-dev libx11-dev xfonts-base
+
+When all the prerequisites are available, you should be able to [compile](#Compiling) the
+program using make (or gmake).
+
+Note - GTK is an optional dependency and is only required to allow users to
+load or save programs.  This will not stop the program from running by this
+functionality  will be unavailable if the GTK libraries are  not  available
+when the program is compiled.
+
+#### Compiling
+
+To  build the emulators check that you have all the [prerequisites](#Prerequisites) installed
+then download the source code from github and unzip it (this will created a
+new directory automatically).
+
+##### Linux/NetBSD
+
+```
+$ wget https://github.com/mike632t/x11-calc/archive/refs/heads/stable.zip
+$ unzip stable.zip
+```
+Then change directory to the new folder.
+```
+$ cd x11-calc-stable
+```
+To compile all the emulators you just need to invoke make.
+```
+$ make clean; make all
+```
+You can also compile an emulator by specifying the model number.
+```
+$ make hp67
+```
+By default the executable files will be created in the `bin` directory.
+```
+$ bin/x11-calc-67
+x11-calc-67: Version 0.19.0198 [Commit Id : 751ab27] gcc version 8.3.0 19 Oct 25 20:51:51
+ROM Size: 8192 words
+Loading '/home/system/.local/share/x11-calc/x11-calc-67.dat'
+```
+OR
+```
+$ bin/x11-calc
+```
+If more than one C compiler is installed or if gcc is not available you can
+specify which one to use from the command line.
+```
+$ make CC=clang hp11c
+
+$ make CC=tcc
+```
+
+##### Tru64 UNIX
+
+To compile all the emulators you just need to invoke make.
+```
+$ make clean; make all
+```
+You can also compile a single emulator by specifying the model number.
+```
+$ make hp29c
+```
+By default the executable files will be created in the `bin` directory.
+```
+$ bin/x11-calc-29c
+```
+
+##### Solaris 10
+
+You  need to be able to use the GNU tools so you have need to include their
+location in your PATH.
+```
+$ PATH=$PATH:/usr/sfw/bin/
+```
+Download the source code, unzip it, and change to the new directory.
+```
+$ wget https://github.com/mike632t/x11-calc/archive/refs/heads/stable.zip
+$ unzip stable.zip
+$ cd x11-calc-stable
+```
+Since `gcc` isn't the default compiler you need to specify it when invoking
+`gmake`.
+```
+$ gmake CC=gcc clean hp21
+```
+```
+$ gmake CC=gcc clean all
+```
+By default the executable files will be created in the `bin` directory.
+```
+$ ./bin/x11-calc-33c
+x11-calc-33c: Version 0.19.0198 [Commit ID: 992cf145] gcc version 3.4.3 19 Oct 25 20:32:48
+ROM Size: 4096 words
+```
+
+##### VMS
+
+On VMS unzip the source code archive, change the default directory and then
+run `make.com`.
+```
+$ unzip stable.zip
+$ set def [.x11-calc-stable.src]
+$ @make all
+
+$ mc [-.bin]x11-calc-29c
+x11-calc-29c: Version 0.10 [Commit ID: 399d546] 02 Nov 23 23:52:11 (Build: 0114)
+ROM Size : 4096 words
+```
+
+#### Installing
+
+On Linux systems after the compilation is complete you can use the makefile
+to install the emulators locally.
+
+By default the installer will use `$HOME/.local` if it exists, but it is
+possible to specify another directory by setting the directory `prefix`.
+```
+$ make install
+
+OR
+
+$ make install prefix=/usr
+```
+The makefile also supports staged installs in a custom directory defined by
+DESTDIR.
+```
+make DESTDIR=/tmp/staging install
+```
+
+<a id="packages"></a>
+### Using a pre-compiled package <sup><sup>[Back to Top](#top)</sup></sup>
+
+If  you  don't  want  to compile the application yourself  you  can  use  a
+pre-compiled flatpak [package](https://flathub.org/apps/io.github.mike632t.x11-calc).
+
+A native binary package is also available on Alpine Linux 3.20 release.
+
+If x11 is not already installed, add it as standalone (`setup-xorg-base`) or together with a standard desktop (`setup-desktop`).
+Make sure `community` repo is enabled and then install with `apk add x11-calc`.
+To leverage GUI for setup, install `apk add zenity`. Optional program saves may be installed with `apk add x11-calc-prg`.
+
+<a id="tested"></a>
+### Tested Systems<sup><sup>[Back to Top](#top)</sup></sup>
+
+The emulators have been successfully compiled and tested on:
 
    - Alpine 3.20, gcc 13.2.1, x64 + arm64 **
 
@@ -215,317 +396,6 @@ The simulator has been successfully compiled and tested on:
 
 **** Compiles with warnings
 
-<a id="obtaining"></a>
-### How to get it <sup><sup>[Back to Top](#top)</sup></sup>
-
-You can either download the source code from GitHub and compile it yourself
-or you can use a pre-compiled package.
-
-   - [Building from the source](#building)
-
-   - [Using binary package](#packages)
-
-<a id="using"></a>
-### Using the simulator <sup><sup>[Back to Top](#top)</sup></sup>
-
-If you install the simulator on most modern desktops it should create a new
-menu entry that will start the launcher script by default. When invoked for
-the first time this will prompt you to select the default simulator as well
-as any additional command line options.  These selections will be saved and
-the selected simulator will become the new default.
-
-When using some desktop environments (like GNOME and KDE) it is possible to
-access a sub-menu that will allow you to select a specific model as well as
-change the default settings by right clicking on the menu icon.
-
-#### Keyboard Shortcuts
-
-The following keyboard shortcuts should work on Linux:
-
-'0' - '9', '+'. '-'. '*'. '/' and 'Enter' should do what you expect them to
-(when using numeric key pad you need to use numlock as usual).
-
-'f' and where applicable 'g' and 'h' correspond to the shift keys.
-
-'Esc' or 'Backspace' corresponds to 'Clx', 'c' to CHS, 'e' to 'EEX', and on
-financial models 'n' and 'i' correspond to 'n' and 'i' if not shifted.
-
-'A' - 'E' , 'A' - 'F' , or 'A' - 'B' correspond to program labels  (whether
-shifted or not).
-
-'Space' maps to 'SST' (if not shifted.
-
-The following control keys can also be used.
-
-Note - Only models with continuous memory can load or save state.
-
-'Ctrl-C' Resets the simulator to its last saved or initial state.
-
-'Ctrl-L' Load a saved data file.
-
-'Ctrl-R' Prints the register contents.
-
-'Ctrl-S' Enable tracing and executes a single instruction.
-
-'Ctrl-T' Toggles tracing of the simulator code execution.
-
-'Ctrl-Q' Resumes execution (does not disable trace).
-
-'Ctrl-Z' Exits the simulator.
-
-#### Command line options
-
-The following command line options are available:
-
-```
-  -b  ADDR                 set break-point (octal)
-  -i  OPCODE               set instruction trap (octal)
-  -r  FILE                 read ROM from FILE
-  -s                       single step
-  -t                       trace
-  -c, --comma              use a comma instead of a decimal point
-      --cursor             display cursor
-      --no-cursor          hide cursor
-      --zoom ZOOM          enlarge window size
-      --help               display this help and exit
-      --version            output version information and exit
-```
-
-#### Loading and saving
-
-For  models with continuous memory the contents of program memory and  data
-registers  are saved automatically when the calculator is switched  off  or
-the  window is closed.  The current state of the simulator will be saved in
-either `$HOME/.local/share/x11-calc/` or in a hidden file in the user's  HOME
-directory if `$HOME/.local/` does not exist.
-
-Where  an on/off slide switch exists switching the calculator off will save
-the current state.
-
-When  starting the simulator the name of the data file used to restore  the
-saved state can be specified on the command line, allowing previously saved
-copies of programs to be loaded automatically when the simulator starts  or
-the  simulator is reset using `Ctrl-C`.
-
-To load or save a program right click anywhere in the application window to
-open  a dialog box.  This will prompt for the name of an existing data file
-in `run` mode and allow the current simulator state to be saved in `prgm` mode.
-
-Resetting the simulator using `Ctrl-C` will restore it to it's initial state.
-
-#### Exiting
-
-For  models with a 'sliding' On/Off switch clicking on the switch will turn
-the simulator on or off, but if when switching off you hold down the switch
-down for two seconds the program will exit.
-
-#### Window Size
-
-The size of the simulator window can be adjusted from the command line with
-the `--zoom ZOOM` option, where the value for ZOOM can be in the range zero
-to four (0-4).
-
-#### Debugging
-
-You  can  start the simulation in trace mode using '-t', or in single  step
-mode using '-s', and set a break-point using '-b &lt;octal address&gt;'.
-
-'Ctrl-T'  also toggles trace mode when running, 'Ctrl-S' executes the  next
-instruction, 'Ctrl-Q' resumes execution, and 'Ctrl-R' displays the contents
-of the CPU registers.
-
-When in trace mode a jump to the same instruction produces no output.
-
-#### ROM Images
-
-The '-r <filename>' command line option provides the ability to use the ROM
-contents from a separate file.  The contents of the ROM are stored as pairs
-values separated by a colon containing the memory address and the opcode.
-
-Anything appearing after a semi colon on each line is ignored.
-
-For the HP10C, HP11C, HP12C, HP15C and HP16C the ROM file contains pairs of
-_hexadecimal_ values.
-```
-0000:107
-0001:04e
-0002:270
-0003:238
-0004:2ee
-0005:13f
-```
-For other models the ROM file contains pairs of _octal_ values.
-```
-00000:00255
-00001:01420
-00002:00451
-00003:01456
-00004:01746
-00005:00472
-```
-When loading a ROM from file any gaps between the memory addresses will not
-be filled with zeros, and the existing ROM contents will be left unchanged.
-
-ROM files can therefore be used to load alternative version of the firmware
-for a particular model or apply a patch to the existing firmware.
-
-<a id="building"></a>
-### Building from the source <sup><sup>[Back to Top](#top)</sup></sup>
-
-#### Prerequisites
-
-If you want to compile the simulator from the source code yourself then the
-following packages must be installed.
-
-   - Debian : gcc | clang | tcc  make libc6-dev libx11-dev xfonts-base
-
-   - Fedora : gcc | clang  make glibc-devel libX11-devel xorg-x11-fonts-base | xorg-x11-fonts-misc
-
-   - Gentoo : gcc make libc6-dev libx11-dev font-misc-misc
-
-   - MacOS  : [Xcode](https://developer.apple.com/xcode/)  [Xquartz](https://www.xquartz.org/)
-
-   - NetBSD : clang | gcc pmake
-
-   - SUSE   : gcc | clang make libX11-devel
-
-   - Ubuntu : gcc make libc6-dev libx11-dev xfonts-base
-
-   - Windows 11 + WSL2 : gcc make libc6-dev libx11-dev xfonts-base
-
-When all the prerequisites are available, you should be able to [compile](#Compiling) the
-program using make if it is in the list of tested platforms.
-
-#### Compiling
-
-To  build the simulator check that you have all the [prerequisites](#Prerequisites) installed
-then download the source code from github and unzip it (this will created a
-new directory automatically).
-
-e.g:
-```
-$ wget https://github.com/mike632t/x11-calc/archive/refs/heads/stable.zip
-$ unzip x11-calc-stable.zip
-```
-Then change directory to the new folder.
-```
-$ cd x11-calc-stable
-```
-The to compile all the simulators you just need to invoke make.
-```
-$ make clean; make all
-```
-You can also compile a single simulator by specifying the model number.
-```
-$ make hp29c
-```
-By default the executable files will be created in the `bin` directory.
-```
-$ ./bin/x11-calc-29c
-x11-calc-29c: Version 0.10 [Commit ID: 399d546] 01 Nov 23 23:53:00 (Build: 0114)
-ROM Size : 4096 words
-```
-OR
-```
-$ bin/x11-calc
-```
-If more than one C compiler is installed or if gcc is not available you can
-specify which one to use from the command line.
-```
-$ make CC=clang hp11c
-
-$ make CC=tcc
-```
-
-##### Solaris 10
-
-In order to use the GNU tools you need to add their location to your path.
-
-```
-$ PATH=$PATH:/usr/sfw/bin/
-$ gmake CC=gcc clean hp21
-```
-```
-$ PATH=$PATH:/usr/sfw/bin/
-$ gmake CC=gcc clean all
-```
-
-##### VMS
-
-On VMS unzip the source code archive, change the default directory and then
-run `make.com`.
-
-e.g:
-```
-$ unzip x11-calc-stable.zip
-$ set def [.x11-calc-stable.src]
-$ @make all
-
-$ mc [-.bin]x11-calc-29c
-x11-calc-29c: Version 0.10 [Commit ID: 399d546] 02 Nov 23 23:52:11 (Build: 0114)
-ROM Size : 4096 words
-```
-
-#### Installing
-
-On Linux systems after the compilation is complete you can use the makefile
-to install the simulators locally.
-
-By default the installer will use `$HOME/.local` if it exists, but it is
-possible to specify another directory by setting the directory `prefix`.
-```
-$ make install
-
-OR
-
-$ make install prefix=/usr
-```
-The makefile also supports staged installs in a custom directory defined by
-DESTDIR.
-```
-make DESTDIR=/tmp/staging install
-```
-
-<a id="packages"></a>
-### Using a pre-compiled package <sup><sup>[Back to Top](#top)</sup></sup>
-
-If you don't want to download an compile the sources yourself you can use a
-pre-compiled binary package compatible with most distros from [Flathub](https://flathub.org/apps/io.github.mike632t.x11-calc) using Flatpak.
-
-A native binary package is also available on Alpine Linux 3.20 release.\
-If x11 is not already installed, add it as standalone (`setup-xorg-base`) or together with a standard desktop (`setup-desktop`).\
-Make sure `community` repo is enabled and then install with `apk add x11-calc`.\
-To leverage GUI for setup, install `apk add zenity`. Optional program saves may be installed with `apk add x11-calc-prg`.
-
-<a id="issues"></a>
-### Known Issues <sup><sup>[Back to Top](#top)</sup></sup>
-
-#### General issues
-
-- A 24 bit colour display is required.
-- Keyboard shortcuts are not available on all systems.
-- For best results you need to have the X windows core fonts installed.
-- Parallel make only works on Linux, NetBSD and FreeBSD.
-
-##### HP 11C + HP 12C + HP 15C + HP 16C
-
-- Keyboard test is successful but these models do not pass the self-test.
-
-#### Wayland
-
-- The application window should be a fixed size (this can be modified using
-'--zoom'), but Xwayland does not handle this correctly.
-
-#### VMS
-
-- Colour palette assumes a black and white display (simh with QVSS). If the
-system's  colour depth is different you must modify COLOUR_DEPTH to  match.
-Note that the display will still only use two colours!
-(You can modify x11-calc-colour.h and x11-calc.h to change `vms` to `oldvms` if
-you do have a 24-bit colour display).
-- Not all text is visible if not using 24-bit colour.
-- Not all key legends are shown as the font is missing some characters.
-
 <a id="acknowledgements"></a>
 ### Acknowledgements <sup><sup>[Back to Top](#top)</sup></sup>
 
@@ -536,19 +406,19 @@ have managed to get as far as I have.
 
 - `Teenix` for convincing me that it was possible in the first place.
 
-- `Teenix`  and `Panamatik` for their excellent simulators from which I was
-able  to  figure out most of what should happen when  each  instruction  is
-executed.
+- `Teenix`  and `Panamatik` for their excellent emulators from which I  was
+   able to figure out most of what should happen when each  instruction  is
+   is executed.
 
 - `Agarza` for providing the details of the voyager displays.
 
-- `Macmpi` for completely rewriting the makefiles and all while maintaining
-backward compatibility with Tru64 UNIX!
+- `Macmpi` for completely rewriting the make files and maintaining backward
+   compatibility with Tru64 UNIX while doing so!
 
-- `Macmpi` for packaging the simulator for Flatpak and setting up the build
-so new releases are built automatically.
+- `Macmpi` for packaging the emulators for Flatpak and setting up the build
+   so new releases are built automatically.
 
-- `Macmpi` for packaging and testing the simulators on Alpine Linux.
+- `Macmpi` for packaging and testing the emulators on Alpine Linux.
 
 - `Agarza` and `Martin HEPPERLE` for helping to translate the help text.
 
@@ -558,7 +428,7 @@ so new releases are built automatically.
 
 - `Mark SHIN` for testing on MacOS.
 
-- `Jonakeys` for getting the simulators working on FreeBSD.
+- `Jonakeys` for getting the emulators working on FreeBSD.
 
 - `Quozl` for helping with double buffering display changes.
 
@@ -571,8 +441,8 @@ so new releases are built automatically.
 <a id="problems"></a>
 ### Problem Reports <sup><sup>[Back to Top](#top)</sup></sup>
 
-If you find problems or have suggestions relating to these simulators, then
-please create a new [issue](https://github.com/mike632t/x11-calc/issues).
+If  you encounter an issue or have suggestions for future changes to  these
+emulators, then please create a new [issue](https://github.com/mike632t/x11-calc/issues).
 
 Your problem report should contain:
 
