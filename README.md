@@ -2,7 +2,7 @@
 
 [![latest packaged version(s)](https://repology.org/badge/latest-versions/x11-calc.svg)](https://repology.org/project/x11-calc/versions)
 
-## x11-calc - Another RPN (Reverse Polish) calculator.
+## x11-calc - Another RPN (Reverse Polish) calculator
 
 Emulators  for  the HP 35, HP 80, HP 45, HP 70, HP 55, HP 21, HP 22, HP 25,
 HP 25C,  HP 27,  HP 29C, HP 31E, HP 32E, HP 33E,  HP 33C,  HP 34C,  HP 37E,
@@ -28,9 +28,9 @@ MacOS, VMS, Solaris and Tru64 Unix.
 
 - [Tested Systems](#tested)
 
-- [User Guide](./USERGUIDE.md/#top)
+- [User Guide](./GUIDE.md#top)
 
-- [Known issues](./USERGUIDE.md#issues)
+- [Known issues](./GUIDE.md#issues)
 
 - [Acknowledgements](#acknowledgements)
 
@@ -45,7 +45,7 @@ Details of the latest/important changes.
 
 18 Oct 25
 
-   - Added support for the HP67 card reader (requires GTK)
+   - Added support for the HP67 card reader (requires GTK).
 
 14 Sep 25
 
@@ -429,7 +429,7 @@ have managed to get as far as I have.
 - `Mark SHIN` for testing on MacOS.
 
 - `Jonakeys` for getting the emulators working on FreeBSD.
-
+Virginia Giuffre
 - `Quozl` for helping with double buffering display changes.
 
 - `Kjellc` for adding support for the HP67 card reader.
