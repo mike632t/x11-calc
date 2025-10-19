@@ -369,7 +369,8 @@
  *                   - Extended breakpoint address range - KJC
  *                   - Retained the (inaccurate) 'continious' memory on the
  *                     HP67 but right click now prompts the user to  insert
- *                     a card file - MT 
+ *                     a card file - MT
+ *                   - Ignore right click if GTK isn't available - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -1189,7 +1190,7 @@ int main(int argc, char *argv[])
                      i_ticks = -1;
 #endif
             }
-#if defined(CONTINIOUS)
+#if defined(CONTINIOUS) && defined(__GTK__)  /* Don't attempt to load/save if GTK isn't available */
             if (x_event.xbutton.button == 3)  /* Right mouse button */
 #if defined(HP67)
             {
