@@ -110,6 +110,8 @@
 #  17 Aug 25         - Added makefile.sunos to files - MT
 #  15 Oct 25         - Added makefile.minix to files - MT
 #                    - Modified backup and included '.crd' files - MT
+#  19 Oct 25         - Check if git is available before trying to determine
+#                      the current branch - MT
 #
 
 PROGRAM		=  x11-calc
@@ -132,12 +134,12 @@ _date			= `date +'%Y%m%d%H%M'`
 
 # Archive name
 
-_branch		=  $(shell git rev-parse --abbrev-ref HEAD > /dev/null 2>&1 && echo `git rev-parse --abbrev-ref HEAD 2>/dev/null` || true)
+_branch		=  $(shell command -v git >/dev/null 2>&1 && git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
 
 ifeq ($(_branch),)
-_archive		= $(PROGRAM)-$(_date).tar.gz
+_archive		= $(PROGRAM)-$(_date).tar
 else
-_archive		= $(PROGRAM)-$(_branch)-$(_date).tar.gz
+_archive		= $(PROGRAM)-$(_branch)-$(_date).tar
 endif
 
 # Calculator models available in the emulator.
