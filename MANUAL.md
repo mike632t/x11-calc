@@ -1,5 +1,5 @@
 <a id="top"></a>
-## x11-calc - User Guide.
+## x11-calc - User Guide
 
 ### Contents
 
@@ -16,7 +16,7 @@
 
 Installing  the emulators on most modern desktops should create a new  menu
 entry that will start the launcher script by default.  When invoked for the
-first time this will prompt you to select the default simulator as well  as
+first  time this will prompt you to select the default emulator as well  as
 any additional command line options.
 
 These selections will be saved and become the default settings.
@@ -63,7 +63,7 @@ Usage: x11-calc [OPTION]... [FILE] **
 When  starting  the emulator the name of the data file used to restore  the
 saved state can be specified on the command line, allowing previously saved
 copies  of programs to be loaded automatically when the program  starts  or
-the simulator is reset using `Ctrl-C`.
+the emulator is reset using `Ctrl-C`.
 
 #### -b ADDR
 Sets a breakpoint at the specified address (octal).  The emulator will halt
@@ -159,14 +159,14 @@ the current state.
 If  the program was compiled with GTK support then a user can load or  save
 programs by right clicking anywhere in the application window.
 open  a dialog box.  This will prompt for the name of an existing data file
-in `run` mode and allow the current simulator state to be saved in `prgm` mode.
+in `run` mode and allow the current emulator state to be saved in `prgm` mode.
 
-Resetting the simulator using `Ctrl-C` will restore it to it's initial state.
+Resetting the emulator using `Ctrl-C` will restore it to it's initial state.
 
 #### Exiting
 
 For  models with a 'sliding' On/Off switch clicking on the switch will turn
-the simulator on or off, but if when switching off you hold down the switch
+the emulator on or off, but if when switching off you hold down the  switch
 down for two seconds the program will exit.
 
 #### Keyboard Shortcuts
@@ -190,7 +190,7 @@ The following control keys can also be used.
 
 Note - Only models with continuous memory can load or save state.
 
-'Ctrl-C' Resets the simulator to its last saved or initial state.
+'Ctrl-C' Resets the emulator to its last saved or initial state.
 
 'Ctrl-L' Load a saved data file.
 
@@ -198,15 +198,15 @@ Note - Only models with continuous memory can load or save state.
 
 'Ctrl-S' Enable tracing and executes a single instruction.
 
-'Ctrl-T' Toggles tracing of the simulator code execution.
+'Ctrl-T' Toggles tracing of the emulator code execution.
 
 'Ctrl-Q' Resumes execution (does not disable trace).
 
-'Ctrl-Z' Exits the simulator.
+'Ctrl-Z' Exits the emulator.
 
 #### Debugging
 
-You  can  start the simulation in trace mode using '-t', or in single  step
+You  can  start the emulation in trace mode using '-t', or in  single  step
 mode using '-s', and set a break-point using '-b &lt;octal address&gt;'.
 
 'Ctrl-T'  also toggles trace mode when running, 'Ctrl-S' executes the  next
