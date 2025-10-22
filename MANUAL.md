@@ -156,18 +156,25 @@ HOME directory if `$HOME/.local/` does not exist.
 Where  an on/off slide switch exists switching the calculator off will save
 the current state.
 
-If  the program was compiled with GTK support then a user can load or  save
-programs by right clicking anywhere in the application window.
-open  a dialog box.  This will prompt for the name of an existing data file
-in `run` mode and allow the current emulator state to be saved in `prgm` mode.
+You can create a copy the saved emulator state by making a copy of the file
+which allow the user to make a backup when ever program was held in  memory
+when  the  emulator was switched off.  Different programs can be loaded  by
+specifying the name of the file on the command when starting the emulator.
 
-Resetting the emulator using `Ctrl-C` will restore it to it's initial state.
+If  the program was compiled with GTK support then a user can load or  save
+programs  while the emulator is running by right clicking anywhere  in  the
+application window.  This will prompt for the name of an existing data file
+in  `run` mode and allow the current emulator state to be saved in when  in
+`prgm` mode.
+
+Note - Models with working card readers will be prompt the user to select a
+read or write a program card file, instead of restoring the emulator state.
 
 #### Exiting
 
 For  models with a 'sliding' On/Off switch clicking on the switch will turn
-the emulator on or off, but if when switching off you hold down the  switch
-down for two seconds the program will exit.
+the  emulator on or off, but if when switching off you hold down the  mouse
+button for two seconds the program will exit.
 
 #### Keyboard Shortcuts
 
@@ -190,9 +197,7 @@ The following control keys can also be used.
 
 Note - Only models with continuous memory can load or save state.
 
-'Ctrl-C' Resets the emulator to its last saved or initial state.
-
-'Ctrl-L' Load a saved data file.
+'Ctrl-C' Resets the emulator to its initial or last saved state.
 
 'Ctrl-R' Prints the register contents.
 
