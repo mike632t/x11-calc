@@ -24,7 +24,7 @@ MacOS, VMS, Solaris and Tru64 Unix.
 
 - [Changes](#changes)
 
-- [Building/Installing](#obtaining)
+- [Installing/Building](#obtaining)
 
 - [Tested Systems](#tested)
 
@@ -125,9 +125,60 @@ Details of the latest/important changes.
 You can either download the source code from GitHub and compile it yourself
 or you can use a pre-compiled package.
 
+   - [Using binary package](#packages)
+
    - [Building from the source](#building)
 
-   - [Using binary package](#packages)
+
+<a id="packages"></a>
+### Using a pre-compiled package <sup><sup>[Back to Top](#top)</sup></sup>
+
+#### Alpine Linux
+A binary package is available for Alpine Linux 3.20 and later.
+
+If  X11 is not already installed, either add it using `setup-xorg-base`  or
+install it together with a standard desktop using `setup-desktop`.
+
+Make  sure `community` repo is enabled and then install x11-calc by running
+the command `apk add x11-calc` as root.
+
+Additional programs may be installed with `apk add x11-calc-prg`.
+
+#### Flatpak
+If  you  don't  want  to compile the application yourself  you  can  use  a
+flatpak.
+
+Follow the instructions for your distribution to install Flatpak.
+
+Logout and Login again.
+
+Add the Flathub repository.
+```
+flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+```
+Install the emulator.
+
+Note - Although the application only requires less then 2MB of storage this
+will  also install the run-time environment needed by Flatpak (if it is not
+already installed) which could require up to 925 MB of disk space!  However
+even  if  the run-time is not installed the disk space used is usually only
+about half that.
+```
+flatpak install flathub io.github.mike632t.x11-calc
+```
+Start it
+```
+flatpak run io.github.mike632t.x11-calc
+```
+The  first time the application runs you will be prompted to select  which
+model calculator you want to use.
+
+If later you want to use a different calculator model you can specify it on
+the command line.
+```
+flatpak run io.github.mike632t.x11-calc hp21
+```
+
 
 <a id="building"></a>
 ### Building from the source <sup><sup>[Back to Top](#top)</sup></sup>
@@ -137,11 +188,11 @@ or you can use a pre-compiled package.
 If you want to compile the emulators from the source code yourself then the
 following packages must be installed.
 
-   - Alpine   : gcc | clang | tcc  make libc6-dev libx11-dev xorg-x11-fonts-base [gtk+3.0-dev]
+   - Alpine   : gcc | clang | tcc make libx11-dev xorg-x11-fonts-base [gtk+3.0-dev]
 
-   - Debian   : gcc | clang | tcc  make libc6-dev libx11-dev xfonts-base [libgtk-3-dev | libgtk2.0-dev]
+   - Debian   : gcc | clang | tcc make libc6-dev libx11-dev xfonts-base [libgtk-3-dev | libgtk2.0-dev]
 
-   - Fedora   : gcc | clang  make glibc-devel libX11-devel xorg-x11-fonts-base | xorg-x11-fonts-misc [gtk3-devel]
+   - Fedora   : gcc | clang make glibc-devel libX11-devel xorg-x11-fonts-base | xorg-x11-fonts-misc [gtk3-devel]
 
    - Gentoo   : gcc make libc6-dev libx11-dev font-misc-misc [x11-libs/gtk+]
 
@@ -157,13 +208,13 @@ following packages must be installed.
 
    - Windows 11 + WSL2 : gcc make libc6-dev libx11-dev xfonts-base
 
-When all the prerequisites are available, you should be able to [compile](#Compiling) the
-program using make (or gmake).
+When all the prerequisites are available, you should be able to compile the
+application using make (or gmake).
 
 Note - GTK is an optional dependency and is only required to allow users to
-load or save programs.  This will not stop the program from running by this
-functionality  will be unavailable if the GTK libraries are  not  available
-when the program is compiled.
+load or save programs.  The emulator will still compile but without the GTK
+libraries  the ability to right click on the application window and load or
+save  programs won't be available.
 
 #### Compiling
 
@@ -285,24 +336,13 @@ DESTDIR.
 make DESTDIR=/tmp/staging install
 ```
 
-<a id="packages"></a>
-### Using a pre-compiled package <sup><sup>[Back to Top](#top)</sup></sup>
-
-If  you  don't  want  to compile the application yourself  you  can  use  a
-pre-compiled flatpak [package](https://flathub.org/apps/io.github.mike632t.x11-calc).
-
-A native binary package is also available on Alpine Linux 3.20 release.
-
-If x11 is not already installed, add it as standalone (`setup-xorg-base`) or together with a standard desktop (`setup-desktop`).
-Make sure `community` repo is enabled and then install with `apk add x11-calc`.
-To leverage GUI for setup, install `apk add zenity`. Optional program saves may be installed with `apk add x11-calc-prg`.
 
 <a id="tested"></a>
 ### Tested Systems<sup><sup>[Back to Top](#top)</sup></sup>
 
 The emulators have been successfully compiled and tested on:
 
-   - Alpine 3.20, gcc 13.2.1, x64 + arm64 **
+   - Alpine 3.20, gcc 13.2.1, x64 + arm64
 
    - Alpine 3.19, gcc 13.2.1, x64 + arm64 ***
 
