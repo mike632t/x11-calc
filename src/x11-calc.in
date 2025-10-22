@@ -201,6 +201,13 @@ _setup() {
       fi
    fi
 
+   # Add prg alias during setup - macmpi
+   #if ! [ -h "${XDG_DATA_HOME}/x11-calc/prg" ]; then
+   #   echo "***"
+   #   [ -d /usr/share/x11-calc/prg ] && ln -s /usr/share/x11-calc/prg "${XDG_DATA_HOME}/x11-calc/prg" && echo "ln -s /usr/share/x11-calc/prg \"${XDG_DATA_HOME}/x11-calc/prg\" "
+   #   [ -d /app/share/x11-calc/prg ] && ln -s /app/share/x11-calc/prg "${XDG_DATA_HOME}/x11-calc/prg" && echo "ln -s /app/share/x11-calc/prg \"${XDG_DATA_HOME}/x11-calc/prg\" "
+   #fi
+
    . "$_configfile" # Reload modified settings from config file
 }
 
