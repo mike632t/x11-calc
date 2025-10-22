@@ -1190,7 +1190,8 @@ int main(int argc, char *argv[])
                      i_ticks = -1;
 #endif
             }
-#if defined(CONTINIOUS) && defined(__GTK__)  /* Don't attempt to load/save if GTK isn't available */
+#if defined(__GTK__)  /* Don't attempt to load/save if GTK isn't available */
+#if defined(CONTINIOUS) || defined(HP67)
             if (x_event.xbutton.button == 3)  /* Right mouse button */
 #if defined(HP67)
             {
@@ -1207,6 +1208,7 @@ int main(int argc, char *argv[])
                while (XPending(x_display))
                   XNextEvent(x_display, &x_event);  /* Clear the event queue */
             }
+#endif
 #endif
 #endif
             break;

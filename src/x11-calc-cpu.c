@@ -480,7 +480,7 @@
 #include <sys/stat.h>
 #endif
 
-#if defined(CONTINIOUS)
+#if defined(CONTINIOUS) || defined(HP67)
 
 #if defined(__GTK__)
 #include <gtk/gtk.h>

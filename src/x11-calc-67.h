@@ -72,8 +72,9 @@
 #define SWITCH_HEIGHT      10 * SCALE_HEIGHT
 
 #define ROM_SIZE           020000
-#define MEMORY_SIZE        256  /** Include buffer addresses - KJC */
-#define CONTINIOUS
+#define MEMORY_SIZE        256  /** Include buffer addresses and extended memory - KJC */
+
+#define NOT_CONTINIOUS
 
 extern int i_rom [ROM_SIZE];
 
