@@ -69,6 +69,8 @@
 #  07 Jul 25         - Modified changed '_f_conf' to '_configfile' - MT
 #                    - Additional command line options are always passed to
 #                      the emulator (even when running setup) - MT
+#  23 Oct 25         - Adds a symbolic link to a shared library of programs
+#                      in /usr/share/x11-calc/prg if it exists - macmpi/MT
 #
 
 SUCCESS=0
@@ -78,6 +80,8 @@ ENODATA=61
 ENOACC=126 # Permission denied (not official)
 ENOCMD=127 # Executable file not found (not official)
 ENOFNT=192 # No font (not official)
+
+COMMON="lib" # Name of symlink to common program library
 
 # Prototype model list: is to be filled-in by makefile
 # e.g _models="hp35|hp80|hp45|hp70|hp21|hp22|hp25|hp25c|hp27|hp29c|hp31e|hp32e|hp33e|hp33c|hp34c|hp37e|hp38c|hp38e|hp67|hp10c|hp11c|hp12c|hp15c|hp16c"
@@ -186,6 +190,15 @@ _config (){
 
 }
 
+#- create_symlink  - Add symlink to shared program library - macmpi/MT
+
+_create_symlink() {
+   if ! [ -e "${XDG_DATA_HOME}/x11-calc/$COMMON" ]; then  # Check NOTHING with the same name exists
+      [ -d /usr/share/x11-calc/prg ] && ln -s /usr/share/x11-calc/prg "${XDG_DATA_HOME}/x11-calc/$COMMON" && echo "ln -s /usr/share/x11-calc/prg \"${XDG_DATA_HOME}/x11-calc/$COMMON\" "
+      [ -d /app/share/x11-calc/prg ] && ln -s /app/share/x11-calc/prg "${XDG_DATA_HOME}/x11-calc/$COMMON" && echo "ln -s /app/share/x11-calc/prg \"${XDG_DATA_HOME}/x11-calc/$COMMON\" "
+   fi
+}
+
 #- setup()
 
 _setup() {
@@ -200,14 +213,6 @@ _setup() {
          vi "$_configfile"
       fi
    fi
-
-   # Add prg alias during setup - macmpi
-   #if ! [ -h "${XDG_DATA_HOME}/x11-calc/prg" ]; then
-   #   echo "***"
-   #   [ -d /usr/share/x11-calc/prg ] && ln -s /usr/share/x11-calc/prg "${XDG_DATA_HOME}/x11-calc/prg" && echo "ln -s /usr/share/x11-calc/prg \"${XDG_DATA_HOME}/x11-calc/prg\" "
-   #   [ -d /app/share/x11-calc/prg ] && ln -s /app/share/x11-calc/prg "${XDG_DATA_HOME}/x11-calc/prg" && echo "ln -s /app/share/x11-calc/prg \"${XDG_DATA_HOME}/x11-calc/prg\" "
-   #fi
-
    . "$_configfile" # Reload modified settings from config file
 }
 
@@ -233,9 +238,9 @@ command -v zenity >/dev/null 2>&1
 has_zenity=$?
 _has_zenity() { return "$has_zenity"; }
 
-if [ ! -f "$_configfile" ]
-then
+if [ ! -f "$_configfile" ]; then  # if the config file does no exist create it
    ! _has_zenity && echo "`basename $0`: Did you know that installing 'zenity' will give you a graphical setup interface?"
+   _create_symlink
    mkdir -p "`dirname "${_configfile}"`"
    cat <<-EOF >"$_configfile"
 #
