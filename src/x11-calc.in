@@ -81,7 +81,7 @@ ENOACC=126 # Permission denied (not official)
 ENOCMD=127 # Executable file not found (not official)
 ENOFNT=192 # No font (not official)
 
-COMMON="lib" # Name of symlink to common program library
+LIBRARY="lib" # Name of symlink to the shaired program library
 
 # Prototype model list: is to be filled-in by makefile
 # e.g _models="hp35|hp80|hp45|hp70|hp21|hp22|hp25|hp25c|hp27|hp29c|hp31e|hp32e|hp33e|hp33c|hp34c|hp37e|hp38c|hp38e|hp67|hp10c|hp11c|hp12c|hp15c|hp16c"
@@ -193,9 +193,9 @@ _config (){
 #- create_symlink  - Add symlink to shared program library - macmpi/MT
 
 _create_symlink() {
-   if ! [ -e "${XDG_DATA_HOME}/x11-calc/$COMMON" ]; then  # Check NOTHING with the same name exists
-      [ -d /usr/share/x11-calc/prg ] && ln -s /usr/share/x11-calc/prg "${XDG_DATA_HOME}/x11-calc/$COMMON" && echo "ln -s /usr/share/x11-calc/prg \"${XDG_DATA_HOME}/x11-calc/$COMMON\" "
-      [ -d /app/share/x11-calc/prg ] && ln -s /app/share/x11-calc/prg "${XDG_DATA_HOME}/x11-calc/$COMMON" && echo "ln -s /app/share/x11-calc/prg \"${XDG_DATA_HOME}/x11-calc/$COMMON\" "
+   if ! [ -e "${XDG_DATA_HOME}/x11-calc/$LIBRARY" ]; then  # Check NOTHING with the same name exists
+      [ -d /usr/share/x11-calc/prg ] && ln -s /usr/share/x11-calc/prg "${XDG_DATA_HOME}/x11-calc/$LIBRARY"
+      [ -d /app/share/x11-calc/prg ] && ln -s /app/share/x11-calc/prg "${XDG_DATA_HOME}/x11-calc/$LIBRARY"
    fi
 }
 
