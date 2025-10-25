@@ -71,6 +71,7 @@
 #                      the emulator (even when running setup) - MT
 #  23 Oct 25         - Adds a symbolic link to a shared library of programs
 #                      in /usr/share/x11-calc/prg if it exists - macmpi/MT
+#  24 Oct 25         - Checks for broken symlinks - MT
 #
 
 SUCCESS=0
@@ -194,9 +195,9 @@ _config (){
 
 _create_symlink() {
    _link="${XDG_DATA_HOME}/x11-calc/$LIBRARY"
-   if ! ([ -e "$_link" ]   || [ -L "$_link" ]); then  # Check NOTHING with the same name exists (even broken symlink)
-      [ -d /usr/share/x11-calc/prg ] && ln -s /usr/share/x11-calc/prg "${XDG_DATA_HOME}/x11-calc/$LIBRARY"
-      [ -d /app/share/x11-calc/prg ] && ln -s /app/share/x11-calc/prg "${XDG_DATA_HOME}/x11-calc/$LIBRARY"
+   if ! ([ -e "$_link" ] || [ -L "$_link" ]); then  # Check NOTHING with the same name exists (even broken symlink)
+      [ -d /usr/share/x11-calc/prg ] && ln -s /usr/share/x11-calc/prg "$_link"
+      [ -d /app/share/x11-calc/prg ] && ln -s /app/share/x11-calc/prg "$_link"
    fi
 }
 
