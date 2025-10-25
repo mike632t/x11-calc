@@ -170,6 +170,16 @@ in  `run` mode and allow the current emulator state to be saved in when  in
 Note - Models with working card readers will be prompt the user to select a
 read or write a program card file, instead of restoring the emulator state.
 
+There is no validation when reading a file except that each record needs to
+match the expected type (records that don't match the expected type will be
+ignored) and the emulator will stop reading the file if the expected number
+of records have already been processed.
+
+Trying to read a file with invalid records usually results in an error, but
+can  cause some very odd behaviour.  If this happens reset the emulator  to
+it's  initial  state  using `Ctrl-C`, or close the window  and  restart the
+emulator from the command line using the `--reset` option.
+
 #### Exiting
 
 For  models with a 'sliding' On/Off switch clicking on the switch will turn
