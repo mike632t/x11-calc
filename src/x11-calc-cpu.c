@@ -427,7 +427,7 @@
  *                   - Added 'rom address -> buffer' (could have changed it
  *                     to a nop as it doesn't appear to do anything) - MT
  * 10 Sep 25         - Fixed 'select rom' - MT
- *                   - Changed message vairable names - MT
+ *                   - Changed message variable names - MT
  * 11 Sep 25         - Print values of 'p' when tracing execution - MT
  * 12 Sep 25         - Updated 'select rom' so that it selects the  correct
  *                     address when 'delayed select rom' or 'delayed select
@@ -436,6 +436,11 @@
  *                   - Removed 'zenity' fallback - MT
  * 13 Oct 25  (0229) - Fixed get_datafile() function declaration -MT
  * 18 Oct 25         - Added card reader support - KJC
+ * 27 Oct 25         - Removed  HP67  specific code from op_inc_pt()  which
+ *                     looks like a problem that occurred when merging  the
+ *                     changes into the forked branch - MT
+ *                   - Saves and restores the function key state for models
+ *                     with card readers - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -448,8 +453,8 @@
  */
 
 #define  NAME          "x11-calc-cpu"
-#define  BUILD         "0230"
-#define  DATE          "18 Oct 25"
+#define  BUILD         "0231"
+#define  DATE          "27 Oct 25"
 #define  AUTHOR        "MT"
 
 #define  NODEBUG
@@ -774,6 +779,9 @@ void v_read_state(oprocessor *h_processor, char *s_pathname) /* Read processor s
             {
                if (fscanf(h_file, "%x,", &i_temp)) h_processor->mem[i_count]->nibble[i_counter] = i_temp;
             }
+#if defined(HP67)  /* Must be done last to avoid errors when reading existing data files */
+         if (fscanf(h_file, "%x,", &i_temp)) h_processor->crc[FUNCTION] = i_temp;  /* Restore the function-key state - KJC */
+#endif
          fclose(h_file);
       }
       else
@@ -820,6 +828,9 @@ void v_write_state(oprocessor *h_processor, char *s_pathname) /* Write processor
                fprintf(h_file, "%02x,", h_processor->mem[i_count]->nibble[i_counter]);
             fprintf(h_file,"\n");
          }
+#if defined(HP67)
+         fprintf(h_file, "%02x,\n", h_processor->crc[FUNCTION]);  /* Save the default function-key state (labels if a prgm is loaded, else functions) - KJC */
+#endif
          fclose(h_file);
       }
       else
@@ -942,7 +953,7 @@ void v_fprint_registers(FILE *h_file, oprocessor *h_processor) /* Display curren
       fprintf(h_file, "  addr = %02d\n", h_processor->addr);
 #if defined(HP67)
       fprintf(h_file, "\tsp = %d\t\t", h_processor->sp);  /* Added - KJC */
-      fprintf(h_file, "\tf4 = %d\n", h_processor->crc[FUNCTION]);
+      fprintf(h_file, "\t\ttf4 = %d\n", h_processor->crc[FUNCTION]);
 #endif
    }
 }
@@ -1225,9 +1236,6 @@ static void v_op_inc_pt(oprocessor *h_processor) /* Increment active pointer */
          *h_active_pointer(h_processor) = *h_active_pointer(h_processor) + 1;
       else
       {
-#if defined(HP67)
-         fprintf(h_file, "%02x,\n", h_processor->crc[FUNCTION]);  /* Save the default function-key state (labels if a prgm is loaded, else functions) - KJC */
-#endif
          if (h_processor->opcode != h_processor->rom[h_processor->pc - 1]) /* Literally the only way to work out if the pointer */
             *h_active_pointer(h_processor) = *h_active_pointer(h_processor) + 1; /* should be incremented when it is zero is to check the previous opcode ! */
       }
