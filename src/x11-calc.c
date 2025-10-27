@@ -371,6 +371,8 @@
  *                     HP67 but right click now prompts the user to  insert
  *                     a card file - MT
  *                   - Ignore right click if GTK isn't available - MT
+ * 27 Oct 25         - Added  function key labels for HP67 (only shown when
+ *                     function keys are enabled) - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -528,6 +530,10 @@ int main(int argc, char *argv[])
    int i_zoom = 0;                     /* Zoom level */
    int i_trap = -1;                    /* Trap instruction */
    int i_ticks = -1;
+
+#if defined(HP67)
+   int i_last = 0;  /* Remember the state of function keys */
+#endif
 
 #if defined(CONTINIOUS)
    char b_reset = False;               /* Do not restore state (reset) */
@@ -981,6 +987,11 @@ int main(int argc, char *argv[])
          i_count = INTERVAL;
 #if defined(HP67)
          i_wait(INTERVAL / 4);   /* Sleep for ~6.25 ms per tick */
+         if (i_last != h_processor->crc[FUNCTION]) /* Has the state of the function keys changed ? */
+         {
+            XClearArea(x_display, x_window, 0, 0, 0, 0, True);  /* Force display to refresh - bit of a fudge.. */
+            i_last = h_processor->crc[FUNCTION]; /* Remember the state of function keys */
+         }
 #elif defined(HP55)
          i_wait(INTERVAL / 3.1); /* Sleep for ~???? ms per tick */
 #elif defined(VOYAGER) || defined(SPICE)
@@ -1168,7 +1179,6 @@ int main(int argc, char *argv[])
 #endif
                         i_switch_draw(x_display, x_buffer, i_screen, h_switch[1]);
                         XCopyArea(x_display, x_buffer, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
-
                      }
                }
 #endif
@@ -1195,8 +1205,8 @@ int main(int argc, char *argv[])
             if (x_event.xbutton.button == 3)  /* Right mouse button */
 #if defined(HP67)
             {
-               h_processor->crc[CARD] = True;               /* kjc: cleared at motor start & stop */
-               h_processor->flags[DISPLAY_ENABLE] = False;  /* kjc: disable display during file-choose */
+               h_processor->crc[CARD] = True;               /* Clear at motor start & stop - KJC */
+               h_processor->flags[DISPLAY_ENABLE] = False;  /* Disable display while reading card - KJC */
             }
 #else
             {
@@ -1217,6 +1227,10 @@ int main(int argc, char *argv[])
                int i_count;
                i_display_draw(x_display, x_buffer, i_screen, h_display);/* Draw display */
 #if defined(LABELS)
+#if defined(HP67)
+               for (i_count = 0; i_count < LABELS; i_count++)  /* Update label state */
+                  h_label[i_count]->state = h_processor->crc[FUNCTION];
+#endif
                for (i_count = 0; i_count < LABELS; i_count++)  /* Draw labels */
                   i_label_draw(x_display, x_buffer, i_screen, h_label[i_count]);
 #endif

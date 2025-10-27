@@ -35,12 +35,13 @@
  * 21 Oct 23         - Updated  switch parameters to accommodate 3 position
  *                     switches - MT
  * 20 May 25         - Tidied up data structure definitions - MT
+ * 27 Oct 25         - Added function key labels - MT
  *
  */
 
 #define NAME           "x11-calc-67"
-#define BUILD          "0013"
-#define DATE           "20 May 25"
+#define BUILD          "0014"
+#define DATE           "27 Oct 25"
 #define AUTHOR         "MT"
 
 #include <stdarg.h>    /* strlen(), etc. */
@@ -70,12 +71,29 @@ void v_init_switches(struct oswitch *h_switch[]) /* Define the switches. */
    h_switch[1] = h_switch_create(00000, "PRGM", "", "RUN", h_alternate_font, KBD_LEFT + 3 * KEY_WIDTH + 2 * KEY_GAP, KBD_TOP, 2 * KEY_WIDTH + KEY_GAP, SWITCH_HEIGHT, True, MID_GREY, DARK_GREY);
 }
 
+void v_init_labels(struct olabel *h_label[]) {
+   int i_left, i_top, i_count = 0;
+   int i_height = h_small_font->ascent + h_small_font->descent;
+   i_top = KBD_TOP + 2* (SWITCH_HEIGHT + 1);
+   i_top = KBD_TOP + (KEY_HEIGHT) - i_height + 1 * SCALE_HEIGHT;
+   i_left = KBD_LEFT;
+   h_label[i_count++] = h_label_create(001, "1/x" , h_small_font, i_left, i_top, KEY_WIDTH, i_height, WHITE, BACKGROUND, True);
+   i_left += (KEY_WIDTH + KEY_GAP);
+   h_label[i_count++] = h_label_create(001, "/\xaf" , h_small_font, i_left, i_top, KEY_WIDTH, i_height, WHITE, BACKGROUND, True);
+   i_left += (KEY_WIDTH + KEY_GAP);
+   h_label[i_count++] = h_label_create(001, "yX" , h_small_font, i_left, i_top, KEY_WIDTH, i_height, WHITE, BACKGROUND, True);
+   i_left += (KEY_WIDTH + KEY_GAP);
+   h_label[i_count++] = h_label_create(001, "Rv" , h_small_font, i_left, i_top, KEY_WIDTH, i_height, WHITE, BACKGROUND, True);
+   i_left += (KEY_WIDTH + KEY_GAP);
+   h_label[i_count++] = h_label_create(001, "X-Y" , h_small_font, i_left, i_top, KEY_WIDTH, i_height, WHITE, BACKGROUND, True);
+}
+
 void v_init_buttons(struct obutton *h_button[]) {
    int i_left, i_top, i_count = 0;
 
    /* Define top row of keys. */
-   i_top = KBD_TOP + 2* (SWITCH_HEIGHT + 1); /* Assumes the function label and switch text use the same font */
-   i_top = KBD_TOP + KEY_HEIGHT + 2 * SCALE_HEIGHT + 1; /* Leave gap for card */
+   i_top = KBD_TOP + 2 * (SWITCH_HEIGHT + 1); /* Assumes the function label and switch text use the same font */
+   i_top = KBD_TOP + (KEY_HEIGHT) + 2 * SCALE_HEIGHT + 1; /* Leave gap for card */
    i_left = KBD_LEFT;
    h_button[i_count++] = h_button_create(00244, 'A', "A", "a", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, False, GREEN, YELLOW, MID_BLUE, BLACK);
    i_left += (KEY_WIDTH + KEY_GAP);
@@ -133,7 +151,7 @@ void v_init_buttons(struct obutton *h_button[]) {
    i_left += (KEY_NUMERIC + 2 * KEY_GAP );
    h_button[i_count++] = h_button_create(00101, '8', "8", "LOG", "10x", "Rv", h_large_font, h_small_font, h_alternate_font, i_left, i_top, KEY_NUMERIC, KEY_HEIGHT, False, False, LIGHT_GRAY, YELLOW, MID_BLUE, BLACK);
    i_left += (KEY_NUMERIC + 2 * KEY_GAP );
-   h_button[i_count++] = h_button_create(00100, '9', "9", "V\xaf", "x\xb2", "R^", h_large_font, h_small_font, h_alternate_font, i_left, i_top, KEY_NUMERIC, KEY_HEIGHT, False, False, LIGHT_GRAY, YELLOW, MID_BLUE, BLACK);
+   h_button[i_count++] = h_button_create(00100, '9', "9", "/\xaf", "x\xb2", "R^", h_large_font, h_small_font, h_alternate_font, i_left, i_top, KEY_NUMERIC, KEY_HEIGHT, False, False, LIGHT_GRAY, YELLOW, MID_BLUE, BLACK);
 
    /* Define sixth row of keys. */
    i_top += KBD_ROW;

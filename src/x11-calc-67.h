@@ -32,6 +32,7 @@
  *                     for buttons and switches into two functions - MT
  * 20 May 25         - Tidied up data structure definitions - MT
  * 11 Oct 25         - Modified key layout - MT
+ * 27 Oct 25         - Added function key labels - MT
  *
  */
 
@@ -40,6 +41,7 @@
 #define BUTTONS            35
 #define SWITCHES           2
 #define DIGITS             15
+#define LABELS             5
 
 #define DIGIT_COLOUR       RED
 #define DIGIT_BACKGROUND   DARK_RED
@@ -74,7 +76,7 @@
 #define ROM_SIZE           020000
 #define MEMORY_SIZE        256  /** Include buffer addresses and extended memory - KJC */
 
-#define NOT_CONTINIOUS
+#define CONTINIOUS
 
 extern int i_rom [ROM_SIZE];
 
