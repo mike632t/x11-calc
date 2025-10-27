@@ -30,6 +30,8 @@
  * 22 Apr 24         - Shortened long lines - MT
  * 23 Apr 24         - Separated out prototypes for error handlers - MT
  *                   - Removed unnecessary includes - MT
+ * 27 Oct 26         - Always  fills in the background (allowing a label to
+ *                     be hidden by disabling it) - NT
  *
  * TO DO:            - Implement ability to align text in a label using the
  *                     style property to modify the position and appearance
@@ -38,8 +40,8 @@
  */
 
 #define NAME           "x11-calc-label"
-#define BUILD          "0009"
-#define DATE           "23 Apr 24"
+#define BUILD          "0010"
+#define DATE           "27 Oct 25"
 #define AUTHOR         "MT"
 
 #include <errno.h>     /* errno */
@@ -139,17 +141,16 @@ int i_label_draw(Display *h_display, int x_application_window, int i_screen, str
    int i_indent, i_upper, i_offset;
    if (h_label != NULL)
    {
+      i_offset = h_label->label_position.y + h_label->label_position.height / 2;
+      XSetFont(h_display, DefaultGC(h_display, i_screen), h_label->text_font->fid); /* Set the text font. */
+      i_indent = 1 + h_label->label_position.x + (h_label->label_position.width - XTextWidth(h_label->text_font, h_label->text, strlen(h_label->text))) / 2; /* Find position of the text. */
+      i_upper = h_label->label_position.y + (h_label->text_font->ascent) + (h_label->label_position.height - (h_label->text_font->ascent + h_label->text_font->descent)) / 2; /* Position text in middle of label. */
+
+      XSetForeground(h_display, DefaultGC(h_display, i_screen), h_label->background);
+      XFillRectangle(h_display, x_application_window, DefaultGC(h_display, i_screen),
+         h_label->label_position.x, h_label->label_position.y , h_label->label_position.width, h_label->label_position.height); /* Always fill in label background. */
       if (h_label->state)
       {
-         i_offset = h_label->label_position.y + h_label->label_position.height / 2;
-         XSetFont(h_display, DefaultGC(h_display, i_screen), h_label->text_font->fid); /* Set the text font. */
-         i_indent = 1 + h_label->label_position.x + (h_label->label_position.width - XTextWidth(h_label->text_font, h_label->text, strlen(h_label->text))) / 2; /* Find position of the text. */
-         i_upper = h_label->label_position.y + (h_label->text_font->ascent) + (h_label->label_position.height - (h_label->text_font->ascent + h_label->text_font->descent)) / 2; /* Position text in middle of label. */
-
-         XSetForeground(h_display, DefaultGC(h_display, i_screen), h_label->background);
-         XFillRectangle(h_display, x_application_window, DefaultGC(h_display, i_screen),
-            h_label->label_position.x, h_label->label_position.y , h_label->label_position.width, h_label->label_position.height); /* Fill in label background. */
-
          XSetForeground(h_display, DefaultGC(h_display, i_screen), h_label->colour); /* Set the text colour. */
          if (h_label->state < 0)
             XDrawLine(h_display, x_application_window, DefaultGC(h_display, i_screen),
