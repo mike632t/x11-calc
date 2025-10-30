@@ -377,11 +377,14 @@
  *                     function state changes - MT
  *                   - Window geometry can be specified on the command line
  *                     (size is ignored) - MT
+ *                   - Reworked  the window hints.  By default  the  window
+ *                     will centred on the screen, but this will usually be
+ *                     ignored by the window manager unless the position is
+ *                     specified on the command line - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
- *                     of switches
- *                   - Add verbose option.
+ *                     of switches.
  *                   - Allow VMS users to set breakpoints?
  *                   - Free up allocated memory on exit.
  *                   - Sort out colour mapping.
@@ -521,6 +524,7 @@ int main(int argc, char *argv[])
    char b_cursor = True;               /* Draw a cursor */
    char b_run = True;                  /* Run flag controls CPU instruction execution in main loop */
    char b_abort = False;               /* Abort flag controls execution of main loop */
+   char b_geometry = False;            /* User specified window position */
 #if defined (__unix__)
    char b_numlock = False;             /* Use number pad - even if numlock is off */
 #endif
@@ -725,6 +729,7 @@ int main(int argc, char *argv[])
                            for (int i_offset = i_count + 1; i_offset < argc - 1; i_offset++)
                               argv[i_offset] = argv[i_offset + 1];
                         argc--;
+                        b_geometry = True;
                      }
                      else
                         v_error(EINVAL, h_err_geometry, c_geometry);
@@ -744,6 +749,7 @@ int main(int argc, char *argv[])
                               for (int i_offset = i_count + 1; i_offset < argc - 1; i_offset++)
                                  argv[i_offset] = argv[i_offset + 1];
                            argc--;
+                           b_geometry = True;
                         }
                         else
                            v_error(EINVAL, h_err_geometry, c_geometry);
@@ -884,6 +890,8 @@ int main(int argc, char *argv[])
          &i_colour_depth) == False)
       v_error(errno, h_err_display_properties);
 
+   debug(printf("%dx%d%+d%+d\n", i_window_width, i_window_height, i_window_left, i_window_top));
+
    if (i_colour_depth != COLOUR_DEPTH) v_error(errno, h_err_display_colour, COLOUR_DEPTH);  /* Check colour depth */
 
    if  (!(x_logo = XCreateBitmapFromData(x_display, x_window, (char*) logo_bits, logo_width, logo_height))) v_error(errno, h_err_pixmap);  /* Check colour depth */
@@ -921,15 +929,21 @@ int main(int argc, char *argv[])
 #endif
 
    /* Resize application window */
-   o_window_position.x = o_window_geometry.x * f_scale;
-   o_window_position.y = o_window_geometry.y * f_scale;
+   o_window_position.x = o_window_geometry.x;
+   o_window_position.y = o_window_geometry.y;
    o_window_position.width = o_window_geometry.width;
    o_window_position.height = o_window_geometry.height;
 
    h_size_hint = XAllocSizeHints();  /* Set application window size */
    h_size_hint->flags = PMinSize | PMaxSize;
-   h_size_hint->height = o_window_position.height;  /* Obsolete but used by some oli_window_leftder windows managers */
-   h_size_hint->width = o_window_position.width;  /* Obsolete but used by some older windows managers */
+   if (b_geometry)
+   {
+      h_size_hint->flags = h_size_hint->flags | USPosition;  /* Update flags */
+      h_size_hint->x = o_window_position.x;
+      h_size_hint->y = o_window_position.y;
+   }
+   h_size_hint->height = o_window_position.height;
+   h_size_hint->width = o_window_position.width;
    h_size_hint->min_height = o_window_position.height;
    h_size_hint->min_width = o_window_position.width;
    h_size_hint->max_height = o_window_position.height;
