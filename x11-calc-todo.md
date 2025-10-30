@@ -3,23 +3,17 @@
 
 ### Planned changes
 
+- [ ] Add a graphical printer display to the HP10
+
 - [ ] Use a fixed window, display and key sizes (don't use scale with for CLASSIC or  KISS)
-
-- [ ] Fix window resizing.  Using window hints to resize the window doesn't work in every environment
-
-  [https://tronche.com/gui/x/xlib/window/XMoveResizeWindow.html]::
 
 - [ ] Allow user to resize the window at runtime (scroll wheel?).
 
 - [ ] Formatted program listings (using a separate python script)
 
-- [ ] Add a graphical printer display to the HP10
-
 - [ ] Reorganize x11-calc and simplify the switch handling
 
 - [ ] Add HP65
-
-- [ ] Add proper card reader to HP67
 
 - [ ] Draw switches showing position (and not just labels)
 
@@ -44,6 +38,12 @@
 - [ ] Add HP41C
 
 ### Completed changes
+
+- [X] Allow user to specify window position.
+
+  [https://tronche.com/gui/x/xlib/window/XMoveResizeWindow.html]::
+
+- [X] Add card reader to HP67
 
 - [X] Added HP55 with timer mode
 
