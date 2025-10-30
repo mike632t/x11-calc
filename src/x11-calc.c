@@ -373,6 +373,10 @@
  *                   - Ignore right click if GTK isn't available - MT
  * 27 Oct 25         - Added  function key labels for HP67 (only shown when
  *                     function keys are enabled) - MT
+ * 30 Oct 25  (0201) - Update function key labels and redraw them when  the
+ *                     function state changes - MT
+ *                   - Window geometry can be specified on the command line
+ *                     (size is ignored) - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -500,13 +504,13 @@ int main(int argc, char *argv[])
 
    float f_scale = 1.0;
 
-   unsigned int i_screen_width;        /* Screen width */
-   unsigned int i_screen_height;       /* Screen height */
+   unsigned int i_screen_width = 0;    /* Screen width */
+   unsigned int i_screen_height = 0;   /* Screen height */
 
-   int i_window_top;                   /* Window top */
-   int i_window_left;                  /* Window left */
-   unsigned int i_window_width;        /* Window width */
-   unsigned int i_window_height;       /* Window height */
+   int i_window_top = 0;               /* Window top */
+   int i_window_left = 0;              /* Window left */
+   unsigned int i_window_width = 0;    /* Window width */
+   unsigned int i_window_height = 0;   /* Window height */
 
    unsigned int i_window_border = 4;   /* Window's border width */
    unsigned int i_colour_depth;        /* Window's colour depth */
@@ -532,7 +536,7 @@ int main(int argc, char *argv[])
    int i_ticks = -1;
 
 #if defined(HP67)
-   int i_last = 0;  /* Remember the state of function keys */
+   int i_last = 0;                     /* Used to determine if the state of function keys has changed */
 #endif
 
 #if defined(CONTINIOUS)
@@ -708,6 +712,45 @@ int main(int argc, char *argv[])
                      else
                         v_error(EINVAL, h_err_missing_argument, argv[i_count]);
                   }
+                  else if (!strncmp(argv[i_count], "--geometry=", 11)) /* Just check the first 11 characters match */
+                  {
+                     char *c_geometry = argv[i_count] + 11;
+                     char *c_char;
+
+                     for (c_char = c_geometry; *c_char; c_char++) /* Convert to lowercase before parsing */
+                        *c_char = (char)tolower((unsigned char)*c_char);
+                     if (XParseGeometry(c_geometry,  &i_window_left, &i_window_top, &i_window_width, &i_window_height))
+                     {
+                        if (i_count + 1 < argc)  /* Remove the parameter from the arguments */
+                           for (int i_offset = i_count + 1; i_offset < argc - 1; i_offset++)
+                              argv[i_offset] = argv[i_offset + 1];
+                        argc--;
+                     }
+                     else
+                        v_error(EINVAL, h_err_geometry, c_geometry);
+                  }
+                  else if (!strncmp(argv[i_count], "--geometry", i_index))
+                  {
+                     if (i_count + 1 < argc)
+                     {
+                        char *c_geometry = argv[i_count + 1];
+                        char *c_char;
+
+                        for (c_char = c_geometry; *c_char; c_char++) /* Convert to lowercase before parsing */
+                           *c_char = (char)tolower((unsigned char)*c_char);
+                        if (XParseGeometry(c_geometry,  &i_window_left, &i_window_top, &i_window_width, &i_window_height))
+                        {
+                           if (i_count + 2 < argc)  /* Remove the parameter from the arguments */
+                              for (int i_offset = i_count + 1; i_offset < argc - 1; i_offset++)
+                                 argv[i_offset] = argv[i_offset + 1];
+                           argc--;
+                        }
+                        else
+                           v_error(EINVAL, h_err_geometry, c_geometry);
+                     }
+                     else
+                        v_error(EINVAL, h_err_missing_argument, argv[i_count]);
+                  }
                   else if (!strncmp(argv[i_count], "--version", i_index))
                   {
                      v_version();  /* Display version information */
@@ -812,9 +855,14 @@ int main(int argc, char *argv[])
 
    o_window_position.width = (int)(WIDTH * f_scale);  /* Window width in pixels */
    o_window_position.height = (int)(HEIGHT * f_scale);  /* Window height in pixels */
-   o_window_position.x = (i_screen_width - o_window_position.width) / 2 ;  /* Centre window on screen - ignored by most window managers but useful in kiosk mode */
-   o_window_position.y = (i_screen_height - o_window_position.height) / 2;
-
+   if (!i_window_left)  /* If the window position wasn't specified just centre it on the screen - ignored by most window managers but useful in kiosk mode */
+      o_window_position.x = (i_screen_width - o_window_position.width) / 2;  /* Centre window on screen  */
+   else
+      o_window_position.x = i_window_left;  /* User specified position */
+   if (!i_window_top)
+      o_window_position.y = (i_screen_height - o_window_position.height) / 2;  /* Centre window on screen  */
+   else
+      o_window_position.y = i_window_top;  /* User specified position */
    o_window_geometry = o_window_position;  /* Save window position */
 
    x_window = XCreateSimpleWindow(x_display, /* Create the application window, as a child of the root window */
@@ -986,12 +1034,15 @@ int main(int argc, char *argv[])
          XCopyArea(x_display, x_buffer, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
          i_count = INTERVAL;
 #if defined(HP67)
-         i_wait(INTERVAL / 4);   /* Sleep for ~6.25 ms per tick */
          if (i_last != h_processor->crc[FUNCTION]) /* Has the state of the function keys changed ? */
          {
-            XClearArea(x_display, x_window, 0, 0, 0, 0, True);  /* Force display to refresh - bit of a fudge.. */
+            for (i_count = 0; i_count < LABELS; i_count++)  /* Update label state */
+               h_label[i_count]->state = h_processor->crc[FUNCTION];
+            for (i_count = 0; i_count < LABELS; i_count++)  /* Draw labels */
+               i_label_draw(x_display, x_buffer, i_screen, h_label[i_count]);
             i_last = h_processor->crc[FUNCTION]; /* Remember the state of function keys */
          }
+         i_wait(INTERVAL / 4);   /* Sleep for ~6.25 ms per tick */
 #elif defined(HP55)
          i_wait(INTERVAL / 3.1); /* Sleep for ~???? ms per tick */
 #elif defined(VOYAGER) || defined(SPICE)
@@ -1227,10 +1278,6 @@ int main(int argc, char *argv[])
                int i_count;
                i_display_draw(x_display, x_buffer, i_screen, h_display);/* Draw display */
 #if defined(LABELS)
-#if defined(HP67)
-               for (i_count = 0; i_count < LABELS; i_count++)  /* Update label state */
-                  h_label[i_count]->state = h_processor->crc[FUNCTION];
-#endif
                for (i_count = 0; i_count < LABELS; i_count++)  /* Draw labels */
                   i_label_draw(x_display, x_buffer, i_screen, h_label[i_count]);
 #endif

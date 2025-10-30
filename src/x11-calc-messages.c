@@ -61,12 +61,13 @@
  * 29 Jun 25         - Changed command line option for the european display
  *                     format to '-c' or '--comma', and updated text - MT
  * 10 Sep 25         - Changed message variable names - MT
+ * 30 Oct 25         - Added invalid window geometry message - MT
  *
  */
 
 #define NAME           "x11-calc-messages"
-#define BUILD          "0028"
-#define DATE           "10 Sep 25"
+#define BUILD          "0029"
+#define DATE           "30 Oct 25"
 #define AUTHOR         "MT"
 
 #if defined(HP10c) || defined(HP11c) || defined(HP12c)|| defined(HP15c) || defined(HP16c)
@@ -80,9 +81,12 @@ License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\n
 This is free software: you are free to change and redistribute it.\n\
 There is NO WARRANTY, to the extent permitted by law.\n";
 
+/* Messages awaiting translation */
 const char *h_err_creating_file = "Can't create '%s'.\n";
 const char *h_err_memmory_alloc = "Memory allocation failed in %s line : %d\n";
 const char *h_err_ROM = "Empty ROM - no firmware loaded.\n";
+
+const char *h_err_geometry = "Invalid geometry: %s (expected: WxH[+X+Y])\n";
 
 #if defined(HEXADECIMAL)
 const char *h_msg_opcode = "%1x-%03x  %03x   ";
