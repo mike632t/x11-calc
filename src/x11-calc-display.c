@@ -101,7 +101,7 @@
  * 14 Sep 25         - Display  decoder for HP35, HP45, HP70, HP80 and HP55
  *                     completely rewritten to handle the timer and program
  *                     modes - MT
- *                   - HP55 now displays the timer using colons to seperate 
+ *                   - HP55 now displays the timer using colons to seperate
  *                     hours, minutes and seconds - MT
  *
  */
@@ -205,43 +205,43 @@ struct odisplay *h_display_create(int i_index, int i_left, int i_top, int i_widt
    i_width = 1 + XTextWidth(h_small_font, "USER ", 5) * SCALE_WIDTH;
    i_left = i_display_left + (i_width / 4) * SCALE_WIDTH;
    h_display->label[0] = h_label_create(001, "USER " , h_small_font, i_left, i_top,
-      i_width, i_height, i_foreground, i_background, False);
+      i_width, i_height, i_foreground, i_background, LABEL_ALIGN_CENTER, False, False);
    i_left += i_width;
    i_width = 1 + XTextWidth(h_small_font, "f ", 2) * SCALE_WIDTH;
    h_display->label[1] = h_label_create(002, "f " , h_small_font, i_left, i_top,
-      i_width, i_height, i_foreground, i_background, False);
+      i_width, i_height, i_foreground, i_background, LABEL_ALIGN_CENTER, False, False);
    i_left += i_width;
    i_width = 1 + XTextWidth(h_small_font, "g ", 2) * SCALE_WIDTH;
    h_display->label[2] = h_label_create(003, "g " , h_small_font, i_left, i_top,
-      i_width, i_height, i_foreground, i_background, False);
+      i_width, i_height, i_foreground, i_background, LABEL_ALIGN_CENTER, False, False);
    i_left += i_width;
 #if defined(HP12c)
    i_width = 1 + XTextWidth(h_small_font, "BEGIN ", 6) * SCALE_WIDTH;
    h_display->label[3] = h_label_create(004, "BEGIN " , h_small_font, i_left, i_top,
-      i_width, i_height, i_foreground, i_background, False);
+      i_width, i_height, i_foreground, i_background, LABEL_ALIGN_CENTER, False, False);
    i_left += i_width;
    h_display->label[4] = NULL;
 #else
    i_width = 1 + XTextWidth(h_small_font, "  RAD ", 6) * SCALE_WIDTH;
    h_display->label[3] = h_label_create(004, "  RAD " , h_small_font, i_left, i_top,
-      i_width, i_height, i_foreground, i_background, False);
+      i_width, i_height, i_foreground, i_background, LABEL_ALIGN_CENTER, False, False);
    i_width = 1 + XTextWidth(h_small_font, " GRAD ", 6) * SCALE_WIDTH;
    h_display->label[4] = h_label_create(005, " GRAD " , h_small_font, i_left, i_top,
-      i_width, i_height, i_foreground, i_background, False);
+      i_width, i_height, i_foreground, i_background, LABEL_ALIGN_CENTER, False, False);
    i_left += i_width;
 #endif
    i_width = 1 + XTextWidth(h_small_font, " D.MY ", 6) * SCALE_WIDTH;
    h_display->label[5] = h_label_create(006, " D.MY " , h_small_font, i_left, i_top,
-      i_width, i_height, i_foreground, i_background, False);
+      i_width, i_height, i_foreground, i_background, LABEL_ALIGN_CENTER, False, False);
    i_left += i_width;
 
    i_width = 1 + XTextWidth(h_small_font, " C ", 3) * SCALE_WIDTH;
    h_display->label[6] = h_label_create(007, " C " , h_small_font, i_left, i_top,
-      i_width, i_height, i_foreground, i_background, False);
+      i_width, i_height, i_foreground, i_background, LABEL_ALIGN_CENTER, False, False);
    i_left += i_width;
    i_width = 1 + XTextWidth(h_small_font, " PRGM ", 6) * SCALE_WIDTH;
    h_display->label[7] = h_label_create(010, " PRGM " , h_small_font, i_left, i_top,
-      i_width, i_height, i_foreground, i_background, False);
+      i_width, i_height, i_foreground, i_background, LABEL_ALIGN_CENTER, False, False);
 #endif
 
    return (h_display);

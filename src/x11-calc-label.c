@@ -33,6 +33,7 @@
  * 27 Oct 26         - Always  fills in the background (allowing a label to
  *                     be hidden by disabling it) - NT
  *                   - Allow use of NULL string - MT
+ * 28 Oct 25         - Added alignment and text attributes - MT
  *
  * TO DO:            - Implement ability to align text in a label using the
  *                     style property to modify the position and appearance
@@ -47,12 +48,12 @@
 
 #include <errno.h>     /* errno */
 
-#include <string.h>    /* strlen(), etc. */
-#include <stdio.h>     /* fprintf(), etc. */
-#include <stdlib.h>    /* malloc(), etc. */
+#include <string.h>    /* strlen(), etc */
+#include <stdio.h>     /* fprintf(), etc */
+#include <stdlib.h>    /* malloc(), etc */
 
-#include <X11/Xlib.h>  /* XOpenDisplay(), etc. */
-#include <X11/Xutil.h> /* XSizeHints etc. */
+#include <X11/Xlib.h>  /* XOpenDisplay(), etc */
+#include <X11/Xutil.h> /* XSizeHints etc */
 
 #include "x11-calc-messages.h"
 #include "x11-calc-errors.h"
@@ -63,11 +64,10 @@
 
 #include "gcc-debug.h"
 
-/* label_pressed (label, x, y) */
+/* label_pressed(label, x, y) */
 
-struct olabel *h_label_pressed(struct olabel *h_label, int i_xpos, int i_ypos)
+struct olabel *h_label_pressed(struct olabel *h_label, int i_xcordinate, int i_ycordinate)
 {
-
    int i_indent, i_extent, i_upper, i_lower;
 
    i_indent = h_label->label_position.x;
@@ -75,8 +75,8 @@ struct olabel *h_label_pressed(struct olabel *h_label, int i_xpos, int i_ypos)
    i_upper = h_label->label_position.y;
    i_lower = h_label->label_position.y + h_label->label_position.height;
 
-   if (((i_xpos > i_indent ) && (i_xpos < i_extent)) &&
-      ((i_ypos > i_upper ) && (i_ypos < i_lower)))
+   if (((i_xcordinate > i_indent ) && (i_xcordinate < i_extent)) &&
+      ((i_ycordinate > i_upper ) && (i_ycordinate < i_lower)))
       return(h_label);
    return(NULL);
 }
@@ -85,39 +85,32 @@ struct olabel *h_label_pressed(struct olabel *h_label, int i_xpos, int i_ypos)
 
 struct olabel *h_label_create(int i_index, char* s_text, XFontStruct *h_font,
    int i_left, int i_top, int i_width, int i_height,
-   unsigned int i_colour, unsigned int i_background, int i_state)
+   unsigned int i_colour, unsigned int i_background, int i_alignment,
+   int i_attributes, int i_state)
 {
+   struct olabel *h_label;  /* Pointer to label */
 
-   struct olabel *h_label; /* Pointer to label. */
-
-   /* Attempt to allocate memory for a label. */
-   if ((h_label = malloc (sizeof(*h_label)))==NULL) v_error(errno, h_err_memmory_alloc, __FILE__, __LINE__);
+   if ((h_label = malloc (sizeof(*h_label)))==NULL) v_error(errno, h_err_memmory_alloc, __FILE__, __LINE__);  /* Attempt to allocate memory for a label */
 
    h_label->index = i_index;
    h_label->text = s_text;
    h_label->text_font = h_font;
-
-   h_label->label_position.x = i_left;
-
    h_label->label_position.x = i_left;
    h_label->label_position.y = i_top;
    h_label->label_position.width = i_width;
    h_label->label_position.height = i_height;
 
-   h_label->label_geometry = h_label->label_position; /* Save position */
+   h_label->label_geometry = h_label->label_position;  /* Save position */
 
    h_label->colour = i_colour;
    h_label->background = i_background;
+   h_label->attributes = i_attributes;
+   h_label->alignment = i_alignment;
    h_label->state = i_state;
    return(h_label);
 }
 
-/*
- * label_resize (display, scale)
- *
- * Resize label based on original geometery
- *
- */
+/* label_resize (display, scale) */
 
 int i_label_resize(struct olabel *h_label, float f_scale)
 {
@@ -129,43 +122,46 @@ int i_label_resize(struct olabel *h_label, float f_scale)
    return 0;
 }
 
-/*
- * label_draw (display, window, screen, label)
- *
- * Draw a label.
- *
- */
+/* label_draw (display, window, screen, label) */
 
 int i_label_draw(Display *h_display, int x_application_window, int i_screen, struct olabel *h_label)
 {
 
-   int i_indent, i_upper, i_offset;
+   int i_indent, i_upper, i_offset, i_margin = 2;
    if (h_label != NULL)
    {
-      i_offset = h_label->label_position.y + h_label->label_position.height / 2;
-      XSetFont(h_display, DefaultGC(h_display, i_screen), h_label->text_font->fid); /* Set the text font. */
+      XSetFont(h_display, DefaultGC(h_display, i_screen), h_label->text_font->fid);  /* Set the text font */
 
       XSetForeground(h_display, DefaultGC(h_display, i_screen), h_label->background);
       XFillRectangle(h_display, x_application_window, DefaultGC(h_display, i_screen),
-         h_label->label_position.x, h_label->label_position.y , h_label->label_position.width, h_label->label_position.height); /* Always fill in label background. */
+         h_label->label_position.x, h_label->label_position.y , h_label->label_position.width, h_label->label_position.height);  /* Always fill in label background */
       if ((h_label->state) && (h_label->text))
       {
-         i_indent = 1 + h_label->label_position.x + (h_label->label_position.width - XTextWidth(h_label->text_font, h_label->text, strlen(h_label->text))) / 2; /* Find position of the text. */
-         i_upper = h_label->label_position.y + (h_label->text_font->ascent) + (h_label->label_position.height - (h_label->text_font->ascent + h_label->text_font->descent)) / 2; /* Position text in middle of label. */
-         XSetForeground(h_display, DefaultGC(h_display, i_screen), h_label->colour); /* Set the text colour. */
-         if (h_label->state < 0)
+         XSetForeground(h_display, DefaultGC(h_display, i_screen), h_label->colour);  /* Set the text colour */
+         if (h_label->attributes)
+         {
+            i_offset = h_label->label_position.y + h_label->label_position.height / 2;  /* Find offset to middle of label */
             XDrawLine(h_display, x_application_window, DefaultGC(h_display, i_screen),
-            h_label->label_position.x , i_offset, h_label->label_position.x + h_label->label_position.width - 2, i_offset); /* Draw line through middle of label. */
-
+            h_label->label_position.x , i_offset, h_label->label_position.x + h_label->label_position.width - 2, i_offset);  /* Draw line through middle of label */
+         }
+         switch (h_label->alignment)
+         {
+            case LABEL_ALIGN_LEFT:
+               i_indent = 1 + h_label->label_position.x + XTextWidth(h_label->text_font, " ", 1) + i_margin;  /* Text left aligned */
+               break;
+            case LABEL_ALIGN_RIGHT:
+               i_indent = 1 + h_label->label_position.x + (h_label->label_position.width - XTextWidth(h_label->text_font, h_label->text, strlen(h_label->text)) - XTextWidth(h_label->text_font, " ", 1)) - i_margin;  /* Text right aligned */
+               break;
+            default:
+               i_indent = 1 + h_label->label_position.x + (h_label->label_position.width - XTextWidth(h_label->text_font, h_label->text, strlen(h_label->text))) / 2;  /* Text centre aligned */
+         }
+         i_upper = h_label->label_position.y + (h_label->text_font->ascent) + (h_label->label_position.height - (h_label->text_font->ascent + h_label->text_font->descent)) / 2;  /* Position text in middle of label */
          XSetForeground(h_display, DefaultGC(h_display, i_screen), h_label->background);
          XFillRectangle(h_display, x_application_window, DefaultGC(h_display, i_screen),
-            (i_indent - 3), h_label->label_position.y , XTextWidth(h_label->text_font, h_label->text, strlen(h_label->text)) + 5, h_label->label_position.height); /* Fill in label background. */
-
-         XSetForeground(h_display, DefaultGC(h_display, i_screen), h_label->colour); /* Set the background colour. */
-         XDrawString(h_display, x_application_window, DefaultGC(h_display, i_screen), i_indent, i_upper, h_label->text, strlen(h_label->text)); /* Draw the text. */
+            (i_indent - 3), h_label->label_position.y , XTextWidth(h_label->text_font, h_label->text, strlen(h_label->text)) + 5, h_label->label_position.height);  /* Fill in label background */
+         XSetForeground(h_display, DefaultGC(h_display, i_screen), h_label->colour);  /* Set the background colour */
+         XDrawString(h_display, x_application_window, DefaultGC(h_display, i_screen), i_indent, i_upper, h_label->text, strlen(h_label->text));  /* Draw the text */
       }
    }
    return(True);
 }
-
-

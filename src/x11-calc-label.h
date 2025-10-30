@@ -21,26 +21,34 @@
  * 29 Jul 13         - Initial version - MT
  * 12 Mar 22         - Implemented a state property allowing the appearance
  *                     of the label to be changed (hidden, or no line) - MT
+ * 28 Oct 25         - Added alignment and text attributes - MT
  *
  */
 
-struct olabel/* Calculator label structure */
+#define LABEL_ALIGN_CENTER 0
+#define LABEL_ALIGN_LEFT   1
+#define LABEL_ALIGN_RIGHT  2
+
+struct olabel  /* Calculator label structure */
 {
    int index;
    XRectangle label_position;    /* Current label position */
    XRectangle label_geometry;    /* Original label position */
-   char* text; /* Text */
-   XFontStruct* text_font; /* Pointer to font */
-   unsigned int colour; /* Colour */
-   unsigned int background; /* Background colour */
-   int state; /* Visible */
+   char* text;                   /* Text */
+   XFontStruct* text_font;       /* Font */
+   unsigned int colour;          /* Colour */
+   unsigned int background;      /* Background colour */
+   int attributes;               /* Strike-through */
+   int alignment;                /* Centre left or right */
+   int state;                    /* Enabled */
 };
 
 struct olabel *h_label_pressed(struct olabel *h_label, int i_xpos, int i_ypos);
 
 struct olabel *h_label_create(int i_index, char* s_text, XFontStruct *h_font,
    int i_left, int i_top, int i_width, int i_height,
-   unsigned int i_colour, unsigned int i_background, int i_state);
+   unsigned int i_colour, unsigned int i_background, int i_alignmanet,
+   int i_attributes, int i_state);
 
 int i_label_resize(struct olabel *h_label, float f_scale);
 

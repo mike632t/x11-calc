@@ -24,6 +24,7 @@
  * 12 Mar 22         - Added the label state property - MT
  * 18 Mar 24         - Embedded firmware - MT
  * 22 Apr 24         - Removed duplicate definition - MT
+ * 29 Oct 25         - Updated labels to add alignment and attribute - MT
  *
  */
 
@@ -53,22 +54,22 @@
 
 oregister o_mem[MEMORY_SIZE];
 
-void v_init_labels(struct olabel *h_label[]) {
+void v_init_labels(struct olabel *h_label[])
+{
    int i_height = h_small_font->ascent + h_small_font->descent;
    h_label[2] = h_label_create(001, "BOND" , h_alternate_font, KBD_LEFT,
       KBD_TOP + KEY_HEIGHT +  KBD_ROW - 2 * i_height + h_small_font->descent,
-      2 * KEY_WIDTH + KEY_GAP, i_height, YELLOW, BACKGROUND, -1);
-
+      2 * KEY_WIDTH + KEY_GAP, i_height, YELLOW, BACKGROUND, LABEL_ALIGN_CENTER, True, True);
    h_label[1] = h_label_create(001, "DEPRECIATION" , h_alternate_font, KBD_LEFT + 2 * (KEY_WIDTH + KEY_GAP),
       KBD_TOP + KEY_HEIGHT +  KBD_ROW - 2 * i_height + h_small_font->descent,
-      2 * (KEY_WIDTH + KEY_GAP) + KEY_WIDTH, i_height, YELLOW, BACKGROUND, -1);
-
+      2 * (KEY_WIDTH + KEY_GAP) + KEY_WIDTH, i_height, YELLOW, BACKGROUND, LABEL_ALIGN_CENTER, True, True);
    h_label[0] = h_label_create(001, "CLEAR" , h_alternate_font, KBD_LEFT + KEY_WIDTH + KEY_GAP,
       KBD_TOP + KEY_HEIGHT +  2 * (KBD_ROW - i_height) + h_small_font->descent,
-      4 * (KEY_WIDTH + KEY_GAP) + KEY_WIDTH, i_height, YELLOW, BACKGROUND, -1);
+      4 * (KEY_WIDTH + KEY_GAP) + KEY_WIDTH, i_height, YELLOW, BACKGROUND, LABEL_ALIGN_CENTER, True, True);
 }
 
-void v_init_buttons(struct obutton *h_button[]) {
+void v_init_buttons(struct obutton *h_button[])
+{
    int i_left, i_top, i_count;
 
    /* Define top row of keys. */

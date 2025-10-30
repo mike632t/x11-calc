@@ -36,6 +36,7 @@
  *                     switches - MT
  * 20 May 25         - Tidied up data structure definitions - MT
  * 27 Oct 25         - Added function key labels - MT
+ * 29 Oct 25         - Updated labels to add alignment and attribute - MT
  *                   - Added a label as placeholder for a program card - MT
  *
  */
@@ -76,21 +77,22 @@ void v_init_labels(struct olabel *h_label[])
 {
    XFontStruct *h_label_font = h_small_font;
    int i_left, i_top, i_count = 0;
-   int i_height = h_small_font->ascent + h_small_font->descent;
+   int i_height = h_label_font->ascent + h_label_font->descent;
 
    i_top = KBD_TOP + SWITCH_HEIGHT + 1 * SCALE_HEIGHT;
    i_left = KBD_LEFT;
-   h_label[i_count++] = h_label_create(001, NULL, h_label_font, i_left, i_top, 5 * KEY_WIDTH + 4 * KEY_GAP, KEY_HEIGHT - SWITCH_HEIGHT, WHITE, BACKGROUND, True); /* Draws background for program card */
-   i_top += (KEY_HEIGHT) - SWITCH_HEIGHT - i_height + 1 * SCALE_HEIGHT;
-   h_label[i_count++] = h_label_create(001, "1/x", h_label_font, i_left, i_top, KEY_WIDTH, i_height, WHITE, BACKGROUND, True);
+   h_label[i_count++] = h_label_create(001, NULL, h_label_font, i_left, i_top, 5 * KEY_WIDTH + 4 * KEY_GAP, KEY_HEIGHT - SWITCH_HEIGHT, WHITE, BACKGROUND, LABEL_ALIGN_CENTER, False, True);  /* Draws background for program card */
+   h_label[i_count++] = h_label_create(001, NULL, h_alternate_font, i_left + KEY_GAP, i_top, 5 * KEY_WIDTH + 4 * KEY_GAP, i_height, WHITE, BACKGROUND, LABEL_ALIGN_LEFT, False, True);  /* Draws background for program card */
+   i_top += (KEY_HEIGHT) - SWITCH_HEIGHT - i_height;
+   h_label[i_count++] = h_label_create(001, "1/x", h_label_font, i_left, i_top, KEY_WIDTH, i_height, WHITE, BACKGROUND, LABEL_ALIGN_CENTER, False, False);
    i_left += (KEY_WIDTH + KEY_GAP);
-   h_label[i_count++] = h_label_create(001, "/\xaf", h_label_font, i_left, i_top, KEY_WIDTH, i_height, WHITE, BACKGROUND, True);
+   h_label[i_count++] = h_label_create(001, "/\xaf", h_label_font, i_left, i_top, KEY_WIDTH, i_height, WHITE, BACKGROUND, LABEL_ALIGN_CENTER, False, False);
    i_left += (KEY_WIDTH + KEY_GAP);
-   h_label[i_count++] = h_label_create(001, "yX", h_label_font, i_left, i_top, KEY_WIDTH, i_height, WHITE, BACKGROUND, True);
+   h_label[i_count++] = h_label_create(001, "yX", h_label_font, i_left, i_top, KEY_WIDTH, i_height, WHITE, BACKGROUND, LABEL_ALIGN_CENTER, False, False);
    i_left += (KEY_WIDTH + KEY_GAP);
-   h_label[i_count++] = h_label_create(001, "Rv", h_label_font, i_left, i_top, KEY_WIDTH, i_height, WHITE, BACKGROUND, True);
+   h_label[i_count++] = h_label_create(001, "Rv", h_label_font, i_left, i_top, KEY_WIDTH, i_height, WHITE, BACKGROUND, LABEL_ALIGN_CENTER, False, False);
    i_left += (KEY_WIDTH + KEY_GAP);
-   h_label[i_count++] = h_label_create(001, "X-Y", h_label_font, i_left, i_top, KEY_WIDTH, i_height, WHITE, BACKGROUND, True);
+   h_label[i_count++] = h_label_create(001, "X-Y", h_label_font, i_left, i_top, KEY_WIDTH, i_height, WHITE, BACKGROUND, LABEL_ALIGN_CENTER, False, False);
 }
 
 void v_init_buttons(struct obutton *h_button[]) {
