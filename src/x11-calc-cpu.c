@@ -720,8 +720,7 @@ void v_card_open_file(oprocessor* h_processor)
         if (s_filename)
             if ((h_processor->card_file = fopen(s_filename, "r"))) printf("Reading '%s'\n", s_filename);
     }
-
-    h_processor->crc[CARD] = False ;  /* kjc: Card removed immediately after starting */
+    h_processor->crc[CARD] = False ;  /* Card removed immediately - KJC */
 }
 
 void v_card_close_file(oprocessor* h_processor)

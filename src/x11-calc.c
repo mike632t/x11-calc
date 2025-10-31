@@ -381,6 +381,7 @@
  *                     will centred on the screen, but this will usually be
  *                     ignored by the window manager unless the position is
  *                     specified on the command line - MT
+ *                   - Remove any program cards when powering off - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -393,7 +394,7 @@
 
 #define  NAME          "x11-calc"
 #define  VERSION       "0.19"
-#define  BUILD         "0203"
+#define  BUILD         "0204"
 #define  DATE          "30 Oct 25"
 #define  AUTHOR        "MT"
 
@@ -473,6 +474,23 @@ void v_set_blank_cursor(Display *x_display, Window x_window, Cursor *x_cursor)
    x_blank = XCreateBitmapFromData (x_display, x_window, h_pixmap_data, 1, 1);  /* Create an empty bitmap */
    (*x_cursor) = XCreatePixmapCursor(x_display, x_blank, x_blank, &x_Color, &x_Color, 0, 0);  /* Use the empty pixmap to create a blank cursor */
    XFreePixmap (x_display, x_blank);  /* Free up pixmap */
+}
+
+char* s_reformat(char *s_string)  /* Re-formats the card filename as a program name */
+{
+   int i = 0;
+
+   while (s_string[i])
+   {
+      if (s_string[i] == '_' || s_string[i] == '-') s_string[i] = ' ';  /* Replace underscores and hyphens with spaces */
+
+      if (i == 0 || s_string[i - 1] == ' ')
+         s_string[i] = (char)toupper((unsigned char)s_string[i]);  /* Convert initial letters of each word to uppercase */
+      else
+         s_string[i] = (char)tolower((unsigned char)s_string[i]);  /* Everything else is lowercase */
+      i++;
+   }
+   return s_string;  /* Return pointer to updated string */
 }
 
 char b_search(int *a, int m, int n) /* Linear search. */
@@ -1195,6 +1213,7 @@ int main(int argc, char *argv[])
 #endif
                         h_processor->enabled = False;  /* Disable the processor */
 #if defined(HP67)
+                        h_processor->crc[FUNCTION] = True;  /* Reinstate function keys */
                         i_ticks = DELAY * 4;  /* Set count down */
 #elif defined(VOYAGER)
                         i_ticks = DELAY * 3;

@@ -141,8 +141,8 @@ typedef struct {
    unsigned char flags[FLAGS];         /* Processor flags*/
    unsigned char status[STATUS_BITS];  /* Status (S0 - S15) */
 #if defined(HP67)
-   unsigned char crc[STATES];          /* Card reader states */
    FILE* card_file;                    /* Open card file (NULL = not opened) - KJC */
+   unsigned char crc[STATES];          /* Card reader states */
    int card_records;                   /* Number of records read/written, cleared at open - KJC */
 #endif
    unsigned int opcode;                /* Last opcode */

@@ -81,8 +81,8 @@ void v_init_labels(struct olabel *h_label[])
 
    i_top = KBD_TOP + SWITCH_HEIGHT + 1 * SCALE_HEIGHT;
    i_left = KBD_LEFT;
-   h_label[i_count++] = h_label_create(001, NULL, h_label_font, i_left, i_top, 5 * KEY_WIDTH + 4 * KEY_GAP, KEY_HEIGHT - SWITCH_HEIGHT, WHITE, BACKGROUND, LABEL_ALIGN_CENTER, False, True);  /* Draws background for program card */
-   h_label[i_count++] = h_label_create(001, NULL, h_alternate_font, i_left + KEY_GAP, i_top, 5 * KEY_WIDTH + 4 * KEY_GAP, i_height, WHITE, BACKGROUND, LABEL_ALIGN_LEFT, False, True);  /* Draws background for program card */
+   /** h_label[i_count++] = h_label_create(001, NULL, h_label_font, i_left, i_top, 5 * KEY_WIDTH + 4 * KEY_GAP, KEY_HEIGHT - SWITCH_HEIGHT, WHITE, BACKGROUND, LABEL_ALIGN_CENTER, False, True);  /* Draws background for program card */
+   /** h_label[i_count++] = h_label_create(001, NULL, h_alternate_font, i_left + KEY_GAP, i_top, 5 * KEY_WIDTH + 4 * KEY_GAP, i_height, WHITE, BACKGROUND, LABEL_ALIGN_LEFT, False, True);  /* Draws background for program card */
    i_top += (KEY_HEIGHT) - SWITCH_HEIGHT - i_height;
    h_label[i_count++] = h_label_create(001, "1/x", h_label_font, i_left, i_top, KEY_WIDTH, i_height, WHITE, BACKGROUND, LABEL_ALIGN_CENTER, False, False);
    i_left += (KEY_WIDTH + KEY_GAP);
