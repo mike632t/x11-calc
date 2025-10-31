@@ -382,6 +382,7 @@
  *                     ignored by the window manager unless the position is
  *                     specified on the command line - MT
  *                   - Remove any program cards when powering off - MT
+ *                   - Update function key labels at startup - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -394,7 +395,7 @@
 
 #define  NAME          "x11-calc"
 #define  VERSION       "0.19"
-#define  BUILD         "0204"
+#define  BUILD         "0205"
 #define  DATE          "30 Oct 25"
 #define  AUTHOR        "MT"
 
@@ -558,7 +559,7 @@ int main(int argc, char *argv[])
    int i_ticks = -1;
 
 #if defined(HP67)
-   int i_last = 0;                     /* Used to determine if the state of function keys has changed */
+   int i_last;                         /* Used to determine if the state of function keys has changed */
 #endif
 
 #if defined(CONTINIOUS)
@@ -1010,6 +1011,10 @@ int main(int argc, char *argv[])
       else
          v_read_state(h_processor, s_pathname);  /* Load user specified settings */
    }
+#endif
+
+#if defined(HP67)
+   i_last = !h_processor->crc[FUNCTION];  /* Force function keys labels to be updated */
 #endif
 
 #if defined(SWITCHES)
