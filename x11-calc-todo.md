@@ -5,9 +5,9 @@
 
 - [ ] Add a graphical printer display to the HP10
 
-- [ ] Use a fixed window, display and key sizes (don't use scale with for CLASSIC or  KISS)
-
 - [ ] Allow user to resize the window at runtime (scroll wheel?).
+
+- [ ] Allow pre-recorded program cards to include labels
 
 - [ ] Formatted program listings (using a separate python script)
 
