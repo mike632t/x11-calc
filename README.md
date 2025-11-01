@@ -17,7 +17,7 @@ The  aim  is to have the same source code compile without  modification  on
 as  many  systems  and architectures as possible including  Linux,  NetBSD,
 MacOS, VMS, Solaris and Tru64 Unix.
 
- ![HP67](./img/x11-calc-67-card.png) ![HP25](./img/x11-calc-25.png) ![HP34C](./img/x11-calc-34c.png)
+ ![HP67](./img/x11-calc-67.png) ![HP67](./img/x11-calc-67-card.png) ![HP25](./img/x11-calc-25.png) ![HP34C](./img/x11-calc-34c.png)
  ![HP10](./img/x11-calc-10c.png) ![HP11](./img/x11-calc-11c.png)
 
 ### Contents <sup><sup>[Back to Top](#top)</sup></sup>
