@@ -34,7 +34,7 @@
  *                     be hidden by disabling it) - NT
  *                   - Allow use of NULL string - MT
  * 28 Oct 25         - Added alignment and text attributes - MT
- * 31 Oct 25         - Tidied up label object properties - MT
+ * 31 Oct 25         - Tidied up label properties - MT
  *
  * TO DO:            - Implement ability to align text in a label using the
  *                     style property to modify the position and appearance

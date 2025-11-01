@@ -104,6 +104,7 @@
  *                   - HP55 now displays the timer using colons to seperate
  *                     hours, minutes and seconds - MT
  * 01 Nov 25         - Added cards - MT
+ *                   - Fixed label properties - MT
  *
  */
 
@@ -313,9 +314,9 @@ int i_display_resize(struct odisplay *h_display, float f_scale)  /* Resize displ
    {
       if (!(h_display->label[i_count] == NULL))
       {
-         h_display->label[i_count]->label_position.x = h_display->label[i_count]->label_position.x * f_scale;
-         h_display->label[i_count]->label_position.y = h_display->bezel_position.y + h_display->display_position.height - h_small_font->descent;
-         h_display->label[i_count]->label_position.width = h_display->label[i_count]->label_geometry.width * f_scale;
+         h_display->label[i_count]->position.x = h_display->label[i_count]->position.x * f_scale;
+         h_display->label[i_count]->position.y = h_display->bezel_position.y + h_display->display_position.height - h_small_font->descent;
+         h_display->label[i_count]->position.width = h_display->label[i_count]->geometry.width * f_scale;
       }
    }
 #endif
