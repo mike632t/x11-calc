@@ -383,6 +383,7 @@
  *                     specified on the command line - MT
  *                   - Remove any program cards when powering off - MT
  *                   - Update function key labels at startup - MT
+ * 01 Nov 25         - Added cards replace the function key labels - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -395,8 +396,8 @@
 
 #define  NAME          "x11-calc"
 #define  VERSION       "0.19"
-#define  BUILD         "0205"
-#define  DATE          "30 Oct 25"
+#define  BUILD         "0206"
+#define  DATE          "01 Nov 25"
 #define  AUTHOR        "MT"
 
 #define  INTERVAL 48   /* Number of ticks to execute before updating the display */
@@ -419,11 +420,12 @@
 #include "x11-calc-messages.h"
 #include "x11-calc-errors.h"
 
+#include "x11-calc-colour.h"
 #include "x11-calc-font.h"
 #include "x11-calc-button.h"
 #include "x11-calc-switch.h"
 #include "x11-calc-label.h"
-#include "x11-calc-colour.h"
+#include "x11-calc-card.h"
 
 #include "x11-calc.h"
 
@@ -477,28 +479,46 @@ void v_set_blank_cursor(Display *x_display, Window x_window, Cursor *x_cursor)
    XFreePixmap (x_display, x_blank);  /* Free up pixmap */
 }
 
-char* s_reformat(char *s_string)  /* Re-formats the card filename as a program name */
+char* s_reformat(const char *s_string)
 {
-   int i = 0;
+   char *s_output;
+   int i_count = 0;
+   int i_length = 0;
 
-   while (s_string[i])
+   if (strncmp(s_string, FILENAME, strlen(FILENAME)) == 0)
+      s_string = s_string + strlen(FILENAME) + 1;  /* Ignore the prefix */
+
+   if (strrchr(s_string, '.') == NULL)
+      i_length = strlen(s_string);
+   else
+      i_length = strrchr(s_string, '.') - s_string;
+
+   if ((s_output = (char *)malloc(strlen(s_string) + 1)) == NULL) v_error(errno, h_err_memmory_alloc, __FILE__, __LINE__);
+
+   while (i_count < i_length)
    {
-      if (s_string[i] == '_' || s_string[i] == '-') s_string[i] = ' ';  /* Replace underscores and hyphens with spaces */
-
-      if (i == 0 || s_string[i - 1] == ' ')
-         s_string[i] = (char)toupper((unsigned char)s_string[i]);  /* Convert initial letters of each word to uppercase */
+      if (s_string[i_count] == '_' || s_string[i_count] == '-')
+      {
+         s_output[i_count] = ' ';  /* Replace underscores and hyphens with spaces */
+      }
       else
-         s_string[i] = (char)tolower((unsigned char)s_string[i]);  /* Everything else is lowercase */
-      i++;
+      {
+         if (i_count == 0 || s_output[i_count - 1] == ' ')
+            s_output[i_count] = (char)toupper((unsigned char)s_string[i_count]);  /* Convert initial letters of each word to uppercase */
+         else
+            s_output[i_count] = (char)tolower((unsigned char)s_string[i_count]);  /* Everything else is lowercase */
+      }
+      i_count++;
    }
-   return s_string;  /* Return pointer to updated string */
+   s_output[i_count] = '\0';
+   return s_output;
 }
 
 char b_search(int *a, int m, int n) /* Linear search. */
 {
-   int i;
-   for (i = 0; i < n; i++)
-      if (a[i] == m)
+   int i_count;
+   for (i_count = 0; i_count < n; i_count++)
+      if (a[i_count] == m)
          return True;
    return False;
 }
@@ -550,17 +570,11 @@ int main(int argc, char *argv[])
 #if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
    char b_euro = False;
 #endif
-
    int i_breakpoints[] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};  /* Array to hold breakpoints */
-
    int i_offset, i_count, i_index, i_value, i_size;
    int i_zoom = 0;                     /* Zoom level */
    int i_trap = -1;                    /* Trap instruction */
    int i_ticks = -1;
-
-#if defined(HP67)
-   int i_last;                         /* Used to determine if the state of function keys has changed */
-#endif
 
 #if defined(CONTINIOUS)
    char b_reset = False;               /* Do not restore state (reset) */
@@ -573,6 +587,10 @@ int main(int argc, char *argv[])
 
 #if defined(LABELS)
    struct olabel *h_label[LABELS];
+#endif
+
+#if defined(HP67)
+   struct ocard *h_card[2];
 #endif
 
 #if defined (__unix__)
@@ -947,6 +965,10 @@ int main(int argc, char *argv[])
    v_init_labels(h_label);
 #endif
 
+#if defined(HP67)
+   v_init_cards(h_card);
+#endif
+
    /* Resize application window */
    o_window_position.x = o_window_geometry.x;
    o_window_position.y = o_window_geometry.y;
@@ -1013,10 +1035,6 @@ int main(int argc, char *argv[])
    }
 #endif
 
-#if defined(HP67)
-   i_last = !h_processor->crc[FUNCTION];  /* Force function keys labels to be updated */
-#endif
-
 #if defined(SWITCHES)
    if (h_switch[0] != NULL) h_processor->enabled = h_switch[0]->state; /* Allow switches to be undefined if not used */
    if (SWITCHES == 2) /** To Do - Must be a better way of handling an arbitrary number of switches */
@@ -1058,7 +1076,6 @@ int main(int argc, char *argv[])
 #endif
    }
 #endif
-
    b_abort = False;
    i_count = 0;
    while (!b_abort)  /* Main program event loop */
@@ -1067,18 +1084,29 @@ int main(int argc, char *argv[])
       if (i_count < 0)
       {
          i_display_update(h_display, h_processor);
-         i_display_draw(x_display, x_buffer, i_screen, h_display);  /* Redraw display */
-         XCopyArea(x_display, x_buffer, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
-         i_count = INTERVAL;
 #if defined(HP67)
-         if (i_last != h_processor->crc[FUNCTION]) /* Has the state of the function keys changed ? */
+         if (h_processor->crc[FUNCTION])
          {
             for (i_count = 0; i_count < LABELS; i_count++)  /* Update label state */
                h_label[i_count]->state = h_processor->crc[FUNCTION];
             for (i_count = 0; i_count < LABELS; i_count++)  /* Draw labels */
                i_label_draw(x_display, x_buffer, i_screen, h_label[i_count]);
-            i_last = h_processor->crc[FUNCTION]; /* Remember the state of function keys */
+            h_card[1]->text = NULL;  /* Clear the current card text */
          }
+         else
+         {
+            if (h_processor->filename)
+            {
+               h_card[1]->text = s_reformat(h_processor->filename);  /* Reformat the file name */
+               h_processor->filename = NULL;
+            }
+            i_card_draw(x_display, x_buffer, i_screen, h_card[1]);
+         }
+#endif
+         i_display_draw(x_display, x_buffer, i_screen, h_display);  /* Redraw display */
+         XCopyArea(x_display, x_buffer, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
+         i_count = INTERVAL;
+#if defined(HP67)
          i_wait(INTERVAL / 4);   /* Sleep for ~6.25 ms per tick */
 #elif defined(HP55)
          i_wait(INTERVAL / 3.1); /* Sleep for ~???? ms per tick */
@@ -1213,12 +1241,11 @@ int main(int argc, char *argv[])
                      }
                      else
                      {
+                        h_processor->enabled = False;  /* Disable the processor */
 #if defined(CONTINIOUS)
                         v_backup_state(h_processor);  /* Save current settings */
 #endif
-                        h_processor->enabled = False;  /* Disable the processor */
 #if defined(HP67)
-                        h_processor->crc[FUNCTION] = True;  /* Reinstate function keys */
                         i_ticks = DELAY * 4;  /* Set count down */
 #elif defined(VOYAGER)
                         i_ticks = DELAY * 3;

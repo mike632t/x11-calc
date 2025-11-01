@@ -441,6 +441,7 @@
  *                     changes into the forked branch - MT
  *                   - Saves and restores the function key state for models
  *                     with card readers - MT
+ * 01 Nov 25         - Added cards replace the function key labels - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -453,8 +454,8 @@
  */
 
 #define  NAME          "x11-calc-cpu"
-#define  BUILD         "0231"
-#define  DATE          "27 Oct 25"
+#define  BUILD         "0233"
+#define  DATE          "01 Nov 25"
 #define  AUTHOR        "MT"
 
 #define  NODEBUG
@@ -472,6 +473,7 @@
 #include "x11-calc-messages.h"
 #include "x11-calc-errors.h"
 
+#include "x11-calc-card.h"
 #include "x11-calc-label.h"
 #include "x11-calc-switch.h"
 #include "x11-calc-button.h"
@@ -590,15 +592,15 @@ char *s_get_datafile(void) /* Return path the the data file */
    {
       free(s_pathname);
       s_directory = getenv("XDG_DATA_HOME");
-      if (s_directory) /* XDG_DATA_HOME is defined so atempt to use it */
+      if (s_directory) /* XDG_DATA_HOME is defined so attempt to use it */
       {
-         s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 10) * sizeof(char*));
+         s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 10) * sizeof(char*));  /* Length of 'x11-calc\0' is 10 characters */
          strcpy(s_pathname, s_directory);
       }
       else /* Otherwise try to use $HOME/.local/share */
       {
          s_directory = getenv("HOME");
-         s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 23) * sizeof(char*));
+         s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 23) * sizeof(char*));  /* Length of '/.local/share/x11-calc\0' is 23 characters */
          strcpy(s_pathname, s_directory);
          strcat(s_pathname, "/.local/share");
       }
@@ -718,7 +720,11 @@ void v_card_open_file(oprocessor* h_processor)
     {
         s_filename = s_get_filename(s_get_datafile(), 'r', FILENAME"-*.crd", "Card File");
         if (s_filename)
-            if ((h_processor->card_file = fopen(s_filename, "r"))) printf("Reading '%s'\n", s_filename);
+            if ((h_processor->card_file = fopen(s_filename, "r")))
+            {
+               printf("Reading '%s'\n", s_filename);
+               h_processor->filename = strrchr(s_filename, '/') + 1;
+            }
     }
     h_processor->crc[CARD] = False ;  /* Card removed immediately - KJC */
 }
@@ -1180,6 +1186,8 @@ void v_processor_reset(oprocessor *h_processor) /* Reset processor */
    h_processor->status[5] = True; /* TO DO - Check which flags should be set by default */
 #endif
 #if defined(HP67)
+   h_processor->card_file = NULL;
+   h_processor->filename = NULL;
    for (i_count = 0; i_count < STATES; i_count++) /* Clear the processor flags */
       h_processor->crc[i_count] = False;
    h_processor->crc[READY] = -4;

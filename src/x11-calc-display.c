@@ -103,12 +103,13 @@
  *                     modes - MT
  *                   - HP55 now displays the timer using colons to seperate
  *                     hours, minutes and seconds - MT
+ * 01 Nov 25         - Added cards - MT
  *
  */
 
 #define NAME           "x11-calc-display"
-#define BUILD          "0048"
-#define DATE           "14 Sep 25"
+#define BUILD          "0049"
+#define DATE           "01 Nov 25"
 #define AUTHOR         "MT"
 
 #include <errno.h>     /* errno */
@@ -122,6 +123,7 @@
 #include "x11-calc-messages.h"
 #include "x11-calc-errors.h"
 
+#include "x11-calc-card.h"
 #include "x11-calc-label.h"
 #include "x11-calc-switch.h"
 #include "x11-calc-button.h"

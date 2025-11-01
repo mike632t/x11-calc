@@ -33,15 +33,18 @@
  * 20 May 25         - Tidied up data structure definitions - MT
  * 11 Oct 25         - Modified key layout - MT
  * 27 Oct 25         - Added function key labels - MT
+ * 01 Nov 25         - Added cards replace the function key labels - MT
  *
  */
 
+#if !defined(HEIGHT)
 #define HEIGHT             450 * SCALE_HEIGHT
 #define WIDTH              230 * SCALE_WIDTH
 #define BUTTONS            35
 #define SWITCHES           2
 #define DIGITS             15
-#define LABELS             5
+
+#define LABELS             6
 
 #define DIGIT_COLOUR       RED
 #define DIGIT_BACKGROUND   DARK_RED
@@ -76,12 +79,16 @@
 #define ROM_SIZE           020000
 #define MEMORY_SIZE        256  /** Include buffer addresses and extended memory - KJC */
 
+#define CARDREADER
 #define CONTINIOUS
 
 extern int i_rom [ROM_SIZE];
 
-void v_init_labels(struct olabel *h_label[]);
+void v_init_labels(struct olabel *h_card[]);
+
+void v_init_cards(struct ocard *h_card[]);
 
 void v_init_switches(struct oswitch *h_label[]);
 
 void v_init_buttons(struct obutton *h_button[]);
+#endif

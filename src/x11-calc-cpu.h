@@ -142,6 +142,7 @@ typedef struct {
    unsigned char status[STATUS_BITS];  /* Status (S0 - S15) */
 #if defined(HP67)
    FILE* card_file;                    /* Open card file (NULL = not opened) - KJC */
+   char* filename;
    unsigned char crc[STATES];          /* Card reader states */
    int card_records;                   /* Number of records read/written, cleared at open - KJC */
 #endif
