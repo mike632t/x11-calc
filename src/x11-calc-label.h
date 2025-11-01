@@ -22,6 +22,7 @@
  * 12 Mar 22         - Implemented a state property allowing the appearance
  *                     of the label to be changed (hidden, or no line) - MT
  * 28 Oct 25         - Added alignment and text attributes - MT
+ * 31 Oct 25         - Tidied up label object properties - MT
  *
  */
 
@@ -32,11 +33,11 @@
 struct olabel  /* Calculator label structure */
 {
    int index;
-   XRectangle label_position;    /* Current label position */
-   XRectangle label_geometry;    /* Original label position */
+   XRectangle position;          /* Current label position */
+   XRectangle geometry;          /* Original label position */
    char* text;                   /* Text */
-   XFontStruct* text_font;       /* Font */
-   unsigned int colour;          /* Colour */
+   XFontStruct* font;            /* Font */
+   unsigned int foreground;      /* Foreground colour */
    unsigned int background;      /* Background colour */
    int attributes;               /* Strike-through */
    int alignment;                /* Centre left or right */
