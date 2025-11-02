@@ -592,7 +592,7 @@ int main(int argc, char *argv[])
 #endif
 
 #if defined(HP67)
-   struct ocard *h_card[2];
+   struct ocard *h_card;  /* Must be a pointer to a struct */
 #endif
 
 #if defined (__unix__)
@@ -964,11 +964,11 @@ int main(int argc, char *argv[])
 #endif
 
 #if defined(LABELS)
-   v_init_labels(h_label);
+   v_init_labels(h_label);  /* Passes the address of the array */
 #endif
 
 #if defined(HP67)
-   v_init_cards(h_card);
+   v_init_card(&h_card);  /* Pass the address */
 #endif
 
    /* Resize application window */
@@ -1009,9 +1009,8 @@ int main(int argc, char *argv[])
       i_label_resize(h_label[i_count], f_scale);
 #endif
 
-#if defined(CARDS)
-   for (i_count = 0; i_count < CARDS; i_count++)  /* Resize cards */
-      i_card_resize(h_card[i_count], f_scale);
+#if defined(HP67)
+   i_card_resize(h_card, f_scale);  /* Resize card */
 #endif
 
 #if defined (__unix__)
@@ -1098,16 +1097,16 @@ int main(int argc, char *argv[])
                h_label[i_count]->state = h_processor->crc[FUNCTION];
             for (i_count = 0; i_count < LABELS; i_count++)  /* Draw labels */
                i_label_draw(x_display, x_buffer, i_screen, h_label[i_count]);
-            h_card[1]->text = NULL;  /* Clear the current card text */
+            h_card->text = NULL;  /* Clear the current card text */
          }
          else
          {
             if (h_processor->filename)
             {
-               h_card[1]->text = s_reformat(h_processor->filename);  /* Reformat the file name */
+               h_card->text = s_reformat(h_processor->filename);  /* Reformat the file name */
                h_processor->filename = NULL;
             }
-            i_card_draw(x_display, x_buffer, i_screen, h_card[1]);
+            i_card_draw(x_display, x_buffer, i_screen, h_card);
          }
 #endif
          i_display_draw(x_display, x_buffer, i_screen, h_display);  /* Redraw display */

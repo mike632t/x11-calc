@@ -96,19 +96,14 @@ void v_init_labels(struct olabel *h_label[])
    h_label[i_count++] = h_label_create(001, "X-Y", h_font, i_left, i_top, KEY_WIDTH, i_height, WHITE, BACKGROUND, LABEL_ALIGN_CENTER, False, False);
 }
 
-void v_init_cards(struct ocard *h_card[])
+void v_init_card(struct ocard **h_card)
 {
    XFontStruct *h_font = h_alternate_font;
-   int i_left, i_top, i_count = 0;
+   int i_top = KBD_TOP + SWITCH_HEIGHT + 1 * SCALE_HEIGHT;
+   int i_left = KBD_LEFT;
 
-   i_top = KBD_TOP + SWITCH_HEIGHT + 1 * SCALE_HEIGHT;
-   i_left = KBD_LEFT;
-   h_card[i_count++] = h_card_create(000, NULL, h_font, i_left, i_top, 5 * KEY_WIDTH + 4 * KEY_GAP, KEY_HEIGHT - SWITCH_HEIGHT, WHITE, BACKGROUND, True);
-
-   h_card[i_count++] = h_card_create(001, NULL, h_font, i_left, i_top, 5 * KEY_WIDTH + 4 * KEY_GAP, KEY_HEIGHT - SWITCH_HEIGHT, BLACK, WHITE, True);  /* Program card */
-   /** h_label[i_count++] = h_label_create(001, NULL, h_alternate_font, i_left + KEY_GAP, i_top, 5 * KEY_WIDTH + 4 * KEY_GAP, i_height, WHITE, BACKGROUND, LABEL_ALIGN_LEFT, False, True);  /* Draws background for program card */
+   *h_card = h_card_create(001, NULL, h_font, i_left, i_top, 5 * KEY_WIDTH + 4 * KEY_GAP, KEY_HEIGHT - SWITCH_HEIGHT, BLACK, WHITE, True);  /* Program card */
 }
-
 
 void v_init_buttons(struct obutton *h_button[])
 {

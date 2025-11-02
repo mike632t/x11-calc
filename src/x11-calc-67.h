@@ -45,7 +45,6 @@
 #define DIGITS             15
 
 #define LABELS             6
-#define CARDS              2
 
 #define DIGIT_COLOUR       RED
 #define DIGIT_BACKGROUND   DARK_RED
@@ -80,13 +79,14 @@
 #define ROM_SIZE           020000
 #define MEMORY_SIZE        256  /** Include buffer addresses and extended memory - KJC */
 
+#define CARDREADER
 #define CONTINIOUS
 
 extern int i_rom [ROM_SIZE];
 
-void v_init_labels(struct olabel *h_card[]);
+void v_init_labels(struct olabel *h_label[]);
 
-void v_init_cards(struct ocard *h_card[]);
+void v_init_card(struct ocard **h_card);
 
 void v_init_switches(struct oswitch *h_label[]);
 
