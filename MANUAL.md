@@ -215,13 +215,14 @@ The following control keys can also be used.
 
 `Ctrl-Z` Exits the emulator.
 
-#### Debugging
+#### Firmware Debugging
 
-You  can  start the emulation in trace mode using '-t', or in  single  step
-mode using '-s', and set a break-point using '-b &lt;octal address&gt;'.
+You  can  start the emulation in trace mode using `-t`, or in  single  step
+mode using `-s`, and set a break-point using `-b <octal address>` or a trap
+using `-i <octal opcode>`.
 
-'Ctrl-T'  also toggles trace mode when running, 'Ctrl-S' executes the  next
-instruction, 'Ctrl-Q' resumes execution, and 'Ctrl-R' displays the contents
+`Ctrl-T`  also toggles trace mode when running, `Ctrl-S` executes the  next
+instruction, `Ctrl-Q` resumes execution, and `Ctrl-R` displays the contents
 of the CPU registers.
 
 When in trace mode a jump to the same instruction produces no output.
