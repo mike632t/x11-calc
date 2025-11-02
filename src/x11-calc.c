@@ -384,6 +384,8 @@
  *                   - Remove any program cards when powering off - MT
  *                   - Update function key labels at startup - MT
  * 01 Nov 25         - Added cards replace the function key labels - MT
+ *                   - Replace all non alphabetic characters with spaces in
+ *                     program labels - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -497,9 +499,9 @@ char* s_reformat(const char *s_string)
 
    while (i_count < i_length)
    {
-      if (s_string[i_count] == '_' || s_string[i_count] == '-')
+      if (!isalpha(s_string[i_count]))  /* Check for non alphabetic characters */
       {
-         s_output[i_count] = ' ';  /* Replace underscores and hyphens with spaces */
+         s_output[i_count] = ' ';  /* and replace with spaces */
       }
       else
       {
