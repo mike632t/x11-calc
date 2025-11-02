@@ -129,8 +129,8 @@ Forces the keys on the numeric keypad to behave as if numlock is on even if
 it isn't (apparently some laptops don't have a numlock key!)
 
 #### --zoom ZOOM
-Specifying a ZOOM (1, 2, 3 or 4) level will enlarge the size of the window
-up to a maximum of 150%.
+Specifying  a  value for zoom (1, 2, 3 or 4) will enlarge the size  of  the
+window up to a maximum of 150%.
 
 #### --help
 Display the help text shown above and exits.
@@ -188,34 +188,32 @@ button for two seconds the program will exit.
 
 The following keyboard shortcuts should work on Linux:
 
-'0' - '9', '+'. '-'. '*'. '/' and 'Enter' should do what you expect them to
+`0` - `9`, `+`. `-`. `*`. `/` and `Enter` should do what you expect them to
 (when using numeric key pad you need to use numlock as usual).
 
-'f' and where applicable 'g' and 'h' correspond to the shift keys.
+`f` and where applicable `g` and `h` correspond to the shift keys.
 
-'Esc' or 'Backspace' corresponds to 'Clx', 'c' to CHS, 'e' to 'EEX', and on
-financial models 'n' and 'i' correspond to 'n' and 'i' if not shifted.
+`Esc` or `Backspace` corresponds to `Clx`, `c` to `CHS`, `e` to `EEX`, and on
+financial models `n` and `i` correspond to `n` and `i` if not shifted.
 
-'A' - 'E' , 'A' - 'F' , or 'A' - 'B' correspond to program labels  (whether
+`A` - `E` , `A` - `F` , or `A` - `B` correspond to program labels  (whether
 shifted or not).
 
-'Space' maps to 'SST' (if not shifted.
+`Space` corresponds to `SST` (if not shifted).
 
 The following control keys can also be used.
 
-Note - Only models with continuous memory can load or save state.
+`Ctrl-C` Resets the emulator to its initial or last saved state.
 
-'Ctrl-C' Resets the emulator to its initial or last saved state.
+`Ctrl-R` Prints the register contents.
 
-'Ctrl-R' Prints the register contents.
+`Ctrl-S` Enable tracing and executes a single instruction.
 
-'Ctrl-S' Enable tracing and executes a single instruction.
+`Ctrl-T` Toggles tracing of the emulator code execution.
 
-'Ctrl-T' Toggles tracing of the emulator code execution.
+`Ctrl-Q` Resumes execution (does not disable trace).
 
-'Ctrl-Q' Resumes execution (does not disable trace).
-
-'Ctrl-Z' Exits the emulator.
+`Ctrl-Z` Exits the emulator.
 
 #### Debugging
 
