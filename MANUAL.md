@@ -9,8 +9,6 @@
 
 - [Operation](#operation)
 
-- [Known issues](#issues)
-
 <a id="starting"></a>
 ### Starting the emulator<sup><sup>[Back to Top](#top)</sup></sup>
 
@@ -229,32 +227,3 @@ instruction, 'Ctrl-Q' resumes execution, and 'Ctrl-R' displays the contents
 of the CPU registers.
 
 When in trace mode a jump to the same instruction produces no output.
-
-<a id="issues"></a>
-### Known Issues <sup><sup>[Back to Top](#top)</sup></sup>
-
-#### General issues
-
-- A 24 bit colour display is required.
-- Keyboard shortcuts are not available on all systems.
-- For best results you need to have the X windows core fonts installed.
-- Parallel make only works on Linux, NetBSD and FreeBSD.
-
-##### HP 11C + HP 12C + HP 15C + HP 16C
-
-- Keyboard test is successful but these models do not pass the self-test.
-
-#### Wayland
-
-- The application window should be a fixed size (this can be modified using
-'--zoom'), but Xwayland does not handle this correctly.
-
-#### VMS
-
-- Colour palette assumes a black and white display (simh with QVSS). If the
-  system's  colour depth is different you must modify COLOUR_DEPTH to  match.
-  Note that the display will still only use two colours!
-  (You can modify x11-calc-colour.h and x11-calc.h to change `vms` to `oldvms`
-  if you do have a 24-bit colour display).
-- Not all text is visible if not using 24-bit colour.
-- Not all key legends are shown as the font is missing some characters.
