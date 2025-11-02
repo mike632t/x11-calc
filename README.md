@@ -30,7 +30,7 @@ MacOS, VMS, Solaris and Tru64 Unix.
 
 - [User Guide](./GUIDE.md#top)
 
-- [Known issues](./GUIDE.md#issues)
+- [Known issues](#issues)
 
 - [Acknowledgements](#acknowledgements)
 
@@ -469,14 +469,43 @@ have managed to get as far as I have.
 - `Mark SHIN` for testing on MacOS.
 
 - `Jonakeys` for getting the emulators working on FreeBSD.
-Virginia Giuffre
+
 - `Quozl` for helping with double buffering display changes.
 
 - `Kjellc` for adding support for the HP67 card reader.
 
-- 'Vttoth` for allowing me to include some of his example programs.
+- `Vttoth` for allowing me to include some of his example programs.
 
 - `Kjellc` for translating the help text (into Swedish).
+
+<a id="issues"></a>
+### Known Issues <sup><sup>[Back to Top](#top)</sup></sup>
+
+#### General issues
+
+- A 24 bit colour display is required.
+- Keyboard shortcuts are not available on all systems.
+- For best results you need to have the X windows core fonts installed.
+- Parallel make only works on Linux, NetBSD and FreeBSD.
+
+##### HP 11C + HP 12C + HP 15C + HP 16C
+
+- Keyboard test is successful but these models do not pass the self-test.
+
+#### Wayland
+
+- The application window should be a fixed size (this can be modified using
+'--zoom'), but Xwayland does not handle this correctly.
+
+#### VMS
+
+- Colour palette assumes a black and white display (simh with QVSS). If the
+  system's  colour depth is different you must modify COLOUR_DEPTH to  match.
+  Note that the display will still only use two colours!
+  (You can modify x11-calc-colour.h and x11-calc.h to change `vms` to `oldvms`
+  if you do have a 24-bit colour display).
+- Not all text is visible if not using 24-bit colour.
+- Not all key legends are shown as the font is missing some characters.
 
 <a id="problems"></a>
 ### Problem Reports <sup><sup>[Back to Top](#top)</sup></sup>
