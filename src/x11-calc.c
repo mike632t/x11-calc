@@ -1009,6 +1009,11 @@ int main(int argc, char *argv[])
       i_label_resize(h_label[i_count], f_scale);
 #endif
 
+#if defined(CARDS)
+   for (i_count = 0; i_count < CARDS; i_count++)  /* Resize cards */
+      i_card_resize(h_card[i_count], f_scale);
+#endif
+
 #if defined (__unix__)
    h_keyboard = h_keyboard_create(x_display);  /* Only works with Linux */
 #endif

@@ -45,6 +45,7 @@
 #define DIGITS             15
 
 #define LABELS             6
+#define CARDS              2
 
 #define DIGIT_COLOUR       RED
 #define DIGIT_BACKGROUND   DARK_RED
