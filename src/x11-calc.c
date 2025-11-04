@@ -381,11 +381,14 @@
  *                     will centred on the screen, but this will usually be
  *                     ignored by the window manager unless the position is
  *                     specified on the command line - MT
- *                   - Remove any program cards when powering off - MT
  *                   - Update function key labels at startup - MT
  * 01 Nov 25         - Added cards replace the function key labels - MT
  *                   - Replace all non alphabetic characters with spaces in
  *                     program labels - MT
+ * 04 Nov 25         - Program card defined as part of the processor (makes
+ *                     it easier to use in the processor code) - MT
+ *                   - Initialize fonts early allowing them to be used when
+ *                     creating the program card - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -398,8 +401,8 @@
 
 #define  NAME          "x11-calc"
 #define  VERSION       "0.19"
-#define  BUILD         "0206"
-#define  DATE          "01 Nov 25"
+#define  BUILD         "0208"
+#define  DATE          "04 Nov 25"
 #define  AUTHOR        "MT"
 
 #define  INTERVAL 48   /* Number of ticks to execute before updating the display */
@@ -591,13 +594,16 @@ int main(int argc, char *argv[])
    struct olabel *h_label[LABELS];
 #endif
 
-#if defined(HP67)
-   struct ocard *h_card;  /* Must be a pointer to a struct */
-#endif
-
 #if defined (__unix__)
    okeyboard *h_keyboard;
 #endif
+
+   if (!(x_display = XOpenDisplay(s_display_name))) v_error (errno, h_err_display, s_display_name);  /* Open the default display */
+
+   if (!(h_normal_font = h_get_font(x_display, s_normal_fonts))) v_error(errno, h_err_font, s_normal_fonts[0]);
+   if (!(h_small_font = h_get_font(x_display, s_small_fonts))) v_error(errno, h_err_font, s_small_fonts[0]);
+   if (!(h_alternate_font = h_get_font(x_display, s_alternate_fonts))) v_error(errno, h_err_font, s_alternate_fonts[0]);
+   if (!(h_large_font = h_get_font(x_display, s_large_fonts))) v_error(errno, h_err_font, s_large_fonts[0]);
 
    h_processor = h_processor_create(i_rom);
 
@@ -892,8 +898,6 @@ int main(int argc, char *argv[])
    while ((i_count > 0) && (i_rom[--i_count] == 0));  /* Check that the ROM isn't empty */
    if (i_count == 0) v_error (ENODATA, h_err_ROM);
 
-   if (!(x_display = XOpenDisplay(s_display_name))) v_error (errno, h_err_display, s_display_name);  /* Open the default display */
-
    i_screen = DefaultScreen(x_display);  /* Get the default screen for our X server */
    i_screen_width = DisplayWidth(x_display, i_screen);
    i_screen_height = DisplayHeight(x_display, i_screen);
@@ -935,11 +939,6 @@ int main(int argc, char *argv[])
 
    if  (!(x_logo = XCreateBitmapFromData(x_display, x_window, (char*) logo_bits, logo_width, logo_height))) v_error(errno, h_err_pixmap);  /* Check colour depth */
 
-   if (!(h_normal_font = h_get_font(x_display, s_normal_fonts))) v_error(errno, h_err_font, s_normal_fonts[0]);
-   if (!(h_small_font = h_get_font(x_display, s_small_fonts))) v_error(errno, h_err_font, s_small_fonts[0]);
-   if (!(h_alternate_font = h_get_font(x_display, s_alternate_fonts))) v_error(errno, h_err_font, s_alternate_fonts[0]);
-   if (!(h_large_font = h_get_font(x_display, s_large_fonts))) v_error(errno, h_err_font, s_large_fonts[0]);
-
    if (b_cursor)
       x_cursor = XCreateFontCursor(x_display, XC_arrow);  /* Create a 'default' cursor */
    else
@@ -965,10 +964,6 @@ int main(int argc, char *argv[])
 
 #if defined(LABELS)
    v_init_labels(h_label);  /* Passes the address of the array */
-#endif
-
-#if defined(HP67)
-   v_init_card(&h_card);  /* Pass the address */
 #endif
 
    /* Resize application window */
@@ -1010,7 +1005,7 @@ int main(int argc, char *argv[])
 #endif
 
 #if defined(HP67)
-   i_card_resize(h_card, f_scale);  /* Resize card */
+   i_card_resize(h_processor->card, f_scale);  /* Resize card */
 #endif
 
 #if defined (__unix__)
@@ -1097,16 +1092,16 @@ int main(int argc, char *argv[])
                h_label[i_count]->state = h_processor->crc[FUNCTION];
             for (i_count = 0; i_count < LABELS; i_count++)  /* Draw labels */
                i_label_draw(x_display, x_buffer, i_screen, h_label[i_count]);
-            h_card->text = NULL;  /* Clear the current card text */
+            h_processor->card->text = NULL;  /* Clear the current card text */
          }
          else
          {
-            if (h_processor->filename)
+            if (h_processor->card->filename)
             {
-               h_card->text = s_reformat(h_processor->filename);  /* Reformat the file name */
-               h_processor->filename = NULL;
+               h_processor->card->text = s_reformat(h_processor->card->filename);  /* Use the filename as the basis of the card label */
+               h_processor->card->filename = NULL;
             }
-            i_card_draw(x_display, x_buffer, i_screen, h_card);
+            i_card_draw(x_display, x_buffer, i_screen, h_processor->card);  /* Update display */
          }
 #endif
          i_display_draw(x_display, x_buffer, i_screen, h_display);  /* Redraw display */

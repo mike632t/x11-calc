@@ -441,7 +441,9 @@
  *                     changes into the forked branch - MT
  *                   - Saves and restores the function key state for models
  *                     with card readers - MT
- * 01 Nov 25         - Added cards replace the function key labels - MT
+ * 04 Nov 25         - Program card defined as part of the processor (makes
+ *                     it easier to use in the processor code) - MT
+ *                   - Added error handler to card_open_file() - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -455,7 +457,7 @@
 
 #define  NAME          "x11-calc-cpu"
 #define  BUILD         "0233"
-#define  DATE          "01 Nov 25"
+#define  DATE          "04 Nov 25"
 #define  AUTHOR        "MT"
 
 #define  NODEBUG
@@ -473,12 +475,14 @@
 #include "x11-calc-messages.h"
 #include "x11-calc-errors.h"
 
-#include "x11-calc-card.h"
 #include "x11-calc-label.h"
 #include "x11-calc-switch.h"
 #include "x11-calc-button.h"
+#include "x11-calc-card.h"
 
 #include "x11-calc-cpu.h"
+
+//#include "x11-calc.h"
 
 #include "gcc-debug.h"  /* debug() */
 #include "gcc-exists.h" /* i_isfile(), i_isdir(), i_exists() */
@@ -518,7 +522,7 @@ char *s_get_filename(char *s_path, char c_mode, char *s_filter, char *s_name)
       break;
    }
 
-   if (s_filter) /* Should the results be filtered */
+   if (s_filter)  /* Should the results be filtered */
    {
       h_filter = gtk_file_filter_new();
       gtk_file_filter_add_pattern (h_filter, s_filter);
@@ -545,7 +549,7 @@ char *s_get_filename(char *s_path, char c_mode, char *s_filter, char *s_name)
    else
       s_filename = NULL;
 
-   gtk_file_chooser_remove_filter(GTK_FILE_CHOOSER(h_widget), h_all); /* Tidy up */
+   gtk_file_chooser_remove_filter(GTK_FILE_CHOOSER(h_widget), h_all);  /* Tidy up */
    gtk_file_chooser_remove_filter(GTK_FILE_CHOOSER(h_widget), h_filter);
    gtk_widget_destroy(h_widget);
 
@@ -555,14 +559,18 @@ char *s_get_filename(char *s_path, char c_mode, char *s_filter, char *s_name)
    return s_filename;
 }
 #else
-char *s_get_filename(char *s_path, char c_mode, char *s_filter, char *s_name) /* Don't do anything if GTK not installed */
+char *s_get_filename(char *s_path, char c_mode, char *s_filter, char *s_name)  /* Don't do anything if GTK not installed */
 {
    return NULL;
 }
 #endif
 
-char *s_get_datafile(void) /* Return path the the data file */
+char *s_get_datafile(void)
 /*
+ * get_datafile()
+ *
+ * Get path the the data file.
+ *
  *  - If $HOME is defined and the data file already exists in there  return
  *    the pathname of the data file in $HOME to maintain compatibility with
  *    earlier releases.
@@ -641,6 +649,8 @@ char *s_get_datafile(void) /* Return path the the data file */
 #if defined(HP67)
 void v_card_read_write_record(oprocessor* h_processor)
 /*
+ * card_read_write()
+ *
  * Called  when the processor executes 'card read write' (01700) to read or
  * write a block of data to a card (depending on the 'crc[WRITE]' flag).
  *
@@ -648,7 +658,7 @@ void v_card_read_write_record(oprocessor* h_processor)
  *
  */
 {
-    if (h_processor->card_file)  /* Check if card file was opened successfully */
+    if (h_processor->card->file)  /* Check if card file was opened successfully */
     {
         if (h_processor->crc[BUFFER])  /* Check if buffer is ready */
         {
@@ -665,13 +675,9 @@ void v_card_read_write_record(oprocessor* h_processor)
                     record += *p_buffer_pointer--;
                 }
 
-                fprintf(h_processor->card_file, "%07x,", record);
-                if (h_processor->card_records % 8 == 0) fprintf(h_processor->card_file, "\n");
-
-                /** fprintf(stdout, "%07x ", record); /* Debug */
-                /** if (h_processor->card_records % 8 == 0) fprintf(stdout, "\n"); */
-
-                h_processor->card_records++;
+                fprintf(h_processor->card->file, "%07x,", record);
+                if (h_processor->card->records % 8 == 0) fprintf(h_processor->card->file, "\n");
+                h_processor->card->records++;
             }
 
             /* Read a card-record if the buffer address is 0x99/0x9b (for standard HP 67) or 0xf9/0xfb (for extended HP 67) */
@@ -682,17 +688,12 @@ void v_card_read_write_record(oprocessor* h_processor)
                 int reg_ptr = (h_processor->addr & 0xf0) + 0x0b;  /* 0x9b or 0xfb */
                 unsigned char* p_buffer_pointer = &(h_processor->mem[reg_ptr]->nibble[REG_SIZE - 1]);
 
-                fscanf(h_processor->card_file, "%x,", (unsigned int*)&record);
+                fscanf(h_processor->card->file, "%x,", (unsigned int*)&record);
                 for (int i = 6; i >= 0; i--)  /* Put record in upper 7 nibbles */
-                    *p_buffer_pointer-- = (record >> i*4) & 0xf;
-
+                    *p_buffer_pointer-- = (record >> i * 4) & 0xf;
                 for (int i = 6; i >= 0; i--)  /* Put record in lower 7 nibbles as well! */
-                    *p_buffer_pointer-- = (record >> i*4) & 0xf;
-
-                /** fprintf(stdout, "%07x ", record); /* Debug */
-                /** if (h_processor->card_records % 8 == 0) fprintf(stdout, "\n"); */
-
-                h_processor->card_records++;
+                    *p_buffer_pointer-- = (record >> i * 4) & 0xf;
+                h_processor->card->records++;
             }
         }
     }
@@ -700,53 +701,66 @@ void v_card_read_write_record(oprocessor* h_processor)
 
 void v_card_open_file(oprocessor* h_processor)
 /*
+ * card_open_file()
+ *
  * Used to open a card file for reading or writing (depending on the  state
  * of the WRITE flag).
  *
  * 18 Oct 25         - Initial version - KJC
+ * 04 Nov 25         - Added error message if file can't be opened - MT
  *
  */
 {
-    char* s_filename;
-    h_processor->card_file = NULL;
-    h_processor->card_records = 0;
-    if (h_processor->crc[WRITE])
-    {
-        s_filename = s_get_filename(s_get_datafile(), 'w', FILENAME"-*.crd", "Card File");
-        if (s_filename)
-            if ((h_processor->card_file = fopen(s_filename, "w"))) printf("Writing '%s'\n", s_filename);
-    }
-    else
-    {
-        s_filename = s_get_filename(s_get_datafile(), 'r', FILENAME"-*.crd", "Card File");
-        if (s_filename)
-            if ((h_processor->card_file = fopen(s_filename, "r")))
-            {
-               printf("Reading '%s'\n", s_filename);
-               h_processor->filename = strrchr(s_filename, '/') + 1;
-            }
-    }
-    h_processor->crc[CARD] = False ;  /* Card removed immediately - KJC */
+   char* s_filename;
+   h_processor->card->file = NULL;
+   h_processor->card->records = 0;
+   if (h_processor->crc[WRITE])
+   {
+      s_filename = s_get_filename(s_get_datafile(), 'w', FILENAME"-*.crd", "Card File");
+      if (s_filename)
+      {
+         if ((h_processor->card->file = fopen(s_filename, "w")))
+            fprintf(stderr, "Writing '%s'\n", s_filename);
+         else
+            v_warning(h_err_opening_file, s_filename);  /* Can't open data file */
+      }
+   }
+   else
+   {
+      s_filename = s_get_filename(s_get_datafile(), 'r', FILENAME"-*.crd", "Card File");
+      if (s_filename)
+      {
+         if ((h_processor->card->file = fopen(s_filename, "r")))
+         {
+            fprintf(stderr, "Reading '%s'\n", s_filename);
+            h_processor->card->filename = strrchr(s_filename, '/') + 1;
+         }
+         else
+            v_warning(h_err_opening_file, s_filename);  /* Can't open data file */
+       }
+   }
+   h_processor->crc[CARD] = False ;  /* Card removed immediately - KJC */
 }
 
 void v_card_close_file(oprocessor* h_processor)
 /*
+ * card_close_file()
+ *
  * Closes an open card file.
  *
  * 18 Oct 25         - Initial version - KJC
  *
  */
 {
-    h_processor->crc[CARD] = False;  /* Card removed when motor is stopped */
-    if (h_processor->card_file)
-    {
-        if (h_processor->crc[WRITE]) fprintf(h_processor->card_file, "\n"); /* End file with newline */
-        fclose(h_processor->card_file);
-    }
-    h_processor->card_file = NULL;
+   h_processor->crc[CARD] = False;  /* Card removed when motor is stopped */
+   if (h_processor->card->file)
+   {
+      if (h_processor->crc[WRITE]) fprintf(h_processor->card->file, "\n");  /* End file with newline */
+      fclose(h_processor->card->file);
+   }
+   h_processor->card->file = NULL;
 }
 #endif
-
 
 void v_read_state(oprocessor *h_processor, char *s_pathname) /* Read processor state from file */
 {
@@ -1186,8 +1200,8 @@ void v_processor_reset(oprocessor *h_processor) /* Reset processor */
    h_processor->status[5] = True; /* TO DO - Check which flags should be set by default */
 #endif
 #if defined(HP67)
-   h_processor->card_file = NULL;
-   h_processor->filename = NULL;
+   h_processor->card->file = NULL;
+   h_processor->card->filename = NULL;
    for (i_count = 0; i_count < STATES; i_count++) /* Clear the processor flags */
       h_processor->crc[i_count] = False;
    h_processor->crc[READY] = -4;
@@ -1210,7 +1224,11 @@ oprocessor *h_processor_create(int *h_rom) /* Create a new processor 'object' */
 {
    oprocessor *h_processor;
    int i_count;
+
    if ((h_processor = malloc(sizeof(*h_processor)))==NULL) v_error(errno, h_err_memmory_alloc, __FILE__, __LINE__);
+#if defined(HP67)
+   v_init_card(&h_processor->card);  /* Defining the card as part of the processor allow the processor code to access the card properties */
+#endif
    for (i_count = 0; i_count < REGISTERS; i_count++)
       h_processor->reg[i_count] = h_register_create((i_count + 1) * -1); /* Allocate storage for the registers */
    for (i_count = 0; i_count < MEMORY_SIZE; i_count++)
@@ -1764,7 +1782,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                 */
                case 00100: /* test/clear motor on (crc buffer ready) */
                   if (h_processor->trace) fprintf(stdout, "test motor on (crc ready)");
-                  h_processor->status[3] = (h_processor->card_file != NULL);  /* device/buffer ready if not canceled */
+                  h_processor->status[3] = (h_processor->card->file != NULL);  /* device/buffer ready if not canceled */
                   h_processor->crc[BUFFER] = True ;  /* Buffer is ready after test/clear */
                   break;
                case 00300: /* test mode flag */

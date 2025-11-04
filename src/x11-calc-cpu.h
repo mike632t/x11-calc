@@ -66,6 +66,8 @@
  * 15 Sep 25         - Fixed errors when compiling on MacOS - MT
  * 13 Oct 25         - Fixed get_datafile() function declaration -MT
  * 18 Oct 25         - Added card reader support - KJC
+ * 04 Nov 25         - Program card defined as part of the processor (makes
+ *                     it easier to use in the processor code) - MT
  *
  */
 
@@ -141,10 +143,8 @@ typedef struct {
    unsigned char flags[FLAGS];         /* Processor flags*/
    unsigned char status[STATUS_BITS];  /* Status (S0 - S15) */
 #if defined(HP67)
-   FILE* card_file;                    /* Open card file (NULL = not opened) - KJC */
-   char* filename;
+   struct ocard *card;
    unsigned char crc[STATES];          /* Card reader states */
-   int card_records;                   /* Number of records read/written, cleared at open - KJC */
 #endif
    unsigned int opcode;                /* Last opcode */
    unsigned int pc;                    /* Program counter */
