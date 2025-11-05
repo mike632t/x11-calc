@@ -8,6 +8,14 @@
  * text are as the result of changes I've made to limit the characters used
  * to those in the 8-bit ACSII character set.
  *
+ * To use a specific language set the environment variable before building.
+ *
+ * Spanish -   export LANG=es_ES.UTF-8
+ * German -    export LANG=de_DE.UTF-8
+ * French -    export LANG=fr_FR.UTF-8
+ * Swedish -   export LANG=sv_SE.UTF-8
+ * English -   export LANG=en_GB.UTF-8
+ *
  * This  program is free software: you can redistribute it and/or modify it
  * under  the terms of the GNU General Public License as published  by  the
  * Free  Software Foundation, either version 3 of the License, or (at  your
@@ -62,6 +70,8 @@
  *                     format to '-c' or '--comma', and updated text - MT
  * 10 Sep 25         - Changed message variable names - MT
  * 30 Oct 25         - Added invalid window geometry message - MT
+ * 05 Nov 25         - Fixed incorrect variable names - MT
+ *                   - Fixed Swedish language code - MT
  *
  */
 
@@ -133,7 +143,7 @@ const char *h_err_missing_argument = "opcion requiere un argumento -- '%s'\n";
 
 #if defined(unix) || defined(__unix__) || defined(__APPLE__)
 #if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
-const char * c_msg_usage = "Uso: %s [OPCION]... [ARCHIVO]\n\
+const char * h_msg_usage = "Uso: %s [OPCION]... [ARCHIVO]\n\
 Un emulador de calculadora RPN para X11.\n\n\
   -b  ADDR                 punto de interrupcion (octal)\n\
   -i  OPCODE               instruccion de trampa (octal)\n\
@@ -143,11 +153,14 @@ Un emulador de calculadora RPN para X11.\n\n\
   -c, --comma              utiliza una coma como separador decimal\n\
       --cursor             mostrar cursor (default)\n\
       --no-cursor          ocultar cursor\n\
+      --geometry +x+y      specify initial windows position\n\
+      --numlock            use numeric keypad (even if numlock is not on)\n\
+      --reset              do not restore saved state (factory reset)\n\
       --zoom ZOOM          ampliar el tamaño de la ventana\n\
       --help               mostrar esta ayuda y salir\n\
       --version            mostrar version y salir\n\n";
 #else
-const char *c_msg_usage = "Uso: %s [OPCION]... [ARCHIVO]\n\
+const char *h_msg_usage = "Uso: %s [OPCION]... [ARCHIVO]\n\
 Una emulador de emulador RPN para X11.\n\n\
   -b  ADDR                 punto de interrupcion (octal)\n\
   -i  OPCODE               instruccion de trampa (octal)\n\
@@ -226,7 +239,7 @@ Eine RPN rechner-emulator fur X11.\n\n\
       --help               diese hilfe anzeigen und dann beenden\n\
       --version            versionsinformationen ausgeben und dann beenden\n\n";
 #else
-const char * c_msg_usage = "Verwendung: %s [OPTION]... [DATEI]\n\
+const char * h_msg_usage = "Verwendung: %s [OPTION]... [DATEI]\n\
 Eine RPN rechner-emulator fur X11.\n\n\
   -b  ADDR                 haltepunkt an adresse setzen (oktal)\n\
   -i  OPCODE               haltepunkt auf Opcode setzen  (oktal)\n\
@@ -341,7 +354,7 @@ const char *h_err_invalid_option = "option invalide %s\n";
 #endif /* Unix */
 
 
-#elif defined(LANG_se)
+#elif defined(LANG_sv)
 
 const char *h_msg_loading = "Laddar '%s'\n";
 const char *h_msg_saving = "Sparar '%s'\n";
