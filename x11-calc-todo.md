@@ -11,6 +11,8 @@
 
 - [ ] Formatted program listings (using a separate python script)
 
+- [ ] Allow a program card to be loaded from the command line
+
 - [ ] Reorganize x11-calc and simplify the switch handling
 
 - [ ] Add HP65
