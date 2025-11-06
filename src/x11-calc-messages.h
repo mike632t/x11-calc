@@ -33,6 +33,9 @@
  *                   - Defined messages as string constants - MT
  * 10 Sep 25         - Changed message variable names - MT
  * 30 Oct 25         - Added invalid window geometry message - MT
+ * 05 Nov 25         - Use arrays to hold multiple lines as this allows pre
+ *                     processor directives to modify output - MT
+ *                   - Moved error(), warning() and usage() routines - MT
  *
  */
 
@@ -61,7 +64,7 @@ extern const char *h_msg_negative_offset;
 extern const char *h_msg_positive_offset;
 extern const char *h_msg_rom;
 
-extern const char *h_msg_usage;
+extern const char *h_msg_usage[];
 extern const char *h_err_invalid_operand;
 extern const char *h_err_invalid_option;
 extern const char *h_err_duplicate_option;
@@ -74,9 +77,15 @@ extern const char *h_err_max_breakpoints;
 extern const char *h_err_invalid_argument;
 #endif
 
-extern const char *h_msg_licence;
+extern const char *h_msg_licence[];
 extern const char *h_err_display;
 extern const char *h_err_display_properties;
 extern const char *h_err_display_colour;
 extern const char *h_err_pixmap;
 extern const char *h_err_font;
+
+
+void v_version(void);  /* Display version information */
+void v_error(int i_errno, const char *s_fmt, ...);  /* Print formatted error message */
+void v_warning(const char *s_fmt, ...);  /* Print formatted warning message */
+void v_usage(FILE *h_file, const char **s_text, ...);

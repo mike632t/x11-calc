@@ -454,26 +454,6 @@ void v_version(void)  /* Display version information */
       __DATE__[0], __DATE__[1], __DATE__[2], &__DATE__[9], __TIME__ );
 }
 
-void v_warning(const char *s_format, ...)  /* Print formatted warning message */
-{
-   va_list t_args;
-   va_start(t_args, s_format);
-   fprintf(stderr, "%s: ", FILENAME);
-   vfprintf(stderr, s_format, t_args);
-   va_end(t_args);
-}
-
-void v_error(int i_errno, const char *s_format, ...)  /* Print formatted error message and exit returning errno */
-{
-   va_list t_args;
-   if (!(i_errno)) i_errno = -1;  /* If errno not set return -1 */
-   va_start(t_args, s_format);
-   fprintf(stderr, "%s: ", FILENAME);
-   vfprintf(stderr, s_format, t_args);
-   va_end(t_args);
-   exit(i_errno);
-}
-
 void v_set_blank_cursor(Display *x_display, Window x_window, Cursor *x_cursor)
 {
    Pixmap x_blank;
@@ -805,12 +785,12 @@ int main(int argc, char *argv[])
                   else if (!strncmp(argv[i_count], "--version", i_index))
                   {
                      v_version();  /* Display version information */
-                     fprintf(stdout, h_msg_licence, &__DATE__[7], AUTHOR);
+                     v_usage(stdout, h_msg_licence, &__DATE__[7], AUTHOR);
                      exit(EXIT_SUCCESS);
                   }
                   else if (!strncmp(argv[i_count], "--help", i_index))
                   {
-                     fprintf(stdout, h_msg_usage, FILENAME);
+                     v_usage(stdout, h_msg_usage, FILENAME);
                      exit(EXIT_SUCCESS);
                   }
                   else  /* If we get here then the we have an invalid long option */
