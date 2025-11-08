@@ -21,6 +21,9 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * 31 Oct 25  0.1.0001  - Initial version - MT
+ * 08 Nov 25            - Modified names of colour properties and added two
+ *                        more to store the default colours - MT
+ *                      - Added card_reset() to restore the defaults - MT
  *
  */
 struct onode /* Linked list node */
@@ -39,9 +42,12 @@ struct ocard /* Card structure */
    XRectangle position;          /* Current position */
    XRectangle geometry;          /* Original position */
    XFontStruct* font;            /* Font */
-   struct onode *list;           /* List */
-   unsigned int foreground;      /* Foreground colour */
-   unsigned int background;      /* Background colour */
+   struct olabel *label[10];     /* Labels */
+   unsigned int foreground;      /* Default foreground colour */
+   unsigned int background;      /* Default background colour */
+   unsigned int label_colour;    /* Label colour */
+   unsigned int shifted_colour;  /* Alternate (shifted) text colour */
+   unsigned int colour;          /* Default card colour */
    int state;                    /* Enabled */
 };
 
@@ -49,8 +55,11 @@ struct ocard *h_card_pressed(struct ocard *h_card, int i_xpos, int i_ypos);
 
 struct ocard *h_card_create(int i_index, char* s_text, XFontStruct *h_font,
    int i_left, int i_top, int i_width, int i_height,
-   unsigned int i_foreground, unsigned int i_background, int i_state);
+   unsigned int i_colour, unsigned int i_label_colour,
+   unsigned int i_shifted_colour, int i_state);
 
-int i_card_resize(struct ocard *h_card, float f_scale);
+void i_card_reset(struct ocard *h_card);
+
+void i_card_resize(struct ocard *h_card, float f_scale);
 
 int i_card_draw(Display *h_display, int x_application_window, int i_screen, struct ocard *h_card);

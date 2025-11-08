@@ -381,14 +381,17 @@
  *                     will centred on the screen, but this will usually be
  *                     ignored by the window manager unless the position is
  *                     specified on the command line - MT
- *                   - Update function key labels at startup - MT
- * 01 Nov 25         - Added cards replace the function key labels - MT
- *                   - Replace all non alphabetic characters with spaces in
- *                     program labels - MT
+ *                   - HP67 will display default function keys labels if no
+ *                     program is loaded - MT
+ * 01 Nov 25         - Added program card to HP67 - MT
+ *                   - Replace all non alphabetic characters with spaces on
+ *                     program cards - MT
  * 04 Nov 25         - Program card defined as part of the processor (makes
  *                     it easier to use in the processor code) - MT
  *                   - Initialize fonts early allowing them to be used when
- *                     creating the program card - MT
+ *                     creating a program card - MT
+ * 08 Nov 25         - Can now read the card colours and text labels from a
+ *                     card  file if available (both are optional) - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number

@@ -444,6 +444,8 @@
  * 04 Nov 25         - Program card defined as part of the processor (makes
  *                     it easier to use in the processor code) - MT
  *                   - Added error handler to card_open_file() - MT
+ * 08 Nov 25         - Can now read the card colours and text labels from a
+ *                     card  file if available (both are optional) - MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -456,8 +458,8 @@
  */
 
 #define  NAME          "x11-calc-cpu"
-#define  BUILD         "0233"
-#define  DATE          "04 Nov 25"
+#define  BUILD         "0235"
+#define  DATE          "08 Nov 25"
 #define  AUTHOR        "MT"
 
 #define  NODEBUG
@@ -706,12 +708,29 @@ void v_card_open_file(oprocessor* h_processor)
  * Used to open a card file for reading or writing (depending on the  state
  * of the WRITE flag).
  *
+ * The colours used and text labels are NOT automatically added when a card
+ * is saved and must be added to later.
+ *
+ * By  default if no colour is specified then pre-recorded cards (with text
+ * labels) will be displayed using light text on a dark coloured background
+ * and cards without text labels will use dark text on a light background.
+ *
+ * Note - When updating the colours both the colour properties of the  card
+ * and colours of each label need to be set.
+ *
  * 18 Oct 25         - Initial version - KJC
  * 04 Nov 25         - Added error message if file can't be opened - MT
+ * 08 Nov 25         - Can now read the card colours and text labels from a
+ *                     card  file if available (both are optional) - MT
+ *
  *
  */
 {
    char* s_filename;
+   char s_buffer[16];
+   int i_colours = 0, i_labels = 0;
+   unsigned int i_hex;
+
    h_processor->card->file = NULL;
    h_processor->card->records = 0;
    if (h_processor->crc[WRITE])
@@ -733,7 +752,58 @@ void v_card_open_file(oprocessor* h_processor)
          if ((h_processor->card->file = fopen(s_filename, "r")))
          {
             fprintf(stderr, "Reading '%s'\n", s_filename);
-            h_processor->card->filename = strrchr(s_filename, '/') + 1;
+            i_card_reset(h_processor->card);  /* Reset card freeing up labels */
+
+            while (fscanf(h_processor->card->file, " #%x,%*[ \t\n]", &i_hex) == 1)  /* Parse card colours (optional) " #%x,%*[ ,\t\n]" */
+            {
+               if (i_colours < 2)  /* Ignore all but the first two values */
+               {
+                  switch (i_colours)
+                  {
+                     case 0:
+                        h_processor->card->colour = i_hex;
+                        break;
+                     case 1:
+                        h_processor->card->label_colour = i_hex;
+                        break;
+                  }
+                  i_colours++;
+               }
+            }
+
+            while (fscanf(h_processor->card->file, " '%15[^']',%*[ \t\n]", s_buffer) == 1)  /* Read labels (optional) " '%15[^']'%*[ ,\t\n]" */
+            {
+               if (i_labels < sizeof(h_processor->card->label) / sizeof(h_processor->card->label[0]))  /* Ignore any extra labels */
+               {
+                  if (h_processor->card->label[i_labels])  /* Check label is defined */
+                  {
+                     if (h_processor->card->label[i_labels]->text) free(h_processor->card->label[i_labels]->text);  /* Free existing text if necessary*/
+                     if ((h_processor->card->label[i_labels]->text = malloc(strlen(s_buffer) + 1)) == NULL) v_error(errno, h_err_memmory_alloc, __FILE__, __LINE__);  /*Allocate memory for string in buffer */
+                     strcpy(h_processor->card->label[i_labels]->text, s_buffer);  /* Copy text to label */
+                     h_processor->card->label[i_labels]->state = True;  /* Enable the label */
+                  }
+               }
+               i_labels++;
+            }
+
+            if (i_labels && !i_colours)  /* If labels are defined but no colours were specified, swap the default colours over */
+            {
+               i_hex = h_processor->card->colour;
+               h_processor->card->colour = h_processor->card->label_colour;
+               h_processor->card->label_colour = i_hex;
+               i_colours = 2;
+            }
+
+            for (i_labels = 0; i_labels < sizeof(h_processor->card->label) / sizeof(h_processor->card->label[0]); i_labels++)  /* Explicitly set label colours for each label */
+            {
+               if (h_processor->card->label[i_labels])  /* Check that label is defined */
+               {
+                  h_processor->card->label[i_labels]->foreground = h_processor->card->label_colour;
+                  h_processor->card->label[i_labels]->background = h_processor->card->colour;
+               }
+            }
+
+            h_processor->card->filename = strrchr(s_filename, '/') + 1; /* Save filename */
          }
          else
             v_warning(h_err_opening_file, s_filename);  /* Can't open data file */
