@@ -392,6 +392,9 @@
  *                     creating a program card - MT
  * 08 Nov 25         - Can now read the card colours and text labels from a
  *                     card  file if available (both are optional) - MT
+ *                   - Changed  command line parser to use strtol() for any
+ *                     numeric arguments and allow breakpoints and traps to
+ *                     be set using octal or hexadecimal - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -531,6 +534,7 @@ int main(int argc, char *argv[])
 
    char *s_display_name = "";          /* Just use the default display */
    char *s_title = TITLE;              /* Windows title */
+   char *s_text;                       /* Temporary pointer */
 
    float f_scale = 1.0;
 
@@ -560,7 +564,6 @@ int main(int argc, char *argv[])
 #endif
    int i_breakpoints[] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};  /* Array to hold breakpoints */
    int i_offset, i_count, i_index, i_value, i_size;
-   int i_zoom = 0;                     /* Zoom level */
    int i_trap = -1;                    /* Trap instruction */
    int i_ticks = -1;
 
@@ -607,15 +610,13 @@ int main(int argc, char *argv[])
                else
                   if (i_count + 1 < argc)
                   {
-                     i_value = 0;
-                     for (i_offset = 0; i_offset < strlen(argv[i_count + 1]); i_offset++)  /* Parse octal number */
-                     {
-                        if ((argv[i_count + 1][i_offset] < '0') || (argv[i_count + 1][i_offset] > '7'))
-                           v_error(EINVAL, h_err_invalid_number, argv[i_count + 1]);
-                        else
-                           i_value = i_value * 8 + argv[i_count + 1][i_offset] - '0';
-                     }
-                     if ((i_value < 0) || (i_value > ROM_SIZE) || (i_value > 017777))  /* Check address range, allow bank - KJC */
+                     if (strncmp(argv[i_count + 1], "0x", 2) == 0)  /* Check for a hexadecimal value */
+                        i_value = strtol(argv[i_count + 1], &s_text, 16);
+                     else
+                        i_value = strtol(argv[i_count + 1], &s_text, 8);
+                     if (*s_text != '\0')
+                        v_error(EINVAL, h_err_invalid_number, argv[i_count + 1]);
+                     if ((i_value < 0) || (i_value > ROM_SIZE) || (i_value > 017777) || (errno == ERANGE))  /* Check address range, allow bank - KJC */
                         v_error(EINVAL, h_err_numeric_range, argv[i_count + 1]);
                      else
                      {
@@ -641,15 +642,13 @@ int main(int argc, char *argv[])
                else
                   if (i_count + 1 < argc)
                   {
-                     i_value = 0;
-                     for (i_offset = 0; i_offset < strlen(argv[i_count + 1]); i_offset++)  /* Parse octal number */
-                     {
-                        if ((argv[i_count + 1][i_offset] < '0') || (argv[i_count + 1][i_offset] > '7'))
-                           v_error(EINVAL, h_err_invalid_number, argv[i_count + 1]);
-                        else
-                           i_value = i_value * 8 + argv[i_count + 1][i_offset] - '0';
-                     }
-                     if ((i_value < 0)  || (i_value > ROM_SIZE) || (i_value > 017777))  /* Check address range */
+                     if (strncmp(argv[i_count + 1], "0x", 2) == 0)  /* Check for a hexadecimal value */
+                        i_value = strtol(argv[i_count + 1], &s_text, 16);
+                     else
+                        i_value = strtol(argv[i_count + 1], &s_text, 8);
+                     if (*s_text != '\0')
+                        v_error(EINVAL, h_err_invalid_number, argv[i_count + 1]);
+                     if ((i_value < 0) || (i_value > 01777) || (errno == ERANGE))  /* Check range */
                         v_error(EINVAL, h_err_numeric_range, argv[i_count + 1]);
                      else
                      {
@@ -722,16 +721,11 @@ int main(int argc, char *argv[])
                   {
                      if (i_count + 1 < argc)
                      {
-                        i_zoom = 0;
-                        for (i_offset = 0; i_offset < strlen(argv[i_count + 1]); i_offset++)  /* Parse decimal number */
-                        {
-                           if ((argv[i_count + 1][i_offset] < '0') || (argv[i_count + 1][i_offset] > '9'))
-                              v_error(EINVAL, h_err_numeric_range, argv[i_count + 1]);
-                           else
-                              i_zoom = i_zoom * 10 + argv[i_count + 1][i_offset] - '0';
-                        }
-                        if ((i_zoom < 0) || (i_zoom > 4))  /* Check range */
-                           v_error(EINVAL, h_err_numeric_range, argv[i_count + 1]);  /** TODO: Add new error message */
+                        i_value = strtol(argv[i_count + 1], &s_text, 10);
+                        if (*s_text != '\0')
+                           v_error(EINVAL, h_err_invalid_number, argv[i_count + 1]);
+                        if ((i_value < 0) || (i_value > 4) || (errno == ERANGE))  /* Check range */
+                           v_error(EINVAL, h_err_numeric_range, argv[i_count + 1]);
                         else
                         {
                            if (i_count + 2 < argc)  /* Remove the parameter from the arguments */
@@ -739,7 +733,7 @@ int main(int argc, char *argv[])
                                  argv[i_offset] = argv[i_offset + 1];
                            argc--;
                         }
-                        f_scale = 1 + (0.125 * i_zoom);
+                        f_scale = 1 + (0.125 * i_value);
                      }
                      else
                         v_error(EINVAL, h_err_missing_argument, argv[i_count]);

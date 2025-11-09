@@ -39,8 +39,8 @@ The following command line options are available:
 ```
 Usage: x11-calc [OPTION]... [FILE] **
 
-  -b  ADDR                 set break-point (octal)
-  -i  OPCODE               set instruction trap (octal)
+  -b  ADDR                 set break-point (octal or hex)
+  -i  OPCODE               set instruction trap (octal or hex)
   -r  FILE                 load an alternate ROM
   -s                       single step
   -t                       trace
@@ -64,15 +64,16 @@ copies  of programs to be loaded automatically when the program  starts  or
 the emulator is reset using `Ctrl-C`.
 
 #### -b ADDR
-Sets a breakpoint at the specified address (octal).  The emulator will halt
-when  it encounters the breakpoint and display the instruction allowing the
-user to inspect the contents of the processor registers or continue.
+Sets  a  breakpoint at the specified address (octal or hex).  The  emulator
+will  halt  when it encounters the breakpoint and display  the  instruction
+allowing  the  user to inspect the contents of the processor  registers  or
+continue.
 
 Up to 10 breakpoints may be specified.
 
 #### -i OPCODE
-Sets  a breakpoint at the specified opcode (octal).  The emulator will halt
-when in encounters an instruction in the firmware that matches the opcode.
+Sets  a  breakpoint at the specified opcode (octal or  hex).  The  emulator
+will halt when it encounters an instruction that matches the opcode.
 
 ### -r FILE
 Provides the ability to load the firmware from a separate file.
@@ -218,8 +219,8 @@ The following control keys can also be used.
 #### Firmware Debugging
 
 You  can  start the emulation in trace mode using `-t`, or in  single  step
-mode using `-s`, and set a break-point using `-b <octal address>` or a trap
-using `-i <octal opcode>`.
+mode using `-s`, and set a break-point using `-b <address>` or a trap using
+`-i <opcode>`.
 
 `Ctrl-T`  also toggles trace mode when running, `Ctrl-S` executes the  next
 instruction, `Ctrl-Q` resumes execution, and `Ctrl-R` displays the contents
