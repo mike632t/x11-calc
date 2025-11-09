@@ -34,19 +34,21 @@
  * 20 May 25         - Tidied up data structure definitions - MT
  * 06 Sep 25         - Updated key positions to match HP55 - MT
  * 11 Oct 25         - Modified key layout - MT
+ * 09 Nov 25         - Another tweak to the keyboard layout - MT
  *
  */
 
 #define NAME           "x11-calc-35"
-#define BUILD          "0012"
-#define DATE           "06 Sep 25"
+#define BUILD          "0013"
+#define DATE           "09 Nov 25"
 #define AUTHOR         "MT"
 
-/* Define REDDOT to build a version with the original HP35 bugs */
+#define NOREDDOT       /* Define REDDOT to build a version with the original HP35 bugs */
 
 #include <stdarg.h>    /* strlen(), etc. */
 #include <stdio.h>     /* fprintf(), etc. */
 #include <stdlib.h>    /* getenv(), etc. */
+
 
 #include <X11/Xlib.h>  /* XOpenDisplay(), etc. */
 #include <X11/Xutil.h> /* XSizeHints etc. */
@@ -74,7 +76,7 @@ void v_init_buttons(struct obutton *h_button[]) {
    int i_left, i_top, i_count = 0;
 
    /* Define top row of keys. */
-   i_top = KBD_TOP + 3* (SWITCH_HEIGHT + 1); /* Assumes the function label and switch text use the same font */
+   i_top = KBD_TOP + 3 * SWITCH_HEIGHT + 1 * SCALE_HEIGHT; /* Assumes the function label and switch text use the same font */
    i_left = KBD_LEFT;
 
 #if defined(REDDOT)

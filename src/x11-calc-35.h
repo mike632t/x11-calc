@@ -28,10 +28,11 @@
  * 30 Mar 24         - Corrected number of switches - MT
  * 20 May 25         - Tidied up data structure definitions - MT
  * 11 Oct 25         - Modified key layout - MT
+ * 09 Nov 25         - Another tweak to the keyboard layout - MT
  *
  */
 
-#define HEIGHT             450 * SCALE_HEIGHT
+#define HEIGHT             440 * SCALE_HEIGHT
 #define WIDTH              230 * SCALE_WIDTH
 #define BUTTONS            35
 #define SWITCHES           1
@@ -55,7 +56,7 @@
 
 #define KBD_LEFT           12 * SCALE_WIDTH
 #define KBD_TOP            67 * SCALE_HEIGHT
-#define KBD_ROW            44 * SCALE_HEIGHT
+#define KBD_ROW            43 * SCALE_HEIGHT
 
 #define KEY_HEIGHT         25 * SCALE_HEIGHT
 #define KEY_WIDTH          39 * SCALE_WIDTH
