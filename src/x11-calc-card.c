@@ -28,6 +28,7 @@
  *                        more to store the default colours - MT
  *                      - Added card_reset() to restore the default colours
  *                        and reset label text - MT
+ *                      - Fixed resize() - MT
  *
  */
 
@@ -143,10 +144,16 @@ void i_card_reset(struct ocard *h_card)
 
 void i_card_resize(struct ocard *h_card, float f_scale)
 {
+   int i_labels;
+
    h_card->position.x = h_card->geometry.x * f_scale;
    h_card->position.y = h_card->geometry.y * f_scale;
    h_card->position.width = h_card->geometry.width * f_scale;
    h_card->position.height = h_card->geometry.height * f_scale;
+
+   for (i_labels = 0; i_labels < sizeof(h_card->label) / sizeof(h_card->label[0]); i_labels++)
+      if (h_card->label[i_labels])
+         i_label_resize(h_card->label[i_labels], f_scale);
 }
 
 int i_card_draw(Display *h_display, int x_application_window, int i_screen, struct ocard *h_card)
