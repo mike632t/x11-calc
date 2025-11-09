@@ -466,10 +466,10 @@
 
 #include <errno.h>     /* errno */
 
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdarg.h>
+#include <stdio.h>     /* fprintf(), etc */
+#include <stdlib.h>    /* getenv(), etc */
+#include <string.h>    /* strlen(), etc */
+#include <stdarg.h>    /* vargs(), etc */
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -729,6 +729,7 @@ void v_card_open_file(oprocessor* h_processor)
    char* s_filename;
    char s_buffer[16];
    int i_colours = 0, i_labels = 0;
+   int i_total = sizeof(h_processor->card->label) / sizeof(h_processor->card->label[0]);  /* Total number of labels */
    unsigned int i_hex;
 
    h_processor->card->file = NULL;
@@ -773,7 +774,7 @@ void v_card_open_file(oprocessor* h_processor)
 
             while (fscanf(h_processor->card->file, " '%15[^']',%*[ \t\n]", s_buffer) == 1)  /* Read labels (optional) " '%15[^']'%*[ ,\t\n]" */
             {
-               if (i_labels < sizeof(h_processor->card->label) / sizeof(h_processor->card->label[0]))  /* Ignore any extra labels */
+               if (i_labels < i_total)  /* Ignore any extraneous labels */
                {
                   if (h_processor->card->label[i_labels])  /* Check label is defined */
                   {
@@ -794,11 +795,14 @@ void v_card_open_file(oprocessor* h_processor)
                i_colours = 2;
             }
 
-            for (i_labels = 0; i_labels < sizeof(h_processor->card->label) / sizeof(h_processor->card->label[0]); i_labels++)  /* Explicitly set label colours for each label */
+            for (i_labels = 0; i_labels < i_total; i_labels++)  /* Explicitly set label colours for each label */
             {
                if (h_processor->card->label[i_labels])  /* Check that label is defined */
                {
-                  h_processor->card->label[i_labels]->foreground = h_processor->card->label_colour;
+                  if (i_labels < i_total / 2)
+                     h_processor->card->label[i_labels]->foreground = h_processor->card->label_colour;
+                  else
+                     h_processor->card->label[i_labels]->foreground = h_processor->card->shifted_colour;
                   h_processor->card->label[i_labels]->background = h_processor->card->colour;
                }
             }

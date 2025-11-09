@@ -29,6 +29,7 @@
  *                      - Added card_reset() to restore the default colours
  *                        and reset label text - MT
  *                      - Fixed resize() - MT
+ * 09 Nov 25            - Removed redundent linked list routines - MT 
  *
  */
 
@@ -58,25 +59,6 @@
 #include "x11-calc-cpu.h"
 
 #include "gcc-debug.h"
-
-struct onode *h_new(void *h_data, size_t t_size) /* Create a new node */
-{
-   struct onode *h_node;
-   h_node = (struct onode*)malloc(sizeof(*h_node));
-   h_node->data = malloc(t_size);
-   memcpy(h_node->data, h_data, t_size);
-   h_node->next = NULL;
-   return h_node;
-}
-
-struct onode *h_append(struct onode *h_list, void *h_data, size_t t_size) /* Append item to list */
-{
-   if (h_list != NULL)
-      h_list->next = h_append(h_list->next, h_data, t_size);
-   else
-      h_list = h_new(h_data, t_size); /* Create node */
-   return h_list;
-}
 
 /*
  * card_create (index, text, left, top, width, height, foreground,

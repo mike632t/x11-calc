@@ -39,8 +39,11 @@
  * 29 Oct 25         - Updated labels to add alignment and attribute - MT
  *                   - Added a label as placeholder for a program card - MT
  * 01 Nov 25         - Added a card to replace the placeholder - MT
- * 08 Nov 25         - Modified colour scheme and added function key labels
- *                     to the program card - MT
+ * 08 Nov 25         - Modified  the default card colour scheme  and  added
+ *                     labels to the program card - MT
+ * 09 Nov 25         - Resized the window to allow the switches to be moved
+ *                     and provide space for a full size card with two rows
+ *                     of function key labels - MT
  *
  */
 
@@ -49,9 +52,9 @@
 #define DATE           "01 Nov 25"
 #define AUTHOR         "MT"
 
-#include <stdarg.h>    /* strlen(), etc. */
-#include <stdio.h>     /* fprintf(), etc. */
-#include <stdlib.h>    /* getenv(), etc. */
+#include <stdio.h>     /* fprintf(), etc */
+#include <stdlib.h>    /* getenv(), etc */
+#include <stdarg.h>    /* vargs(), etc */
 
 #include <X11/Xlib.h>  /* XOpenDisplay(), etc. */
 #include <X11/Xutil.h> /* XSizeHints etc. */
@@ -73,8 +76,8 @@ oregister o_mem[MEMORY_SIZE];
 
 void v_init_switches(struct oswitch *h_switch[]) /* Define the switches. */
 {
-   h_switch[0] = h_switch_create(00000, "OFF", "", "ON ", h_alternate_font, KBD_LEFT, KBD_TOP, 2 * KEY_WIDTH + KEY_GAP, SWITCH_HEIGHT, True, MID_GREY, DARK_GREY);
-   h_switch[1] = h_switch_create(00000, "PRGM", "", "RUN", h_alternate_font, KBD_LEFT + 3 * KEY_WIDTH + 2 * KEY_GAP, KBD_TOP, 2 * KEY_WIDTH + KEY_GAP, SWITCH_HEIGHT, True, MID_GREY, DARK_GREY);
+   h_switch[0] = h_switch_create(00000, "OFF", "", "ON ", h_alternate_font, KBD_LEFT,  KBD_TOP + SWITCH_HEIGHT / 2, 2 * KEY_WIDTH + KEY_GAP, SWITCH_HEIGHT, True, MID_GREY, DARK_GREY);  /* Gives a bit more room for switches */
+   h_switch[1] = h_switch_create(00000, "PRGM", "", "RUN", h_alternate_font, KBD_LEFT + 3 * KEY_WIDTH + 2 * KEY_GAP,  KBD_TOP + SWITCH_HEIGHT / 2, 2 * KEY_WIDTH + KEY_GAP, SWITCH_HEIGHT, True, MID_GREY, DARK_GREY);
 }
 
 void v_init_labels(struct olabel *h_label[])
@@ -83,10 +86,12 @@ void v_init_labels(struct olabel *h_label[])
    int i_left, i_top, i_count = 0;
    int i_height = h_font->ascent + h_font->descent;
 
-   i_top = KBD_TOP + SWITCH_HEIGHT + 1 * SCALE_HEIGHT;
+   /** i_top = KBD_TOP + SWITCH_HEIGHT + 1 * SCALE_HEIGHT;  /* Original */
+   i_top = KBD_TOP + 2 * SWITCH_HEIGHT + 1 * SCALE_HEIGHT;
+
    i_left = KBD_LEFT;
-   h_label[i_count++] = h_label_create(001, NULL, h_font, i_left, i_top, 5 * KEY_WIDTH + 4 * KEY_GAP, KEY_HEIGHT - SWITCH_HEIGHT, LIGHT_TEXT, BACKGROUND, LABEL_ALIGN_CENTER, False, True);  /* Draws background for program card */
-   i_top += (KEY_HEIGHT) - SWITCH_HEIGHT - i_height;
+   h_label[i_count++] = h_label_create(001, NULL, h_font, i_left, i_top, 5 * KEY_WIDTH + 4 * KEY_GAP, 3.5 * SWITCH_HEIGHT, LIGHT_TEXT, BACKGROUND, LABEL_ALIGN_CENTER, False, True);  /* Draws background for program card */
+   i_top += (3 * SWITCH_HEIGHT) - i_height;
    h_label[i_count++] = h_label_create(001, "1/x", h_font, i_left, i_top, KEY_WIDTH, i_height, LIGHT_TEXT, BACKGROUND, LABEL_ALIGN_CENTER, False, False);
    i_left += (KEY_WIDTH + KEY_GAP);
    h_label[i_count++] = h_label_create(001, "/\xaf", h_font, i_left, i_top, KEY_WIDTH, i_height, LIGHT_TEXT, BACKGROUND, LABEL_ALIGN_CENTER, False, False);
@@ -98,17 +103,19 @@ void v_init_labels(struct olabel *h_label[])
    h_label[i_count++] = h_label_create(001, "X-Y", h_font, i_left, i_top, KEY_WIDTH, i_height, LIGHT_TEXT, BACKGROUND, LABEL_ALIGN_CENTER, False, False);
 }
 
-void v_init_card(struct ocard **h_card)
+void v_init_card(struct ocard **h_card)  /* Not an array */
 {
    XFontStruct *h_font = h_small_font;
    int i_left, i_top, i_count = 0;
    int i_height = h_font->ascent + h_font->descent;
 
-   i_top = KBD_TOP + SWITCH_HEIGHT + 1 * SCALE_HEIGHT;
+   i_top = KBD_TOP + 2 * SWITCH_HEIGHT + 1 * SCALE_HEIGHT;
    i_left = KBD_LEFT;
 
-   *h_card = h_card_create(001, NULL, h_font, i_left, i_top, 5 * KEY_WIDTH + 4 * KEY_GAP, KEY_HEIGHT - SWITCH_HEIGHT, LIGHT_TEXT, BLACK, YELLOW, True);  /* Program card - with colour scheme for a blank card*/
-   i_top += (KEY_HEIGHT) - SWITCH_HEIGHT - i_height;
+   /* Note - Label text MUST be a NULL pointer, it will be cleared anyway when reading a card */
+
+   *h_card = h_card_create(001, NULL, h_font, i_left, i_top, 5 * KEY_WIDTH + 4 * KEY_GAP, 3.5 * SWITCH_HEIGHT, LIGHT_TEXT, BLACK, YELLOW, True);  /* Program card - with colour scheme for a blank card*/
+   i_top += (3.5 * SWITCH_HEIGHT) - i_height;
    (*h_card)->label[i_count++] = h_label_create(001, NULL, h_font, i_left, i_top, KEY_WIDTH, i_height, BLACK, LIGHT_TEXT, LABEL_ALIGN_CENTER, False, False);
    i_left += (KEY_WIDTH + KEY_GAP);
    (*h_card)->label[i_count++] = h_label_create(001, NULL, h_font, i_left, i_top, KEY_WIDTH, i_height, BLACK, LIGHT_TEXT, LABEL_ALIGN_CENTER, False, False);
@@ -118,6 +125,17 @@ void v_init_card(struct ocard **h_card)
    (*h_card)->label[i_count++] = h_label_create(001, NULL, h_font, i_left, i_top, KEY_WIDTH, i_height, BLACK, LIGHT_TEXT, LABEL_ALIGN_CENTER, False, False);
    i_left += (KEY_WIDTH + KEY_GAP);
    (*h_card)->label[i_count++] = h_label_create(001, NULL, h_font, i_left, i_top, KEY_WIDTH, i_height, BLACK, LIGHT_TEXT, LABEL_ALIGN_CENTER, False, False);
+   i_top -= SWITCH_HEIGHT;
+   i_left = KBD_LEFT;
+   (*h_card)->label[i_count++] = h_label_create(001, NULL, h_font, i_left, i_top, KEY_WIDTH, i_height, YELLOW, LIGHT_TEXT, LABEL_ALIGN_CENTER, False, False);
+   i_left += (KEY_WIDTH + KEY_GAP);
+   (*h_card)->label[i_count++] = h_label_create(001, NULL, h_font, i_left, i_top, KEY_WIDTH, i_height, YELLOW, LIGHT_TEXT, LABEL_ALIGN_CENTER, False, False);
+   i_left += (KEY_WIDTH + KEY_GAP);
+   (*h_card)->label[i_count++] = h_label_create(001, NULL, h_font, i_left, i_top, KEY_WIDTH, i_height, YELLOW, LIGHT_TEXT, LABEL_ALIGN_CENTER, False, False);
+   i_left += (KEY_WIDTH + KEY_GAP);
+   (*h_card)->label[i_count++] = h_label_create(001, NULL, h_font, i_left, i_top, KEY_WIDTH, i_height, YELLOW, LIGHT_TEXT, LABEL_ALIGN_CENTER, False, False);
+   i_left += (KEY_WIDTH + KEY_GAP);
+   (*h_card)->label[i_count++] = h_label_create(001, NULL, h_font, i_left, i_top, KEY_WIDTH, i_height, YELLOW, LIGHT_TEXT, LABEL_ALIGN_CENTER, False, False);
 }
 
 void v_init_buttons(struct obutton *h_button[])
@@ -125,7 +143,7 @@ void v_init_buttons(struct obutton *h_button[])
    int i_left, i_top, i_count = 0;
 
    /* Define top row of keys. */
-   i_top = KBD_TOP + (KEY_HEIGHT) + 2 * SCALE_HEIGHT + 1; /* Leave gap for card */
+   i_top = KBD_TOP + 6 * SWITCH_HEIGHT + 1 * SCALE_HEIGHT;
    i_left = KBD_LEFT;
    h_button[i_count++] = h_button_create(00244, 'A', "A", "a", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, False, GREEN, YELLOW, MID_BLUE, BLACK);
    i_left += (KEY_WIDTH + KEY_GAP);

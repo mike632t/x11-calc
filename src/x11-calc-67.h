@@ -37,8 +37,7 @@
  *
  */
 
-#if !defined(HEIGHT)
-#define HEIGHT             450 * SCALE_HEIGHT
+#define HEIGHT             480 * SCALE_HEIGHT
 #define WIDTH              230 * SCALE_WIDTH
 #define BUTTONS            35
 #define SWITCHES           2
@@ -50,10 +49,6 @@
 #define DIGIT_BACKGROUND   DARK_RED
 #define DISPLAY_BACKGROUND RED_BACKGROUND
 #define BEZEL_COLOUR       LIGHT_GREY
-
-#define KBD_LEFT           12 * SCALE_WIDTH
-#define KBD_TOP            67 * SCALE_HEIGHT
-#define KBD_ROW            43 * SCALE_HEIGHT /** Was 43 / 49 */
 
 #define BEZEL_LEFT         0 * SCALE_WIDTH
 #define BEZEL_TOP          4 * SCALE_HEIGHT
@@ -80,15 +75,15 @@
 #define MEMORY_SIZE        256  /** Include buffer addresses and extended memory - KJC */
 
 #define CARDREADER
+
 #define CONTINIOUS
 
 extern int i_rom [ROM_SIZE];
 
 void v_init_labels(struct olabel *h_label[]);
 
-void v_init_card(struct ocard **h_card);
+void v_init_card(struct ocard **h_card);  /* Not passing an array */
 
 void v_init_switches(struct oswitch *h_label[]);
 
 void v_init_buttons(struct obutton *h_button[]);
-#endif

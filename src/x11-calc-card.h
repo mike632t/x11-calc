@@ -24,13 +24,9 @@
  * 08 Nov 25            - Modified names of colour properties and added two
  *                        more to store the default colours - MT
  *                      - Added card_reset() to restore the defaults - MT
+ * 09 Nov 25            - Removed redundent linked list data structure - MT 
  *
  */
-struct onode /* Linked list node */
-{
-    void  *data;
-    struct onode *next;
-};
 
 struct ocard /* Card structure */
 {
