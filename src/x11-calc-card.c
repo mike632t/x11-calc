@@ -29,7 +29,11 @@
  *                      - Added card_reset() to restore the default colours
  *                        and reset label text - MT
  *                      - Fixed resize() - MT
- * 09 Nov 25            - Removed redundent linked list routines - MT 
+ * 09 Nov 25            - Removed redundant linked list routines - MT
+ * 11 Nov 25            - Tidied up layout - MT
+ *
+ * To Do                - Use a label to display the file name (allows each
+ *                        model some control over the position and style).
  *
  */
 
@@ -150,7 +154,7 @@ int i_card_draw(Display *h_display, int x_application_window, int i_screen, stru
          h_card->position.x, h_card->position.y , h_card->position.width, h_card->position.height);  /* Always fill in background */
       if ((h_card->state) && (h_card->text))  /* Only draw text if enabled and not blank */
       {
-         i_indent = 1 + h_card->position.x + XTextWidth(h_card->font, " ", 1) + i_margin;  /* Text left aligned */
+         i_indent = 1 + h_card->position.x + i_margin;  /* Text left aligned */
          i_upper = h_card->position.y + (h_card->font->ascent) + (h_card->position.height / 2 - (h_card->font->ascent + h_card->font->descent)) / 2;
          XSetForeground(h_display, DefaultGC(h_display, i_screen), h_card->label_colour);  /* Set the text colour */
          XDrawString(h_display, x_application_window, DefaultGC(h_display, i_screen), i_indent, i_upper, h_card->text, strlen(h_card->text));  /* Draw the text */
