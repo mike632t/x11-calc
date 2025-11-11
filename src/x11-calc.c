@@ -395,6 +395,7 @@
  *                   - Changed  command line parser to use strtol() for any
  *                     numeric arguments and allow breakpoints and traps to
  *                     be set using octal or hexadecimal - MT
+ * 11 Nov 25         - Card text ignores any characters after a '.' - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -479,10 +480,10 @@ char* s_reformat(const char *s_string)
    if (strncmp(s_string, FILENAME, strlen(FILENAME)) == 0)
       s_string = s_string + strlen(FILENAME) + 1;  /* Ignore the prefix */
 
-   if (strrchr(s_string, '.') == NULL)
+   if (strchr(s_string, '.') == NULL)  /* Ignore not just the file extension, but any characters after the first '.' */
       i_length = strlen(s_string);
    else
-      i_length = strrchr(s_string, '.') - s_string;
+      i_length = strchr(s_string, '.') - s_string;
 
    if ((s_output = (char *)malloc(strlen(s_string) + 1)) == NULL) v_error(errno, h_err_memmory_alloc, __FILE__, __LINE__);
 
