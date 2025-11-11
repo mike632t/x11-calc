@@ -24,7 +24,8 @@
  * 08 Nov 25            - Modified names of colour properties and added two
  *                        more to store the default colours - MT
  *                      - Added card_reset() to restore the defaults - MT
- * 09 Nov 25            - Removed redundent linked list data structure - MT 
+ * 09 Nov 25            - Removed redundent linked list data structure - MT
+ * 11 Nov 25            - Added label for card reference number - MT
  *
  */
 
@@ -38,7 +39,7 @@ struct ocard /* Card structure */
    XRectangle position;          /* Current position */
    XRectangle geometry;          /* Original position */
    XFontStruct* font;            /* Font */
-   struct olabel *label[10];     /* Labels */
+   struct olabel *label[11];     /* Labels */
    unsigned int foreground;      /* Default foreground colour */
    unsigned int background;      /* Default background colour */
    unsigned int label_colour;    /* Label colour */

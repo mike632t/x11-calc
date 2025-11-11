@@ -44,6 +44,7 @@
  * 09 Nov 25         - Resized the window to allow the switches to be moved
  *                     and provide space for a full size card with two rows
  *                     of function key labels - MT
+ * 11 Nov 25         - Added label for card reference number - MT
  *
  */
 
@@ -136,6 +137,8 @@ void v_init_card(struct ocard **h_card)  /* Not an array */
    (*h_card)->label[i_count++] = h_label_create(001, NULL, h_font, i_left, i_top, KEY_WIDTH, i_height, YELLOW, LIGHT_TEXT, LABEL_ALIGN_CENTER, False, False);
    i_left += (KEY_WIDTH + KEY_GAP);
    (*h_card)->label[i_count++] = h_label_create(001, NULL, h_font, i_left, i_top, KEY_WIDTH, i_height, YELLOW, LIGHT_TEXT, LABEL_ALIGN_CENTER, False, False);
+   i_top = KBD_TOP + 2 * SWITCH_HEIGHT + 1 * SCALE_HEIGHT + ((*h_card)->position.height / 2 - (h_font->ascent + h_font->descent)) / 2;
+   (*h_card)->label[i_count++] = h_label_create(001, NULL, h_alternate_font, i_left, i_top, KEY_WIDTH, i_height, YELLOW, LIGHT_TEXT, LABEL_ALIGN_CENTER, False, False);
 }
 
 void v_init_buttons(struct obutton *h_button[])
