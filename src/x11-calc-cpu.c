@@ -747,7 +747,7 @@ void v_card_open_file(oprocessor* h_processor)
    }
    else
    {
-      s_filename = s_get_filename(s_get_datafile(), 'r', FILENAME"-*.crd", "Card File");
+      s_filename = s_get_filename(s_get_datafile(), 'r', FILENAME"-*.crd", "Card File");  /* Won't work on VAX C but that doesn't have GTK so it isn;t a problem */
       if (s_filename)
       {
          if ((h_processor->card->file = fopen(s_filename, "r")))
