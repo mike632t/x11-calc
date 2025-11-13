@@ -395,7 +395,8 @@
  *                   - Changed  command line parser to use strtol() for any
  *                     numeric arguments and allow breakpoints and traps to
  *                     be set using octal or hexadecimal - MT
- * 11 Nov 25         - Card text ignores any characters after a '.' - MT
+ * 11 Nov 25  (0211) - Card text ignores any characters after a '.' - MT
+ * 12 Nov 25   0.29  - Use a label to display program name - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -407,9 +408,9 @@
  */
 
 #define  NAME          "x11-calc"
-#define  VERSION       "0.19"
-#define  BUILD         "0208"
-#define  DATE          "04 Nov 25"
+#define  VERSION       "0.20"
+#define  BUILD         "0212"
+#define  DATE          "12 Nov 25"
 #define  AUTHOR        "MT"
 
 #define  INTERVAL 48   /* Number of ticks to execute before updating the display */
@@ -1070,13 +1071,15 @@ int main(int argc, char *argv[])
                h_label[i_count]->state = h_processor->crc[FUNCTION];
             for (i_count = 0; i_count < LABELS; i_count++)  /* Draw labels */
                i_label_draw(x_display, x_buffer, i_screen, h_label[i_count]);
-            h_processor->card->text = NULL;  /* Clear the current card text */
+            h_processor->card->state = False;
+            h_processor->card->label[0]->text = NULL;  /* Clear the current card text */
          }
          else
          {
             if (h_processor->card->filename)
             {
-               h_processor->card->text = s_reformat(h_processor->card->filename);  /* Use the filename as the basis of the card label */
+               h_processor->card->state = True;
+               h_processor->card->label[0]->text = s_reformat(h_processor->card->filename);
                h_processor->card->filename = NULL;
             }
             i_card_draw(x_display, x_buffer, i_screen, h_processor->card);  /* Update display */

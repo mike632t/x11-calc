@@ -26,34 +26,34 @@
  *                      - Added card_reset() to restore the defaults - MT
  * 09 Nov 25            - Removed redundent linked list data structure - MT
  * 11 Nov 25            - Added label for card reference number - MT
+ * 12 Nov 25            - Use a label to display program name - MT
+ *                      - Allow colour of all labels to be modified - MT
  *
  */
 
-struct ocard /* Card structure */
+struct ocard  /* Card structure */
 {
    int index;
    FILE * file;                  /* Open card file (NULL = not opened) - KJC */
    char* filename;               /* Filename */
    int records;                  /* Number of records read/written, cleared at open - KJC */
-   char* text;                   /* Label */
    XRectangle position;          /* Current position */
    XRectangle geometry;          /* Original position */
    XFontStruct* font;            /* Font */
-   struct olabel *label[11];     /* Labels */
+   struct olabel *label[12];     /* Labels */
    unsigned int foreground;      /* Default foreground colour */
+   unsigned int alternate;       /* Default function colour */
    unsigned int background;      /* Default background colour */
    unsigned int label_colour;    /* Label colour */
-   unsigned int shifted_colour;  /* Alternate (shifted) text colour */
+   unsigned int function_colour; /* Function text colour */
    unsigned int colour;          /* Default card colour */
    int state;                    /* Enabled */
 };
 
 struct ocard *h_card_pressed(struct ocard *h_card, int i_xpos, int i_ypos);
 
-struct ocard *h_card_create(int i_index, char* s_text, XFontStruct *h_font,
-   int i_left, int i_top, int i_width, int i_height,
-   unsigned int i_colour, unsigned int i_label_colour,
-   unsigned int i_shifted_colour, int i_state);
+struct ocard *h_card_create(int i_index, XFontStruct *h_font, int i_left, int i_top, int i_width, int i_height,
+   unsigned int i_colour, unsigned int i_label_colour, unsigned int i_shifted_colour, int i_state);
 
 void i_card_reset(struct ocard *h_card);
 

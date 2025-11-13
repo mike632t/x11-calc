@@ -31,6 +31,8 @@
  *                      - Fixed resize() - MT
  * 09 Nov 25            - Removed redundant linked list routines - MT
  * 11 Nov 25            - Tidied up layout - MT
+ * 12 Nov 25            - Use a label to display program name - MT
+ *                      - Allow colour of all labels to be modified - MT
  *
  * To Do                - Use a label to display the file name (allows each
  *                        model some control over the position and style).
@@ -38,8 +40,8 @@
  */
 
 #define NAME           "x11-calc-card"
-#define BUILD          "0002"
-#define DATE           "08 Oct 2025"
+#define BUILD          "0009"
+#define DATE           "12 Nov 2025"
 #define AUTHOR         "MT"
 
 #include <errno.h>     /* errno */
@@ -76,10 +78,8 @@
  *
  */
 
-struct ocard *h_card_create(int i_index, char* s_text, XFontStruct *h_font,
-   int i_left, int i_top, int i_width, int i_height,
-   unsigned int i_colour, unsigned int i_label_colour,
-   unsigned int i_shifted_colour, int i_state)
+struct ocard *h_card_create(int i_index, XFontStruct *h_font, int i_left, int i_top, int i_width, int i_height,
+   unsigned int i_colour, unsigned int i_label_colour, unsigned int i_function_colour, int i_state)
 {
    struct ocard *h_card;  /* Pointer to card */
    int i_count;
@@ -90,7 +90,6 @@ struct ocard *h_card_create(int i_index, char* s_text, XFontStruct *h_font,
    h_card->file = NULL;
    h_card->filename = NULL;
    h_card->records = 0;
-   h_card->text = s_text;
    h_card->font = h_font;
    h_card->position.x = i_left;
    h_card->position.y = i_top;
@@ -99,71 +98,68 @@ struct ocard *h_card_create(int i_index, char* s_text, XFontStruct *h_font,
 
    h_card->geometry = h_card->position;  /* Save position */
 
-   for (i_count = 0; i_count < sizeof(h_card->label) / sizeof(h_card->label[0]); i_count++)
+   for (i_count = 1; i_count < sizeof(h_card->label) / sizeof(h_card->label[0]); i_count++)
       h_card->label[i_count] = NULL;
 
    h_card->colour = i_colour;
    h_card->label_colour = i_label_colour;
-   h_card->shifted_colour = i_shifted_colour;
-   h_card->foreground = h_card->label_colour;
+   h_card->function_colour = i_function_colour;
    h_card->background = h_card->colour;
+   h_card->foreground = h_card->label_colour;
+   h_card->alternate = h_card->function_colour;
    h_card->state = i_state;
    return(h_card);
 }
 
 void i_card_reset(struct ocard *h_card)
 {
-   int i_labels;
+   int i_label;
 
-   for (i_labels = 0; i_labels < sizeof(h_card->label) / sizeof(h_card->label[0]); i_labels++)
+   for (i_label = 0; i_label < sizeof(h_card->label) / sizeof(h_card->label[0]); i_label++)
    {
-      if (h_card->label[i_labels])
+      if (h_card->label[i_label])
       {
-         free(h_card->label[i_labels]->text);
-         h_card->label[i_labels]->text = NULL;
-         h_card->label[i_labels]->state = False;
+         free(h_card->label[i_label]->text);
+         if (i_label > 0) h_card->label[i_label]->text = NULL;
+         h_card->label[i_label]->state = True;
       }
    }
    h_card->colour = h_card->background;  /* Reset colours */
    h_card->label_colour = h_card->foreground;
+   h_card->function_colour = h_card->alternate;
 }
 
 void i_card_resize(struct ocard *h_card, float f_scale)
 {
-   int i_labels;
+   int i_label;
 
    h_card->position.x = h_card->geometry.x * f_scale;
    h_card->position.y = h_card->geometry.y * f_scale;
    h_card->position.width = h_card->geometry.width * f_scale;
    h_card->position.height = h_card->geometry.height * f_scale;
 
-   for (i_labels = 0; i_labels < sizeof(h_card->label) / sizeof(h_card->label[0]); i_labels++)
-      if (h_card->label[i_labels])
-         i_label_resize(h_card->label[i_labels], f_scale);
+   for (i_label = 0; i_label < sizeof(h_card->label) / sizeof(h_card->label[0]); i_label++)
+      if (h_card->label[i_label])
+         i_label_resize(h_card->label[i_label], f_scale);
 }
 
 int i_card_draw(Display *h_display, int x_application_window, int i_screen, struct ocard *h_card)
 {
-   int i_count, i_indent, i_upper, i_margin = 2;
+   int i_count;
 
    if (h_card != NULL)
    {
-      XSetFont(h_display, DefaultGC(h_display, i_screen), h_card->font->fid);  /* Set the text font */
-      XSetForeground(h_display, DefaultGC(h_display, i_screen), h_card->colour);
-      XFillRectangle(h_display, x_application_window, DefaultGC(h_display, i_screen),
+      if (h_card->state)  /* Only draw text if enabled */
+      {
+         XSetForeground(h_display, DefaultGC(h_display, i_screen), h_card->colour);
+         XFillRectangle(h_display, x_application_window, DefaultGC(h_display, i_screen),
          h_card->position.x, h_card->position.y , h_card->position.width, h_card->position.height);  /* Always fill in background */
-      if ((h_card->state) && (h_card->text))  /* Only draw text if enabled and not blank */
-      {
-         i_indent = 1 + h_card->position.x + i_margin;  /* Text left aligned */
-         i_upper = h_card->position.y + (h_card->font->ascent) + (h_card->position.height / 2 - (h_card->font->ascent + h_card->font->descent)) / 2;
-         XSetForeground(h_display, DefaultGC(h_display, i_screen), h_card->label_colour);  /* Set the text colour */
-         XDrawString(h_display, x_application_window, DefaultGC(h_display, i_screen), i_indent, i_upper, h_card->text, strlen(h_card->text));  /* Draw the text */
-      }
-      for (i_count = 0; i_count < sizeof(h_card->label) / sizeof(h_card->label[0]); i_count++)
-      {
-         if (h_card->label[i_count] != NULL)
+         for (i_count = 0; i_count < sizeof(h_card->label) / sizeof(h_card->label[0]); i_count++)
          {
-            i_label_draw(h_display, x_application_window,i_screen, h_card->label[i_count]);
+            if (h_card->label[i_count] != NULL)  /* Only draw each labels if not blank */
+            {
+               i_label_draw(h_display, x_application_window,i_screen, h_card->label[i_count]);
+            }
          }
       }
    }

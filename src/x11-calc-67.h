@@ -34,10 +34,11 @@
  * 11 Oct 25         - Modified key layout - MT
  * 27 Oct 25         - Added function key labels - MT
  * 01 Nov 25         - Added cards replace the function key labels - MT
+ * 12 Nov 25         - Updated card layout and window size - MT 
  *
  */
 
-#define HEIGHT             480 * SCALE_HEIGHT
+#define HEIGHT             470 * SCALE_HEIGHT
 #define WIDTH              230 * SCALE_WIDTH
 #define BUTTONS            35
 #define SWITCHES           2
