@@ -7,8 +7,6 @@
 
 - [ ] Allow user to resize the window at runtime (scroll wheel?).
 
-- [ ] Allow pre-recorded program cards to include labels
-
 - [ ] Formatted program listings (using a separate python script)
 
 - [ ] Allow a program card to be loaded from the command line
@@ -44,6 +42,8 @@
 - [X] Allow user to specify window position.
 
   [https://tronche.com/gui/x/xlib/window/XMoveResizeWindow.html]::
+
+- [X] Allow pre-recorded program cards to include labels
 
 - [X] Add card reader to HP67
 
