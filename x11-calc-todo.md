@@ -39,11 +39,13 @@
 
 ### Completed changes
 
-- [X] Allow user to specify window position.
+- [X] Allow pre-recorded program cards to include labels
+
+- [X] Breakpoint and instruction traps can now be specified in octal or hex
+
+- [X] Allow user to specify window position
 
   [https://tronche.com/gui/x/xlib/window/XMoveResizeWindow.html]::
-
-- [X] Allow pre-recorded program cards to include labels
 
 - [X] Add card reader to HP67
 
