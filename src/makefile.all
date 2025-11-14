@@ -35,6 +35,7 @@
 #  18 Aug 25         - Attempt to define compiler - MT
 #  20 Sep 25         - Fixed issue with compiler version - MT
 #  01 Nov 25         - Added a x11-calc-card - MT
+#  14 Nov 25         - Added x11-calc-register - MT
 #
 
 MODEL	= 21
@@ -43,9 +44,11 @@ BIN		= ../bin
 
 COMPILER	= `$(CC) -v 2>&1 | grep ' version ' | sed -e 's/([^()]*)//g' | sed -e 's/[ \t]*$$//g'`
 
-# SHARED sources are model-dependant via HP$(MODEL) #define statements
+# Note   SHARED sources are model dependant and are recompiled for every emulator
+#        COMMON code is only compiled once an cannot contain model dependent code blocks
+
 SHARED	= x11-calc.c x11-calc-cpu.c x11-calc-display.c x11-calc-digit.c x11-calc-messages.c x11-calc-button.c x11-calc-card.c
-COMMON	= x11-calc-switch.c x11-calc-label.c x11-calc-colour.c x11-calc-font.c x11-keyboard.c gcc-wait.c gcc-exists.c
+COMMON	=  x11-calc-register.c x11-calc-switch.c x11-calc-label.c x11-calc-colour.c x11-calc-font.c x11-keyboard.c gcc-wait.c gcc-exists.c
 
 CC		= cc
 DEBUG	= -g

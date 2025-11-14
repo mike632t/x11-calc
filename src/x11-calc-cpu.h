@@ -68,15 +68,19 @@
  * 18 Oct 25         - Added card reader support - KJC
  * 04 Nov 25         - Program card defined as part of the processor (makes
  *                     it easier to use in the processor code) - MT
+ * 14 Nov 25         - Moved register defination to a seperate file - MT
+ *
+ * To Do             -
  *
  */
 
-#ifndef REGISTERS
-#include "x11-calc.h"
+#include "x11-calc-register.h"         /* CPU Register definitions */
+#include "x11-calc.h"                  /* Model specific constants */
+
+#ifndef CPU_H
+#define CPU_H
 
 #define REGISTERS       8              /* A, B, C(X), D(Y), E(Z), F(T), M, N(M2) */
-#define REG_SIZE        14
-#define EXP_SIZE        3              /* Two digit exponent plus a sign digit */
 #define STATUS_BITS     16
 #define FLAGS           9
 
@@ -127,11 +131,6 @@
 
 #define BUFSIZE         20             /* Output buffer size */
 #endif
-
-typedef struct {
-   int id;
-   unsigned char nibble[REG_SIZE];
-} oregister;
 
 typedef struct {
    oregister *reg[REGISTERS];          /* Registers */
@@ -187,6 +186,10 @@ void v_fprint_registers(FILE *h_file, oprocessor *h_procesor);
 void v_fprint_memory(FILE *h_file, oprocessor *h_procesor);
 
 void v_processor_tick(oprocessor *h_procesor);
+
+#if defined(CONTINIOUS) || defined(HP67)
+char *s_get_filename(char *s_path, char c_mode, char *s_filter, char *s_name);
+#endif
 
 #if defined(CONTINIOUS)
 char *s_get_datafile(void);

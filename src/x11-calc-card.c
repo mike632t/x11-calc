@@ -7,8 +7,6 @@
  *
  * Contains  the  functions needed to create a card object and render it.
  *
- * Labels are stored in a linked list.
- *
  * This  program is free software: you can redistribute it and/or modify it
  * under  the terms of the GNU General Public License as published  by  the
  * Free  Software Foundation, either version 3 of the License, or (at  your
@@ -74,10 +72,11 @@
  * pointer  to the card, or exits the program if there isn't enough  memory
  * available.
  *
- * Does NOT create the labels - these are added later.
+ * Does NOT create the labels - these are created by model specific init_card() routine.
  *
  */
 
+#if defined(HP67)
 struct ocard *h_card_create(int i_index, XFontStruct *h_font, int i_left, int i_top, int i_width, int i_height,
    unsigned int i_colour, unsigned int i_label_colour, unsigned int i_function_colour, int i_state)
 {
@@ -165,3 +164,4 @@ int i_card_draw(Display *h_display, int x_application_window, int i_screen, stru
    }
    return(True);
 }
+#endif
