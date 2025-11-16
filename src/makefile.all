@@ -36,6 +36,7 @@
 #  20 Sep 25         - Fixed issue with compiler version - MT
 #  01 Nov 25         - Added a x11-calc-card - MT
 #  14 Nov 25         - Added x11-calc-register - MT
+#                    - Disable optimization when debugging - MT
 #
 
 MODEL	= 21
@@ -51,7 +52,8 @@ SHARED	= x11-calc.c x11-calc-cpu.c x11-calc-display.c x11-calc-digit.c x11-calc-
 COMMON	=  x11-calc-register.c x11-calc-switch.c x11-calc-label.c x11-calc-colour.c x11-calc-font.c x11-keyboard.c gcc-wait.c gcc-exists.c
 
 CC		= cc
-DEBUG	= -g
+#DEBUG	= -O0 -g
+DEBUG	=
 
 LDLIBS_ADD	= -lX11 -lm
 
