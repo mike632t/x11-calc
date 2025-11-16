@@ -24,7 +24,7 @@
  *                     type definition - MT
  * 24 Dec 21         - Standard key width now defined as KEY WIDTH - MT
  * 11 Jan 22         - Removed ROM_BANKS - MT
- * 15 jan 22         - Corrected MEMORY_SIZE - MT
+ * 15 Jan 22         - Corrected MEMORY_SIZE - MT
  * 20 Jan 22         - Fixed compilation warnings on VAXC by defining i_rom
  *                     as external - MT
  * 29 Jan 22         - Added an optional bezel to the display - MT
@@ -32,9 +32,11 @@
  *                     for buttons and switches into two functions - MT
  * 20 May 25         - Tidied up data structure definitions - MT
  * 11 Oct 25         - Modified key layout - MT
+ * 18 Oct 25         - Added card reader support - KJC
  * 27 Oct 25         - Added function key labels - MT
  * 01 Nov 25         - Added cards replace the function key labels - MT
- * 12 Nov 25         - Updated card layout and window size - MT 
+ * 12 Nov 25         - Updated card layout and window size - MT
+ * 16 Nov 25         - Revert to standard memory size - MT
  *
  */
 
@@ -73,9 +75,7 @@
 #define SWITCH_HEIGHT      10 * SCALE_HEIGHT
 
 #define ROM_SIZE           020000
-#define MEMORY_SIZE        256  /** Include buffer addresses and extended memory - KJC */
-
-#define CARDREADER
+#define MEMORY_SIZE        64
 
 #define CONTINIOUS
 
