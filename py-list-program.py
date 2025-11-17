@@ -75,6 +75,7 @@
 #                            more like a printed listing - MT
 #  05 Sep 25  0.6 (0028)   - Added support for HP12C - MT
 #  10 Nov 25               - Modified mnemonics to make them clearer - MT
+#  17 Nov 25               - Fixed issue with Python 3 - MT
 #
 #  To Do                   - Add lookup tables for HP10C, HP11C, and HP38C.
 #                          - Add support for HP15C.
@@ -906,6 +907,9 @@ try:
                _char = _get_char(_file) # Read ahead
 
             if _reverse: _bytes.reverse() # Reverse the order of the bytes
+
+            print(_bytes)
+
             if len(_names) > 1:
                sys.stdout.write(_formats[_format]["heading"] + _expand(_buffer + _name) + _formats[_format]["end"] + "\n\n")
                _buffer = ""
