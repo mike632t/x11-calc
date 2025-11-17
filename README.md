@@ -515,19 +515,9 @@ emulators, then please create a new [issue](https://github.com/mike632t/x11-calc
 
 Your problem report should contain:
 
-- Computer model (or hypervisor);
+- Whether you are using a pre-built binary (Alpine / Flatpak);
 
-- Processor architecture;
-
-- Operating System and version;
-
-- Desktop Environment and version;
-
-- Window Manager and version;
-
-- If you are using a pre-built binary (Alpine / Flatpak);
-
-- Compiler and version used (if applicable);
+- The output from `sh-get-environment-info.sh`;
 
 - Commit ID;
 
