@@ -31,6 +31,7 @@
  * 11 Nov 25            - Tidied up layout - MT
  * 12 Nov 25            - Use a label to display program name - MT
  *                      - Allow colour of all labels to be modified - MT
+ * 14 Nov 25            - Added a buffer register - MT
  *
  * To Do                - Use a label to display the file name (allows each
  *                        model some control over the position and style).
@@ -89,6 +90,7 @@ struct ocard *h_card_create(int i_index, XFontStruct *h_font, int i_left, int i_
    h_card->file = NULL;
    h_card->filename = NULL;
    h_card->records = 0;
+   h_card->buffer = h_register_create(-9);
    h_card->font = h_font;
    h_card->position.x = i_left;
    h_card->position.y = i_top;

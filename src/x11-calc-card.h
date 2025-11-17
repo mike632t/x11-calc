@@ -28,7 +28,7 @@
  * 11 Nov 25            - Added label for card reference number - MT
  * 12 Nov 25            - Use a label to display program name - MT
  *                      - Allow colour of all labels to be modified - MT
- * 14 Nov 25            - Added a buffer register to the card - MT
+ * 14 Nov 25            - Added a buffer register - MT
  *
  */
 
@@ -37,10 +37,10 @@
 struct ocard  /* Card structure */
 {
    int index;
-   FILE * file;                  /* Open card file (NULL = not opened) - KJC */
+   FILE* file;                   /* Open card file (NULL = not opened) - KJC */
    char* filename;               /* Filename */
    int records;                  /* Number of records read/written, cleared at open - KJC */
-   oregister buffer;             /* Card reader buffer */
+   oregister* buffer;            /* Card reader buffer */
    XRectangle position;          /* Current position */
    XRectangle geometry;          /* Original position */
    XFontStruct* font;            /* Font */
