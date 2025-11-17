@@ -16,7 +16,7 @@ in C using only X11.
 
 ![HP27](./x11-calc-27.png) ![HP29](./x11-calc-29.png)
 
-![HP67](./x11-calc-67.png)
+![HP67](./x11-calc-67.png) ![HP67](./x11-calc-67-card.png) ![HP67](./x11-calc-67-diag-a.png) ![HP67](./x11-calc-67-diag-c.png)
 
 ![HP31](./x11-calc-31e.png) ![HP32](./x11-calc-32e.png) ![HP33](./x11-calc-33c.png)
 
