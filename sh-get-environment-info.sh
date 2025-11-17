@@ -1,6 +1,8 @@
 #!/bin/bash
 
-if [ -f /etc/os-release ]; then # Try geting the Operating System
+# Operating System
+_operating_system=""
+if [ -f /etc/os-release ]; then
    . /etc/os-release
    _operating_system="$PRETTY_NAME"
 elif [ -f /etc/lsb-release ]; then
@@ -14,6 +16,7 @@ fi
 echo "Operating System: $_operating_system"
 echo ""
 
+# Hypervisor
 _hypervisor=""
 if grep -qi microsoft /proc/version 2>/dev/null; then # Start by checking for WSL or WSL2
    if uname -r | grep -qi "WSL2"; then
@@ -57,14 +60,14 @@ if [ -n "$_display_manager" ]; then
    _display_manager=$(basename "$_display_manager")
 fi
 if [ -z "$_display_manager" ]; then
-	_display_manager=$(ps -e -o comm= | grep -E 'cdm|gdm|gdm3|kdm|lightdm|sddm|slim|xdm' | sort | uniq)
-	if [ -z "$_display_manager" ]; then
-		if [ -n "$WAYLAND_DISPLAY" ]; then
+   _display_manager=$(ps -e -o comm= | grep -E 'cdm|gdm|gdm3|kdm|lightdm|sddm|slim|xdm' | sort | uniq)
+   if [ -z "$_display_manager" ]; then
+      if [ -n "$WAYLAND_DISPLAY" ]; then
          _display_manager="WSLg"
       else
          _display_manager="Unknown"
       fi
-	fi
+   fi
 fi
 echo "Display Manager: $_display_manager"
 echo ""
@@ -86,7 +89,6 @@ if [ -z "$_session_manager" ]; then
 fi
 echo "Session Manager: $_session_manager"
 echo ""
-
 
 # Window Manager
 _window_manager=$(ps -e -o comm= | grep -E 'awesome|blackbox|fluxbox|fvwm|gnome-shell|icewm|i3|kwin|marco|metacity|mutter|openbox|sawfish|twm|wmaker|xfwm' | sort | uniq)
@@ -118,7 +120,7 @@ fi
 echo "Session Type: $_session_type"
 echo ""
 
-# C Compiler
+# Compiler
 _compiler=""
 if command -v cc >/dev/null 2>&1; then
    _compiler=$(readlink -f "$(command -v cc)" 2>/dev/null || command -v cc)
@@ -138,4 +140,3 @@ else
    _make="Not installed"
 fi
 echo "Make: $_make"
-
