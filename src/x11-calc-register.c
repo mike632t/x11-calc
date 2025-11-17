@@ -19,6 +19,8 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * 14 Nov 25  0.1.0001  - Initial version - MT
+ * 15 Nov 25            - Added  a default register description to describe
+ *                        buffer registers to fprint_register() - MT
  *
  * To Do                -
  *
@@ -64,15 +66,19 @@ oregister *h_register_create(int i_id)  /* Create a new register */
 void v_fprint_register(FILE *h_file, oregister *h_register)  /* Print the contents of a register */
 {
    const char c_name[8] = {'A', 'B', 'C', 'Y', 'Z', 'T', 'M', 'N'};
-   int i_count;
+   int i_count, i_offset = 0;
    if (h_register != NULL)
    {
-      fprintf(h_file, "\treg[");
       if (h_register->id < 0)
-         fprintf(h_file, "\'%c\'", c_name[h_register->id * -1 - 1]);
+      {
+         i_offset= -h_register->id - 1;
+         if (i_offset >= sizeof(c_name))
+            fprintf(h_file, "\tbuffer  = 0x");
+         else
+            fprintf(h_file, "\treg[\'%c\'] = 0x", c_name[i_offset]);
+      }
       else
-         fprintf(h_file, "%03d", h_register->id);
-      fprintf(h_file, "] = 0x");
+         fprintf(h_file, "\treg[%03d] = 0x", h_register->id);
       for (i_count = REG_SIZE - 1; i_count >=0 ; i_count--)
          fprintf(h_file, "%1x", h_register->nibble[i_count]);
    }
