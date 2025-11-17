@@ -17,8 +17,8 @@ The  aim  is to have the same source code compile without  modification  on
 as  many  systems  and architectures as possible including  Linux,  NetBSD,
 MacOS, VMS, Solaris and Tru64 Unix.
 
- ![HP27](./img/x11-calc-27.png) ![HP33](./img/x11-calc-33c.png) ![HP34C](./img/x11-calc-34c.png) ![HP67](./img/x11-calc-67-diag-a.png) 
- ![HP11](./img/x11-calc-11c.png) ![HP12](./img/x11-calc-12c.png) 
+ ![HP27](./img/x11-calc-27.png) ![HP33](./img/x11-calc-33c.png) ![HP34C](./img/x11-calc-34c.png) ![HP67](./img/x11-calc-67-diag-a.png)
+ ![HP11](./img/x11-calc-11c.png) ![HP12](./img/x11-calc-12c.png)
 
 ### Contents <sup><sup>[Back to Top](#top)</sup></sup>
 
@@ -428,7 +428,7 @@ The emulators have been successfully compiled and tested on:
 
    - VMS 9.2-1, C 7.4-726, x64 ***
 
-   - Windows 11 + WSL2, gcc 12.2.0, x64 + arm64
+   - Windows 11 + WSL2 (Ubuntu 24.04 LTS), gcc 13.3.0, x64
 
 ** Not yet retested with this build.
 
