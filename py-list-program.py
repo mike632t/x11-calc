@@ -936,7 +936,7 @@ try:
                   _flush(_buffer)
                   _buffer = ""
                else:
-                  if _number or _buffer[-1:] <> "\n": _buffer += "\n" # Put a newline in the buffer in case we encounter any more program steps later
+                  if _number or _buffer[-1:] != "\n": _buffer += "\n" # Put a newline in the buffer in case we encounter any more program steps later
                _count += 1
                _last = _byte
 
