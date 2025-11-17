@@ -396,7 +396,10 @@
  *                     numeric arguments and allow breakpoints and traps to
  *                     be set using octal or hexadecimal - MT
  * 11 Nov 25  (0211) - Card text ignores any characters after a '.' - MT
- * 12 Nov 25   0.29  - Use a label to display program name - MT
+ * 12 Nov 25         - Use a label to display program name - MT
+ * 16 Nov 25   0.21  - The card reader register addresses are now mapped to
+ *                     a buffer register allowing the size of the memory to
+ *                     be restored to its original value - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -408,9 +411,9 @@
  */
 
 #define  NAME          "x11-calc"
-#define  VERSION       "0.20"
-#define  BUILD         "0212"
-#define  DATE          "12 Nov 25"
+#define  VERSION       "0.21"
+#define  BUILD         "0214"
+#define  DATE          "16 Nov 25"
 #define  AUTHOR        "MT"
 
 #define  INTERVAL 48   /* Number of ticks to execute before updating the display */

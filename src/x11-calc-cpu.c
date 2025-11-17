@@ -449,6 +449,10 @@
  * 12 Nov 25         - Use a label to display program name - MT
  *                   - Allow colour of all labels to be modified - MT
  * 14 Nov 25         - Reformatted most comments  - MT
+ * 15 Nov 25         - Fixed up newlines (now every 8 records) - MT
+ * 16 Nov 25         - The card reader register addresses are now mapped to
+ *                     a buffer register allowing the size of the memory to
+ *                     be restored to its original value - MT
  *
  * To Do             - Move register functions to separate source file.
  *                   - Finish adding code to display any modified registers
@@ -546,7 +550,6 @@ char *s_get_filename(char *s_path, char c_mode, char *s_filter, char *s_name)
    gtk_file_filter_set_name (h_all, s_name);
    gtk_file_chooser_add_filter (GTK_FILE_CHOOSER(h_widget), h_all);
 
-   /** gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(h_widget), "test.dat");  /* Default filename */
    gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER(h_widget), s_path);  /* Set default path */
    gtk_widget_show_all(h_widget);
 
@@ -661,48 +664,51 @@ void v_card_read_write_record(oprocessor* h_processor)
  * write a block of data to a card (depending on the 'crc[WRITE]' flag).
  *
  * 18 Oct 25         - Initial version - KJC
+ * 15 Nov 25         - Fixed up newlines (now every 8 records) - MT
+ * 16 Nov 25         - The card reader register addresses are now mapped to
+ *                     a buffer register allowing the size of the memory to
+ *                     be restored to its original value - MT
  *
  */
 {
-    if (h_processor->card->file)  /* Check if card file was opened successfully */
-    {
-        if (h_processor->crc[BUFFER])  /* Check if buffer is ready */
-        {
-            /* Write a card-record if the buffer address is 0x99 (for standard HP 67) or 0xF9 (for extended HP 67) */
-            if (h_processor->crc[WRITE] && (h_processor->addr == 0x99 || h_processor->addr == 0xF9))
+   unsigned char* p_buffer_pointer;
+   int i_record = 0;
+   int i_count;
+
+   if (h_processor->card->file)  /* Check if card file was opened successfully */
+   {
+      if (h_processor->crc[BUFFER])  /* Check if buffer is ready */
+      {
+         if (h_processor->crc[WRITE] && (h_processor->addr == 0x99 || h_processor->addr == 0xF9))  /* Write a card-record if the buffer address is 0x99 (for standard HP 67) or 0xF9 (for extended HP 67) */
+         {
+            p_buffer_pointer = &(h_processor->card->buffer->nibble[REG_SIZE - 1]);
+
+            for (i_count = 0; i_count < 7; i_count++)  /* Copy the 7 most significant nibbles to the record */
             {
-                /* Write the 7 most significant nibbles to the card */
-                unsigned char* p_buffer_pointer = &(h_processor->mem[h_processor->addr]->nibble[REG_SIZE - 1]);
-                int record = 0;
-
-                for (int i = 0; i < 7; i++)
-                {
-                    record <<= 4;
-                    record += *p_buffer_pointer--;
-                }
-
-                fprintf(h_processor->card->file, "%07x,", record);
-                if (h_processor->card->records % 8 == 0) fprintf(h_processor->card->file, "\n");
-                h_processor->card->records++;
+               i_record <<= 4;
+               i_record += *p_buffer_pointer--;
             }
+            fprintf(h_processor->card->file, "%07x,", i_record);
+            h_processor->card->records++;  /* Increment before testing to see if a newline is required */
+            if (h_processor->card->records > 0 && h_processor->card->records  % 8 == 0) fprintf(h_processor->card->file, "\n");
+         }
 
-            /* Read a card-record if the buffer address is 0x99/0x9b (for standard HP 67) or 0xf9/0xfb (for extended HP 67) */
-            else if (h_processor->crc[WRITE] == False && (h_processor->addr == 0x99 || h_processor->addr == 0x9b || h_processor->addr == 0xf9 || h_processor->addr == 0xfb ))
-            {
-                /* Read 7 nibbles from file to the most and least (duplicated) significant nibbles from the card */
-                int record = 0;
-                int reg_ptr = (h_processor->addr & 0xf0) + 0x0b;  /* 0x9b or 0xfb */
-                unsigned char* p_buffer_pointer = &(h_processor->mem[reg_ptr]->nibble[REG_SIZE - 1]);
+         else if (h_processor->crc[WRITE] == False && (h_processor->addr == 0x99 || h_processor->addr == 0x9b || h_processor->addr == 0xf9 || h_processor->addr == 0xfb ))  /* Read a card-record if the buffer address is 0x99/0x9b (for standard HP 67) or 0xf9/0xfb (for extended HP 67) */
 
-                fscanf(h_processor->card->file, "%x,", (unsigned int*)&record);
-                for (int i = 6; i >= 0; i--)  /* Put record in upper 7 nibbles */
-                    *p_buffer_pointer-- = (record >> i * 4) & 0xf;
-                for (int i = 6; i >= 0; i--)  /* Put record in lower 7 nibbles as well! */
-                    *p_buffer_pointer-- = (record >> i * 4) & 0xf;
-                h_processor->card->records++;
-            }
-        }
-    }
+         {
+            /* Read 7 nibbles from file to the most and least (duplicated) significant nibbles from the card */
+
+            fscanf(h_processor->card->file, "%x,", (unsigned int*)&i_record);  /*Read next record from file */
+
+            p_buffer_pointer = &(h_processor->card->buffer->nibble[REG_SIZE - 1]);
+            for (i_count = 6; i_count >= 0; i_count--)  /* Put record in upper 7 nibbles of the buffer */
+               *p_buffer_pointer-- = (i_record >> i_count * 4) & 0xf;
+            for (i_count = 6; i_count >= 0; i_count--)  /* Put record in lower 7 nibbles as well! */
+               *p_buffer_pointer-- = (i_record >> i_count * 4) & 0xf;
+            h_processor->card->records++;
+         }
+      }
+   }
 }
 
 void v_card_open_file(oprocessor* h_processor)
@@ -933,7 +939,7 @@ void v_write_state(oprocessor *h_processor, char *s_pathname) /* Write processor
                fprintf(h_file, "%02x,", h_processor->mem[i_count]->nibble[i_counter]);
             fprintf(h_file,"\n");
          }
-#if defined(HP67)
+#if defined(HP67)  /* Must be done last maintain compatibility with existing data files */
          fprintf(h_file, "%02x,\n", h_processor->crc[FUNCTION]);  /* Save the default function-key state (labels if a prgm is loaded, else functions) - KJC */
 #endif
          fclose(h_file);
@@ -1040,7 +1046,7 @@ void v_fprint_registers(FILE *h_file, oprocessor *h_processor)  /* Display curre
       v_fprint_flags(h_file, h_processor);
       v_fprint_status(h_file, h_processor);
       fprintf(h_file, "\tp = %d\t\t", h_processor->p);
-      fprintf(h_file, "  addr = %02d\n", h_processor->addr);
+      fprintf(h_file, " addr = %03d\n", h_processor->addr);  /* Align with right margin */
 #if defined(HP67)
       fprintf(h_file, "\tsp = %d\t\t", h_processor->sp);  /* Added - KJC */
       fprintf(h_file, "\t\ttf4 = %d\n", h_processor->crc[FUNCTION]);
@@ -1083,8 +1089,8 @@ void v_read_rom(oprocessor *h_processor, char *s_pathname)  /* Load rom from 'ob
          else
          {
             while ((i_count < i_addr) && (i_count < ROM_SIZE))
-               /** i_rom[i_count++] = 0; */
-               i_count++;  /* Don't clear ROM */
+               /** i_rom[i_count++] = 0;  /* Don't clear ROM - allows existinf ROM contents to be patched */
+               i_count++;
             if (i_count < ROM_SIZE) i_rom[i_count++] = i_opcode;
          }
       }
@@ -1235,7 +1241,7 @@ void v_processor_reset(oprocessor *h_processor)  /* Reset processor */
       v_reg_copy(h_processor, h_processor->reg[i_count], NULL);  /* Copying nothing to a register clears it */
    for (i_count = 0; i_count < STACK_SIZE; i_count++)  /* Clear the processor stack */
       h_processor->stack[i_count] = 0;
-   for (i_count = 0; i_count < MEMORY_SIZE; i_count++) /*Clear memory */
+   for (i_count = 0; i_count < MEMORY_SIZE; i_count++)  /*Clear memory */
       v_reg_copy(h_processor, h_processor->mem[i_count], NULL);  /* Copying nothing to a register clears it */
    for (i_count = 0; i_count < STATUS_BITS; i_count++)  /* Clear the processor status word */
       h_processor->status[i_count] = False;
@@ -1575,8 +1581,11 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
                      h_processor->addr = i_addr;
                      if (i_addr < MEMORY_SIZE)
                         h_processor->addr = i_addr;
-                     else {
-                        h_processor->addr = MEMORY_SIZE - 1;
+                     else
+                     {
+                        /** h_processor->addr = MEMORY_SIZE - 1; /* Why ? - Raise an error instead! */
+                        if (h_processor->trace) fprintf(stdout, "\n");
+                        v_error(errno, h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
                      }
                   }
                   if (h_processor->trace) fprintf(stdout, "addr = %d", h_processor->addr);
@@ -1758,7 +1767,13 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
                case 01370:  /* data -> c */
                   if (h_processor->trace) fprintf(stdout, "data -> c\t\t");
                   h_processor->first = 0; h_processor->last = REG_SIZE - 1;
-                  v_reg_copy(h_processor, h_processor->reg[C_REG], h_processor->mem[h_processor->addr]);
+                  if (h_processor->addr < MEMORY_SIZE)
+                     v_reg_copy(h_processor, h_processor->reg[C_REG], h_processor->mem[h_processor->addr]);
+                  else
+                  {
+                     if (h_processor->trace) fprintf(stdout, "\n");
+                     v_error(errno, h_err_invalid_register, h_processor->addr, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
+                  }
                   if (h_processor->trace) v_fprint_register(stdout,h_processor->reg[C_REG]);
                   break;
                default:
@@ -2064,16 +2079,21 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
                         h_processor->addr = i_addr;
                      else
                      {
-                        h_processor->addr = MEMORY_SIZE - 1;
                         if (h_processor->trace) fprintf(stdout, "\n");
                         v_error(errno, h_err_invalid_register, i_addr, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
                      }
 #else
+#if defined(HP67)
+                     if (i_addr == 0x99 || i_addr == 0x9b || i_addr == 0xf9 || i_addr ==  0xfb )  /* Check buffer addresses for both standard and enhanced ROMs */
+                        h_processor->addr = i_addr;
+                     else
+#endif
                      if (i_addr < MEMORY_SIZE)
                         h_processor->addr = i_addr;
                      else
                      {
-                        h_processor->addr = MEMORY_SIZE - 1;
+                        if (h_processor->trace) fprintf(stdout, "\n");
+                        v_error(errno, h_err_invalid_register, i_addr, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
                      }
 #endif
                   }
@@ -2108,9 +2128,26 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
                case 01360:  /* c -> data */
                   if (h_processor->trace) fprintf(stdout, "c -> data\t\t");
                   h_processor->first = 0; h_processor->last = REG_SIZE - 1;
-                  v_reg_copy(h_processor, h_processor->mem[h_processor->addr], h_processor->reg[C_REG]);
-                  if (h_processor->trace)
-                     v_fprint_register(stdout, h_processor->mem[h_processor->addr]);
+#if defined(HP67)
+                  if (h_processor->addr == 0x99 || h_processor->addr == 0x9b || h_processor->addr == 0xf9 || h_processor->addr ==  0xfb )  /* Check buffer addresses for both standard and enhanced ROMs */
+                  {
+                     v_reg_copy(h_processor, h_processor->card->buffer, h_processor->reg[C_REG]);
+                     if (h_processor->trace)
+                        v_fprint_register(stdout, h_processor->card->buffer);
+                  }
+                  else
+#endif
+                  if (h_processor->addr < MEMORY_SIZE)
+                  {
+                     v_reg_copy(h_processor, h_processor->mem[h_processor->addr], h_processor->reg[C_REG]);
+                     if (h_processor->trace)
+                        v_fprint_register(stdout, h_processor->mem[h_processor->addr]);
+                  }
+                  else
+                  {
+                     if (h_processor->trace) fprintf(stdout, "\n");
+                     v_error(errno, h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
+                  }
                   break;
 #if defined(HP10)
                case 01660:  /* pik1660 print alpha (6 bit data)*/
@@ -2341,11 +2378,22 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
             case 02:  /* c -> data register(n) */
                h_processor->addr &= 0xfff0;
                h_processor->addr += (i_opcode >> 6);
-               if (h_processor->trace) fprintf(stdout, "c -> data register(%d)", h_processor->addr);
+               if (h_processor->trace) fprintf(stdout, "c -> data register(%d)\t", h_processor->addr);
+               h_processor->first = 0; h_processor->last = REG_SIZE - 1;
+#if defined(HP67)
+               if (h_processor->addr == 0x99 || h_processor->addr == 0x9b || h_processor->addr == 0xf9 || h_processor->addr ==  0xfb )  /* Check buffer addresses for both standard and enhanced ROMs */
+               {
+                  v_reg_copy(h_processor, h_processor->card->buffer, h_processor->reg[C_REG]);  /* C -> buffer */
+                  if (h_processor->trace)
+                     v_fprint_register(stdout, h_processor->card->buffer);
+               }
+               else
+#endif
                if ((h_processor->addr) < MEMORY_SIZE)
                {
-                  h_processor->first = 0; h_processor->last = REG_SIZE - 1;
-                  v_reg_copy(h_processor, h_processor->mem[h_processor->addr], h_processor->reg[C_REG]); /* C -> reg(n) */
+                  v_reg_copy(h_processor, h_processor->mem[h_processor->addr], h_processor->reg[C_REG]);  /* C -> reg(n) */
+                  if (h_processor->trace)
+                     v_fprint_register(stdout, h_processor->mem[h_processor->addr]);
                }
                else
                {
@@ -2358,7 +2406,13 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
                if ((i_opcode >> 6) == 0)
                {
                   if (h_processor->trace) fprintf(stdout, "data -> c\t\t");
-                  v_reg_copy(h_processor, h_processor->reg[C_REG], h_processor->mem[h_processor->addr]);
+                  if ((h_processor->addr) < MEMORY_SIZE)
+                     v_reg_copy(h_processor, h_processor->reg[C_REG], h_processor->mem[h_processor->addr]);
+                  else
+                  {
+                     if (h_processor->trace) fprintf(stdout, "\n");
+                     v_error(errno, h_err_invalid_address, i_opcode >> 6, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
+                  }
                }
 #if defined(HP10)
                else if (((i_opcode >> 6) == 0xf) && (h_processor->addr == 0xff))
@@ -2374,23 +2428,14 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
                {
                   h_processor->addr &= 0xfff0;
                   h_processor->addr += (i_opcode >> 6);
-                  if (h_processor->trace) fprintf(stdout, "data register(%d) -> c", h_processor->addr);
-                  if ((h_processor->addr) < MEMORY_SIZE)
-                     v_reg_copy(h_processor, h_processor->reg[C_REG], h_processor->mem[h_processor->addr]);
+                  if (h_processor->trace) fprintf(stdout, "data register(%d) -> c **", h_processor->addr);
 #if defined(HP67)
-                  /* To Do - Read data from card buffer...
-                  else if ((h_processor->addr) == BUFFER_ADDRESS)
-                  {
-                     for (i_count = h_processor->last; i_count >= h_processor->first; i_count--)
-                     {
-                        if (i_count == h_processor->first)
-                           h_processor->reg[C_REG]->nibble[i_count] = 0;
-                        else
-                           h_processor->reg[C_REG]nibble[i_count] = h_processor->card->buffer[i_count - 1];
-                     }
-                  }
-                  */
+                  if (h_processor->addr == 0x99 || h_processor->addr == 0x9b || h_processor->addr == 0xf9 || h_processor->addr ==  0xfb )  /* Check buffer addresses for both standard and enhanced ROMs */
+                     v_reg_copy(h_processor, h_processor->reg[C_REG], h_processor->card->buffer);
+                  else
 #endif
+                  if (h_processor->addr < MEMORY_SIZE)
+                     v_reg_copy(h_processor, h_processor->reg[C_REG], h_processor->mem[h_processor->addr]);
                   else
                   {
                      if (h_processor->trace) fprintf(stdout, "\n");
