@@ -428,7 +428,7 @@ The emulators have been successfully compiled and tested on:
 
    - VMS 9.2-1, C 7.4-726, x64 ***
 
-   - Windows 11 + WSL2, gcc 12.2.0, x64 + arm64 **
+   - Windows 11 + WSL2, gcc 12.2.0, x64 + arm64
 
 ** Not yet retested with this build.
 
@@ -440,11 +440,15 @@ The emulators have been successfully compiled and tested on:
 ### Acknowledgements <sup><sup>[Back to Top](#top)</sup></sup>
 
 There are almost certainly some names I've missed off this list but without
-the help and encouragement from several members of the calculator community
-it is unlikely that this project would have happened at all or that I would
-have managed to get as far as I have.
+the  help and encouragement from members of the calculator community it  is
+unlikely that this project would have happened at all or that I would  have
+managed to get as far as I have.
 
 - `Teenix` for convincing me that it was possible in the first place.
+
+   Though he omitted to warn that the once I got one working I would get an
+   overwhelming urge to add as many many models as possible (including some
+   I didn't think were possible!)
 
 - `Teenix`  and `Panamatik` for their excellent emulators from which I  was
    able to figure out most of what should happen when each  instruction  is
