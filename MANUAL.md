@@ -158,16 +158,25 @@ the current state.
 You can create a copy the saved emulator state by making a copy of the file
 which allow the user to make a backup when ever program was held in  memory
 when  the  emulator was switched off.  Different programs can be loaded  by
-specifying the name of the file on the command when starting the emulator.
+specifying the name of the file that was used to save the emulator state on
+the command line.
+```
+x11-calc-33c prg/x11-calc-33c-random-number-generator.dat
+```
+If the emulator was compiled with GTK support then a user can also load and
+save  programs while the emulator is running by right clicking anywhere  in
+the application window.
 
-If  the program was compiled with GTK support then a user can load or  save
-programs  while the emulator is running by right clicking anywhere  in  the
-application window.  This will prompt for the name of an existing data file
-in  `run` mode and allow the current emulator state to be saved in when  in
-`prgm` mode.
+To load a program select `run` mode and them right click to select the file
+and to save a program select `prgm` mode before right clicking.
 
-Note - Models with working card readers will be prompt the user to select a
-read or write a program card file, instead of restoring the emulator state.
+By default the files shown will be filtered to include only those with file
+names that start with the same name as the current emulator, and correspond
+the type appropriate file type.
+
+Models  that include support for a card reader load and save programs using
+card  files (`.crd`) and may prompt for multiple cards.  Other models  with
+continuous memory will use a single data file (`.dat`).
 
 There is no validation when reading a file except that each record needs to
 match the expected type (records that don't match the expected type will be
