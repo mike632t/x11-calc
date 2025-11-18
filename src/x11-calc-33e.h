@@ -38,6 +38,7 @@
  * 12 Feb 22         - Updated layout and separated the initialisation code
  *                     for buttons and switches into two functions - MT
  * 20 May 25         - Tidied up data structure definitions - MT
+ * 18 Nov 25         - Adjusted number of registers - MT
  *
  */
 
@@ -81,7 +82,7 @@
 #define KEY_GAP            3 * SCALE_WIDTH
 #define SWITCH_HEIGHT      10 * SCALE_HEIGHT
 #define ROM_SIZE           010000
-#define MEMORY_SIZE        21
+#define MEMORY_SIZE        20
 
 extern int i_rom [ROM_SIZE];
 
