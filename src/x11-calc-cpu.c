@@ -453,6 +453,9 @@
  * 16 Nov 25         - The card reader register addresses are now mapped to
  *                     a buffer register allowing the size of the memory to
  *                     be restored to its original value - MT
+ * 18 Nov 25         - Fixed regressing issue that affected memory register
+ *                     addressing on HP33C HP34C and HP37E - MT
+ *
  *
  * To Do             - Move register functions to separate source file.
  *                   - Finish adding code to display any modified registers
@@ -2091,10 +2094,7 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
                      if (i_addr < MEMORY_SIZE)
                         h_processor->addr = i_addr;
                      else
-                     {
-                        if (h_processor->trace) fprintf(stdout, "\n");
-                        v_error(errno, h_err_invalid_register, i_addr, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
-                     }
+                        h_processor->addr = MEMORY_SIZE - 1;  /* Required for some models (HP33C HP34C HP37E) */
 #endif
                   }
                   if (h_processor->trace) fprintf(stdout, "addr = %d", h_processor->addr);
@@ -2398,7 +2398,7 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
                else
                {
                   if (h_processor->trace) fprintf(stdout, "\n");
-                  v_error(errno, h_err_invalid_address, i_opcode >> 6, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
+                  v_error(errno, h_err_invalid_address, h_processor->addr, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
                }
                break;
             case 03:  /* data -> c or data register(n)-> c */
@@ -2438,6 +2438,7 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
                      v_reg_copy(h_processor, h_processor->reg[C_REG], h_processor->mem[h_processor->addr]);
                   else
                   {
+                     h_processor->addr = MEMORY_SIZE - 1;
                      if (h_processor->trace) fprintf(stdout, "\n");
                      v_error(errno, h_err_invalid_address, h_processor->addr, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
                   }
