@@ -428,7 +428,11 @@ The emulators have been successfully compiled and tested on:
 
    - VMS 9.2-1, C 7.4-726, x64 ***
 
+   - Windows 11 + WSL2, gcc 12.2.0, x64 + arm64 ***
+
    - Windows 11 + WSL2 (Ubuntu 24.04 LTS), gcc 13.3.0, x64
+
+   - Windows 11 + WSL2 (Debian 13), clang 19.0.6, x64
 
 ** Not yet retested with this build.
 
