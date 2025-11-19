@@ -456,6 +456,9 @@
  * 18 Nov 25         - Fixed regressing issue that affected memory register
  *                     addressing on HP33C HP34C and HP37E - MT
  * 19 Nov 25         - Allocate memory registers dynamically - MT
+ *                   - Maintain  compatibility with earlier versions of the
+ *                     HP67 emulators and versions without extended  memory
+ *                     when loading or saving state - MT
  *
  *
  * To Do             - Move register functions to separate source file.
@@ -887,7 +890,7 @@ void v_read_state(oprocessor *h_processor, char *s_pathname) /* Read processor s
          if (fscanf(h_file, "%x,", &i_temp)) h_processor->g[0] = i_temp;
          if (fscanf(h_file, "%x,", &i_temp)) h_processor->g[1] = i_temp;
 #endif
-         for (i_count = 0; i_count < h_processor->memory_size; i_count++)
+         for (i_count = 0; i_count < MEMORY_SIZE; i_count++)
             for (i_counter = REG_SIZE - 1; i_counter >= 0 ; i_counter--)
             {
                if (fscanf(h_file, "%x,", &i_temp)) h_processor->mem[i_count]->nibble[i_counter] = i_temp;
@@ -895,6 +898,11 @@ void v_read_state(oprocessor *h_processor, char *s_pathname) /* Read processor s
 #if defined(HP67)  /* Must be done last to avoid errors when reading existing data files */
          if (fscanf(h_file, "%x,", &i_temp)) h_processor->crc[FUNCTION] = i_temp;  /* Restore the function-key state - KJC */
 #endif
+         for (i_count = MEMORY_SIZE; i_count < h_processor->memory_size; i_count++)
+            for (i_counter = REG_SIZE - 1; i_counter >= 0 ; i_counter--)
+            {
+               if (fscanf(h_file, "%x,", &i_temp)) h_processor->mem[i_count]->nibble[i_counter] = i_temp;
+            }
          fclose(h_file);
       }
       else
@@ -937,7 +945,7 @@ void v_write_state(oprocessor *h_processor, char *s_pathname) /* Write processor
          fprintf(h_file, "%02x,", h_processor->g[1]);
          fprintf(h_file,"\n");
 #endif
-         for (i_count = 0; i_count < h_processor->memory_size; i_count++)
+         for (i_count = 0; i_count < MEMORY_SIZE; i_count++)
          {
             for (i_counter = REG_SIZE - 1; i_counter >= 0 ; i_counter--)
                fprintf(h_file, "%02x,", h_processor->mem[i_count]->nibble[i_counter]);
@@ -946,6 +954,12 @@ void v_write_state(oprocessor *h_processor, char *s_pathname) /* Write processor
 #if defined(HP67)  /* Must be done last maintain compatibility with existing data files */
          fprintf(h_file, "%02x,\n", h_processor->crc[FUNCTION]);  /* Save the default function-key state (labels if a prgm is loaded, else functions) - KJC */
 #endif
+         for (i_count = MEMORY_SIZE; i_count < h_processor->memory_size; i_count++)
+         {
+            for (i_counter = REG_SIZE - 1; i_counter >= 0 ; i_counter--)
+               fprintf(h_file, "%02x,", h_processor->mem[i_count]->nibble[i_counter]);
+            fprintf(h_file,"\n");
+         }
          fclose(h_file);
       }
       else

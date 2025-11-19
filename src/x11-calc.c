@@ -404,6 +404,9 @@
  *                   - The memory size can be specified on the command line
  *                     (very useful when using modified firmware to provide
  *                     enhanced features) - MT
+ *                   - Maintain  compatibility with earlier versions of the
+ *                     HP67 emulators and versions without extended  memory
+ *                     when loading or saving state - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -416,7 +419,7 @@
 
 #define  NAME          "x11-calc"
 #define  VERSION       "0.22"
-#define  BUILD         "0215"
+#define  BUILD         "0216"
 #define  DATE          "19 Nov 25"
 #define  AUTHOR        "MT"
 
