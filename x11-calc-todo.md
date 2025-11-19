@@ -3,6 +3,8 @@
 
 ### Planned changes
 
+- [ ] Update help text
+
 - [ ] Allow user to resize the window at runtime (scroll wheel?).
 
 - [ ] Add a graphical printer display to the HP10
