@@ -69,6 +69,7 @@
  * 04 Nov 25         - Program card defined as part of the processor (makes
  *                     it easier to use in the processor code) - MT
  * 14 Nov 25         - Moved register defination to a seperate file - MT
+ * 19 Nov 25         - Allocate memory registers dynamically - MT
  *
  * To Do             -
  *
@@ -134,10 +135,11 @@
 
 typedef struct {
    oregister *reg[REGISTERS];          /* Registers */
-   oregister *mem[MEMORY_SIZE];        /* Memory registers */
+   oregister **mem;                    /* Pointer to array of registers */
    int *rom;
    int first;
    int last;
+   unsigned int memory_size;
    unsigned int stack[STACK_SIZE];     /* Call stack */
    unsigned char flags[FLAGS];         /* Processor flags*/
    unsigned char status[STATUS_BITS];  /* Status (S0 - S15) */
@@ -175,11 +177,11 @@ typedef struct {
 #endif
 } oprocessor;
 
-oprocessor *h_processor_create(int *h_rom);
+oprocessor* h_processor_create(int *h_rom, int i_size);
 
 void v_processor_reset(oprocessor *h_processor);
 
-void v_read_rom(oprocessor *h_processor, char *s_pathname);
+void v_read_rom(int *i_rom, const char *s_pathname);
 
 void v_fprint_registers(FILE *h_file, oprocessor *h_procesor);
 

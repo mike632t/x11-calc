@@ -455,6 +455,7 @@
  *                     be restored to its original value - MT
  * 18 Nov 25         - Fixed regressing issue that affected memory register
  *                     addressing on HP33C HP34C and HP37E - MT
+ * 19 Nov 25         - Allocate memory registers dynamically - MT
  *
  *
  * To Do             - Move register functions to separate source file.
@@ -886,7 +887,7 @@ void v_read_state(oprocessor *h_processor, char *s_pathname) /* Read processor s
          if (fscanf(h_file, "%x,", &i_temp)) h_processor->g[0] = i_temp;
          if (fscanf(h_file, "%x,", &i_temp)) h_processor->g[1] = i_temp;
 #endif
-         for (i_count = 0; i_count < MEMORY_SIZE; i_count++)
+         for (i_count = 0; i_count < h_processor->memory_size; i_count++)
             for (i_counter = REG_SIZE - 1; i_counter >= 0 ; i_counter--)
             {
                if (fscanf(h_file, "%x,", &i_temp)) h_processor->mem[i_count]->nibble[i_counter] = i_temp;
@@ -936,7 +937,7 @@ void v_write_state(oprocessor *h_processor, char *s_pathname) /* Write processor
          fprintf(h_file, "%02x,", h_processor->g[1]);
          fprintf(h_file,"\n");
 #endif
-         for (i_count = 0; i_count < MEMORY_SIZE; i_count++)
+         for (i_count = 0; i_count < h_processor->memory_size; i_count++)
          {
             for (i_counter = REG_SIZE - 1; i_counter >= 0 ; i_counter--)
                fprintf(h_file, "%02x,", h_processor->mem[i_count]->nibble[i_counter]);
@@ -1040,7 +1041,7 @@ void v_fprint_registers(FILE *h_file, oprocessor *h_processor)  /* Display curre
          v_fprint_register(h_file, h_processor->reg[i_count]);
       }
       fprintf(h_file, "\n");
-      for (i_count = 0; i_count < MEMORY_SIZE; i_count++)
+      for (i_count = 0; i_count < h_processor->memory_size; i_count++)
       {
          if (i_count % 3 == 0) fprintf(h_file, "\n");
          v_fprint_register(h_file, h_processor->mem[i_count]);
@@ -1062,8 +1063,8 @@ void v_fprint_memory(FILE *h_file, oprocessor *h_processor)  /* Display current 
    if (h_processor != NULL)
    {
       int i_count;
-      if (MEMORY_SIZE > 1) {  /* Bit of a fudge but... */
-         for (i_count = 0; i_count < MEMORY_SIZE; i_count++)
+      if (h_processor->memory_size > 1) {  /* Bit of a fudge but... */
+         for (i_count = 0; i_count < h_processor->memory_size; i_count++)
          {
             if (i_count % 3 == 0) fprintf(h_file, "\n\t\t");
             v_fprint_register(h_file, h_processor->mem[i_count]);
@@ -1073,7 +1074,7 @@ void v_fprint_memory(FILE *h_file, oprocessor *h_processor)  /* Display current 
    }
 }
 
-void v_read_rom(oprocessor *h_processor, char *s_pathname)  /* Load rom from 'object' file */
+void v_read_rom(int *i_rom, const char *s_pathname)  /* Load rom from 'object' file */
 {
    FILE *h_file;
    unsigned int i_addr, i_opcode;
@@ -1092,7 +1093,7 @@ void v_read_rom(oprocessor *h_processor, char *s_pathname)  /* Load rom from 'ob
          else
          {
             while ((i_count < i_addr) && (i_count < ROM_SIZE))
-               /** i_rom[i_count++] = 0;  /* Don't clear ROM - allows existinf ROM contents to be patched */
+               /** i_rom[i_count++] = 0;  /* Don't clear ROM - allows existing ROM contents to be patched */
                i_count++;
             if (i_count < ROM_SIZE) i_rom[i_count++] = i_opcode;
          }
@@ -1244,12 +1245,12 @@ void v_processor_reset(oprocessor *h_processor)  /* Reset processor */
       v_reg_copy(h_processor, h_processor->reg[i_count], NULL);  /* Copying nothing to a register clears it */
    for (i_count = 0; i_count < STACK_SIZE; i_count++)  /* Clear the processor stack */
       h_processor->stack[i_count] = 0;
-   for (i_count = 0; i_count < MEMORY_SIZE; i_count++)  /*Clear memory */
-      v_reg_copy(h_processor, h_processor->mem[i_count], NULL);  /* Copying nothing to a register clears it */
    for (i_count = 0; i_count < STATUS_BITS; i_count++)  /* Clear the processor status word */
       h_processor->status[i_count] = False;
    for (i_count = 0; i_count < FLAGS; i_count++)  /* Clear the processor flags */
       h_processor->flags[i_count] = False;
+   for (i_count = 0; i_count < h_processor->memory_size; i_count++)  /*Clear memory */
+      v_reg_copy(h_processor, h_processor->mem[i_count], NULL);  /* Copying nothing to a register clears it */
    h_processor->opcode = 0;
    h_processor->pc = 0;
    h_processor->sp = 0;
@@ -1284,19 +1285,21 @@ void v_processor_reset(oprocessor *h_processor)  /* Reset processor */
 #endif
 }
 
-oprocessor *h_processor_create(int *h_rom)  /* Create a new processor 'object' */
+oprocessor* h_processor_create(int *h_rom, int i_size)  /* Create a new processor 'object' */
 {
-   oprocessor *h_processor;
+   oprocessor* h_processor;
    int i_count;
 
    if ((h_processor = malloc(sizeof(*h_processor)))==NULL) v_error(errno, h_err_memmory_alloc, __FILE__, __LINE__);
+   if ((h_processor->mem = malloc(sizeof(oregister*) * i_size))==NULL) v_error(errno, h_err_memmory_alloc, __FILE__, __LINE__);
 #if defined(HP67)
    v_init_card(&h_processor->card);  /* Defining the card as part of the processor allow the processor code to access the card properties */
 #endif
    for (i_count = 0; i_count < REGISTERS; i_count++)
-      h_processor->reg[i_count] = h_register_create((i_count + 1) * -1);  /* Allocate storage for the registers */
-   for (i_count = 0; i_count < MEMORY_SIZE; i_count++)
-      h_processor->mem[i_count] = h_register_create(i_count);  /* Allocate storage for the RAM */
+      h_processor->reg[i_count] = h_register_create((i_count + 1) * -1);  /* Allocate storage for the processor registers */
+   for (i_count = 0; i_count < i_size; i_count++)
+      h_processor->mem[i_count] = h_register_create(i_count);  /* Allocate storage for each memory register */
+   h_processor->memory_size = i_size;  /* Save number of memory registers */
    h_processor->rom = h_rom ;  /* Address of ROM */
    h_processor->mode = False;
    h_processor->timer = False;
@@ -1582,11 +1585,11 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
                         v_error(errno, h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
                      }
                      h_processor->addr = i_addr;
-                     if (i_addr < MEMORY_SIZE)
+                     if (i_addr < h_processor->memory_size)
                         h_processor->addr = i_addr;
                      else
                      {
-                        /** h_processor->addr = MEMORY_SIZE - 1; /* Why ? - Raise an error instead! */
+                        /** h_processor->addr = h_processor->memory_size - 1; /* Why ? - Raise an error instead! */
                         if (h_processor->trace) fprintf(stdout, "\n");
                         v_error(errno, h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
                      }
@@ -1596,7 +1599,7 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
                case 01360:  /* c -> data */
                   if (h_processor->trace) fprintf(stdout, "c -> data\t\t");
                   h_processor->first = 0; h_processor->last = REG_SIZE - 1;
-                  if (h_processor->addr < MEMORY_SIZE)
+                  if (h_processor->addr < h_processor->memory_size)
                      v_reg_copy(h_processor, h_processor->mem[h_processor->addr], h_processor->reg[C_REG]);
                   else
                   {
@@ -1758,7 +1761,7 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
                case 01360:  /* c -> data */
                   if (h_processor->trace) fprintf(stdout, "c -> data\t\t");
                   h_processor->first = 0; h_processor->last = REG_SIZE - 1;
-                  if (h_processor->addr < MEMORY_SIZE)
+                  if (h_processor->addr < h_processor->memory_size)
                      v_reg_copy(h_processor, h_processor->mem[h_processor->addr], h_processor->reg[C_REG]);
                   else
                   {
@@ -1770,7 +1773,7 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
                case 01370:  /* data -> c */
                   if (h_processor->trace) fprintf(stdout, "data -> c\t\t");
                   h_processor->first = 0; h_processor->last = REG_SIZE - 1;
-                  if (h_processor->addr < MEMORY_SIZE)
+                  if (h_processor->addr < h_processor->memory_size)
                      v_reg_copy(h_processor, h_processor->reg[C_REG], h_processor->mem[h_processor->addr]);
                   else
                   {
@@ -2078,7 +2081,7 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
                      if (h_processor->trace) fprintf(stdout, "c -> data address\t\t");
                      i_addr = (h_processor->reg[C_REG]->nibble[1] << 4) + h_processor->reg[C_REG]->nibble[0];
 #if defined(HP10)
-                     if ((i_addr < MEMORY_SIZE) || (i_addr == 0xFF))  /* Address 0xFF tells the PIK chip to put the key code on the data bus */
+                     if ((i_addr < h_processor->memory_size) || (i_addr == 0xFF))  /* Address 0xFF tells the PIK chip to put the key code on the data bus */
                         h_processor->addr = i_addr;
                      else
                      {
@@ -2091,10 +2094,10 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
                         h_processor->addr = i_addr;
                      else
 #endif
-                     if (i_addr < MEMORY_SIZE)
+                     if (i_addr < h_processor->memory_size)
                         h_processor->addr = i_addr;
                      else
-                        h_processor->addr = MEMORY_SIZE - 1;  /* Required for some models (HP33C HP34C HP37E) */
+                        h_processor->addr = h_processor->memory_size - 1;  /* Required for some models (HP33C HP34C HP37E) */
 #endif
                   }
                   if (h_processor->trace) fprintf(stdout, "addr = %d", h_processor->addr);
@@ -2118,7 +2121,7 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
                         h_processor->first = 0; h_processor->last = REG_SIZE - 1;
                         for (i_count = h_processor->addr & ~0x0f; i_count < (h_processor->addr & ~0x0f) + 16; i_count++)
                         {
-                           if (i_count < MEMORY_SIZE)  /* Check memory size */
+                           if (i_count < h_processor->memory_size)  /* Check memory size */
                               v_reg_copy(h_processor, h_processor->mem[i_count], NULL);  /* Copying nothing to a register clears it */
                         }
                      }
@@ -2137,7 +2140,7 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
                   }
                   else
 #endif
-                  if (h_processor->addr < MEMORY_SIZE)
+                  if (h_processor->addr < h_processor->memory_size)
                   {
                      v_reg_copy(h_processor, h_processor->mem[h_processor->addr], h_processor->reg[C_REG]);
                      if (h_processor->trace)
@@ -2389,7 +2392,7 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
                }
                else
 #endif
-               if ((h_processor->addr) < MEMORY_SIZE)
+               if ((h_processor->addr) < h_processor->memory_size)
                {
                   v_reg_copy(h_processor, h_processor->mem[h_processor->addr], h_processor->reg[C_REG]);  /* C -> reg(n) */
                   if (h_processor->trace)
@@ -2406,7 +2409,7 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
                if ((i_opcode >> 6) == 0)
                {
                   if (h_processor->trace) fprintf(stdout, "data -> c\t\t");
-                  if ((h_processor->addr) < MEMORY_SIZE)
+                  if ((h_processor->addr) < h_processor->memory_size)
                      v_reg_copy(h_processor, h_processor->reg[C_REG], h_processor->mem[h_processor->addr]);
                   else
                   {
@@ -2434,11 +2437,11 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
                      v_reg_copy(h_processor, h_processor->reg[C_REG], h_processor->card->buffer);
                   else
 #endif
-                  if (h_processor->addr < MEMORY_SIZE)
+                  if (h_processor->addr < h_processor->memory_size)
                      v_reg_copy(h_processor, h_processor->reg[C_REG], h_processor->mem[h_processor->addr]);
                   else
                   {
-                     h_processor->addr = MEMORY_SIZE - 1;
+                     h_processor->addr = h_processor->memory_size - 1;
                      if (h_processor->trace) fprintf(stdout, "\n");
                      v_error(errno, h_err_invalid_address, h_processor->addr, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
                   }
@@ -2820,7 +2823,7 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
             h_processor->addr = (h_processor->addr & 0xff0) | (i_opcode >> 6);
             h_processor->first = 0;
             h_processor->last = REG_SIZE - 1;
-            if (i_translate_addr(h_processor->addr) < MEMORY_SIZE)
+            if (i_translate_addr(h_processor->addr) < h_processor->memory_size)
 #if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c)
                if ((h_processor->addr != 0x08) && (h_processor->addr != 0x18))  /* Non existent registers */
 #endif
@@ -2904,7 +2907,7 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
                break;
             case 0x0b:  /* data = c - Load register from c (10 1111 0000) */
                if (h_processor->trace) fprintf(stdout, "data = c\t\t");
-               if ((i_translate_addr(h_processor->addr) < MEMORY_SIZE) && (h_processor->addr != 0x08) && (h_processor->addr != 0x18))
+               if ((i_translate_addr(h_processor->addr) < h_processor->memory_size) && (h_processor->addr != 0x08) && (h_processor->addr != 0x18))
                {
                   h_processor->first = 0; h_processor->last = REG_SIZE - 1;
                   v_reg_copy(h_processor, h_processor->mem[i_translate_addr(h_processor->addr)], h_processor->reg[C_REG]);
@@ -2961,7 +2964,7 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
                if (h_processor->trace) fprintf(stdout, "c = data\t\t");
             h_processor->first = 0;
             h_processor->last = REG_SIZE - 1;
-            if ((i_translate_addr(h_processor->addr) < MEMORY_SIZE) && (h_processor->addr != 0x08) && (h_processor->addr != 0x18))  /* Treat registers 8 and 18 as if they dont exist */
+            if ((i_translate_addr(h_processor->addr) < h_processor->memory_size) && (h_processor->addr != 0x08) && (h_processor->addr != 0x18))  /* Treat registers 8 and 18 as if they dont exist */
                v_reg_copy(h_processor, h_processor->reg[C_REG], h_processor->mem[i_translate_addr(h_processor->addr)]);
             else
                v_reg_copy(h_processor, h_processor->reg[C_REG], NULL);  /* Return zeros if memory doesnt' exist */

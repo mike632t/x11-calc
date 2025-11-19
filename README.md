@@ -43,6 +43,12 @@ MacOS, VMS, Solaris and Tru64 Unix.
 
 Details of the latest/important changes.
 
+19 Nov 25
+
+   - Allocates  memory dynamically allowing the memory size to be increased
+     enabling  modified firmware to provide extra registers and  additional
+     program steps.
+
 18 Oct 25
 
    - Added support for the HP67 card reader (requires GTK).

@@ -397,9 +397,13 @@
  *                     be set using octal or hexadecimal - MT
  * 11 Nov 25  (0211) - Card text ignores any characters after a '.' - MT
  * 12 Nov 25         - Use a label to display program name - MT
- * 16 Nov 25   0.21  - The card reader register addresses are now mapped to
+ * 16 Nov 25         - The card reader register addresses are now mapped to
  *                     a buffer register allowing the size of the memory to
  *                     be restored to its original value - MT
+ * 19 Nov 25   0.22  - Allocates memory registers dynamically - MT
+ *                   - The memory size can be specified on the command line
+ *                     (very useful when using modified firmware to provide
+ *                     enhanced features) - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -411,9 +415,9 @@
  */
 
 #define  NAME          "x11-calc"
-#define  VERSION       "0.21"
-#define  BUILD         "0214"
-#define  DATE          "16 Nov 25"
+#define  VERSION       "0.22"
+#define  BUILD         "0215"
+#define  DATE          "19 Nov 25"
 #define  AUTHOR        "MT"
 
 #define  INTERVAL 48   /* Number of ticks to execute before updating the display */
@@ -567,6 +571,7 @@ int main(int argc, char *argv[])
 #if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
    char b_euro = False;
 #endif
+   unsigned int i_memory_size = MEMORY_SIZE;
    int i_breakpoints[] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};  /* Array to hold breakpoints */
    int i_offset, i_count, i_index, i_value, i_size;
    int i_trap = -1;                    /* Trap instruction */
@@ -596,8 +601,6 @@ int main(int argc, char *argv[])
    if (!(h_alternate_font = h_get_font(x_display, s_alternate_fonts))) v_error(errno, h_err_font, s_alternate_fonts[0]);
    if (!(h_large_font = h_get_font(x_display, s_large_fonts))) v_error(errno, h_err_font, s_large_fonts[0]);
 
-   h_processor = h_processor_create(i_rom);
-
 #if defined(unix) || defined(__unix__) || defined(__APPLE__)  /* Parse UNIX style command line options */
    b_abort = False;  /* Stop processing command line */
    for (i_count = 1; i_count < argc && (b_abort != True); i_count++)
@@ -615,7 +618,7 @@ int main(int argc, char *argv[])
                else
                   if (i_count + 1 < argc)
                   {
-                     if (strncmp(argv[i_count + 1], "0x", 2) == 0)  /* Check for a hexadecimal value */
+                     if (strncmp(argv[i_count + 1], "0x", 2) == 0 || strncmp(argv[i_count + 1], "0X", 2) == 0 )  /* Check for a hexadecimal value */
                         i_value = strtol(argv[i_count + 1], &s_text, 16);
                      else
                         i_value = strtol(argv[i_count + 1], &s_text, 8);
@@ -647,7 +650,7 @@ int main(int argc, char *argv[])
                else
                   if (i_count + 1 < argc)
                   {
-                     if (strncmp(argv[i_count + 1], "0x", 2) == 0)  /* Check for a hexadecimal value */
+                     if (strncmp(argv[i_count + 1], "0x", 2) == 0 || strncmp(argv[i_count + 1], "0X", 2) == 0 )  /* Check for a hexadecimal value */
                         i_value = strtol(argv[i_count + 1], &s_text, 16);
                      else
                         i_value = strtol(argv[i_count + 1], &s_text, 8);
@@ -671,13 +674,37 @@ int main(int argc, char *argv[])
                      v_error(EINVAL, h_err_missing_argument, argv[i_count]);
                i_index = strlen(argv[i_count]) - 1;
                break;
+            case 'm':  /* Memory registers */
+               if (argv[i_count][i_index + 1] != 0)
+                  v_error(EINVAL, h_err_invalid_argument, argv[i_count][i_index + 1]);
+               else
+                  if (i_count + 1 < argc)
+                  {
+                     i_value = strtol(argv[i_count + 1], &s_text, 0);  /* Auto detect base allow octal, decimal or hexadecimal */
+                     if (*s_text != '\0')
+                        v_error(EINVAL, h_err_invalid_number, argv[i_count + 1]);
+                     if ((i_value < 0) || (i_value < MEMORY_SIZE) || (i_value > 256) || (errno == ERANGE))  /* Check range */
+                        v_error(EINVAL, h_err_numeric_range, argv[i_count + 1]);
+                     else
+                     {
+                        i_memory_size = (unsigned int)i_value;
+                        if (i_count + 2 < argc)  /* Remove the parameter from the arguments */
+                           for (i_offset = i_count + 1; i_offset < argc - 1; i_offset++)
+                              argv[i_offset] = argv[i_offset + 1];
+                        argc--;
+                     }
+                  }
+                  else
+                     v_error(EINVAL, h_err_missing_argument, argv[i_count]);
+               i_index = strlen(argv[i_count]) - 1;
+               break;
             case 'r':  /* Read ROM contents  */
                if (argv[i_count][i_index + 1] != 0)
                   v_error(EINVAL, h_err_invalid_argument, argv[i_count][i_index + 1]);
                else
                   if (i_count + 1 < argc)
                   {
-                     v_read_rom(h_processor, argv[i_count + 1]);  /* Load user specified settings */
+                     v_read_rom(i_rom, argv[i_count + 1]);  /* Load user specified ROM */
                      if (i_count + 2 < argc)  /* Remove the parameter from the arguments */
                         for (i_offset = i_count + 1; i_offset < argc - 1; i_offset++)
                            argv[i_offset] = argv[i_offset + 1];
@@ -832,7 +859,7 @@ int main(int argc, char *argv[])
          {
             if (i_count + 1 < argc)
             {
-               v_read_rom(h_processor, argv[i_count + 1]);  /* Load user specified settings */
+               v_read_rom(i_rom, argv[i_count + 1]);  /* Load user specified ROM */
                if (i_count + 2 < argc)  /* Remove the parameter from the arguments */
                   for (i_offset = i_count + 1; i_offset < argc - 1; i_offset++)
                      argv[i_offset] = argv[i_offset + 1];
@@ -875,8 +902,9 @@ int main(int argc, char *argv[])
    fprintf(stdout, "ROM Size: %4u words \n", ROM_SIZE);
    i_wait(200);  /* Sleep for 200 milliseconds to 'debounce' keyboard! */
 
-   i_count = ROM_SIZE;
+   h_processor = h_processor_create(i_rom, i_memory_size);
 
+   i_count = ROM_SIZE;
    while ((i_count > 0) && (i_rom[--i_count] == 0));  /* Check that the ROM isn't empty */
    if (i_count == 0) v_error (ENODATA, h_err_ROM);
 
