@@ -438,7 +438,7 @@ The emulators have been successfully compiled and tested on:
 
    - Windows 11 + WSL2 (Ubuntu 24.04 LTS), gcc 13.3.0, x64
 
-   - Windows 11 + WSL2 (Debian 13), clang 19.0.6, x64
+   - Windows 11 + WSL2 (Debian 13), clang 19.1.7 + gcc 14.2.0, x64
 
 ** Not yet retested with this build.
 
