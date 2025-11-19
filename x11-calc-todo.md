@@ -3,13 +3,15 @@
 
 ### Planned changes
 
+- [ ] Allow user to resize the window at runtime (scroll wheel?).
+
 - [ ] Add a graphical printer display to the HP10
 
-- [ ] Allow user to resize the window at runtime (scroll wheel?).
+- [ ] Update non UNIX command line parser
 
 - [ ] Formatted program listings (using a separate python script)
 
-- [ ] Allow a program card to be loaded from the command line
+- [ ] Move VMS make script to top level directory
 
 - [ ] Reorganize x11-calc and simplify the switch handling
 
@@ -19,16 +21,6 @@
 
 - [ ] Select default zoom based on screen resolution?
 
-- [ ] Better segregation of common code (switch, label and keyboard)
-
-- [ ] Translate README - Volunteers needed!
-
-- [ ] Move VMS make script to top level directory
-
-- [ ] Expand tilde (~) in filenames
-
-  [https://stackoverflow.com/questions/40128376/how-to-expand-tilde-in-path]::
-
 - [ ] Add HP19C
 
 - [ ] Implement 16 segment digit display
@@ -37,7 +29,18 @@
 
 - [ ] Add HP41C
 
+- [ ] Better segregation of common code (switch, label and keyboard)
+
+- [ ] Translate README - Volunteers needed!
+
+- [ ] Expand tilde (~) in filenames
+
+  [https://stackoverflow.com/questions/40128376/how-to-expand-tilde-in-path]::
+
+
 ### Completed changes
+
+- [X] Can specify the number of memory registers on the command line
 
 - [X] Allow pre-recorded program cards to include labels
 
@@ -81,6 +84,8 @@ point positions, and number of segments etc)
   [https://superuser.com/questions/392439/lang-and-language-environment-variable-in-debian-based-systems]::
 
 ### Rejected changes
+
+- [ ] Allow a program card to be loaded from the command line - Need a way to load multiple cards
 
 - [ ] Allow any _programmable_ model to load a saved program - Not possible without modifying the firmware
 
