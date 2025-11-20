@@ -352,23 +352,15 @@ The emulators have been successfully compiled and tested on:
 
    - Alpine 3.19, gcc 13.2.1, x64 + arm64 ***
 
-   - Debian 12 (Bookworm), clang 14.0.6, x64 + arm64
+   - Debian 13 (Trixie), gcc 14.2.0 | clang 19.1.7, x64
 
-   - Debian 12 (Bookworm), tcc 0.9.27, x64 + arm64
+   - Debian 12 (Bookworm), gcc 12.2.0 | clang 14.0.6 ! tcc 0.9.27, x64 + arm64
 
-   - Debian 12 (Bookworm), gcc 12.2.0, x64 + arm64
-
-   - Debian 11 (Bullseye), clang 11.0.1-2, x64 ***
-
-   - Debian 11 (Bullseye), gcc 10.2.1, x64 ***
+   - Debian 11 (Bullseye), gcc 10.2.1 | clang 11.0.1-2, x64 ***
 
    - Debian 10 (Buster), gcc 8.3.0, arm **
 
-   - Debian 10 (Buster), gcc 8.3.0, x64
-
-   - Debian 10 (Buster), clang 7.0.1, x64
-
-   - Debian 10 (Buster), tcc 0.9.27, x64
+   - Debian 10 (Buster), gcc 8.3.0 | clang 7.0.1 | tcc 0.9.27, x64
 
    - Debian 9 (Stretch), gcc 6.3.0, arm ***
 
@@ -376,21 +368,13 @@ The emulators have been successfully compiled and tested on:
 
    - Debian 5 (Lenny), gcc 4.3.2, i686
 
-   - Fedora 35, gcc 11.3.1, x64
+   - Fedora 35, gcc 11.3.1 | clang 13.0.1, x64 **
 
-   - Fedora 35, clang 13.0.1, x64
+   - Fedora 39, gcc 13.2.1 | clang 17.0.6, x64 **
 
-   - Fedora 39, gcc 13.2.1, x64
+   - Fedora 41, gcc 14.3.1 | clang 19.1.7, x64 **
 
-   - Fedora 39, clang 17.0.6, x64
-
-   - Fedora 41, gcc 14.3.1, x64
-
-   - Fedora 41, clang 19.1.7, x64
-
-   - Fedora 42, gcc 15.2.1, x64
-
-   - Fedora 42, clang 20.1.8, x64
+   - Fedora 42, gcc 15.2.1 | clang 20.1.8, x64
 
    - FreeBSD 14.0, clang 16.0.6, x64 **
 
@@ -404,27 +388,19 @@ The emulators have been successfully compiled and tested on:
 
    - MacOS 14.4.1 (Sonoma), clang 15.0.0, arm46 **
 
-   - Minix 3.4.0, clang 3.6, x86
+   - Minix 3.4.0, clang 3.6, x86 **
 
-   - NetBSD 9.2, gcc 7.5.0, x86
-
-   - NetBSD 9.2, clang 16.0.6, x86
+   - NetBSD 9.2, gcc 7.5.0 | clang 16.0.6, x86 **
 
    - SunOS 5.10, gcc 3.4.3, x86
 
-   - SUSE 15.4, clang 13. 0.1, x64
+   - SUSE 15.4, gcc 7.5.0 | clang 13. 0.1, x64 **
 
-   - SUSE 15.4, gcc 7.5.0, x64
+   - Tru64 5.1, cc 6.5-011, alpha **
 
-   - Tru64 5.1, cc 6.5-011, alpha
+   - Ubuntu 20.04, gcc 9.4.0 | clang 10.0.0 | tcc 0.9.27, x64 + aarch64
 
-   - Ubuntu 20.04, gcc 9.4.0, x64 + aarch64
-
-   - Ubuntu 20.04, clang 10.0.0, x64 + aarch64
-
-   - Ubuntu 20.04, tcc 0.9.27, x64 + aarch64
-
-   - Ubuntu 22.04, gcc 11.4.0, x64
+   - Ubuntu 22.04, gcc 11.4.0, x64 **
 
    - Ubuntu 24.04, gcc 13.3.0, x64
 
@@ -438,7 +414,7 @@ The emulators have been successfully compiled and tested on:
 
    - Windows 11 + WSL2 (Ubuntu 24.04 LTS), gcc 13.3.0, x64
 
-   - Windows 11 + WSL2 (Debian 13), clang 19.1.7 + gcc 14.2.0, x64
+   - Windows 11 + WSL2 (Debian 13), clang 19.1.7 | gcc 14.2.0, x64
 
 ** Not yet retested with this build.
 
