@@ -76,6 +76,8 @@
 #  05 Sep 25  0.6 (0028)   - Added support for HP12C - MT
 #  10 Nov 25               - Modified mnemonics to make them clearer - MT
 #  17 Nov 25               - Fixed issue with Python 3 - MT
+#  20 Nov 25               - Fixed spelling of 'substitutions' and included
+#                            some additional unicode mnemonics - MT
 #
 #  To Do                   - Add lookup tables for HP10C, HP11C, and HP38C.
 #                          - Add support for HP15C.
@@ -83,7 +85,7 @@
 
 import sys, os
 
-VERSION = "0.5.0027"
+VERSION = "0.5.0031"
 
 def _about():
   _path = os.path.basename(sys.argv[0])
@@ -207,14 +209,14 @@ _formats = {
    }
 }
 
-_substutions = { # Note that this must be a collection of arrays of collections to preserve the order in which the substitutions occur!
+_substitutions = { # Note that this must be a collection of arrays of collections to preserve the order in which the substitutions occur!
    "unicode": [
       {" / "   : (u" \u00f7 ")},
       {" * "   : (u" \u00d7 ")},
       {"e^X"   : (u"e\u02e3")},
       {"y^X"   : (u"y\u02e3")},
-      # {"1/x" : (u"\u215fx")}, # Removed as it is very unclear
       {"10^x"  : (u"10\u02e3")},
+      {" Pi "  : (u" \u03C0 ")},
 
       {"x^2"   : (u"x\u00b2")},
       {"SQRT"  : (u"\u221Ax  ")},
@@ -226,12 +228,17 @@ _substutions = { # Note that this must be a collection of arrays of collections 
       {"x^"    : (u"x\u0302 ")},
       {"x~"    : (u"x\u0304 ")},
 
+      {"ENTER" : (u"ENTER\u2191")},
       {"R up"  : (u"R\u2191")},
       {"R dn"  : (u"R\u2193")},
 
       {"P<>S"  : (u"P\u21C4S ")},
       {"X<>Y"  : (u"X\u21C4Y")},
       {"X<>I"  : (u"X\u21C4I")},
+
+      {"P<>S"  : (u"P\u21D4S ")},
+      {"X<>Y"  : (u"X\u21D4Y")},
+      {"X<>I"  : (u"X\u21D4I")},
 
       {"D->R"  : (u"D\u2192R")},
       {"R->D"  : (u"R\u2192D")},
@@ -243,12 +250,12 @@ _substutions = { # Note that this must be a collection of arrays of collections 
       {"->H"   : (u"\u2192H")},
       {"->H.MS": (u"\u2192H.MS")},
 
-      {"X<=Y?" : (u"X\u2264Y ")},
-      {"X>=Y?" : (u"X\u2265Y ")},
-      {"X!=Y?" : (u"X\u2260Y ")},
-      {"X<=0?" : (u"X\u22640 ")},
-      {"X>=0?" : (u"X\u22650 ")},
-      {"X!=0?" : (u"X\u22600 ")}
+      {"X<=Y?" : (u"X\u2264Y?")},
+      {"X>=Y?" : (u"X\u2265Y?")},
+      {"X!=Y?" : (u"X\u2260Y?")},
+      {"X<=0?" : (u"X\u22640?")},
+      {"X>=0?" : (u"X\u22650?")},
+      {"X!=0?" : (u"X\u22600?")}
    ],
    "ascii2html": [
       {"&"     : "&amp;"},
@@ -731,28 +738,28 @@ def _expand(_buffer):
    global _unicode
 
    if _unicode:
-      for _pattern in _substutions["unicode"]:
+      for _pattern in _substitutions["unicode"]:
          for _item in _pattern:
             _buffer = _buffer.replace(_item, _pattern[_item])
    else: # Strip out hints for unicode
-      for _pattern in _substutions["text"]:
+      for _pattern in _substitutions["text"]:
          for _item in _pattern:
             _buffer = _buffer.replace(_item, _pattern[_item])
 
    if _format == "markup":
-      for _pattern in _substutions["markup"]:
+      for _pattern in _substitutions["markup"]:
          for _item in _pattern:
             _buffer = _buffer.replace(_item, _pattern[_item])
 
    if _format == "html":
-      for _pattern in _substutions["ascii2html"]:
+      for _pattern in _substitutions["ascii2html"]:
          for _item in _pattern:
             _buffer = _buffer.replace(_item, _pattern[_item])
 
-      for _pattern in _substutions["ascii2html"]:
+      for _pattern in _substitutions["ascii2html"]:
          try:
             _buffer = _buffer.decode("utf-8")
-            for _pattern in _substutions["unicode2html"]:
+            for _pattern in _substitutions["unicode2html"]:
                for _item in _pattern:
                   _buffer = _buffer.replace(_item, _pattern[_item])
             _buffer = _buffer.encode("ascii")
@@ -772,6 +779,7 @@ def _get_char(_file):
    else:
       _char = ""
    return _char
+
 
 _strip = False
 _restart = False
@@ -907,8 +915,6 @@ try:
                _char = _get_char(_file) # Read ahead
 
             if _reverse: _bytes.reverse() # Reverse the order of the bytes
-
-            print(_bytes)
 
             if len(_names) > 1:
                sys.stdout.write(_formats[_format]["heading"] + _expand(_buffer + _name) + _formats[_format]["end"] + "\n\n")
