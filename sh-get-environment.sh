@@ -21,7 +21,31 @@
 #  09 Nov 25            - Attempts to detect the session manager - MT
 #  12 Nov 25            - Added the default compiler - MT
 #  20 Nov 25            - Scan for multiple compilers - MT
+#  21 Nov 25            - Improved portability (tested on Solaris 10) - MT
 #
+
+#
+#  join()
+#
+#  Concatenates  the elements of an array into comma delimited list removing
+#  any duplicates.
+#
+#  It is deliberately verbose to make it more portable.
+#
+_join() {
+    local _list=""
+    local _text
+    for _text in "$@"; do
+        case ",$_list," in
+            *,"$_text",*) ;;  # skip duplicates
+            *)
+                [ -n "$_list" ] && _list="$_list, "
+                _list="$_list$_text"
+                ;;
+        esac
+    done
+    echo "$_list"
+}
 
 #  Operating System
 _operating_system=""
@@ -164,41 +188,68 @@ echo "Session Type: $_session_type"
 echo ""
 
 # Compiler
+for dir in /usr/sfw/bin /usr/ccs/bin /opt/SUNWspro/bin; do # Add additional directories to PATH
+    [ -d "$dir" ] && PATH="$dir:$PATH"
+done
+
 _matches=()
-# Check if /usr/sfw/bin exists and is a directory
-if [ -d /usr/sfw/bin ]; then
-   PATH="/usr/sfw/bin:$PATH"
-fi
 for _option in cc gcc clang suncc tcc pcc; do
-   _compiler=""
    if command -v "$_option" >/dev/null 2>&1; then
-      _compiler=$(readlink -f "$(command -v "$_option")" 2>/dev/null || command -v "$_option")
-      _version=$($_compiler -v 2>&1 | grep ' version ' | sed -e 's/([^()]*)//g' | sed -e 's/[ \t]*$$//g' | tr '[:upper:]' '[:lower:]')
-      #_matches+=(" $(echo "$_compiler" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')")
-      _matches[${#_matches[@]}]=$(echo "$_version" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')  # This is 'safer' on older versions of bash
+      _command=$(command -v "$_option")
+      case "$_option" in
+         gcc|clang|pcc)
+            _version=$("$_command" --version 2>&1 | sed -n '1p')
+            ;;
+         tcc)
+            _version=$("$_command" -v 2>&1 | sed -n '1p')
+            ;;
+         cc)
+            _version=$("$_command" -v 2>&1 | sed -n '$p')  # Last line
+            ;;
+         cc|suncc)
+            _version=$("$_command" -V 2>&1 | sed -n '1p')
+            ;;
+      esac
+      _version=$(echo $_version | sed -e 's/([^()]*)//g; s/[ \t]*$//; s/version/ /g; s/  */ /g; y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/')
+      #  [ -n "$_version" ] && _matches[${#_matches[@]}]="${_command} → $_version" # Alternative output showing paths and versions
+      [ -n "$_version" ] && _matches[${#_matches[@]}]="$_version"
    fi
 done
-if [ ${#_matches[@]} -gt 0 ]; then
-   echo "Compiler:$(for v in "${_matches[@]}"; do echo "$v"; done | sort -u | paste -sd ",")"
+_list=$(_join "${_matches[@]}")  # Concatenate matches into a list
+
+#  Alternative output showing paths and versions
+#  echo "Compilers detected:"
+#  for m in "${_matches[@]}"; do
+#     echo "  $m"
+#  done
+
+if [ -n $__list ]; then
+   echo "Compiler: $_list"
 else
-   echo "Not installed"
+   echo "Not found"
 fi
 echo ""
 
-# Make
+#  Make
 _matches=()
-for make in bmake gmake make nmake; do
-   _make=""
-   if command -v "$make" >/dev/null 2>&1; then
-      _make=$(readlink -f "$(command -v "$make")" 2>/dev/null || command -v "$make")
-      _version=$($_make -v 2>&1 | sed -n '1p' | sed -e 's/([^()]*)//g' | sed -e 's/[ \t]*$$//g' | tr '[:upper:]' '[:lower:]')  # Just take the first line
-      _matches[${#_matches[@]}]=$(echo "$_version" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')  # This is 'safer' on older versions of bash
+for _option in bmake gmake make nmake; do
+   if command -v "$_option" >/dev/null 2>&1; then
+      _command=$(command -v "$_option")
+      case "$_option" in
+         bmake|gmake|make|nmake)
+            _version=$("$_command" -v 2>&1 | sed -n '1p')
+            ;;
+      esac
+      _version=$(echo $_version | sed -e 's/([^()]*)//g; s/[ \t]*$//; s/version/ /g; s/  */ /g; y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/')
+      [ -n "$_version" ] && _matches[${#_matches[@]}]="$_version"
    fi
 done
-if [ ${#_matches[@]} -gt 0 ]; then
-   echo "Make:$(for v in "${_matches[@]}"; do echo "$v"; done | sort -u | paste -sd ",")"
+_list=$(_join "${_matches[@]}")  # Concatenate matches into a list
+
+if [ -n $__list ]; then
+   echo "Make: $_list"
 else
-   echo "Not installed"
+   echo "Not found"
 fi
-# echo ""
+#  echo ""
 
