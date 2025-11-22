@@ -23,6 +23,8 @@
 #  20 Nov 25            - Scan for multiple compilers - MT
 #  21 Nov 25            - Improved portability (tested on Solaris 10) - MT
 #  22 Nov 25            - Added kernel version and architecture - MT
+#                       - Fixed issues in join  - MT
+#                       - Ignore 'not installed' error messages - MT
 #
 
 #
@@ -33,13 +35,16 @@
 #
 #  It is deliberately verbose to make it more portable.
 #
+#  21 Nov 25  0.1.0001  - Initial version - MT
+#                       - Now handles multi-character delimiters - MT
+#
 _join() {
-   local _delimiter=", "
+   local _delimiter=", "  # Includes space
    local _list=""
    local _text
    for _text in "$@"; do
-      case ",$_list," in
-         *,"$_text",*) ;;  # skip duplicates
+      case "$_delimiter$_list$_delimiter" in
+         *"$_delimiter$_text$_delimiter"*) ;;  # Skip duplicates entries, comment out this line to allow duplicates
          *)
             [ -n "$_list" ] && _list="$_list$_delimiter"
             _list="$_list$_text"
@@ -81,11 +86,11 @@ if grep -qi microsoft /proc/version 2>/dev/null; then  # Start by checking for W
       _hypervisor="wsl"
    fi
 fi
-if [ -z "$_hypervisor" ] && command -v systemd-detect-virt >/dev/null 2>&1; then  # If not found use systemd-detect-virt (if installed)
+if [ -z "$_hypervisor" ] && command -v systemd-detect-virt 2>&1 >/dev/null; then  # If not found use systemd-detect-virt (if installed)
    v=$(systemd-detect-virt 2>/dev/null || true)
    [ -n "$v" ] && [ "$v" != "none" ] && _hypervisor="$v"
 fi
-if [ -z "$_hypervisor" ] && command -v virt-what >/dev/null 2>&1; then  # If not found  fallback to virt-what (if installed)
+if [ -z "$_hypervisor" ] && command -v virt-what 2>&1 >/dev/null; then  # If not found  fallback to virt-what (if installed)
    _hypervisor=$(virt-what 2>/dev/null | tr '\n' ' ' | sed 's/ $//')
 fi
 if [ -z "$_hypervisor" ]; then # If not found try inspecting DMI/SMBIOS strings
@@ -119,7 +124,7 @@ fi
 if [ -z "$_display_manager" ]; then
    # _display_manager=$(ps -e -o comm= | grep -E 'cdm|gdm|gdm3|kdm|lightdm|sddm|slim|xdm' | sort | uniq)  # Can't use 'grep -E'
    for _process in cdm gdm gdm3 kdm lightdm sddm slim xdm; do
-     if pgrep -x "$_process" >/dev/null 2>&1; then
+     if pgrep -x "$_process" 2>&1 >/dev/null; then
        _display_manager="$_process"
        break
      fi
@@ -147,7 +152,7 @@ fi
 if [ -z "$_session_manager" ]; then
    # _session_manager=$(ps -eo comm | grep -E 'budgie-session|cinnamon-session|gnome-session|gnome-session-binary|ksmserver|lxsession|mate-session|xfce4-session' | grep -v grep | sort | uniq)  # Can't use grep -E
    for _process in budgie-session cinnamon-session gnome-session gnome-session-binary ksmserver lxsession mate-session xfce4-session x-session-manager; do
-     if pgrep -x "$(echo "$_process" | cut -c1-15)" >/dev/null 2>&1; then  # Truncate otherwise process name won't match max 15 characters
+     if pgrep -x "$(echo "$_process" | cut -c1-15)" 2>&1 >/dev/null; then  # Truncate otherwise process name won't match max 15 characters
        _session_manager="$_process"
        break
      fi
@@ -163,7 +168,7 @@ echo ""
 _window_manager=""
 #_window_manager=$(ps -e -o comm= | grep -E 'awesome|blackbox|fluxbox|fvwm|gnome-shell|icewm|i3|kwin|marco|metacity|mutter|openbox|sawfish|twm|wmaker|xfwm' | sort | uniq)  # Can't use grep -E
 for _process in awesome blackbox fluxbox fvwm gnome-shell icewm i3 kwin marco metacity mutter openbox sawfish twm wmaker xfwm; do
-  if pgrep -x "$(echo "$_process" | cut -c1-15)" >/dev/null 2>&1; then  # Truncate otherwise process name won't match max 15 characters
+  if pgrep -x "$(echo "$_process" | cut -c1-15)" 2>&1 >/dev/null; then  # Truncate otherwise process name won't match max 15 characters
     _window_manager="$_process"
     break
   fi
@@ -203,28 +208,28 @@ done
 
 _matches=()
 for _option in cc gcc clang suncc tcc pcc; do
-   if command -v "$_option" >/dev/null 2>&1; then
+   if command -v "$_option" 2>&1 >/dev/null; then
       _command=$(command -v "$_option")
       case "$_option" in
          gcc|clang|pcc)
-            _version=$("$_command" --version 2>&1 | sed -n '1p')
+            _version=$("$_command" --version 2>/dev/null | sed -n '1p')
             ;;
          tcc)
-            _version=$("$_command" -v 2>&1 | sed -n '1p')
+            _version=$("$_command" -v 2>/dev/null | sed -n '1p')
             ;;
          cc)
-            _version=$("$_command" -v 2>&1 | sed -n '$p')  # Last line
+            _version=$("$_command" -v 2>/dev/null | sed -n '$p')  # Last line
             ;;
          cc|suncc)
-            _version=$("$_command" -V 2>&1 | sed -n '1p')
+            _version=$("$_command" -V 2>/dev/null | sed -n '1p')
             ;;
       esac
-      _version=$(echo $_version | sed -e 's/([^()]*)//g; s/[ \t]*$//; s/version/ /g; s/  */ /g; y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/')
+      _version=$(echo $_version | grep -v "not installed" | sed -e 's/([^()]*)//g; s/[ \t]*$//; s/ version / /g; s/  */ /g; y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/' | sed -n '1p')
       #  [ -n "$_version" ] && _matches[${#_matches[@]}]="${_command} → $_version" # Alternative output showing paths and versions
       [ -n "$_version" ] && _matches[${#_matches[@]}]="$_version"
    fi
 done
-_list=$(_join ", " "${_matches[@]}")  # Concatenate matches into a list
+_list=$(_join "${_matches[@]}")  # Concatenate matches into a list
 
 #  Alternative output showing paths and versions
 #  echo "Compilers detected:"
@@ -246,10 +251,10 @@ for _option in bmake gmake make nmake; do
       _command=$(command -v "$_option")
       case "$_option" in
          bmake|gmake|make|nmake)
-            _version=$("$_command" -v 2>&1 | sed -n '1p')
+            _version=$("$_command" -v 2>/dev/null | sed -n '1p')
             ;;
       esac
-      _version=$(echo $_version | sed -e 's/([^()]*)//g; s/[ \t]*$//; s/version/ /g; s/  */ /g; y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/')
+      _version=$(echo $_version | grep -v "not installed" | sed -e 's/([^()]*)//g; s/[ \t]*$//; s/version/ /g; s/  */ /g; y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/' | sed -n '1p')
       [ -n "$_version" ] && _matches[${#_matches[@]}]="$_version"
    fi
 done
