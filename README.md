@@ -356,7 +356,7 @@ The emulators have been successfully compiled and tested on:
 
    - Debian 12 (Bookworm), gcc 12.2.0 | clang 14.0.6 ! tcc 0.9.27, x64 + arm64
 
-   - Debian 11 (Bullseye), gcc 10.2.1 | clang 11.0.1-2, x64 ***
+   - Debian 11 (Bullseye), gcc 10.2.1 | clang 11.0.1-2, i686 + x64 ***
 
    - Debian 10 (Buster), gcc 8.3.0, arm **
 
@@ -368,13 +368,15 @@ The emulators have been successfully compiled and tested on:
 
    - Debian 5 (Lenny), gcc 4.3.2, i686
 
-   - Fedora 35, gcc 11.3.1 | clang 13.0.1, x64 **
+   - Fedora 35, gcc 11.3.1 | clang 13.0.1, x64
 
-   - Fedora 39, gcc 13.2.1 | clang 17.0.6, x64 **
+   - Fedora 39, gcc 13.2.1 | clang 17.0.6, x64 ***
 
-   - Fedora 41, gcc 14.3.1 | clang 19.1.7, x64 **
+   - Fedora 41, gcc 14.3.1 | clang 19.1.7, x64 ***
 
    - Fedora 42, gcc 15.2.1 | clang 20.1.8, x64
+
+   - Fedora 43, gcc 15.2.1 | clang 21.1.5, x64
 
    - FreeBSD 14.0, clang 16.0.6, x64 **
 
@@ -507,7 +509,7 @@ Your problem report should contain:
 
 - Whether you are using a pre-built binary (Alpine / Flatpak);
 
-- Output from `sh-get-environment-info.sh`;
+- Output from `sh-get-environment.sh`;
 
 - Commit ID;
 
