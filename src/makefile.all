@@ -37,23 +37,24 @@
 #  01 Nov 25         - Added a x11-calc-card - MT
 #  14 Nov 25         - Added x11-calc-register - MT
 #                    - Disable optimization when debugging - MT
+#  22 Nov 25         - Strip newline from COMPILER string - MT
 #
 
-MODEL	= 21
-PROGRAM	= x11-calc-$(MODEL)
+MODEL		= 21
+PROGRAM		= x11-calc-$(MODEL)
 BIN		= ../bin
 
-COMPILER	= `$(CC) -v 2>&1 | grep ' version ' | sed -e 's/([^()]*)//g' | sed -e 's/[ \t]*$$//g'`
+COMPILER	= `$(CC) -v 2>&1 | grep ' version ' | sed -e 's/([^()]*)//g' | sed -e 's/[ \t]*$$//g' | awk '{printf "%s",$$0}'`  # Strip newline
 
 # Note   SHARED sources are model dependant and are recompiled for every emulator
 #        COMMON code is only compiled once an cannot contain model dependent code blocks
 
-SHARED	= x11-calc.c x11-calc-cpu.c x11-calc-display.c x11-calc-digit.c x11-calc-messages.c x11-calc-button.c x11-calc-card.c
-COMMON	=  x11-calc-register.c x11-calc-switch.c x11-calc-label.c x11-calc-colour.c x11-calc-font.c x11-keyboard.c gcc-wait.c gcc-exists.c
+SHARED		= x11-calc.c x11-calc-cpu.c x11-calc-display.c x11-calc-digit.c x11-calc-messages.c x11-calc-button.c x11-calc-card.c
+COMMON		=  x11-calc-register.c x11-calc-switch.c x11-calc-label.c x11-calc-colour.c x11-calc-font.c x11-keyboard.c gcc-wait.c gcc-exists.c
 
 CC		= cc
-#DEBUG	= -O0 -g
-DEBUG	=
+#DEBUG		= -O0 -g
+DEBUG		=
 
 LDLIBS_ADD	= -lX11 -lm
 
