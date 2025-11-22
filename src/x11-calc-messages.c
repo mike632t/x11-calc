@@ -77,12 +77,13 @@
  *                   - Moved error(), warning() and usage() routines - MT
  * 17 Nov 25         - Updated invalid address messages to use a consistent
  *                     number of digits for the address - MT
+ * 22 Nov 25         - Added read and write error messages - MT
  *
  */
 
 #define NAME           "x11-calc-messages"
-#define BUILD          "0029"
-#define DATE           "30 Oct 25"
+#define BUILD          "0036"
+#define DATE           "22 Nov 25"
 #define AUTHOR         "MT"
 
 #include <errno.h>     /* errno */
@@ -144,6 +145,8 @@ const char *h_msg_saving = "Guardando '%s'\n";
 
 const char *h_err_register_alloc = "Error de ejecucion\t: %s linea: %d: iFallo la asignacion de memoria!\n";
 const char *h_err_opening_file = "No se puede abrir '%s'\n";
+const char *h_err_reading_file = "Error reading file\n";
+const char *h_err_writing_file = "Error writing to file\n";
 
 const char *h_err_display = "No se pudo conectar al servidor X '%s'\n";
 const char *h_err_display_properties = "No se pudo obtener las propiedades del monitor\n";
@@ -222,6 +225,8 @@ const char *h_msg_saving = "Speichere '%s'\n";
 
 const char *h_err_register_alloc = "Laufzeitfehler\t: %s Zeile : %d : Speicheranforderung fehlgeschlagen!\n";
 const char *h_err_opening_file = "Kann '%s' nicht oeffnen\n";
+const char *h_err_reading_file = "Error reading file\n";
+const char *h_err_writing_file = "Error writing to file\n";
 
 const char *h_err_display = "Kann keine verbindung zum X Server '%s' herstellen\n";
 const char *h_err_display_properties = "Kann eigenschaften des displays nicht abfragen\n";
@@ -300,6 +305,8 @@ const char *h_msg_saving = "Enregistrement de '%s'\n";
 
 const char *h_err_register_alloc = "Erreur d'execution\t : Ligne %s : %d : Echec de l'allocation memoire !\n";
 const char *h_err_opening_file = "Impossible d'ouvrir '%s'\n";
+const char *h_err_reading_file = "Error reading file\n";
+const char *h_err_writing_file = "Error writing to file\n";
 
 const char *h_err_display = "Impossible de se connecter au serveur X '%s'\n";
 const char *h_err_display_properties = "Impossible d'obtenir les proprietes d'affichage\n";
@@ -376,9 +383,11 @@ const char *h_err_invalid_option = "option invalide %s\n";
 
 const char *h_msg_loading = "Laddar '%s'\n";
 const char *h_msg_saving = "Sparar '%s'\n";
-const char *h_err_register_alloc = "Exekveringsfel\t: %s rad : %d : Fel vid Minnesallokering!\n";
 
+const char *h_err_register_alloc = "Exekveringsfel\t: %s rad : %d : Fel vid Minnesallokering!\n";
 const char *h_err_opening_file = "Kan inte oeppna '%s'\n";
+const char *h_err_reading_file = "Error reading file\n";
+const char *h_err_writing_file = "Error writing to file\n";
 
 const char *h_err_display = "Kan inte ansluta till X server '%s'\n";
 const char *h_err_display_properties = "Kan inte hamta display-egenskaper\n";
@@ -458,6 +467,8 @@ const char *h_msg_saving = "Saving '%s'\n";
 
 const char *h_err_register_alloc = "Run-time error\t: %s line : %d : Memory allocation failed!\n";
 const char *h_err_opening_file = "Unable to open '%s'\n";
+const char *h_err_reading_file = "Error reading file\n";
+const char *h_err_writing_file = "Error writing to file\n";
 
 const char *h_err_display = "Cannot connect to X server '%s'\n";
 const char *h_err_display_properties = "Unable to get display properties\n";

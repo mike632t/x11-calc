@@ -675,6 +675,7 @@ void v_card_read_write_record(oprocessor* h_processor)
  * 16 Nov 25         - The card reader register addresses are now mapped to
  *                     a buffer register allowing the size of the memory to
  *                     be restored to its original value - MT
+ * 22 Nov 25         - Check for read errors - MT
  *
  */
 {
@@ -695,7 +696,8 @@ void v_card_read_write_record(oprocessor* h_processor)
                i_record <<= 4;
                i_record += *p_buffer_pointer--;
             }
-            fprintf(h_processor->card->file, "%07x,", i_record);
+            if (fprintf(h_processor->card->file, "%07x,", i_record) <0)  /* Write record to file */
+               v_warning(h_err_writing_file);  /* Error reading file */;
             h_processor->card->records++;  /* Increment before testing to see if a newline is required */
             if (h_processor->card->records > 0 && h_processor->card->records  % 8 == 0) fprintf(h_processor->card->file, "\n");
          }
@@ -705,8 +707,8 @@ void v_card_read_write_record(oprocessor* h_processor)
          {
             /* Read 7 nibbles from file to the most and least (duplicated) significant nibbles from the card */
 
-            fscanf(h_processor->card->file, "%x,", (unsigned int*)&i_record);  /*Read next record from file */
-
+            if (fscanf(h_processor->card->file, "%x,", (unsigned int*)&i_record) != 1)  /* Read next record from file */
+               v_warning(h_err_reading_file);  /* Error reading file */;
             p_buffer_pointer = &(h_processor->card->buffer->nibble[REG_SIZE - 1]);
             for (i_count = 6; i_count >= 0; i_count--)  /* Put record in upper 7 nibbles of the buffer */
                *p_buffer_pointer-- = (i_record >> i_count * 4) & 0xf;

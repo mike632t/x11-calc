@@ -36,6 +36,7 @@
  * 05 Nov 25         - Use arrays to hold multiple lines as this allows pre
  *                     processor directives to modify output - MT
  *                   - Moved error(), warning() and usage() routines - MT
+ * 22 Nov 25         - Added read and write error messages - MT
  *
  */
 
@@ -51,6 +52,8 @@ extern const char *h_msg_saving;
 
 extern const char *h_err_register_alloc;
 extern const char *h_err_opening_file;
+extern const char *h_err_reading_file;
+extern const char *h_err_writing_file;
 
 extern const char *h_err_unexpected_opcode;
 extern const char *h_err_unexpected_error;
