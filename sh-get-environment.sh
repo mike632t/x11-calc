@@ -22,6 +22,7 @@
 #  12 Nov 25            - Added the default compiler - MT
 #  20 Nov 25            - Scan for multiple compilers - MT
 #  21 Nov 25            - Improved portability (tested on Solaris 10) - MT
+#  22 Nov 25            - Added kernel version and architecture - MT
 #
 
 #
@@ -33,46 +34,54 @@
 #  It is deliberately verbose to make it more portable.
 #
 _join() {
-    local _list=""
-    local _text
-    for _text in "$@"; do
-        case ",$_list," in
-            *,"$_text",*) ;;  # skip duplicates
-            *)
-                [ -n "$_list" ] && _list="$_list, "
-                _list="$_list$_text"
-                ;;
-        esac
-    done
-    echo "$_list"
+   local _delimiter=", "
+   local _list=""
+   local _text
+   for _text in "$@"; do
+      case ",$_list," in
+         *,"$_text",*) ;;  # skip duplicates
+         *)
+            [ -n "$_list" ] && _list="$_list$_delimiter"
+            _list="$_list$_text"
+            ;;
+      esac
+   done
+   echo "$_list"
 }
 
-#  Operating System
-_operating_system=""
+#  Operating System and kernel version
+_os=$(uname -s 2>/dev/null)      # System name
+_kernel=$(uname -r 2>/dev/null)  # Release
+_arch=$(uname -m 2>/dev/null)    # Hardware
+_system=""
 if [ -f /etc/lsb-release ]; then
    . /etc/lsb-release
-   _operating_system="$DISTRIB_DESCRIPTION"
+   _system="$DISTRIB_DESCRIPTION"
 elif [ -f /etc/os-release ]; then
    . /etc/os-release
-   _operating_system="$PRETTY_NAME"
+   _system="$PRETTY_NAME"
 elif [ -f /etc/redhat-release ]; then
-   _operating_system=$(cat /etc/redhat-release)
+   _system=$(cat /etc/redhat-release)
 else
-   _operating_system="$(uname -s) $(uname -r 2>/dev/null)"
+   _system="$_os $_kernel ($_arch)"
 fi
-echo "Operating System: $_operating_system"
+echo "Operating System: $_system"
 echo ""
+if [ -n "$_kernel" ] && [ -n "$_arch" ]; then
+echo "Kernel: $_kernel $_arch"
+echo ""
+fi
 
 #  Hypervisor
 _hypervisor=""
-if grep -qi microsoft /proc/version 2>/dev/null; then # Start by checking for WSL or WSL2
+if grep -qi microsoft /proc/version 2>/dev/null; then  # Start by checking for WSL or WSL2
    if uname -r | grep -qi "WSL2"; then
       _hypervisor="wsl2"
    else
       _hypervisor="wsl"
    fi
 fi
-if [ -z "$_hypervisor" ] && command -v systemd-detect-virt >/dev/null 2>&1; then # If not found use tyr systemd-detect-virt (if installed)
+if [ -z "$_hypervisor" ] && command -v systemd-detect-virt >/dev/null 2>&1; then  # If not found use systemd-detect-virt (if installed)
    v=$(systemd-detect-virt 2>/dev/null || true)
    [ -n "$v" ] && [ "$v" != "none" ] && _hypervisor="$v"
 fi
@@ -215,7 +224,7 @@ for _option in cc gcc clang suncc tcc pcc; do
       [ -n "$_version" ] && _matches[${#_matches[@]}]="$_version"
    fi
 done
-_list=$(_join "${_matches[@]}")  # Concatenate matches into a list
+_list=$(_join ", " "${_matches[@]}")  # Concatenate matches into a list
 
 #  Alternative output showing paths and versions
 #  echo "Compilers detected:"
