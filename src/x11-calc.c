@@ -407,6 +407,8 @@
  *                   - Maintain  compatibility with earlier versions of the
  *                     HP67 emulators and versions without extended  memory
  *                     when loading or saving state - MT
+ * 22 Nov 25         - Don't use string concatenation to print the compiler
+ *                     version - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -419,8 +421,8 @@
 
 #define  NAME          "x11-calc"
 #define  VERSION       "0.22"
-#define  BUILD         "0216"
-#define  DATE          "19 Nov 25"
+#define  BUILD         "0217"
+#define  DATE          "22 Nov 25"
 #define  AUTHOR        "MT"
 
 #define  INTERVAL 48   /* Number of ticks to execute before updating the display */
@@ -466,7 +468,7 @@
 void v_version(void)  /* Display version information */
 {
    fprintf(stdout, "%s: Version %s.%s %s", FILENAME, VERSION, BUILD, COMMIT_ID);
-   if (strlen(__compiler__)) fprintf(stdout, " "__compiler__);  /* Include compiler version if defined */
+   if (strlen(__compiler__)) fprintf(stdout, " %s", __compiler__);  /* Include compiler version if defined */
    if (__DATE__[4] == ' ') fprintf(stdout, " 0"); else fprintf(stdout, " %c", __DATE__[4]);
    fprintf(stdout, "%c %c%c%c %s %s\n", __DATE__[5],
       __DATE__[0], __DATE__[1], __DATE__[2], &__DATE__[9], __TIME__ );
