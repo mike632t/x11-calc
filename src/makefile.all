@@ -38,13 +38,16 @@
 #  14 Nov 25         - Added x11-calc-register - MT
 #                    - Disable optimization when debugging - MT
 #  22 Nov 25         - Strip newline from COMPILER string - MT
+#                    - Convert compiler version to lowercase using sed - MT
+#                    - Use only the first version listed - MT
 #
 
 MODEL		= 21
 PROGRAM		= x11-calc-$(MODEL)
 BIN		= ../bin
 
-COMPILER	= `$(CC) -v 2>&1 | grep ' version ' | sed -e 's/([^()]*)//g' | sed -e 's/[ \t]*$$//g' | awk '{printf "%s",$$0}'`  # Strip newline
+# Do not put a comment after this line (the spaces will be included in the string
+COMPILER	= `$(CC) -v 2>&1 | grep ' version ' | sed -e 's/([^()]*)//g; s/version//g; s/  */ /g; y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/; s/[ \t]*\$$//g' | sed -n '1p' | awk '{printf "%s",$$0}'`
 
 # Note   SHARED sources are model dependant and are recompiled for every emulator
 #        COMMON code is only compiled once an cannot contain model dependent code blocks
