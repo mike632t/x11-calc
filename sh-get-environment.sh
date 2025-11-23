@@ -25,6 +25,7 @@
 #  22 Nov 25            - Added kernel version and architecture - MT
 #                       - Fixed issues in join  - MT
 #                       - Ignore 'not installed' error messages - MT
+#  23 Nov 25            - Display architecture in brackets - MT
 #
 
 #
@@ -73,7 +74,7 @@ fi
 echo "Operating System: $_system"
 echo ""
 if [ -n "$_kernel" ] && [ -n "$_arch" ]; then
-echo "Kernel: $_kernel $_arch"
+echo "Kernel: $_kernel ($_arch)"
 echo ""
 fi
 
