@@ -383,13 +383,13 @@ The emulators have been successfully compiled and tested on:
 
    - Gentoo, gcc 11.2.0, x64 **
 
-   - MacOS 10.1.15 (Catalina), clang 12.0.0, x64 **
+   - MacOS 10.1.15 (Catalina), clang 12.0.0, x64 ***
 
    - MacOS 12.7.6 (Monterey), clang 14.0.0, x64
 
-   - MacOS 13.4.1 (Ventura), clang 14.0.3, arm64 **
+   - MacOS 13.4.1 (Ventura), clang 14.0.3, arm64 ***
 
-   - MacOS 14.4.1 (Sonoma), clang 15.0.0, arm46 **
+   - MacOS 14.4.1 (Sonoma), clang 15.0.0, arm46 ***
 
    - Minix 3.4.0, clang 3.6, x86 **
 
@@ -399,19 +399,21 @@ The emulators have been successfully compiled and tested on:
 
    - SUSE 15.4, gcc 7.5.0 | clang 13. 0.1, x64 **
 
-   - Tru64 5.1, cc 6.5-011, alpha **
+   - Tru64 5.1, cc 6.5-011, alpha
 
    - Ubuntu 20.04, gcc 9.4.0 | clang 10.0.0 | tcc 0.9.27, x64 + aarch64
 
-   - Ubuntu 22.04, gcc 11.4.0, x64 **
+   - Ubuntu 22.04, gcc 11.4.0 | clang 14.0.0 | tcc 0.9.27, aarch64
+
+   - Ubuntu 22.04, gcc 11.4.0 | clang 14.0.0 | tcc 0.9.27, x64 **
 
    - Ubuntu 24.04, gcc 13.3.0, x64
 
-   - VMS 5.4-3, VAX C 3.2, VAX (simh)
+   - VMS 5.4-3, VAX C 3.2, VAX **
 
-   - VMS 7.3-2, C 6.5-001, alpha
+   - VMS 7.3-2, C 6.5-001, alpha **
 
-   - VMS 9.2-1, C 7.4-726, x64 ***
+   - VMS 9.2-1, C 7.4-726, x64 **
 
    - Windows 11 + WSL2, gcc 12.2.0, x64 + arm64 ***
 
