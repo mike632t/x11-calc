@@ -27,8 +27,7 @@
 #                       - Ignore 'not installed' error messages - MT
 #  23 Nov 25            - Display architecture in brackets - MT
 #  24 Nov 25            - Modified for Tru64 UNIX - MT
-#
-#  To Do                - Retest on Solaris !
+#  25 Nov 25            - Fixed issues on Solaris and Minix - MT
 #
 
 #
@@ -90,6 +89,17 @@ resolve() {
    echo "$_path"
 }
 
+#
+#  lower()
+#
+#  Converts a string to lowercase.
+#
+#  25 Nov 25  0.1.0001  - Initial version - MT
+#
+
+lower() {
+   echo "$*" | sed -e 'y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/'
+}
 
 #  Operating System and kernel version
 _os=`uname -s 2>/dev/null`      # System name
@@ -108,11 +118,11 @@ elif [ -f /etc/redhat-release ]; then
 else
    _system="$_os $_kernel ($_arch)"
 fi
-
 echo "Operating System: $_system"
 echo ""
+
 if [ -n "$_kernel" ] && [ -n "$_arch" ]; then
-   echo "Kernel: $_kernel ($_arch)"
+   echo "Kernel: `lower $_kernel ` ($_arch)``"
    echo ""
 fi
 
@@ -125,7 +135,6 @@ if grep -i microsoft /proc/version 2>/dev/null >/dev/null; then  # Check for WSL
       _hypervisor="wsl"
    fi
 fi
-
 if [ -z "$_hypervisor" ]; then
    if type systemd-detect-virt >/dev/null 2>&1; then  # Try systemd-detect-virt
       v=`systemd-detect-virt 2>/dev/null`
@@ -134,13 +143,11 @@ if [ -z "$_hypervisor" ]; then
       fi
    fi
 fi
-
 if [ -z "$_hypervisor" ]; then
    if type virt-what >/dev/null 2>&1; then  # Try virt-what
       _hypervisor=`virt-what 2>/dev/null | tr '\n' ' ' | sed 's/ $//'`
    fi
 fi
-
 if [ -z "$_hypervisor" ]; then
    for _file in /sys/class/dmi/id/sys_vendor \
              /sys/class/dmi/id/product_name \
@@ -160,15 +167,13 @@ if [ -z "$_hypervisor" ]; then
       fi
    done
 fi
-
 if [ -z "$_hypervisor" ]; then
    if grep hypervisor /proc/cpuinfo >/dev/null 2>&1; then  # CPU flag check (Linux-only)
       _hypervisor="unknown"
    fi
 fi
-
 if [ -n "$_hypervisor" ]; then
-   echo "Hypervisor: $_hypervisor"
+   echo "Hypervisor: `lower $_hypervisor`"
    echo ""
 fi
 
@@ -194,77 +199,77 @@ if [ -z "$_display_manager" ]; then
       if [ -n "$WAYLAND_DISPLAY" ]; then
          _display_manager="WSLg"
       else
-         _display_manager="Unknown"
+         _display_manager="unknown"
       fi
    fi
 fi
-
-echo "Display Manager: $_display_manager"
+echo "Display Manager: `lower $_display_manager`"
 echo ""
 
 #  Session Manager
 _session_manager=""
-_x_session_manager=`command -v x-session-manager 2>/dev/null`  # Check if x-session-manager exists
-if [ -n "$_x_session_manager" ]; then
-   _resolved=`resolve "$_x_session_manager"`
-   _session_manager=`basename "$_resolved"`
-fi
-
+for _process in budgie-session cinnamon-session dxsession dtsession \
+   gnome-session gnome-session-binary ksmserver lxsession mate-session \
+   xfce4-session x-session-manager Xsession xsession
+do
+   if ps -e 2>/dev/null | grep "$_process" | grep -v grep >/dev/null 2>&1; then
+      _session_manager="$_process"
+      break
+   fi
+done
 if [ -z "$_session_manager" ]; then  # Check running processes
-   for _process in budgie-session cinnamon-session dtlogin dxsession \
-      gnome-session gnome-session-binary ksmserver lxsession mate-session \
-      xfce4-session x-session-manager xsession
-   do
-      if ps -e 2>/dev/null | grep "$_process" | grep -v grep >/dev/null 2>&1; then
-         _session_manager="$_process"
-         break
-      fi
-   done
-
+   _x_session_manager=`command -v x-session-manager 2>/dev/null`  # Check if x-session-manager exists
+   if [ -n "$_x_session_manager" ]; then
+      _resolved=`resolve "$_x_session_manager"`
+      _session_manager=`basename "$_resolved"`
+   fi
    if [ -z "$_session_manager" ]; then
-      _session_manager="Unknown"
+      _session_manager="unknown"
    fi
 fi
-
-echo "Session Manager: $_session_manager"
+echo "Session Manager: `lower $_session_manager`"
 echo ""
 
 # Window Manager
 _window_manager=""
 for _process in awesome blackbox fluxbox fvwm gnome-shell icewm i3 kwin marco \
    metacity mutter mwm openbox sawfish twm wmaker xfwm; do
-   if ps -e -o comm= | grep -q "^$_process$"; then
-      _window_manager="$_process"
-      break
-   fi
+      if ps -e 2>/dev/null | grep "$_process" | grep -v grep >/dev/null 2>&1; then
+         _window_manager="$_process"
+         break
+      fi
+      if ps -A 2>/dev/null | grep "$_process" | grep -v grep >/dev/null 2>&1; then
+         _window_manager="$_process"
+         break
+      fi
 done
-[ -z "$_window_manager" ] && _window_manager="Unknown"
-echo "Window Manager: $_window_manager"
+if [ -z "$_window_manager" ]; then
+   _window_manager="unknown"
+fi
+echo "Window Manager: `lower $_window_manager`"
 echo ""
-
 
 # Desktop Environment
 _environment="$XDG_CURRENT_DESKTOP"
 if [ -z "$_environment" ]; then
-   if ps -e -o comm= | grep -q "^dxsession$"; then
-      if [ "$_display_manager" = "xdm" ] && [ "$_window_manager" = "mwm" ]; then
-         _environment="Motif"
-      else
-         _environment="CDE"
-      fi
+   if [ "$_session_manager" = "gnome-session" ]; then
+      _environment="gnome"
+   elif [ "$_display_manager" = "xdm" ] && [ "$_window_manager" = "mwm" ]; then
+      _environment="motif"
+   elif [ "$_display_manager" = "dtlogin" ] && [ "$_window_manager" = "twm" ]; then
+      _environment="cde"
    else
-      _environment="Unknown"
+      _environment="unknown"
    fi
 fi
-echo "Desktop Environment: $_environment"
+echo "Desktop Environment: `lower $_environment`"
 echo ""
 
 
 # Compiler
-for dir in /usr/sfw/bin /usr/ccs/bin /opt/SUNWspro/bin; do # Add additional directories to PATH
-    [ -d "$dir" ] && PATH="$dir:$PATH"
+for dir in /usr/sfw/bin /usr/ccs/bin /opt/SUNWspro/bin; do  # Add additional directories to PATH
+    [ -d "$dir" ] && PATH="$dir:$PATH"  && export PATH
 done
-
 _matches=""
 for _option in cc gcc clang suncc tcc pcc; do
    if command -v "$_option" 2>&1 >/dev/null; then
@@ -273,7 +278,7 @@ for _option in cc gcc clang suncc tcc pcc; do
       cc)
          _version=`"$_command" -V 2>/dev/null | sed -n '1p'`
          if [ -z "$_version" ]; then
-            _version=`"$_command" -v 2>&1 | tail -1`
+            _version=`"$_command" -v 2>&1 | grep version | tail -1`
          fi
          ;;
       gcc|clang|pcc)
@@ -286,8 +291,7 @@ for _option in cc gcc clang suncc tcc pcc; do
          _version=`"$_command" -V 2>/dev/null | sed -n '1p'`
          ;;
       esac
-      _version=`echo $_version | grep -v "not installed" | sed -e 's/([^()]*)//g; s/[ \t]*$//; s/ version / /g; s/^\([^0-9]*[0-9][^ ]*\) .*/\1/; s/  */ /g; y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/' | sed -n '1p'`
-      #_version=`echo $_version | grep -v "not installed" | sed -e 's/([^()]*)//g; s/[ \t]*$//; s/ version / /g; s/ on .*//; s/  */ /g; y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/' | sed -n '1p'`
+      _version=`echo $_version | grep -v "not installed" | sed -e 's/([^()]*)//g; s/[ \t]*$//; s/ version / /g; s/^\([^0-9]*[0-9][^ ]*\) .*/\1/; s/  */ /g' | sed -n '1p'`
       if [ -n "$_version" ]; then
          case ",$_matches," in
             *,"$_version",*)  # Already found don't add a duplicate
@@ -310,9 +314,9 @@ for _option in cc gcc clang suncc tcc pcc; do
    fi
 done
 if [ -n "$_matches" ]; then
-   echo "Compiler: $_matches"
+   echo "Compiler: `lower $_matches`"
 else
-   echo "Compiler: Not found"
+   echo "Compiler: none"
 fi
 echo ""
 
@@ -348,9 +352,9 @@ for _option in bmake gmake make nmake; do
    fi
 done
 if [ -n "$_matches" ]; then
-   echo "Make: $_matches"
+   echo "Make: `lower $_matches`"
 else
-   echo "Make: Not found"
+   echo "Make: none"
 fi
-echo ""
+#echo ""
 
