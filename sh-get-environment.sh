@@ -28,6 +28,8 @@
 #  23 Nov 25            - Display architecture in brackets - MT
 #  24 Nov 25            - Modified for Tru64 UNIX - MT
 #  25 Nov 25            - Fixed issues on Solaris and Minix - MT
+#  27 Nov 25            - Match whole words when searching process names to
+#                         avoid spurious results - MT
 #
 
 #
@@ -189,7 +191,7 @@ fi
 if [ -z "$_display_manager" ]; then
    for _process in cdm dtlogin gdm gdm3 kdm lightdm sddm slim xdm  # Check running processes
    do
-      if ps -e 2>/dev/null | grep "$_process" | grep -v grep >/dev/null 2>&1; then  # Exclude the grep itself
+      if ps -e 2>/dev/null | grep -w "$_process " | grep -v grep >/dev/null 2>&1; then  # Exclude the grep itself
          _display_manager="$_process"
          break
       fi
@@ -212,7 +214,7 @@ for _process in budgie-session cinnamon-session dxsession dtsession \
    gnome-session gnome-session-binary ksmserver lxsession mate-session \
    xfce4-session x-session-manager Xsession xsession
 do
-   if ps -e 2>/dev/null | grep "$_process" | grep -v grep >/dev/null 2>&1; then
+   if ps -e 2>/dev/null | grep -w "$_process" | grep -v grep >/dev/null 2>&1; then
       _session_manager="$_process"
       break
    fi
@@ -234,11 +236,11 @@ echo ""
 _window_manager=""
 for _process in awesome blackbox fluxbox fvwm gnome-shell icewm i3 kwin marco \
    metacity mutter mwm openbox sawfish twm wmaker xfwm; do
-      if ps -e 2>/dev/null | grep "$_process" | grep -v grep >/dev/null 2>&1; then
+      if ps -e 2>/dev/null | grep -w "$_process" | grep -v grep >/dev/null 2>&1; then
          _window_manager="$_process"
          break
       fi
-      if ps -A 2>/dev/null | grep "$_process" | grep -v grep >/dev/null 2>&1; then
+      if ps -A 2>/dev/null | grep -w "$_process" | grep -v grep >/dev/null 2>&1; then
          _window_manager="$_process"
          break
       fi
@@ -278,7 +280,7 @@ for _option in cc gcc clang suncc tcc pcc; do
       cc)
          _version=`"$_command" -V 2>/dev/null | sed -n '1p'`
          if [ -z "$_version" ]; then
-            _version=`"$_command" -v 2>&1 | grep version | tail -1`
+            _version=`"$_command" -v 2>&1 | grep -w version | tail -1`
          fi
          ;;
       gcc|clang|pcc)
