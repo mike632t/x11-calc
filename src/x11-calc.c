@@ -409,6 +409,7 @@
  *                     when loading or saving state - MT
  * 22 Nov 25         - Don't use string concatenation to print the compiler
  *                     version - MT
+ * 29 Nov 25         - Don't print compiler version if not defined - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -468,7 +469,9 @@
 void v_version(void)  /* Display version information */
 {
    fprintf(stdout, "%s: Version %s.%s %s", FILENAME, VERSION, BUILD, COMMIT_ID);
-   if (strlen(__compiler__)) fprintf(stdout, " %s", __compiler__);  /* Include compiler version if defined */
+#if defined(__compiler__)
+   if (strlen(__compiler__)) fprintf(stdout, " %s", __compiler__);  /* Include compiler version if defined - it could be defined as a null string */
+#endif
    if (__DATE__[4] == ' ') fprintf(stdout, " 0"); else fprintf(stdout, " %c", __DATE__[4]);
    fprintf(stdout, "%c %c%c%c %s %s\n", __DATE__[5],
       __DATE__[0], __DATE__[1], __DATE__[2], &__DATE__[9], __TIME__ );
