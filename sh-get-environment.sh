@@ -118,7 +118,14 @@ elif [ -f /etc/os-release ]; then
 elif [ -f /etc/redhat-release ]; then
    _system=`cat /etc/redhat-release`
 else
-   _system="$_os $_kernel ($_arch)"
+   case `lower $_os` in
+   darwin)
+      _system="`sw_vers -productName 2>/dev/null` `sw_vers -productVersion 2>/dev/null`"
+      ;;
+   *)
+      _system="$_os $_kernel ($_arch)"
+      ;;
+   esac
 fi
 echo "Operating System: $_system"
 echo ""
@@ -159,12 +166,24 @@ if [ -z "$_hypervisor" ]; then
       if [ -r "$_file" ]; then  # Inspect DMI/SMBIOS strings (Linux-only)
          _value=`cat "$_file" 2>/dev/null | tr -d '\000'`
          case "$_value" in
-            *Microsoft*|*Hyper-V*|*Virtual\ Machine*) _hypervisor="hyperv"; break ;;
-            *VMware*|*VMware,\ Inc.*|*VMware\ Virtual\ Platform*) _hypervisor="vmware"; break ;;
-            *QEMU*|*KVM*|*Bochs*|*Red\ Hat*|*RHEV*|*oVirt*) _hypervisor="kvm"; break ;;
-            *VirtualBox*|*innotek*|*Oracle*) _hypervisor="virtualbox"; break ;;
-            *Xen*|*XenServer*) _hypervisor="xen"; break ;;
-            *Parallels*|*Parallels\ Software*) _hypervisor="parallels"; break ;;
+         *Microsoft*|*Hyper-V*|*Virtual\ Machine*)
+            _hypervisor="hyperv"
+            break ;;
+         *VMware*|*VMware,\ Inc.*|*VMware\ Virtual\ Platform*)
+            _hypervisor="vmware"
+            break ;;
+         *QEMU*|*KVM*|*Bochs*|*Red\ Hat*|*RHEV*|*oVirt*)
+            _hypervisor="kvm"
+            break ;;
+         *VirtualBox*|*innotek*|*Oracle*)
+            _hypervisor="virtualbox"
+            break ;;
+         *Xen*|*XenServer*)
+            _hypervisor="xen"
+            break ;;
+         *Parallels*|*Parallels\ Software*)
+            _hypervisor="parallels"
+            break ;;
          esac
       fi
    done
