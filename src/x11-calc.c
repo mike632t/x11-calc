@@ -378,8 +378,8 @@
 
 #define  NAME          "x11-calc"
 #define  VERSION       "0.19"
-#define  BUILD         "0194"
-#define  DATE          "12 Oct 25"
+#define  BUILD         "0195"
+#define  DATE          "01 Dec 25"
 #define  AUTHOR        "MT"
 
 #define  INTERVAL 48   /* Number of ticks to execute before updating the display */
