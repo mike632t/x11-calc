@@ -30,6 +30,9 @@
 #  25 Nov 25            - Fixed issues on Solaris and Minix - MT
 #  27 Nov 25            - Match whole words when searching process names to
 #                         avoid spurious results - MT
+#  30 Nov 25            - Specifically checks for the software version when
+#                         running on Darwin - MT
+#   1 Dec 25            - Checks the software version command exists - MT
 #
 
 #
@@ -117,21 +120,16 @@ elif [ -f /etc/os-release ]; then
    _system="$PRETTY_NAME"
 elif [ -f /etc/redhat-release ]; then
    _system=`cat /etc/redhat-release`
+elif [ "`lower $_os`" = "darwin" ] command -v sw_vers 2>&1 >/dev/null; then  # Only exists on Mac OS
+   _system="`sw_vers -productName 2>/dev/null` `sw_vers -productVersion 2>/dev/null`"
 else
-   case `lower $_os` in
-   darwin)
-      _system="`sw_vers -productName 2>/dev/null` `sw_vers -productVersion 2>/dev/null`"
-      ;;
-   *)
-      _system="$_os $_kernel ($_arch)"
-      ;;
-   esac
+   _system="$_os $_kernel"
 fi
 echo "Operating System: $_system"
 echo ""
 
 if [ -n "$_kernel" ] && [ -n "$_arch" ]; then
-   echo "Kernel: `lower $_kernel ` ($_arch)``"
+   echo "Kernel: `lower $_kernel` ($_arch)``"
    echo ""
 fi
 
