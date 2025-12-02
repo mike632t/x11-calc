@@ -32,7 +32,8 @@
 #                         avoid spurious results - MT
 #  30 Nov 25            - Specifically checks for the software version when
 #                         running on Darwin - MT
-#   1 Dec 25            - Checks the software version command exists - MT
+#  01 Dec 25            - Checks the software version command exists - MT
+#  02 Dec 25            - Fixed MacOS version detection - MT
 #
 
 #
@@ -120,8 +121,8 @@ elif [ -f /etc/os-release ]; then
    _system="$PRETTY_NAME"
 elif [ -f /etc/redhat-release ]; then
    _system=`cat /etc/redhat-release`
-elif [ "`lower $_os`" = "darwin" ] command -v sw_vers 2>&1 >/dev/null; then  # Only exists on Mac OS
-   _system="`sw_vers -productName 2>/dev/null` `sw_vers -productVersion 2>/dev/null`"
+elif [ "`lower $_os`" = "darwin" ] && command -v sw_vers 2>&1 >/dev/null; then  # Only exists on Mac OS
+      _system="`sw_vers -productName 2>/dev/null` `sw_vers -productVersion 2>/dev/null`"
 else
    _system="$_os $_kernel"
 fi
