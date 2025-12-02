@@ -37,13 +37,17 @@
  *                     processor directives to modify output - MT
  *                   - Moved error(), warning() and usage() routines - MT
  * 22 Nov 25         - Added read and write error messages - MT
+ * 02 Dec 25         - Added text for file overwrite dialog - MT
  *
  */
 
 
+extern const char *h_err_file_exists;
+extern const char *h_err_confirm_file_replace;
 extern const char *h_err_creating_file;
 extern const char *h_err_memmory_alloc;
 extern const char *h_err_ROM;
+extern const char *h_err_abort;
 
 extern const char *h_err_geometry;
 

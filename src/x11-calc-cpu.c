@@ -459,6 +459,9 @@
  *                   - Maintain  compatibility with earlier versions of the
  *                     HP67 emulators and versions without extended  memory
  *                     when loading or saving state - MT
+ * 02 Dec 25         - Added filename validation checking when saving files
+ *                     to ensure that the filename prefix and file type are
+ *                     correct - MT 
  *
  *
  * To Do             - Move register functions to separate source file.
@@ -515,13 +518,38 @@
 
 char *s_get_filename(char *s_path, char c_mode, char *s_filter, char *s_name)
 {
+   GtkWidget *h_message = NULL;
    GtkWidget *h_widget = NULL;
    GtkFileFilter *h_filter = NULL;
-   GtkFileFilter *h_all = NULL;
-   char *s_filename;
-   char *s_basename;
+   GtkFileFilter *h_all = NULL; /* Used to view all files */
+   gint i_overwrite;
+   char *s_fixed = NULL;  /* Fixed filename */
+   char *s_directory = NULL;
+   char *s_basename = NULL;
+   char *s_prefix = NULL;
+   char *s_type = NULL;
+   char *h_pathname = NULL;
+   char *h_filename = NULL;
+   char *h_first;
+   char *h_last;
 
-   s_basename = strrchr(s_path, '/' );  /* Find the base name */
+   if ((s_prefix = malloc(strlen(s_filter) + 1)) == NULL) v_error(errno, h_err_memmory_alloc, __FILE__, __LINE__);
+   strcpy(s_prefix, s_filter);  /* Create a copy of the filter string we will use this to hold the prefix and file type */
+
+   h_first = strchr(s_prefix, '*');  /* Find position of wild card in filter */
+   h_last = strrchr(s_prefix, '.');  /* Find start of file type (assuming a regular file name) */
+
+   if (h_last != NULL)  /* Check that there is a file type */
+       s_type = h_last;  /* File type */
+   else
+       s_type = NULL;  /* No file type found */
+
+   if (h_first != NULL && h_first > s_prefix)  /* Check that there is a prefix */
+       *(h_first) = '\0';  /* Terminate prefix */
+   else
+       s_prefix = NULL;  /* No prefix before wild card */
+
+   s_basename = strrchr(s_path, '/' );  /* Find the base name */ /** Copy string first */
    *(s_basename++) = '\0';  /* Replace the '/' with a '\0' to split the directory name and base name into two strings */
 
    gtk_init(NULL, NULL);  /* Initialize the GTK environment */
@@ -533,9 +561,9 @@ char *s_get_filename(char *s_path, char c_mode, char *s_filter, char *s_name)
       break;
    case 'w':
       h_widget = gtk_file_chooser_dialog_new("Save", NULL, GTK_FILE_CHOOSER_ACTION_SAVE, "Cancel", GTK_STOCK_QUIT , "Save", GTK_RESPONSE_OK, NULL);
-      gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (h_widget), TRUE);
       break;
-   default:
+   default:  /* Invalid mode */
+      v_error(errno, h_err_abort, __FILE__, __LINE__);
       break;
    }
 
@@ -547,32 +575,96 @@ char *s_get_filename(char *s_path, char c_mode, char *s_filter, char *s_name)
          gtk_file_filter_set_name (h_filter, s_name);
       else
          gtk_file_filter_set_name (h_filter, s_filter);
-      gtk_file_chooser_add_filter (GTK_FILE_CHOOSER(h_widget), h_filter);  /* Use add_filter() not set_filter() otherwise use won't be able to change it */
+      gtk_file_chooser_add_filter (GTK_FILE_CHOOSER(h_widget), h_filter);
+      gtk_file_chooser_set_filter (GTK_FILE_CHOOSER(h_widget), h_filter);  /* Select the default filter  - KJC */
    }
 
-   s_filter = "*.*";  /* Add another filter to allow the user to select all files */
-   s_name = "All Files";
-   h_all = gtk_file_filter_new();
-   gtk_file_filter_add_pattern (h_all, s_filter);
-   gtk_file_filter_set_name (h_all, s_name);
-   gtk_file_chooser_add_filter (GTK_FILE_CHOOSER(h_widget), h_all);
+   if (c_mode == 'r')  /* Only allow users to browse all files when reading */
+   {
+      s_filter = "*.*";
+      s_name = "All Files";
+      h_all = gtk_file_filter_new();
+      gtk_file_filter_add_pattern (h_all, s_filter);
+      gtk_file_filter_set_name (h_all, s_name);
+      gtk_file_chooser_add_filter (GTK_FILE_CHOOSER(h_widget), h_all);  /* Add another filter to allow the user to select all files */
+   }
 
    gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER(h_widget), s_path);  /* Set default path */
    gtk_widget_show_all(h_widget);
 
    if (gtk_dialog_run(GTK_DIALOG(h_widget)) == GTK_RESPONSE_OK)
-      s_filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(h_widget));
+      h_pathname = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(h_widget));
    else
-      s_filename = NULL;
+      h_pathname = NULL;
 
-   gtk_file_chooser_remove_filter(GTK_FILE_CHOOSER(h_widget), h_all);  /* Tidy up */
+   if (h_pathname)
+   {
+      if (c_mode == 'w')  /* Only attempt to validate the the filename when saving a file */
+      {
+         s_directory = g_path_get_dirname(h_pathname);
+         s_basename = g_path_get_basename(h_pathname);  /* Re uses basename */
+         if (!(g_str_has_prefix(s_basename, s_prefix)) || !(g_str_has_suffix(h_pathname, s_type)))
+         {
+            if (!g_str_has_prefix(s_basename, s_prefix))
+            {
+               s_fixed = g_strconcat(s_prefix, s_basename, NULL);
+               g_free(s_basename);
+               s_basename = s_fixed;
+               h_pathname = g_build_filename(s_directory, s_basename, NULL);  /* Reassemble path name */
+            }
+            if (!g_str_has_suffix(h_pathname, s_type))  /* Check for suffix */
+            {
+               s_fixed = g_strconcat(h_pathname, s_type, NULL);
+               g_free(h_pathname);
+               h_pathname = s_fixed;
+            }
+            h_filename = strrchr(h_pathname, '/' ) + 1;  /* Find the filename */
+            h_message = gtk_message_dialog_new(GTK_WINDOW(h_widget), GTK_DIALOG_MODAL, GTK_MESSAGE_WARNING, GTK_BUTTONS_NONE, "Filename changed to '%s'", h_filename);  /* Warn user file has been renamed */
+            gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(h_message), "Click OK to accept");
+            gtk_dialog_add_buttons(GTK_DIALOG(h_message), "_Cancel", GTK_RESPONSE_CANCEL, "_Ok", GTK_RESPONSE_ACCEPT, NULL);
+            i_overwrite = gtk_dialog_run(GTK_DIALOG(h_message));
+            gtk_widget_destroy(h_message);
+            if (i_overwrite != GTK_RESPONSE_ACCEPT)
+            {
+               g_free(h_pathname);
+               h_pathname = NULL;
+            }
+         }
+
+         if (h_pathname)
+         {
+            if (g_file_test(h_pathname, G_FILE_TEST_EXISTS))
+            {
+               h_filename = strrchr(h_pathname, '/' ) + 1;  /* Find the filename - need to do this again as the filename may not have needed to be modified */
+               h_message = gtk_message_dialog_new(GTK_WINDOW(h_widget), GTK_DIALOG_MODAL, GTK_MESSAGE_WARNING, GTK_BUTTONS_NONE, h_err_file_exists, h_filename);
+               gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(h_message), h_err_confirm_file_replace);
+               gtk_dialog_add_buttons(GTK_DIALOG(h_message), "_Cancel", GTK_RESPONSE_CANCEL, "_Overwrite", GTK_RESPONSE_ACCEPT, NULL);
+               i_overwrite = gtk_dialog_run(GTK_DIALOG(h_message));
+               gtk_widget_destroy(h_message);
+               if (i_overwrite != GTK_RESPONSE_ACCEPT)
+               {
+                  g_free(h_pathname);
+                  h_pathname = NULL;
+               }
+            }
+         }
+      }
+   }
+   else
+   {
+      g_free(h_pathname);
+      h_pathname = NULL;
+   }
+
+   if (c_mode == 'r') gtk_file_chooser_remove_filter(GTK_FILE_CHOOSER(h_widget), h_all);
    gtk_file_chooser_remove_filter(GTK_FILE_CHOOSER(h_widget), h_filter);
-   gtk_widget_destroy(h_widget);
+   gtk_widget_destroy(h_widget);  /* Tidy up */
+   g_free(s_prefix);
 
    while (gtk_events_pending())  /* Clear GTK event queue  */
       gtk_main_iteration();
 
-   return s_filename;
+   return h_pathname;
 }
 #else
 char *s_get_filename(char *s_path, char c_mode, char *s_filter, char *s_name)  /* Don't do anything if GTK not installed */
@@ -766,7 +858,7 @@ void v_card_open_file(oprocessor* h_processor)
    }
    else
    {
-      s_filename = s_get_filename(s_get_datafile(), 'r', FILENAME"-*.crd", "Card File");  /* Won't work on VAX C but that doesn't have GTK so it isn't a problem */
+      s_filename = s_get_filename(s_get_datafile(), 'r', FILENAME"-*.crd", "Card File");  /** Won't work on VAX C but that doesn't have GTK so it isn't a problem */
       if (s_filename)
       {
          if ((h_processor->card->file = fopen(s_filename, "r")))

@@ -78,6 +78,7 @@
  * 17 Nov 25         - Updated invalid address messages to use a consistent
  *                     number of digits for the address - MT
  * 22 Nov 25         - Added read and write error messages - MT
+ * 02 Dec 25         - Added text for file overwrite dialog - MT
  *
  */
 
@@ -118,10 +119,13 @@ const char *h_msg_licence[] =
    NULL
 };
 
+const char *h_err_file_exists = "A file named \"%s\" already exists.";  /** Translation needed */
+const char *h_err_confirm_file_replace = "Do you want to replace it?\nReplacing it will overwrite its contents.";  /** Translation needed */
 const char *h_err_creating_file = "Can't create '%s'.\n";  /** Translation needed */
 const char *h_err_memmory_alloc = "Memory allocation failed in %s line : %d\n";  /** Translation needed */
 const char *h_err_ROM = "Empty ROM - no firmware loaded.\n";  /** Translation needed */
 const char *h_err_geometry = "Invalid geometry: %s (expected: WxH[+X+Y])\n";  /** Translation needed */
+const char *h_err_abort = "Unexpected error in %s line : %d\n";
 
 #if defined(HEXADECIMAL)
 const char *h_msg_opcode = "%1x-%03x  %03x   ";
