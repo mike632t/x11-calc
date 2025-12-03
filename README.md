@@ -347,7 +347,9 @@ make DESTDIR=/tmp/staging install
 <a id="tested"></a>
 ### Tested Systems<sup><sup>[Back to Top](#top)</sup></sup>
 
-The emulators have been successfully compiled and tested on:
+Where it has not been possible to test the latest version the last working
+release is shown (if known).  The will be maintained in the repository and
+can be obtained from the 'legacy' branch.
 
    - Alpine 3.20, gcc 13.2.1, x86_64 + arm64
 
@@ -407,9 +409,11 @@ The emulators have been successfully compiled and tested on:
 
    - Ubuntu 24.04, gcc 13.3.0 | clang 14.0.6 | tcc 0.9.27, x86_64 + aarch64
 
-   - VMS 5.4-3, VAX C 3.2, VAX **
+   - VMS 5.4-3, VAX C 3.2, VAX  (0.19.0195)
 
    - VMS 7.3-2, C 6.5-001, alpha **
+
+   - VMS 7.3, C 6.5-005, VAX  (0.19.0195)
 
    - VMS 9.2-1, C 7.4-726, x86_64 **
 
