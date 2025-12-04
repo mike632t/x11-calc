@@ -461,7 +461,9 @@
  *                     when loading or saving state - MT
  * 02 Dec 25         - Added filename validation checking when saving files
  *                     to ensure that the filename prefix and file type are
- *                     correct - MT 
+ *                     correct - MT
+ * 04 Dec 25         - Modified file save dialog behaviour to mimic that of
+ *                     other GNOME applications - MT
  *
  *
  * To Do             - Move register functions to separate source file.
@@ -532,6 +534,7 @@ char *s_get_filename(char *s_path, char c_mode, char *s_filter, char *s_name)
    char *h_filename = NULL;
    char *h_first;
    char *h_last;
+   char b_prompt = True;
 
    if ((s_prefix = malloc(strlen(s_filter) + 1)) == NULL) v_error(errno, h_err_memmory_alloc, __FILE__, __LINE__);
    strcpy(s_prefix, s_filter);  /* Create a copy of the filter string we will use this to hold the prefix and file type */
@@ -592,48 +595,45 @@ char *s_get_filename(char *s_path, char c_mode, char *s_filter, char *s_name)
    gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER(h_widget), s_path);  /* Set default path */
    gtk_widget_show_all(h_widget);
 
-   if (gtk_dialog_run(GTK_DIALOG(h_widget)) == GTK_RESPONSE_OK)
-      h_pathname = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(h_widget));
-   else
-      h_pathname = NULL;
-
-   if (h_pathname)
+   while (b_prompt)
    {
-      if (c_mode == 'w')  /* Only attempt to validate the the filename when saving a file */
+      if (gtk_dialog_run(GTK_DIALOG(h_widget)) == GTK_RESPONSE_OK)
+         h_pathname = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(h_widget));
+      else
+         h_pathname = NULL;
+      b_prompt = False;
+      if (h_pathname)
       {
-         s_directory = g_path_get_dirname(h_pathname);
-         s_basename = g_path_get_basename(h_pathname);  /* Re uses basename */
-         if (!(g_str_has_prefix(s_basename, s_prefix)) || !(g_str_has_suffix(h_pathname, s_type)))
+         if (c_mode == 'w')  /* Only attempt to validate the the filename when saving a file */
          {
-            if (!g_str_has_prefix(s_basename, s_prefix))
+            s_directory = g_path_get_dirname(h_pathname);
+            s_basename = g_path_get_basename(h_pathname);  /* Re uses basename */
+            if (!(g_str_has_prefix(s_basename, s_prefix)) || !(g_str_has_suffix(h_pathname, s_type)))
             {
-               s_fixed = g_strconcat(s_prefix, s_basename, NULL);
-               g_free(s_basename);
-               s_basename = s_fixed;
-               h_pathname = g_build_filename(s_directory, s_basename, NULL);  /* Reassemble path name */
+               if (!g_str_has_prefix(s_basename, s_prefix))
+               {
+                  s_fixed = g_strconcat(s_prefix, s_basename, NULL);
+                  g_free(s_basename);
+                  s_basename = s_fixed;
+                  h_pathname = g_build_filename(s_directory, s_basename, NULL);  /* Reassemble path name */
+               }
+               if (!g_str_has_suffix(h_pathname, s_type))  /* Check for suffix */
+               {
+                  s_fixed = g_strconcat(h_pathname, s_type, NULL);
+                  g_free(h_pathname);
+                  h_pathname = s_fixed;
+               }
+               h_filename = strrchr(h_pathname, '/' ) + 1;  /* Find the filename */
+               h_message = gtk_message_dialog_new(GTK_WINDOW(h_widget), GTK_DIALOG_MODAL, GTK_MESSAGE_WARNING, GTK_BUTTONS_NONE, "Filename changed to '%s'", h_filename);  /* Warn user file has been renamed */
+               gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(h_message), "Click OK to continue");
+               gtk_dialog_add_buttons(GTK_DIALOG(h_message), "_Ok", GTK_RESPONSE_ACCEPT, NULL);
+               i_overwrite = gtk_dialog_run(GTK_DIALOG(h_message));
+               gtk_widget_destroy(h_message);
+               s_basename = strrchr(h_pathname, '/' ); s_basename++;
+               gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(h_widget), s_basename);  /* Populate with filename prefix */
+               b_prompt = True;
             }
-            if (!g_str_has_suffix(h_pathname, s_type))  /* Check for suffix */
-            {
-               s_fixed = g_strconcat(h_pathname, s_type, NULL);
-               g_free(h_pathname);
-               h_pathname = s_fixed;
-            }
-            h_filename = strrchr(h_pathname, '/' ) + 1;  /* Find the filename */
-            h_message = gtk_message_dialog_new(GTK_WINDOW(h_widget), GTK_DIALOG_MODAL, GTK_MESSAGE_WARNING, GTK_BUTTONS_NONE, "Filename changed to '%s'", h_filename);  /* Warn user file has been renamed */
-            gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(h_message), "Click OK to accept");
-            gtk_dialog_add_buttons(GTK_DIALOG(h_message), "_Cancel", GTK_RESPONSE_CANCEL, "_Ok", GTK_RESPONSE_ACCEPT, NULL);
-            i_overwrite = gtk_dialog_run(GTK_DIALOG(h_message));
-            gtk_widget_destroy(h_message);
-            if (i_overwrite != GTK_RESPONSE_ACCEPT)
-            {
-               g_free(h_pathname);
-               h_pathname = NULL;
-            }
-         }
-
-         if (h_pathname)
-         {
-            if (g_file_test(h_pathname, G_FILE_TEST_EXISTS))
+            if (g_file_test(h_pathname, G_FILE_TEST_EXISTS)  && !b_prompt)
             {
                h_filename = strrchr(h_pathname, '/' ) + 1;  /* Find the filename - need to do this again as the filename may not have needed to be modified */
                h_message = gtk_message_dialog_new(GTK_WINDOW(h_widget), GTK_DIALOG_MODAL, GTK_MESSAGE_WARNING, GTK_BUTTONS_NONE, h_err_file_exists, h_filename);
@@ -645,15 +645,16 @@ char *s_get_filename(char *s_path, char c_mode, char *s_filter, char *s_name)
                {
                   g_free(h_pathname);
                   h_pathname = NULL;
+                  b_prompt = True;
                }
             }
          }
       }
-   }
-   else
-   {
-      g_free(h_pathname);
-      h_pathname = NULL;
+      else
+      {
+         g_free(h_pathname);
+         h_pathname = NULL;
+      }
    }
 
    if (c_mode == 'r') gtk_file_chooser_remove_filter(GTK_FILE_CHOOSER(h_widget), h_all);
