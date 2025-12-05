@@ -464,6 +464,7 @@
  *                     correct - MT
  * 04 Dec 25         - Modified file save dialog behaviour to mimic that of
  *                     other GNOME applications - MT
+ * 05 Dec 25         - Fixed compilation warning - MT
  *
  *
  * To Do             - Move register functions to separate source file.
@@ -478,8 +479,8 @@
  */
 
 #define  NAME          "x11-calc-cpu"
-#define  BUILD         "0237"
-#define  DATE          "12 Nov 25"
+#define  BUILD         "0246"
+#define  DATE          "05 Dec 25"
 #define  AUTHOR        "MT"
 
 #define  NODEBUG
@@ -637,7 +638,7 @@ char *s_get_filename(char *s_path, char c_mode, char *s_filter, char *s_name)
             {
                h_filename = strrchr(h_pathname, '/' ) + 1;  /* Find the filename - need to do this again as the filename may not have needed to be modified */
                h_message = gtk_message_dialog_new(GTK_WINDOW(h_widget), GTK_DIALOG_MODAL, GTK_MESSAGE_WARNING, GTK_BUTTONS_NONE, h_err_file_exists, h_filename);
-               gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(h_message), h_err_confirm_file_replace);
+               gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(h_message), "%s", h_err_confirm_file_replace);
                gtk_dialog_add_buttons(GTK_DIALOG(h_message), "_Cancel", GTK_RESPONSE_CANCEL, "_Overwrite", GTK_RESPONSE_ACCEPT, NULL);
                i_overwrite = gtk_dialog_run(GTK_DIALOG(h_message));
                gtk_widget_destroy(h_message);
