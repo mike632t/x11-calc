@@ -39,6 +39,7 @@
  * 17 Aug 25         - Solaris (and FreeBSD) can use usleep() - MT
  * 18 Aug 25         - So can Tru64 UNIX - MT
  * 12 Oct 25         - Added Minix (generic busy loop doesn't work) - MT
+ * 05 Dec 25         - Calls to LIB$WAIT on VMS 9.x use milliseconds - MT
  *
  */
 
@@ -71,6 +72,7 @@
  * 04 Sep 21         - Fixed formatting in debug code - MT
  * 07 Feb 24         - Removed any windows specific or debug code - MT
  * 11 Aug 25         - Warn if busy loop used (requires stdio.h) - MT
+ * 05 Dec 25         - Updated for VMS 9.x - MT
  *
  */
 int i_wait(long l_delay)
@@ -79,7 +81,11 @@ int i_wait(long l_delay)
 return (usleep(l_delay * 1000)); /* Use usleep() function */
 #elif defined(VMS)
 float f_seconds;
+#if defined(__x86_64__)
+f_seconds = l_delay;
+#else
 f_seconds = l_delay / 1000.0;
+#endif
 return (lib$wait(&f_seconds)); /* Use VMS LIB$WAIT */
 #else
 /** #define _DEFAULT_SOURCE /* Possibly required for busy loop more testing needed */
