@@ -79,6 +79,7 @@
  *                     number of digits for the address - MT
  * 22 Nov 25         - Added read and write error messages - MT
  * 02 Dec 25         - Added text for file overwrite dialog - MT
+ * 06 Dec 25         - Added string concatenation function - MT
  *
  */
 
@@ -583,3 +584,22 @@ void v_usage(FILE *h_file, const char **s_text, ...)  /* Print multiple lines of
     va_end(t_args);
 }
 
+char *s_concatinate(const char *s_base, const char *s_suffix)  /* Dynamically allocates memory and concatenates two strings into a new one */
+{
+   char *h_result;
+   int i_length;
+
+   i_length = strlen(s_base) + strlen(s_suffix);
+
+   if ((h_result = malloc(i_length + 1)) == NULL)  /* Allocate memory for string */
+   {
+      v_error(errno, h_err_memmory_alloc, __FILE__, __LINE__);
+      return NULL;  /* In case I decide to make the error a warning ! */
+   }
+   else
+   {
+      strcpy(h_result, s_base);
+      strcat(h_result, s_suffix);
+   }
+   return h_result;
+}

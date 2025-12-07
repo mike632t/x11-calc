@@ -38,6 +38,7 @@
  *                   - Moved error(), warning() and usage() routines - MT
  * 22 Nov 25         - Added read and write error messages - MT
  * 02 Dec 25         - Added text for file overwrite dialog - MT
+ * 06 Dec 25         - Added string concatenation function - MT
  *
  */
 
@@ -91,8 +92,9 @@ extern const char *h_err_display_colour;
 extern const char *h_err_pixmap;
 extern const char *h_err_font;
 
-
 void v_version(void);  /* Display version information */
 void v_error(int i_errno, const char *s_fmt, ...);  /* Print formatted error message */
 void v_warning(const char *s_fmt, ...);  /* Print formatted warning message */
 void v_usage(FILE *h_file, const char **s_text, ...);
+
+char *s_concatinate(const char *s_base, const char *s_suffix);  /* Concatenate strings */
