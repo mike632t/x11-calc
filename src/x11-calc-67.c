@@ -46,12 +46,13 @@
  *                     of function key labels - MT
  * 11 Nov 25         - Added label for card reference number - MT
  * 12 Nov 25         - Updated card layout and window size - MT
+ * 07 Dec 25         - Fixed regression bug affecting card colours - MT
  *
  */
 
 #define NAME           "x11-calc-67"
-#define BUILD          "0021"
-#define DATE           "12 Nov 25"
+#define BUILD          "0022"
+#define DATE           "07 Dec 25"
 #define AUTHOR         "MT"
 
 #include <stdio.h>     /* fprintf(), etc */
@@ -91,7 +92,7 @@ void v_init_labels(struct olabel *h_label[])
    i_top = KBD_TOP + 2 * SWITCH_HEIGHT - 1 * SCALE_HEIGHT;
    i_left = KBD_LEFT - 1 * SCALE_WIDTH;
 
-   h_label[i_count++] = h_label_create(001, NULL, h_font, i_left, i_top, 5 * KEY_WIDTH + 4 * KEY_GAP + 2 * SCALE_WIDTH, 3 * SWITCH_HEIGHT + 1 * SCALE_HEIGHT, LIGHT_TEXT, BACKGROUND, LABEL_ALIGN_CENTER, False, True);  /* Draws background for program card */
+   h_label[i_count++] = h_label_create(001, NULL, h_font, i_left, i_top, 5 * KEY_WIDTH + 4 * KEY_GAP + 2 * SCALE_WIDTH, 3 * SWITCH_HEIGHT + 1 * SCALE_HEIGHT, LIGHT_TEXT, BACKGROUND, LABEL_ALIGN_CENTER, False, False);  /* Draws background for program card */
    i_top += (3 * SWITCH_HEIGHT) - i_height;
    i_left += 1 * SCALE_WIDTH;
    h_label[i_count++] = h_label_create(001, "1/x", h_font, i_left, i_top, KEY_WIDTH, i_height, LIGHT_TEXT, BACKGROUND, LABEL_ALIGN_CENTER, False, False);
@@ -116,33 +117,33 @@ void v_init_card(struct ocard **h_card)  /* Not an array */
 
    /* Note - Label text MUST be a NULL pointer, it will be cleared anyway when reading a card */
 
-   *h_card = h_card_create(001, h_font, i_left, i_top, 5 * KEY_WIDTH + 4 * KEY_GAP + 2 * SCALE_WIDTH, 3 * SWITCH_HEIGHT + 1 * SCALE_HEIGHT, BLACK, LIGHT_TEXT, YELLOW, False);  /* Program card - with colour scheme for a blank card*/
+   *h_card = h_card_create(001, h_font, i_left, i_top, 5 * KEY_WIDTH + 4 * KEY_GAP + 2 * SCALE_WIDTH, 3 * SWITCH_HEIGHT + 1 * SCALE_HEIGHT, LIGHT_TEXT, BLACK, YELLOW, True);  /* Program card - with colour scheme for a blank card */
    i_top += SWITCH_HEIGHT - i_height;
    i_left += 1 * SCALE_WIDTH;
-   (*h_card)->label[i_count++] = h_label_create(000, NULL, h_font, i_left, i_top, 4 * KEY_WIDTH + 3 * KEY_GAP, i_height, BLACK, LIGHT_TEXT, LABEL_ALIGN_CENTER, False, False);  /* Program Label */
+   (*h_card)->label[i_count++] = h_label_create(000, NULL, h_font, i_left, i_top, 4 * KEY_WIDTH + 3 * KEY_GAP, i_height, BLACK, LIGHT_TEXT, LABEL_ALIGN_CENTER, False, True);  /* Program Name */
    i_top += SWITCH_HEIGHT * 2;
-   (*h_card)->label[i_count++] = h_label_create(001, NULL, h_font, i_left, i_top, KEY_WIDTH, i_height, BLACK, LIGHT_TEXT, LABEL_ALIGN_CENTER, False, False);
+   (*h_card)->label[i_count++] = h_label_create(001, NULL, h_font, i_left, i_top, KEY_WIDTH, i_height, BLACK, LIGHT_TEXT, LABEL_ALIGN_CENTER, False, True);
    i_left += (KEY_WIDTH + KEY_GAP);
-   (*h_card)->label[i_count++] = h_label_create(001, NULL, h_font, i_left, i_top, KEY_WIDTH, i_height, BLACK, LIGHT_TEXT, LABEL_ALIGN_CENTER, False, False);
+   (*h_card)->label[i_count++] = h_label_create(001, NULL, h_font, i_left, i_top, KEY_WIDTH, i_height, BLACK, LIGHT_TEXT, LABEL_ALIGN_CENTER, False, True);
    i_left += (KEY_WIDTH + KEY_GAP);
-   (*h_card)->label[i_count++] = h_label_create(001, NULL, h_font, i_left, i_top, KEY_WIDTH, i_height, BLACK, LIGHT_TEXT, LABEL_ALIGN_CENTER, False, False);
+   (*h_card)->label[i_count++] = h_label_create(001, NULL, h_font, i_left, i_top, KEY_WIDTH, i_height, BLACK, LIGHT_TEXT, LABEL_ALIGN_CENTER, False, True);
    i_left += (KEY_WIDTH + KEY_GAP);
-   (*h_card)->label[i_count++] = h_label_create(001, NULL, h_font, i_left, i_top, KEY_WIDTH, i_height, BLACK, LIGHT_TEXT, LABEL_ALIGN_CENTER, False, False);
+   (*h_card)->label[i_count++] = h_label_create(001, NULL, h_font, i_left, i_top, KEY_WIDTH, i_height, BLACK, LIGHT_TEXT, LABEL_ALIGN_CENTER, False, True);
    i_left += (KEY_WIDTH + KEY_GAP);
    (*h_card)->label[i_count++] = h_label_create(001, NULL, h_font, i_left, i_top, KEY_WIDTH, i_height, BLACK, LIGHT_TEXT, LABEL_ALIGN_CENTER, False, False);
    i_top -= SWITCH_HEIGHT;
    i_left = KBD_LEFT;
-   (*h_card)->label[i_count++] = h_label_create(001, NULL, h_font, i_left, i_top, KEY_WIDTH, i_height, YELLOW, LIGHT_TEXT, LABEL_ALIGN_CENTER, False, False);
+   (*h_card)->label[i_count++] = h_label_create(001, NULL, h_font, i_left, i_top, KEY_WIDTH, i_height, YELLOW, LIGHT_TEXT, LABEL_ALIGN_CENTER, False, True);
    i_left += (KEY_WIDTH + KEY_GAP);
-   (*h_card)->label[i_count++] = h_label_create(001, NULL, h_font, i_left, i_top, KEY_WIDTH, i_height, YELLOW, LIGHT_TEXT, LABEL_ALIGN_CENTER, False, False);
+   (*h_card)->label[i_count++] = h_label_create(001, NULL, h_font, i_left, i_top, KEY_WIDTH, i_height, YELLOW, LIGHT_TEXT, LABEL_ALIGN_CENTER, False, True);
    i_left += (KEY_WIDTH + KEY_GAP);
-   (*h_card)->label[i_count++] = h_label_create(001, NULL, h_font, i_left, i_top, KEY_WIDTH, i_height, YELLOW, LIGHT_TEXT, LABEL_ALIGN_CENTER, False, False);
+   (*h_card)->label[i_count++] = h_label_create(001, NULL, h_font, i_left, i_top, KEY_WIDTH, i_height, YELLOW, LIGHT_TEXT, LABEL_ALIGN_CENTER, False, True);
    i_left += (KEY_WIDTH + KEY_GAP);
-   (*h_card)->label[i_count++] = h_label_create(001, NULL, h_font, i_left, i_top, KEY_WIDTH, i_height, YELLOW, LIGHT_TEXT, LABEL_ALIGN_CENTER, False, False);
+   (*h_card)->label[i_count++] = h_label_create(001, NULL, h_font, i_left, i_top, KEY_WIDTH, i_height, YELLOW, LIGHT_TEXT, LABEL_ALIGN_CENTER, False, True);
    i_left += (KEY_WIDTH + KEY_GAP);
-   (*h_card)->label[i_count++] = h_label_create(001, NULL, h_font, i_left, i_top, KEY_WIDTH, i_height, YELLOW, LIGHT_TEXT, LABEL_ALIGN_CENTER, False, False);
+   (*h_card)->label[i_count++] = h_label_create(001, NULL, h_font, i_left, i_top, KEY_WIDTH, i_height, YELLOW, LIGHT_TEXT, LABEL_ALIGN_CENTER, False, True);
    i_top -= SWITCH_HEIGHT;
-   (*h_card)->label[i_count++] = h_label_create(001, NULL, h_alternate_font, i_left, i_top, KEY_WIDTH, i_height, YELLOW, LIGHT_TEXT, LABEL_ALIGN_CENTER, False, False);
+   (*h_card)->label[i_count++] = h_label_create(001, NULL, h_alternate_font, i_left, i_top, KEY_WIDTH, i_height, YELLOW, LIGHT_TEXT, LABEL_ALIGN_CENTER, False, True);
 }
 
 void v_init_buttons(struct obutton *h_button[])

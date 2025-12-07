@@ -32,6 +32,7 @@
  * 12 Nov 25            - Use a label to display program name - MT
  *                      - Allow colour of all labels to be modified - MT
  * 14 Nov 25            - Added a buffer register - MT
+ * 07 Dec 25            - Fixed regression bug affecting card colours - MT
  *
  * To Do                - Use a label to display the file name (allows each
  *                        model some control over the position and style).
@@ -39,8 +40,8 @@
  */
 
 #define NAME           "x11-calc-card"
-#define BUILD          "0009"
-#define DATE           "12 Nov 2025"
+#define BUILD          "0011"
+#define DATE           "07 Dec 2025"
 #define AUTHOR         "MT"
 
 #include <errno.h>     /* errno */
@@ -102,12 +103,12 @@ struct ocard *h_card_create(int i_index, XFontStruct *h_font, int i_left, int i_
    for (i_count = 1; i_count < sizeof(h_card->label) / sizeof(h_card->label[0]); i_count++)
       h_card->label[i_count] = NULL;
 
-   h_card->colour = i_colour;
-   h_card->label_colour = i_label_colour;
-   h_card->function_colour = i_function_colour;
-   h_card->background = h_card->colour;
-   h_card->foreground = h_card->label_colour;
-   h_card->alternate = h_card->function_colour;
+   h_card->background = i_colour;
+   h_card->foreground = i_label_colour;
+   h_card->alternate = i_function_colour;
+   h_card->colour = h_card->background;  /* Reset colours */
+   h_card->label_colour = h_card->foreground;
+   h_card->function_colour = h_card->alternate;
    h_card->state = i_state;
    return(h_card);
 }
@@ -116,6 +117,9 @@ void i_card_reset(struct ocard *h_card)
 {
    int i_label;
 
+   h_card->colour = h_card->background;  /* Reset colours */
+   h_card->label_colour = h_card->foreground;
+   h_card->function_colour = h_card->alternate;
    for (i_label = 0; i_label < sizeof(h_card->label) / sizeof(h_card->label[0]); i_label++)
    {
       if (h_card->label[i_label])
@@ -123,11 +127,10 @@ void i_card_reset(struct ocard *h_card)
          free(h_card->label[i_label]->text);
          if (i_label > 0) h_card->label[i_label]->text = NULL;
          h_card->label[i_label]->state = True;
+         h_card->label[i_label]->foreground = h_card->foreground;
+         h_card->label[i_label]->background = h_card->background;
       }
    }
-   h_card->colour = h_card->background;  /* Reset colours */
-   h_card->label_colour = h_card->foreground;
-   h_card->function_colour = h_card->alternate;
 }
 
 void i_card_resize(struct ocard *h_card, float f_scale)
