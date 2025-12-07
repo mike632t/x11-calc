@@ -464,7 +464,8 @@
  *                     correct - MT
  * 04 Dec 25         - Modified file save dialog behaviour to mimic that of
  *                     other GNOME applications - MT
- * 05 Dec 25         - Fixed compilation warning - MT
+ * 05 Dec 25         - Fixed compilation warnings - MT
+ * 06 Dec 25         - Fixed compilation warning on VAX/VMS - MT
  *
  *
  * To Do             - Move register functions to separate source file.
@@ -840,6 +841,7 @@ void v_card_open_file(oprocessor* h_processor)
  */
 {
    char* s_filename;
+   char *s_pattern;
    char s_buffer[16];
    int i_colour = 0, i_label = 0;
    int i_total = sizeof(h_processor->card->label) / sizeof(h_processor->card->label[0]);  /* Total number of labels */
@@ -849,7 +851,9 @@ void v_card_open_file(oprocessor* h_processor)
    h_processor->card->records = 0;
    if (h_processor->crc[WRITE])
    {
-      s_filename = s_get_filename(s_get_datafile(), 'w', FILENAME"-*.crd", "Card File");
+      s_pattern = s_concatinate(FILENAME, "-*.crd");
+      s_filename = s_get_filename(s_get_datafile(), 'w', s_pattern, "Card File");
+      free(s_pattern);
       if (s_filename)
       {
          if ((h_processor->card->file = fopen(s_filename, "w")))
@@ -860,7 +864,9 @@ void v_card_open_file(oprocessor* h_processor)
    }
    else
    {
-      s_filename = s_get_filename(s_get_datafile(), 'r', FILENAME"-*.crd", "Card File");  /** Won't work on VAX C but that doesn't have GTK so it isn't a problem */
+      s_pattern = s_concatinate(FILENAME, "-*.crd");
+      s_filename = s_get_filename(s_get_datafile(), 'r', s_pattern, "Card File");
+      free(s_pattern);
       if (s_filename)
       {
          if ((h_processor->card->file = fopen(s_filename, "r")))
@@ -1064,16 +1070,26 @@ void v_write_state(oprocessor *h_processor, char *s_pathname) /* Write processor
 
 void v_save_state(oprocessor *h_processor)  /* Save processor state */
 {
-   char *s_pathname = s_get_filename(s_get_datafile(), 'w', FILENAME"-*.dat", "Data Files");
+   char *s_pathname;
+   char *s_pattern;
+
+   s_pattern = s_concatinate(FILENAME, "-*.dat");
+   s_pathname = s_get_filename(s_get_datafile(), 'w', s_pattern, "Data Files");
    v_write_state(h_processor, s_pathname);  /* Save settings */
-   free(s_pathname);  /* Free up pathname */
+   free(s_pathname);
+   free(s_pattern);
 }
 
 void v_load_state(oprocessor *h_processor)  /* Load saved processor state */
 {
-   char *s_pathname = s_get_filename(s_get_datafile(), 'r', FILENAME"-*.dat", "Data Files");
+   char *s_pathname;
+   char *s_pattern;
+
+   s_pattern = s_concatinate(FILENAME, "-*.dat");
+   s_pathname = s_get_filename(s_get_datafile(), 'r', s_pattern, "Data Files");
    v_read_state(h_processor, s_pathname);  /* Load settings */
-   free(s_pathname);  /* Free up pathname */
+   free(s_pathname);
+   free(s_pattern);
 }
 
 void v_backup_state(oprocessor *h_processor)  /* Restore saved processor state */
@@ -2273,7 +2289,8 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
                   {
                      int i_counter = 0;
                      int i_count;
-                     for (i_count = 0; (i_count < REG_SIZE - 1) && (h_processor->position >= 0); i_count++)
+                     /** for (i_count = 0; (i_count < REG_SIZE - 1) && (h_processor->position >= 0); i_count++) /* Unsigned so can never be negative */
+                     for (i_count = 0; (i_count < REG_SIZE - 1); i_count++)
                      {
                         h_processor->position--;
                         if((i_counter & 1) == 0)  /* Even numbered nibble */

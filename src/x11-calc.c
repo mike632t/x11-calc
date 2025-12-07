@@ -180,7 +180,7 @@
  * 20 Dec 21         - Changed all #ifdef to #if defined() - MT
  * 22 Dec 21         - Uses model numbers for conditional compilation - MT
  * 26 Dec 21         - Checks the on/off switch state at startup - MT
- * 03 jan 22         - Added ability to trap execution of an opcode - MT
+ * 03 Jan 22         - Added ability to trap execution of an opcode - MT
  * 03 Jan 22         - Changed debug() macro so that debug code is executed
  *                     when DEBUG is defined (doesn't need to be true) - MT
  * 04 Jan 22         - Updated help text - MT
@@ -410,6 +410,7 @@
  * 22 Nov 25         - Don't use string concatenation to print the compiler
  *                     version - MT
  * 29 Nov 25         - Don't print compiler version if not defined - MT
+ * 06 Dec 25   0.23  - Fixed compilation warnings on VAX/VMS - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -421,9 +422,9 @@
  */
 
 #define  NAME          "x11-calc"
-#define  VERSION       "0.22"
-#define  BUILD         "0217"
-#define  DATE          "22 Nov 25"
+#define  VERSION       "0.23"
+#define  BUILD         "0219"
+#define  DATE          "06 Dec 25"
 #define  AUTHOR        "MT"
 
 #define  INTERVAL 48   /* Number of ticks to execute before updating the display */
@@ -879,12 +880,12 @@ int main(int argc, char *argv[])
          else if (!strncmp(argv[i_count], "/VERSION", i_index))
          {
             v_version();  /* Display version information */
-            fprintf(stdout, h_msg_licence, &__DATE__[7], AUTHOR);
+            v_usage(stdout, h_msg_licence, &__DATE__[7], AUTHOR);
             exit(EXIT_SUCCESS);
          }
          else if ((!strncmp(argv[i_count], "/HELP", i_index)) | (!strncmp(argv[i_count], "/?", i_index)))
          {
-            fprintf(stdout, h_msg_usage, FILENAME);
+            v_usage(stdout, h_msg_usage, FILENAME);
             exit(EXIT_SUCCESS);
          }
          else /* If we get here then the we have an invalid option */
