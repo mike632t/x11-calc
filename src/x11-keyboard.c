@@ -32,6 +32,7 @@
  * 15 Sep 25         - Changed bool to char - MT
  * 20 Sep 25         - Explicitly include X11 keyboard symbols - MT
  *                   - Enable keyboard on any UNIX - MT
+ * 07 Dec 25         - Use int for boolean types instead of char - MT
  *
  */
 
@@ -56,7 +57,7 @@
 #if defined (__unix__)
 
 /* Attempts to translate a key code into a character. */
-static void v_key_decode(okeyboard *h_keyboard, Display *x_display, KeyCode x_keycode, unsigned int i_keystate, char b_numlock)
+static void v_key_decode(okeyboard *h_keyboard, Display *x_display, KeyCode x_keycode, unsigned int i_keystate, int b_numlock)
 {
    h_keyboard->keysym = XKeycodeToKeysym(x_display, x_keycode, 0);
    h_keyboard->key = '\000';
@@ -164,7 +165,7 @@ static void v_key_decode(okeyboard *h_keyboard, Display *x_display, KeyCode x_ke
 
 /* Update the keyboard state */
 
-void h_key_pressed(okeyboard *h_keyboard, Display *x_display, KeyCode x_keycode, unsigned int i_keystate, char b_numlock)
+void h_key_pressed(okeyboard *h_keyboard, Display *x_display, KeyCode x_keycode, unsigned int i_keystate, int b_numlock)
 {
    v_key_decode(h_keyboard, x_display, x_keycode, i_keystate, b_numlock);
    debug(fprintf(stderr, "Key pressed - '%s'.\n", XKeysymToString(h_keyboard->keysym)));
@@ -176,7 +177,7 @@ void h_key_pressed(okeyboard *h_keyboard, Display *x_display, KeyCode x_keycode,
  * Updates the keyboard state when a key is released.
  *
  */
-void h_key_released(okeyboard *h_keyboard, Display *x_display, KeyCode x_keycode, unsigned int i_keystate, char b_numlock)
+void h_key_released(okeyboard *h_keyboard, Display *x_display, KeyCode x_keycode, unsigned int i_keystate, int b_numlock)
 {
    v_key_decode(h_keyboard, x_display, x_keycode, i_keystate, b_numlock);
    debug(fprintf(stderr, "Key released - '%s'.\n", XKeysymToString(h_keyboard->keysym)));

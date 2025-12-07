@@ -24,6 +24,7 @@
  * 23 Apr 24         - More changes to data types - MT
  * 16 Aug 25         - Added flag to optionally ignore numlock - MT
  * 15 Sep 25         - Changed bool to char - MT
+ * 07 Dec 25         - Use int for boolean types instead of char - MT
  *
  */
 
@@ -35,9 +36,9 @@ typedef struct { /* Calculator button structure. */
    char key;
 } okeyboard;
 
-void h_key_pressed(okeyboard *h_keyboard, Display *x_display, KeyCode x_keycode, unsigned int i_keystate, char b_numlock);
+void h_key_pressed(okeyboard *h_keyboard, Display *x_display, KeyCode x_keycode, unsigned int i_keystate, int b_numlock);
 
-void h_key_released(okeyboard *h_keyboard, Display *x_display, KeyCode x_keycode, unsigned int i_keystate, char b_numlock);
+void h_key_released(okeyboard *h_keyboard, Display *x_display, KeyCode x_keycode, unsigned int i_keystate, int b_numlock);
 
 okeyboard *h_keyboard_create(Display *x_display);
 
