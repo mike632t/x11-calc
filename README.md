@@ -357,7 +357,7 @@ can be obtained from the 'legacy' branch.
 
    - Debian 13 (Trixie), gcc 14.2.0 | clang 19.1.7, x86_64
 
-   - Debian 12 (Bookworm), gcc 12.2.0 | clang 14.0.6 ! tcc 0.9.27, x86_64 + arm64
+   - Debian 12 (Bookworm), gcc 12.2.0 | clang 14.0.6 | tcc 0.9.27, x86_64 + arm64
 
    - Debian 11 (Bullseye), gcc 10.2.1 | clang 11.0.1-2, i686 + x86_64  (0.19.0195)
 
@@ -377,13 +377,13 @@ can be obtained from the 'legacy' branch.
 
    - Fedora 41, gcc 14.3.1 | clang 19.1.7, x86_64  (0.19.0195)
 
-   - Fedora 42, gcc 15.2.1 | clang 20.1.8, x86_64
+   - Fedora 42, gcc 15.2.1 | clang 20.1.8, x86_64  (0.19.0195)
 
    - Fedora 43, gcc 15.2.1 | clang 21.1.5, x86_64
 
-   - FreeBSD 14.0, clang 16.0.6, x86_64 **
+   - FreeBSD 14.0, clang 16.0.6, x86_64  (0.19.0195)
 
-   - Gentoo, gcc 11.2.0, x86_64 **
+   - Gentoo, gcc 11.2.0, x86_64  (0.19.0195)
 
    - MacOS 10.1.15 (Catalina), clang 12.0.0, x86_64  (0.19.0195)
 
@@ -392,8 +392,8 @@ can be obtained from the 'legacy' branch.
    - MacOS 13.4.1 (Ventura), clang 14.0.3, arm64  (0.19.0195)
 
    - MacOS 14.4.1 (Sonoma), clang 15.0.0, arm46 (0.19.0195)
- 
-   - Minix 3.4.0, clang 3.6, x86 **
+
+   - Minix 3.4.0, clang 3.6, x86  (0.19.0195)
 
    - NetBSD 9.2, gcc 7.5.0 | clang 16.0.6, x86  (0.19.0195)
 
