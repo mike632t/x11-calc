@@ -47,12 +47,13 @@
  * 11 Nov 25         - Added label for card reference number - MT
  * 12 Nov 25         - Updated card layout and window size - MT
  * 07 Dec 25         - Fixed regression bug affecting card colours - MT
+ * 08 Dec 25         - Shortened lines over 256 characters in length - MT
  *
  */
 
 #define NAME           "x11-calc-67"
-#define BUILD          "0022"
-#define DATE           "07 Dec 25"
+#define BUILD          "0023"
+#define DATE           "08 Dec 25"
 #define AUTHOR         "MT"
 
 #include <stdio.h>     /* fprintf(), etc */
@@ -79,8 +80,10 @@ oregister o_mem[MEMORY_SIZE];
 
 void v_init_switches(struct oswitch *h_switch[]) /* Define the switches. */
 {
-   h_switch[0] = h_switch_create(00000, "OFF", "", "ON ", h_alternate_font, KBD_LEFT,  KBD_TOP + SWITCH_HEIGHT / 2, 2 * KEY_WIDTH + KEY_GAP, SWITCH_HEIGHT, True, MID_GREY, DARK_GREY);  /* Gives a bit more room for switches */
-   h_switch[1] = h_switch_create(00000, "PRGM", "", "RUN", h_alternate_font, KBD_LEFT + 3 * KEY_WIDTH + 2 * KEY_GAP,  KBD_TOP + SWITCH_HEIGHT / 2, 2 * KEY_WIDTH + KEY_GAP, SWITCH_HEIGHT, True, MID_GREY, DARK_GREY);
+   h_switch[0] = h_switch_create(00000, "OFF", "", "ON ", h_alternate_font, KBD_LEFT,  KBD_TOP + SWITCH_HEIGHT / 2, 2 * KEY_WIDTH + KEY_GAP, SWITCH_HEIGHT, True,
+      MID_GREY, DARK_GREY);  /* Gives a bit more room for switches */
+   h_switch[1] = h_switch_create(00000, "PRGM", "", "RUN", h_alternate_font, KBD_LEFT + 3 * KEY_WIDTH + 2 * KEY_GAP, KBD_TOP + SWITCH_HEIGHT / 2, 2 * KEY_WIDTH + KEY_GAP,
+      SWITCH_HEIGHT, True, MID_GREY, DARK_GREY);
 }
 
 void v_init_labels(struct olabel *h_label[])
@@ -92,7 +95,8 @@ void v_init_labels(struct olabel *h_label[])
    i_top = KBD_TOP + 2 * SWITCH_HEIGHT - 1 * SCALE_HEIGHT;
    i_left = KBD_LEFT - 1 * SCALE_WIDTH;
 
-   h_label[i_count++] = h_label_create(001, NULL, h_font, i_left, i_top, 5 * KEY_WIDTH + 4 * KEY_GAP + 2 * SCALE_WIDTH, 3 * SWITCH_HEIGHT + 1 * SCALE_HEIGHT, LIGHT_TEXT, BACKGROUND, LABEL_ALIGN_CENTER, False, False);  /* Draws background for program card */
+   h_label[i_count++] = h_label_create(001, NULL, h_font, i_left, i_top, 5 * KEY_WIDTH + 4 * KEY_GAP + 2 * SCALE_WIDTH, 3 * SWITCH_HEIGHT + 1 * SCALE_HEIGHT, LIGHT_TEXT, BACKGROUND,
+      LABEL_ALIGN_CENTER, False, False);  /* Draws background for program card */
    i_top += (3 * SWITCH_HEIGHT) - i_height;
    i_left += 1 * SCALE_WIDTH;
    h_label[i_count++] = h_label_create(001, "1/x", h_font, i_left, i_top, KEY_WIDTH, i_height, LIGHT_TEXT, BACKGROUND, LABEL_ALIGN_CENTER, False, False);
@@ -192,7 +196,8 @@ void v_init_buttons(struct obutton *h_button[])
    /* Define fourth row of keys. */
    i_top += KBD_ROW;
    i_left = KBD_LEFT;
-   h_button[i_count++] = h_button_create(00063, 015, "ENTER", "W/DATA", "MERGE", "        DEG", h_normal_font, h_small_font, h_alternate_font, KBD_LEFT, i_top, 2 * KEY_WIDTH + KEY_GAP, KEY_HEIGHT, False, False, GREEN, YELLOW, MID_BLUE, BLACK);
+   h_button[i_count++] = h_button_create(00063, 015, "ENTER", "W/DATA", "MERGE", "        DEG", h_normal_font, h_small_font, h_alternate_font, KBD_LEFT, i_top, 2 * KEY_WIDTH + KEY_GAP, KEY_HEIGHT, False, False, GREEN,
+      YELLOW, MID_BLUE, BLACK);
    i_left += 2 * (KEY_WIDTH + KEY_GAP);
    h_button[i_count++] = h_button_create(00062, 'c', "CHS", "P-S", "", "RAD", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, False, GREEN, YELLOW, BLACK, BLACK);
    i_left += (KEY_WIDTH + KEY_GAP);
