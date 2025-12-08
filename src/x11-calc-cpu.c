@@ -467,6 +467,7 @@
  * 05 Dec 25         - Fixed compilation warnings - MT
  * 06 Dec 25         - Fixed compilation warning on VAX/VMS - MT
  * 07 Dec 25         - Saves program card details when exiting - MT
+ * 08 Dec 25         - Fixed buffer size and removed unused variable - MT
  *
  *
  * To Do             - Move register functions to separate source file.
@@ -798,7 +799,7 @@ char* s_reformat(const char *s_string)
 
 void v_card_read_labels(oprocessor* h_processor)
 {
-   char s_buffer[31];  /* Allow enough characters for a program name */
+   char s_buffer[36];  /* Allow enough characters for a program name */
    int i_label = 0;
    int i_colour = 0;
    int i_total = 0;
@@ -828,7 +829,7 @@ void v_card_read_labels(oprocessor* h_processor)
       h_processor->card->label[i_label]->text = s_reformat(h_processor->card->filename);  /* Derive program label from the file name */
    else
       {
-         if (fscanf(h_processor->card->file, " '%32[^']',%*[ \t\n]", s_buffer) == 1)
+         if (fscanf(h_processor->card->file, " '%35[^']',%*[ \t\n]", s_buffer) == 1)
          {
             if ((h_processor->card->label[i_label]->text = malloc(strlen(s_buffer) + 1)) == NULL) v_error(errno, h_err_memmory_alloc, __FILE__, __LINE__);  /*Allocate memory for string in buffer */
             strcpy(h_processor->card->label[i_label]->text, s_buffer);  /* Copy text to label */
@@ -836,7 +837,7 @@ void v_card_read_labels(oprocessor* h_processor)
       }
 
    i_total = sizeof(h_processor->card->label) / sizeof(h_processor->card->label[0]);  /* Total number of labels */
-   while (fscanf(h_processor->card->file, " '%32[^']',%*[ \t\n]", s_buffer) == 1)  /* Read labels (optional) " '%15[^']'%*[ ,\t\n]" */
+   while (fscanf(h_processor->card->file, " '%35[^']',%*[ \t\n]", s_buffer) == 1)  /* Read labels (optional) " '%15[^']'%*[ ,\t\n]" */
    {
       if (i_label < i_total)  /* Ignore any extraneous labels */
       {
@@ -866,7 +867,7 @@ void v_card_read_labels(oprocessor* h_processor)
 
 void v_card_write_labels(oprocessor* h_processor)
 {
-   int i_count, i_counter, i_total;
+   int i_count, i_total;
 
    i_total = sizeof(h_processor->card->label) / sizeof(h_processor->card->label[0]);
 
@@ -874,19 +875,10 @@ void v_card_write_labels(oprocessor* h_processor)
    fprintf(h_processor->card->file, "#0x%06X,", h_processor->card->label_colour);
    fprintf(h_processor->card->file, "#0x%06X,\n", h_processor->card->function_colour);
 
-   i_counter = 0;
-   for (i_count = 0; i_count < sizeof(h_processor->card->label) / sizeof(h_processor->card->label[0]); i_count++)
-   {
+   for (i_count = 0; i_count < i_total; i_count++)
       if (h_processor->card->label[i_count])  /* Check label is defined */
-      {
          if (h_processor->card->label[i_count]->text)
-         {
             fprintf(h_processor->card->file, "'%s',", h_processor->card->label[i_count]->text);
-            i_counter++;
-         }
-      }
-   }
-   if (i_counter) fprintf(h_processor->card->file, "\n");
 }
 
 void v_card_read_write_record(oprocessor* h_processor)
