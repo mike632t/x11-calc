@@ -466,6 +466,7 @@
  *                     other GNOME applications - MT
  * 05 Dec 25         - Fixed compilation warnings - MT
  * 06 Dec 25         - Fixed compilation warning on VAX/VMS - MT
+ * 07 Dec 25         - Saves program card details when exiting - MT
  *
  *
  * To Do             - Move register functions to separate source file.
@@ -480,8 +481,8 @@
  */
 
 #define  NAME          "x11-calc-cpu"
-#define  BUILD         "0246"
-#define  DATE          "05 Dec 25"
+#define  BUILD         "0248"
+#define  DATE          "07 Dec 25"
 #define  AUTHOR        "MT"
 
 #define  NODEBUG
@@ -492,6 +493,8 @@
 #include <stdlib.h>    /* getenv(), etc */
 #include <string.h>    /* strlen(), etc */
 #include <stdarg.h>    /* vargs(), etc */
+
+#include <ctype.h>     /* isalpha(), etc */
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -536,7 +539,7 @@ char *s_get_filename(char *s_path, char c_mode, char *s_filter, char *s_name)
    char *h_filename = NULL;
    char *h_first;
    char *h_last;
-   char b_prompt = True;
+   int b_prompt = True;
 
    if ((s_prefix = malloc(strlen(s_filter) + 1)) == NULL) v_error(errno, h_err_memmory_alloc, __FILE__, __LINE__);
    strcpy(s_prefix, s_filter);  /* Create a copy of the filter string we will use this to hold the prefix and file type */
@@ -758,6 +761,134 @@ char *s_get_datafile(void)
 }
 
 #if defined(HP67)
+char* s_reformat(const char *s_string)
+{
+   char *s_output;
+   int i_count = 0;
+   int i_length = 0;
+
+   if (strncmp(s_string, FILENAME, strlen(FILENAME)) == 0)
+      s_string = s_string + strlen(FILENAME) + 1;  /* Ignore the prefix */
+
+   if (strchr(s_string, '.') == NULL)  /* Ignore not just the file extension, but any characters after the first '.' */
+      i_length = strlen(s_string);
+   else
+      i_length = strchr(s_string, '.') - s_string;
+
+   if ((s_output = (char *)malloc(strlen(s_string) + 1)) == NULL) v_error(errno, h_err_memmory_alloc, __FILE__, __LINE__);
+
+   while (i_count < i_length)
+   {
+      if (!isalpha(s_string[i_count]))  /* Check for non alphabetic characters */
+      {
+         s_output[i_count] = ' ';  /* and replace with spaces */
+      }
+      else
+      {
+         if (i_count == 0 || s_output[i_count - 1] == ' ')
+            s_output[i_count] = (char)toupper((unsigned char)s_string[i_count]);  /* Convert initial letters of each word to uppercase */
+         else
+            s_output[i_count] = (char)tolower((unsigned char)s_string[i_count]);  /* Everything else is lowercase */
+      }
+      i_count++;
+   }
+   s_output[i_count] = '\0';
+   return s_output;
+}
+
+void v_card_read_labels(oprocessor* h_processor)
+{
+   char s_buffer[31];  /* Allow enough characters for a program name */
+   int i_label = 0;
+   int i_colour = 0;
+   int i_total = 0;
+   unsigned int i_hex;
+
+   while (fscanf(h_processor->card->file, " #%x,%*[ \t\n]", &i_hex) == 1)  /* Parse card colours (optional) " #%x,%*[ ,\t\n]" */
+   {
+      if (i_colour < 3)  /* Up to three colours can be specified */
+      {
+         switch (i_colour)
+         {
+            case 0:
+               h_processor->card->colour = i_hex;
+               break;
+            case 1:
+               h_processor->card->label_colour = i_hex;
+               break;
+            case 2:
+               h_processor->card->function_colour = i_hex;
+               break;
+         }
+         i_colour++;
+      }
+   }
+
+   if (h_processor->card->filename)  /* Check if filename is defined */
+      h_processor->card->label[i_label]->text = s_reformat(h_processor->card->filename);  /* Derive program label from the file name */
+   else
+      {
+         if (fscanf(h_processor->card->file, " '%32[^']',%*[ \t\n]", s_buffer) == 1)
+         {
+            if ((h_processor->card->label[i_label]->text = malloc(strlen(s_buffer) + 1)) == NULL) v_error(errno, h_err_memmory_alloc, __FILE__, __LINE__);  /*Allocate memory for string in buffer */
+            strcpy(h_processor->card->label[i_label]->text, s_buffer);  /* Copy text to label */
+         }
+      }
+
+   i_total = sizeof(h_processor->card->label) / sizeof(h_processor->card->label[0]);  /* Total number of labels */
+   while (fscanf(h_processor->card->file, " '%32[^']',%*[ \t\n]", s_buffer) == 1)  /* Read labels (optional) " '%15[^']'%*[ ,\t\n]" */
+   {
+      if (i_label < i_total)  /* Ignore any extraneous labels */
+      {
+         i_label++;  /* Skip the first label this is reserved for the file name */
+         if (h_processor->card->label[i_label])  /* Check label is defined */
+         {
+            if (h_processor->card->label[i_label]->text) free(h_processor->card->label[i_label]->text);  /* Free existing text if necessary*/
+            if ((h_processor->card->label[i_label]->text = malloc(strlen(s_buffer) + 1)) == NULL) v_error(errno, h_err_memmory_alloc, __FILE__, __LINE__);  /*Allocate memory for string in buffer */
+            strcpy(h_processor->card->label[i_label]->text, s_buffer);  /* Copy text to label */
+            h_processor->card->label[i_label]->state = True;  /* Enable the label */
+         }
+      }
+   }
+
+   for (i_label = 0; i_label < i_total; i_label++)  /* Explicitly set text colours for each label */
+   {
+      if (h_processor->card->label[i_label])  /* Check that label is defined */
+      {
+         if (i_label < i_total / 2)
+            h_processor->card->label[i_label]->foreground = h_processor->card->label_colour;
+         else
+            h_processor->card->label[i_label]->foreground = h_processor->card->function_colour;
+         h_processor->card->label[i_label]->background = h_processor->card->colour;
+      }
+   }
+}
+
+void v_card_write_labels(oprocessor* h_processor)
+{
+   int i_count, i_counter, i_total;
+
+   i_total = sizeof(h_processor->card->label) / sizeof(h_processor->card->label[0]);
+
+   fprintf(h_processor->card->file, "#0x%06X,", h_processor->card->colour);
+   fprintf(h_processor->card->file, "#0x%06X,", h_processor->card->label_colour);
+   fprintf(h_processor->card->file, "#0x%06X,\n", h_processor->card->function_colour);
+
+   i_counter = 0;
+   for (i_count = 0; i_count < sizeof(h_processor->card->label) / sizeof(h_processor->card->label[0]); i_count++)
+   {
+      if (h_processor->card->label[i_count])  /* Check label is defined */
+      {
+         if (h_processor->card->label[i_count]->text)
+         {
+            fprintf(h_processor->card->file, "'%s',", h_processor->card->label[i_count]->text);
+            i_counter++;
+         }
+      }
+   }
+   if (i_counter) fprintf(h_processor->card->file, "\n");
+}
+
 void v_card_read_write_record(oprocessor* h_processor)
 /*
  * card_read_write()
@@ -842,10 +973,6 @@ void v_card_open_file(oprocessor* h_processor)
 {
    char* s_filename;
    char *s_pattern;
-   char s_buffer[16];
-   int i_colour = 0, i_label = 0;
-   int i_total = sizeof(h_processor->card->label) / sizeof(h_processor->card->label[0]);  /* Total number of labels */
-   unsigned int i_hex;
 
    h_processor->card->file = NULL;
    h_processor->card->records = 0;
@@ -872,64 +999,10 @@ void v_card_open_file(oprocessor* h_processor)
          if ((h_processor->card->file = fopen(s_filename, "r")))
          {
             fprintf(stderr, "Reading '%s'\n", s_filename);
+            fflush(stdout);
             i_card_reset(h_processor->card);  /* Reset card freeing up labels */
-
-            while (fscanf(h_processor->card->file, " #%x,%*[ \t\n]", &i_hex) == 1)  /* Parse card colours (optional) " #%x,%*[ ,\t\n]" */
-            {
-               if (i_colour < 3)  /* Up to three colours can be specified */
-               {
-                  switch (i_colour)
-                  {
-                     case 0:
-                        h_processor->card->colour = i_hex;
-                        break;
-                     case 1:
-                        h_processor->card->label_colour = i_hex;
-                        break;
-                     case 2:
-                        h_processor->card->function_colour = i_hex;
-                        break;
-                  }
-                  i_colour++;
-               }
-            }
-
-            while (fscanf(h_processor->card->file, " '%15[^']',%*[ \t\n]", s_buffer) == 1)  /* Read labels (optional) " '%15[^']'%*[ ,\t\n]" */
-            {
-               if (i_label < i_total)  /* Ignore any extraneous labels */
-               {
-                  i_label++;
-                  if (h_processor->card->label[i_label])  /* Check label is defined */
-                  {
-                     if (h_processor->card->label[i_label]->text) free(h_processor->card->label[i_label]->text);  /* Free existing text if necessary*/
-                     if ((h_processor->card->label[i_label]->text = malloc(strlen(s_buffer) + 1)) == NULL) v_error(errno, h_err_memmory_alloc, __FILE__, __LINE__);  /*Allocate memory for string in buffer */
-                     strcpy(h_processor->card->label[i_label]->text, s_buffer);  /* Copy text to label */
-                     h_processor->card->label[i_label]->state = True;  /* Enable the label */
-                  }
-               }
-            }
-
-            if (!i_colour)  /* If labels are defined but no colours were specified, swap the default colours over */
-            {
-               i_hex = h_processor->card->colour;
-               h_processor->card->colour = h_processor->card->label_colour;
-               h_processor->card->label_colour = i_hex;
-               i_colour = 2;
-            }
-
-            for (i_label = 0; i_label < i_total; i_label++)  /* Explicitly set label colours for each label */
-            {
-               if (h_processor->card->label[i_label])  /* Check that label is defined */
-               {
-                  if (i_label < i_total / 2)
-                     h_processor->card->label[i_label]->foreground = h_processor->card->label_colour;
-                  else
-                     h_processor->card->label[i_label]->foreground = h_processor->card->function_colour;
-                  h_processor->card->label[i_label]->background = h_processor->card->colour;
-               }
-            }
-
             h_processor->card->filename = strrchr(s_filename, '/') + 1; /* Save filename */
+            v_card_read_labels(h_processor);
          }
          else
             v_warning(h_err_opening_file, s_filename);  /* Can't open data file */
@@ -998,6 +1071,10 @@ void v_read_state(oprocessor *h_processor, char *s_pathname) /* Read processor s
             }
 #if defined(HP67)  /* Must be done last to avoid errors when reading existing data files */
          if (fscanf(h_file, "%x,", &i_temp)) h_processor->crc[FUNCTION] = i_temp;  /* Restore the function-key state - KJC */
+         h_processor->card->file = h_file;
+         h_processor->card->state = False;
+         v_card_read_labels(h_processor);
+         h_processor->card->file = NULL;
 #endif
          for (i_count = MEMORY_SIZE; i_count < h_processor->memory_size; i_count++)
             for (i_counter = REG_SIZE - 1; i_counter >= 0 ; i_counter--)
@@ -1053,7 +1130,11 @@ void v_write_state(oprocessor *h_processor, char *s_pathname) /* Write processor
             fprintf(h_file,"\n");
          }
 #if defined(HP67)  /* Must be done last maintain compatibility with existing data files */
-         fprintf(h_file, "%02x,\n", h_processor->crc[FUNCTION]);  /* Save the default function-key state (labels if a prgm is loaded, else functions) - KJC */
+         fprintf(h_file, "%02x,", h_processor->crc[FUNCTION]);  /* Save the default function-key state (labels if a prgm is loaded, else functions) - KJC */
+         h_processor->card->file = h_file;
+         h_processor->card->state = False;
+         v_card_write_labels(h_processor);
+         h_processor->card->file = NULL;
 #endif
          for (i_count = MEMORY_SIZE; i_count < h_processor->memory_size; i_count++)
          {
@@ -1396,6 +1477,7 @@ void v_processor_reset(oprocessor *h_processor)  /* Reset processor */
    for (i_count = 0; i_count < STATES; i_count++)  /* Clear the processor flags */
       h_processor->crc[i_count] = False;
    h_processor->crc[READY] = -4;
+   h_processor->card->state = False;
 #endif
 #if defined(HP10)
    for (i_count = 0; i_count < BUFSIZE; i_count++)  /* Reset the printer buffer contents */
@@ -3208,7 +3290,7 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
             if (h_processor->p >= REG_SIZE)
             {
                if (h_processor->trace) fprintf(stdout, "\n");
-               debug(printf ("REG_SIZE = %d, h_processor->p = %d", REG_SIZE, h_processor->p));
+               debug(printf("REG_SIZE = %d, h_processor->p = %d", REG_SIZE, h_processor->p));
                v_error(errno, h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
             }
             break;
@@ -3230,7 +3312,7 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
             if (h_processor->p > REG_SIZE)  /* 12 Sep 25 - Changed to greater than from greater then or equal to */
             {
                if (h_processor->trace) fprintf(stdout, "\n");
-               debug(printf ("REG_SIZE = %d, h_processor->p = %d", REG_SIZE, h_processor->p));
+               debug(printf("REG_SIZE = %d, h_processor->p = %d", REG_SIZE, h_processor->p));
                v_error(errno, h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
             }
             break;
@@ -3455,7 +3537,7 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
             if (h_processor->p >= REG_SIZE)
             {
                if (h_processor->trace) fprintf(stdout, "\n");
-               debug(printf ("REG_SIZE = %d, h_processor->p = %d", REG_SIZE, h_processor->p));
+               debug(printf("REG_SIZE = %d, h_processor->p = %d", REG_SIZE, h_processor->p));
                v_error(errno, h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
             }
             break;
@@ -3465,7 +3547,7 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
             if (h_processor->p >= REG_SIZE)
             {
                if (h_processor->trace) fprintf(stdout, "\n");
-               debug(printf ("REG_SIZE = %d, h_processor->p = %d", REG_SIZE, h_processor->p));
+               debug(printf("REG_SIZE = %d, h_processor->p = %d", REG_SIZE, h_processor->p));
                v_error(errno, h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
             }
             break;
@@ -3706,7 +3788,7 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
             if (h_processor->p >= REG_SIZE || h_processor->q >= REG_SIZE)
             {
                if (h_processor->trace) fprintf(stdout, "\n");
-               debug(printf ("REG_SIZE = %d, h_processor->p = %d, h_processor->q = %d", REG_SIZE, h_processor->p, h_processor->q));
+               debug(printf("REG_SIZE = %d, h_processor->p = %d, h_processor->q = %d", REG_SIZE, h_processor->p, h_processor->q));
                v_error(errno, h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
             }
             break;

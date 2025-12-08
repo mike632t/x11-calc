@@ -411,6 +411,9 @@
  *                     version - MT
  * 29 Nov 25         - Don't print compiler version if not defined - MT
  * 06 Dec 25   0.23  - Fixed compilation warnings on VAX/VMS - MT
+ * 07 Dec 25         - Use int for boolean types instead of char - MT
+ *                   - Fixed regression bug affecting card display - MT
+ *                   - Saves program card details when exiting - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -423,8 +426,8 @@
 
 #define  NAME          "x11-calc"
 #define  VERSION       "0.23"
-#define  BUILD         "0219"
-#define  DATE          "06 Dec 25"
+#define  BUILD         "0221"
+#define  DATE          "07 Dec 25"
 #define  AUTHOR        "MT"
 
 #define  INTERVAL 48   /* Number of ticks to execute before updating the display */
@@ -437,7 +440,7 @@
 #include <stdio.h>     /* fprintf(), etc */
 #include <stdlib.h>    /* getenv(), etc */
 
-#include <ctype.h>     /* isprint(), etc */
+#include <ctype.h>     /* isalpha(), etc */
 
 #include <X11/Xlib.h>  /* XOpenDisplay(), True/False etc */
 #include <X11/Xutil.h> /* XSizeHints etc */
@@ -488,42 +491,7 @@ void v_set_blank_cursor(Display *x_display, Window x_window, Cursor *x_cursor)
    XFreePixmap (x_display, x_blank);  /* Free up pixmap */
 }
 
-char* s_reformat(const char *s_string)
-{
-   char *s_output;
-   int i_count = 0;
-   int i_length = 0;
-
-   if (strncmp(s_string, FILENAME, strlen(FILENAME)) == 0)
-      s_string = s_string + strlen(FILENAME) + 1;  /* Ignore the prefix */
-
-   if (strchr(s_string, '.') == NULL)  /* Ignore not just the file extension, but any characters after the first '.' */
-      i_length = strlen(s_string);
-   else
-      i_length = strchr(s_string, '.') - s_string;
-
-   if ((s_output = (char *)malloc(strlen(s_string) + 1)) == NULL) v_error(errno, h_err_memmory_alloc, __FILE__, __LINE__);
-
-   while (i_count < i_length)
-   {
-      if (!isalpha(s_string[i_count]))  /* Check for non alphabetic characters */
-      {
-         s_output[i_count] = ' ';  /* and replace with spaces */
-      }
-      else
-      {
-         if (i_count == 0 || s_output[i_count - 1] == ' ')
-            s_output[i_count] = (char)toupper((unsigned char)s_string[i_count]);  /* Convert initial letters of each word to uppercase */
-         else
-            s_output[i_count] = (char)tolower((unsigned char)s_string[i_count]);  /* Everything else is lowercase */
-      }
-      i_count++;
-   }
-   s_output[i_count] = '\0';
-   return s_output;
-}
-
-char b_search(int *a, int m, int n) /* Linear search. */
+int b_search(int *a, int m, int n) /* Linear search. */
 {
    int i_count;
    for (i_count = 0; i_count < n; i_count++)
@@ -568,17 +536,17 @@ int main(int argc, char *argv[])
    unsigned int i_colour_depth;        /* Window's colour depth */
    int i_screen;                       /* Default screen number */
 
-   char b_trace = False;               /* Trace flag */
-   char b_step = False;                /* Single step flag flag */
-   char b_cursor = True;               /* Draw a cursor */
-   char b_run = True;                  /* Run flag controls CPU instruction execution in main loop */
-   char b_abort = False;               /* Abort flag controls execution of main loop */
-   char b_geometry = False;            /* User specified window position */
+   int b_trace = False;               /* Trace flag */
+   int b_step = False;                /* Single step flag flag */
+   int b_cursor = True;               /* Draw a cursor */
+   int b_run = True;                  /* Run flag controls CPU instruction execution in main loop */
+   int b_abort = False;               /* Abort flag controls execution of main loop */
+   int b_geometry = False;            /* User specified window position */
 #if defined (__unix__)
-   char b_numlock = False;             /* Use number pad - even if numlock is off */
+   int b_numlock = False;             /* Use number pad - even if numlock is off */
 #endif
 #if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
-   char b_euro = False;
+   int b_euro = False;
 #endif
    unsigned int i_memory_size = MEMORY_SIZE;
    int i_breakpoints[] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};  /* Array to hold breakpoints */
@@ -587,7 +555,7 @@ int main(int argc, char *argv[])
    int i_ticks = -1;
 
 #if defined(CONTINIOUS)
-   char b_reset = False;               /* Do not restore state (reset) */
+   int b_reset = False;               /* Do not restore state (reset) */
    char *s_pathname = NULL;
 #endif
 
@@ -952,7 +920,7 @@ int main(int argc, char *argv[])
          &i_colour_depth) == False)
       v_error(errno, h_err_display_properties);
 
-   debug(printf("%dx%d%+d%+d\n", i_window_width, i_window_height, i_window_left, i_window_top));
+   /** debug(printf("%dx%d%+d%+d\n", i_window_width, i_window_height, i_window_left, i_window_top));  /* Display window geometry */
 
    if (i_colour_depth != COLOUR_DEPTH) v_error(errno, h_err_display_colour, COLOUR_DEPTH);  /* Check colour depth */
 
@@ -1107,21 +1075,15 @@ int main(int argc, char *argv[])
 #if defined(HP67)
          if (h_processor->crc[FUNCTION])
          {
+            h_processor->card->state = False;  /* Hide the program card */
             for (i_count = 0; i_count < LABELS; i_count++)  /* Update label state */
                h_label[i_count]->state = h_processor->crc[FUNCTION];
             for (i_count = 0; i_count < LABELS; i_count++)  /* Draw labels */
                i_label_draw(x_display, x_buffer, i_screen, h_label[i_count]);
-            h_processor->card->state = False;
-            h_processor->card->label[0]->text = NULL;  /* Clear the current card text */
          }
          else
          {
-            if (h_processor->card->filename)
-            {
-               h_processor->card->state = True;
-               h_processor->card->label[0]->text = s_reformat(h_processor->card->filename);
-               h_processor->card->filename = NULL;
-            }
+            h_processor->card->state = True;  /* Display the program card */
             i_card_draw(x_display, x_buffer, i_screen, h_processor->card);  /* Update display */
          }
 #endif
