@@ -414,6 +414,7 @@
  * 07 Dec 25         - Use int for boolean types instead of char - MT
  *                   - Fixed regression bug affecting card display - MT
  *                   - Saves program card details when exiting - MT
+ * 09 Dec 25         - Use MEMORY_MAX to define the maximum memory size -MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -426,7 +427,7 @@
 
 #define  NAME          "x11-calc"
 #define  VERSION       "0.23"
-#define  BUILD         "0221"
+#define  BUILD         "0223"
 #define  DATE          "07 Dec 25"
 #define  AUTHOR        "MT"
 
@@ -660,7 +661,7 @@ int main(int argc, char *argv[])
                      i_value = strtol(argv[i_count + 1], &s_text, 0);  /* Auto detect base allow octal, decimal or hexadecimal */
                      if (*s_text != '\0')
                         v_error(EINVAL, h_err_invalid_number, argv[i_count + 1]);
-                     if ((i_value < 0) || (i_value < MEMORY_SIZE) || (i_value > 256) || (errno == ERANGE))  /* Check range */
+                     if ((i_value < 0) || (i_value < MEMORY_SIZE) || (i_value > MEMORY_MAX) || (errno == ERANGE))  /* Check range */
                         v_error(EINVAL, h_err_numeric_range, argv[i_count + 1]);
                      else
                      {

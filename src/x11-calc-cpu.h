@@ -70,6 +70,7 @@
  *                     it easier to use in the processor code) - MT
  * 14 Nov 25         - Moved register defination to a seperate file - MT
  * 19 Nov 25         - Allocate memory registers dynamically - MT
+ * 09 Dec 25         - Use MEMORY_MAX to define the maximum memory size -MT
  *
  * To Do             -
  *
@@ -78,8 +79,8 @@
 #include "x11-calc-register.h"         /* CPU Register definitions */
 #include "x11-calc.h"                  /* Model specific constants */
 
-#ifndef CPU_H
-#define CPU_H
+#ifndef X11_CALC_CPU_H
+#define X11_CALC_CPU_H
 
 #define REGISTERS       8              /* A, B, C(X), D(Y), E(Z), F(T), M, N(M2) */
 #define STATUS_BITS     16
@@ -108,6 +109,8 @@
 #define BANK_SWITCH     4
 #define DISPLAY_ENABLE  5
 #define TIMER           8
+
+#define MEMORY_MAX      512
 
 #if defined(HP67)
 #define MERGE           0              /* Merge flag (F0) */
