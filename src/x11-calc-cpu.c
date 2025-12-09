@@ -468,6 +468,8 @@
  * 06 Dec 25         - Fixed compilation warning on VAX/VMS - MT
  * 07 Dec 25         - Saves program card details when exiting - MT
  * 08 Dec 25         - Fixed buffer size and removed unused variable - MT
+ * 09 Dec 25         - Modified  read_rom() to allow the addresses in a ROM
+ *                     to be in any order - MT
  *
  *
  * To Do             - Move register functions to separate source file.
@@ -1273,28 +1275,34 @@ void v_fprint_memory(FILE *h_file, oprocessor *h_processor)  /* Display current 
 }
 
 void v_read_rom(int *i_rom, const char *s_pathname)  /* Load rom from 'object' file */
+/*
+ * read_rom()
+ *
+ * Reads  the address and opcode values from a ROM file and overwrites  the
+ * opcodes in the default ROM.
+ *
+ * Any invalid lines in the file are assumed to be comments are ignored.
+ *
+ * 09 Dec 25         - Modified to load ROM contents in any order - MT
+ *
+ */
 {
    FILE *h_file;
    unsigned int i_addr, i_opcode;
-   int i_count, i_counter;
+   int i_count;
    char c_char;
 
+   i_addr = 0;
    h_file = fopen(s_pathname, "r");
    if (h_file != NULL)
    {
-      i_count = 0;
-      while ((!feof(h_file)) && (i_count < ROM_SIZE))
+      while (!feof(h_file))
       {
-         i_counter = fscanf(h_file, h_msg_rom, &i_addr, &i_opcode);
-         if (i_counter < 2)
+         i_count = fscanf(h_file, h_msg_rom, &i_addr, &i_opcode);
+         if (i_count < 2)
             while (((c_char = fgetc(h_file)) != '\n') && (!feof(h_file)));
          else
-         {
-            while ((i_count < i_addr) && (i_count < ROM_SIZE))
-               /** i_rom[i_count++] = 0;  /* Don't clear ROM - allows existing ROM contents to be patched */
-               i_count++;
-            if (i_count < ROM_SIZE) i_rom[i_count++] = i_opcode;
-         }
+            if (i_addr < ROM_SIZE) i_rom[i_addr] = i_opcode;
       }
       fclose(h_file);
    }
