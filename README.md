@@ -353,7 +353,7 @@ can be obtained from the 'legacy' branch.
 
    - Alpine 3.20, gcc 13.2.1, x86_64 + arm64
 
-   - Alpine 3.19, gcc 13.2.1, x86_64 + arm64  (0.19.0195)
+   - Alpine 3.19, gcc 13.2.1, x86_64 + arm64  (0.16.0172)
 
    - Debian 13 (Trixie), gcc 14.2.0 | clang 19.1.7, x86_64
 
@@ -361,11 +361,11 @@ can be obtained from the 'legacy' branch.
 
    - Debian 11 (Bullseye), gcc 10.2.1 | clang 11.0.1-2, i686 + x86_64  (0.19.0195)
 
-   - Debian 10 (Buster), gcc 8.3.0, arm  (0.19.0195)
+   - Debian 10 (Buster), gcc 8.3.0, arm  (0.16.0172)
 
    - Debian 10 (Buster), gcc 8.3.0 | clang 7.0.1 | tcc 0.9.27, x86_64
 
-   - Debian 9 (Stretch), gcc 6.3.0, arm  (0.19.0195)
+   - Debian 9 (Stretch), gcc 6.3.0, arm  (0.16.0172)
 
    - Debian 5 (Lenny), gcc 4.2.4, alpha
 
