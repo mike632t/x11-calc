@@ -150,19 +150,29 @@ Loading and saving is only possible on models with continuous memory.
 The  contents of program memory and data registers are saved  automatically
 when  the calculator is switched off or the window is closed, either in the
 `$HOME/.local/share/x11-calc/` directory or in a hidden file in the  user's
-HOME directory if `$HOME/.local/` does not exist.
+HOME  directory  if `$HOME/.local/` does not exist, using a model  specific
+filename `x11-calc-???.dat` where `???` is the model number.
 
 Where  an on/off slide switch exists switching the calculator off will save
 the current state.
 
 You can create a copy the saved emulator state by making a copy of the file
-which allow the user to make a backup when ever program was held in  memory
+which  allows the user to save a copy of the program in memory  by  copying
 when  the  emulator was switched off.  Different programs can be loaded  by
 specifying the name of the file that was used to save the emulator state on
 the command line.
+
+e.g.
+To save the current state:
+```
+cp $HOME/.local/share/x11-calc/x11-calc-33c.dat \
+prg/x11-calc-33c-random-number-generator.dat
+```
+To run the emulator loading the saved program at startup:
 ```
 x11-calc-33c prg/x11-calc-33c-random-number-generator.dat
 ```
+
 If the emulator was compiled with GTK support then a user can also load and
 save  programs while the emulator is running by right clicking anywhere  in
 the application window.
