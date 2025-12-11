@@ -415,6 +415,7 @@
  *                   - Fixed regression bug affecting card display - MT
  *                   - Saves program card details when exiting - MT
  * 09 Dec 25         - Use MEMORY_MAX to define the maximum memory size -MT
+ * 11 Dec 25  (0224) - Implemented /RESET command line option - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -427,7 +428,7 @@
 
 #define  NAME          "x11-calc"
 #define  VERSION       "0.23"
-#define  BUILD         "0223"
+#define  BUILD         "0224"
 #define  DATE          "07 Dec 25"
 #define  AUTHOR        "MT"
 
@@ -833,6 +834,8 @@ int main(int argc, char *argv[])
             b_trace = False;  /* Enable tracing */
          else if (!strncmp(argv[i_count], "/TRACE", i_index))
             b_trace = True;  /* Enable tracing */
+         else if (!strncmp(argv[i_count], "/RESET", i_index))
+            b_reset = True;  /* Enable tracing */
          else if (!strncmp(argv[i_count], "/ROM", i_index))
          {
             if (i_count + 1 < argc)
