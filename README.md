@@ -51,9 +51,9 @@ Details of the latest/important changes.
 
 19 Nov 25
 
-   - Allows  users to increase the number of memory registers by specifying
-     the total number of  the command line.  This enables modified firmware
-     to be used to provide extra registers and additional program steps.
+   - Allows the memory size to be increased from the command line. This can
+     then be used by modified firmware versions to provide extra  registers
+     and additional program steps.
 
 18 Oct 25
 
