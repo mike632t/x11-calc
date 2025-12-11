@@ -44,26 +44,31 @@ MacOS, VMS, Solaris and Tru64 Unix.
 
 Details of the latest/important changes.
 
+11 Dec 25  (0.23.0224)
+
+   - HP67 program card files can include text labels.
+   - Added Portuguese language support for help text and error messages.
+
 19 Nov 25
 
-   - Allocates  memory dynamically allowing the memory size to be increased
-     enabling  modified firmware to provide extra registers and  additional
-     program steps.
+   - Allows  users to increase the number of memory registers by specifying
+     the total number of  the command line.  This enables modified firmware
+     to be used to provide extra registers and additional program steps.
 
 18 Oct 25
 
    - Added support for the HP67 card reader (requires GTK).
 
-14 Sep 25
+14 Sep 25  (0.19.0194)
 
    - Added the HP55 complete with timer.
 
-05 Sep 25
+05 Sep 25  (0.18.0188)
 
    - Fixed issues that prevented the file selection dialog from being shown
      when using Flatpak.
 
-24 Aug 25
+24 Aug 25  (0.18.0187)
 
    - HP37E now passes self test.
    - Loading  or saving the current state can now be done by right clicking
@@ -71,7 +76,7 @@ Details of the latest/important changes.
      load the state from a previously saved `.dat` (data) file, while in `prgm`
      mode the user will be prompted to save the current state.
 
-09 Aug 25
+09 Aug 25  (0.17.0181)
 
    - Improved display updates (using double buffering).
    - Minor changes to fix compilation issues on VAX and DEC Windows.
@@ -246,6 +251,12 @@ $ make clean; make all
 You can also compile an emulator by specifying the model number.
 ```
 $ make hp67
+```
+To build a version with support for a different locale specify the language
+before invoking make.  (This only changes the message text displayed by the
+emulator on the console not they way it behaves).
+```
+LANG=pt_BR make clean hp21
 ```
 By default the executable files will be created in the `bin` directory.
 ```
@@ -475,31 +486,36 @@ managed to get as far as I have.
 <a id="issues"></a>
 ### Known Issues <sup><sup>[Back to Top](#top)</sup></sup>
 
-#### General issues
+#### General
 
 - A 24 bit colour display is required.
-- Keyboard shortcuts are not available on all systems.
+- Keyboard shortcuts are only available on UNIX like systems.
 - For best results you need to have the X windows core fonts installed.
 - Parallel make only works on Linux, NetBSD and FreeBSD.
+
+##### HP 67
+
+- Has continuous memory by default.  Use the '--reset' option to disable it
+  when starting the emulator.
 
 ##### HP 11C + HP 12C + HP 15C + HP 16C
 
 - Keyboard test is successful but these models do not pass the self-test.
 
-#### Wayland
+#### Wayland Issues
 
 - The application window should be a fixed size (this can be modified using
-'--zoom'), but Xwayland does not handle this correctly.
+  '--zoom'), but Wayland does not allow applications to be a fixed size.
 
 #### VMS
 
-- Colour palette assumes a black and white display (simh with QVSS). If the
-  system's  colour depth is different you must modify COLOUR_DEPTH to  match.
-  Note that the display will still only use two colours!
+- Colour palette assumes a black and white display. If the system's  colour
+  depth is different you will have to modify COLOUR_DEPTH to match, however
+  the display will still only use two colours.
   (You can modify x11-calc-colour.h and x11-calc.h to change `vms` to `oldvms`
   if you do have a 24-bit colour display).
 - Not all text is visible if not using 24-bit colour.
-- Not all key legends are shown as the font is missing some characters.
+- Not all key labels are shown as the DEC fonts are missing some characters.
 
 <a id="problems"></a>
 ### Problem Reports <sup><sup>[Back to Top](#top)</sup></sup>
