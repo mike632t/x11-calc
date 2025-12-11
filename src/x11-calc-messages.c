@@ -80,12 +80,13 @@
  * 22 Nov 25         - Added read and write error messages - MT
  * 02 Dec 25         - Added text for file overwrite dialog - MT
  * 06 Dec 25         - Added string concatenation function - MT
+ * 11 Dec 25         - Updated translations and added Portuguese - MT
  *
  */
 
 #define NAME           "x11-calc-messages"
-#define BUILD          "0036"
-#define DATE           "22 Nov 25"
+#define BUILD          "0039"
+#define DATE           "11 Dec 25"
 #define AUTHOR         "MT"
 
 #include <errno.h>     /* errno */
@@ -125,7 +126,6 @@ const char *h_err_confirm_file_replace = "Do you want to replace it?\nReplacing 
 const char *h_err_creating_file = "Can't create '%s'.\n";  /** Translation needed */
 const char *h_err_memmory_alloc = "Memory allocation failed in %s line : %d\n";  /** Translation needed */
 const char *h_err_ROM = "Empty ROM - no firmware loaded.\n";  /** Translation needed */
-const char *h_err_geometry = "Invalid geometry: %s (expected: WxH[+X+Y])\n";  /** Translation needed */
 const char *h_err_abort = "Unexpected error in %s line : %d\n";
 
 #if defined(HEXADECIMAL)
@@ -150,14 +150,15 @@ const char *h_msg_saving = "Guardando '%s'\n";
 
 const char *h_err_register_alloc = "Error de ejecucion\t: %s linea: %d: iFallo la asignacion de memoria!\n";
 const char *h_err_opening_file = "No se puede abrir '%s'\n";
-const char *h_err_reading_file = "Error reading file\n";
-const char *h_err_writing_file = "Error writing to file\n";
+const char *h_err_reading_file = "Error reading file\n";  /** Translation needed */
+const char *h_err_writing_file = "Error writing to file\n";  /** Translation needed */
 
 const char *h_err_display = "No se pudo conectar al servidor X '%s'\n";
 const char *h_err_display_properties = "No se pudo obtener las propiedades del monitor\n";
 const char *h_err_display_colour = "Requiere un monitor de %d bits de color\n";
 const char *h_err_pixmap = "No se puede crear un pixmap\n";
 const char *h_err_font = "No se pudo cargar la fuente '%s' (x11 base bitmap fonts required)\n";
+const char *h_err_geometry = "Geometria invalida: %s (esperado: WxH[+X+Y])\n";
 
 #if defined(HEXADECIMAL)
 const char *h_err_unexpected_opcode = "Codigo de operación inesperado (%03x) en %1x-%03x en %s en la línea : %d\n";
@@ -188,10 +189,10 @@ const char *h_msg_usage[] =
 #endif
    "      --cursor             mostrar cursor (default)\n",
    "      --no-cursor          ocultar cursor\n",
-   "      --geometry +x+y      specify initial windows position\n",
-   "      --numlock            use numeric keypad (even if numlock is not on)\n",
+   "      --geometry +x+y      especificar posicion inicial de ventana\n",
+   "      --numlock            usar teclado numerico\n",
 #if defined(CONTINIOUS)
-   "      --reset              do not restore saved state (factory reset)\n",
+   "      --reset              reinicio de fabrica\n",
 #endif
    "      --zoom ZOOM          ampliar el tamaño de la ventana\n",
    "      --help               mostrar esta ayuda y salir\n",
@@ -215,6 +216,9 @@ const char *h_msg_usage[] =
    "  /nocursor                ocultar cursor\n",
    "  /step                    un paso\n",
    "  /trace                   seguimiento de la ejecucion\n",
+#if defined(CONTINIOUS)
+   "  /reset                   reinicio de fabrica\n",
+#endif
    "  /version                 mostrar version y salir\n",
    "  /?, /help                mostrar esta ayuda y salir\n",
    NULL
@@ -238,6 +242,7 @@ const char *h_err_display_properties = "Kann eigenschaften des displays nicht ab
 const char *h_err_display_colour = "Ein %d-bit farbdisplay wird benoetigt\n";
 const char *h_err_pixmap = "Pixmap kann nicht erstellt werden\n";
 const char *h_err_font = "Kann schrift '%s' nicht laden (x11 base bitmap fonts required)\n";
+const char *h_err_geometry = "Ungueltige geometrie: %s (erwartet: WxH[+X+Y])\n";
 
 #if defined(HEXADECIMAL)
 const char *h_err_unexpected_opcode = "Unerwarteter opcode (%03x) an %1x-%03x in %s zeile: %d\n";
@@ -268,10 +273,10 @@ const char * h_msg_usage[] =
 #endif
    "      --cursor             cursor anzeigen (default)\n",
    "      --no-cursor          cursor verbergen\n",
-   "      --geometry +x+y      specify initial window position\n",  /** Translation needed */
-   "      --numlock            use numeric keypad (even if numlock is off)\n", /** Translation needed */
+   "      --geometry +x+y      anfangsfensterposition angeben\n",
+   "      --numlock            nutze nummernblock (auch wenn numlock aus ist)\n",
 #if defined(CONTINIOUS)
-   "      --reset              do not restore saved state (factory reset)\n",  /** Translation needed */
+   "      --reset              kein gespeicherter zustand wiederherstellen\n",
 #endif
    "      --zoom ZOOM          fenstergrobe erweitern\n",
    "      --help               diese hilfe anzeigen und dann beenden\n",
@@ -295,6 +300,9 @@ const char *h_msg_usage[] =
    "  /nocursor                cursor verstecken\n",
    "  /step                    einzelschritt\n",
    "  /trace                   ausfuhrung protokollieren\n",
+#if defined(CONTINIOUS)
+   "  /reset                   kein gespeicherter zustand wiederherstellen\n",
+#endif
    "  /version                 versionsinformationen ausgeben und dann beenden\n",
    "  /?, /help                diese hilfe anzeigen und dann beenden\n",
    NULL
@@ -318,6 +326,7 @@ const char *h_err_display_properties = "Impossible d'obtenir les proprietes d'af
 const char *h_err_display_colour = "Necessite un affichage couleur %d bits\n";
 const char *h_err_pixmap = "Impossible de creer pixmap\n";
 const char *h_err_font = "Impossible de charger la police '%s' (x11 base bitmap fonts required)\n";
+const char *h_err_geometry = "Geometrie invalide: %s (attendu: WxH[+X+Y])\n";
 
 #if defined(HEXADECIMAL)
 const char *h_err_unexpected_opcode = "Instruction inattendue (%03x) a %1x-%03x , ligne %s : %d\n";
@@ -338,8 +347,8 @@ const char *h_msg_usage[] =
 {
    "Utilisation : %s [OPTION]... [FICHIER]\n",
    "Une émulateur de RPN calculatrice pour X11.\n\n",
-   "  -b  ADDR                 définir un point d'arrêt (octal or hex)\n",
-   "  -i  OPCODE               définir un piège d'instruction (octal or hex)\n",
+   "  -b  ADDR                 definir un point d'arret (octal or hex)\n",
+   "  -i  OPCODE               définir un piege d'instruction (octal or hex)\n",
    "  -r  FILE                 lire le contenu de la ROM de FILE\n",
    "  -s                       single step\n",
    "  -t                       trace execution\n",
@@ -348,10 +357,10 @@ const char *h_msg_usage[] =
 #endif
    "      --cursor             curseur d'affichage (par défaut)\n",
    "      --no-cursor          masquer le curseur\n",
-   "      --geometry +x+y      specify initial window position\n",  /** Translation needed */
-   "      --numlock            use numeric keypad (even if numlock is off)\n", /** Translation needed */
+   "      --geometry +x+y      indiquer position initiale de fenetre\n",
+   "      --numlock            utiliser pavé numerique\n",
 #if defined(CONTINIOUS)
-   "      --reset              do not restore saved state (factory reset)\n",  /** Translation needed */
+   "      --reset              reinitialisation usine\n",
 #endif
    "      --zoom ZOOM          agrandir la taille de la fenêtre\n",
    "      --help               afficher cette aide et quitter\n",
@@ -375,6 +384,9 @@ const char *h_msg_usage[] =
    "  /nocursor                masquer le curseur\n",
    "  /step                    trace execution\n",
    "  /trace                   trace execution\n",
+#if defined(CONTINIOUS)
+   "  /reset                   reinitialisation usine\n",
+#endif
    "  /version                 affiche les informations de version et quitte\n",
    "  /?, /help                afficher cette aide et quitter\n",
    NULL
@@ -383,6 +395,89 @@ const char *h_err_invalid_operand = "parametre(s) invalide(s)\n";
 const char *h_err_invalid_option = "option invalide %s\n";
 #endif /* Unix */
 
+#elif defined(LANG_pt)
+const char *h_msg_loading = "Carregando '%s'\n";
+const char *h_msg_saving = "Salvando '%s'\n";
+
+const char *h_err_register_alloc = "Erro em tempo de execucao\t: %s linha : %d : Falha na alocacao de memoria!\n";
+const char *h_err_opening_file = "Nao foi possivel abrir '%s'\n";
+const char *h_err_reading_file = "Erro ao ler arquivo\n";
+const char *h_err_writing_file = "Erro ao escrever arquivo\n";
+
+const char *h_err_display = "Nao foi possivel conectar ao servidor X '%s'\n";
+const char *h_err_display_properties = "Nao foi possivel obter propriedades de exibicao\n";
+const char *h_err_display_colour = "Requer uma exibicao de cor %d-bit\n";
+const char *h_err_pixmap = "Nao foi possivel criar pixmap\n";
+const char *h_err_font = "Nao foi possivel carregar fonte '%s' (fontes bitmap base x11 requeridas)\n";
+const char *h_err_geometry = "Geometria invalida: %s (esperado: WxH[+X+Y])\n";
+
+#if defined(HEXADECIMAL)
+const char *h_err_unexpected_opcode = "Opcode inesperado (%03x) em %1x-%03x na %s linha : %d\n";
+const char *h_err_unexpected_error = "Erro inesperado em %1x-%03x na %s linha : %d\n";
+const char *h_err_invalid_address = "Endereco (%03x) fora do intervalo em %1x-%03x na %s linha : %d\n";
+const char *h_err_invalid_register = "Registrador invalido (REG[%03d]) em %1x-%03x na %s linha : %d\n";
+# else
+const char *h_err_unexpected_opcode = "Opcode inesperado (%04o) em %1o-%04o na %s linha : %d\n";
+const char *h_err_unexpected_error = "Erro inesperado em %1o-%04o na %s linha : %d\n";
+const char *h_err_invalid_address = "Endereco (%04o) fora do intervalo em %1o-%04o na %s linha : %d\n";
+const char *h_err_invalid_register = "Registrador invalido (REG[%03d]) em %1o-%04o na %s linha : %d\n";
+#endif /* Hexadecimal */
+
+const char *h_err_missing_argument = "opcao requer um argumento -- '%s'\n";
+
+#if defined(unix) || defined(__unix__) || defined(__APPLE__)
+const char *h_msg_usage[] =
+{
+   "Uso: %s [OPTION]... [FILE]\n",
+   "Um emulador de calculadora RPN para X11.\n",
+   "\n",
+   "  -b  ADDR                 endereco de breakpoint (octal ou hex)\n",
+   "  -i  OPCODE               instrucao de trap (octal ou hex)\n",
+   "  -r  FILE                 carregar conteudo da ROM de FILE\n",
+   "  -s                       passo unico\n",
+   "  -t                       rastrear execucao\n",
+#if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
+   "  -c, --comma              usar virgula como separador decimal\n",
+#endif
+   "      --cursor             mostrar cursor (padrao)\n",
+   "      --no-cursor          ocultar cursor\n",
+   "      --geometry +x+y      especificar posicao inicial da janela\n",
+   "      --numlock            usar teclado numerico\n",
+#if defined(CONTINIOUS)
+   "      --reset              reset de fabrica\n",
+#endif
+   "      --zoom ZOOM          ampliar tamanho da janela\n",
+   "      --help               mostrar esta ajuda e sair\n",
+   "      --version            mostrar versao e sair\n\n",
+   NULL
+};
+const char *h_err_invalid_operand = "operando(s) invalido(s)\n";
+const char *h_err_invalid_option = "opcao invalida -- '%c'\n";
+const char *h_err_duplicate_option = "opcao duplicada -- '%c'\n";
+const char *h_err_unrecognised_option = "opcao nao reconhecida '%s'\n";
+const char *h_err_invalid_number = "nao e um numero octal -- '%s'\n";
+const char *h_err_numeric_range = "fora do intervalo -- '%s'\n";
+const char *h_err_max_breakpoints = "numero maximo de breakpoints excedido\n";
+const char *h_err_invalid_argument = "argumento esperado nao -- '%c'\n";
+#else
+const char *h_msg_usage[] =
+{
+   "Uso: %s [OPTION]... [FILE]\n",
+   "Um emulador de calculadora RPN para X11.\n\n",
+   "  /cursor                  mostrar cursor (padrao)\n",
+   "  /nocursor                ocultar cursor\n",
+   "  /step                    passo unico\n",
+#if defined(CONTINIOUS)
+   "  /reset                   reset de fabrica\n",
+#endif
+   "  /trace                   rastrear execucao\n",
+   "  /version                 mostrar versao e sair\n\n",
+   "  /?, /help                mostrar esta ajuda e sair\n",
+   NULL
+};
+const char *h_err_invalid_operand = "parametro(s) invalido(s)\n";
+const char *h_err_invalid_option = "opcao invalida %s\n";
+#endif /* Unix */
 
 #elif defined(LANG_sv)
 
@@ -399,6 +494,7 @@ const char *h_err_display_properties = "Kan inte hamta display-egenskaper\n";
 const char *h_err_display_colour = "Kraever %d-bit faergdjup\n";
 const char *h_err_pixmap = "Kan inte skaps pixmap\n";
 const char *h_err_font = "Kan inte ladda font '%s' (x11 base bitmap fonter kraevs)\n";
+const char *h_err_geometry = "Ogiltig geometri: %s (forvantat: WxH[+X+Y])\n";
 
 #if defined(HEXADECIMAL)
 const char *h_err_unexpected_opcode = "Ovaentad opcode (%03x) vid %1x-%03x i %s rad: %d\n";
@@ -429,10 +525,10 @@ const char *h_msg_usage[] =
 #endif
    "      --cursor             visa markoer (cursor)\n",
    "      --no-cursor          doelj markoer (cursor)\n",
-   "      --geometry +x+y      specify initial window position\n",  /** Translation needed */
-   "      --numlock            use numeric keypad (even if numlock is off)\n", /** Translation needed */
+   "      --geometry +x+y      ange inledande fonstrens placering\n",
+   "      --numlock            anvand numeriskt tangentbord\n",
 #if defined(CONTINIOUS)
-   "      --reset              do not restore saved state (factory reset)\n",  /** Translation needed */
+   "      --reset              fabriksaterstallning\n",
 #endif
    "      --zoom ZOOM          oeka fönster-storleken\n",
    "      --help               visa denna hjaelp och avsluta\n",
@@ -456,6 +552,9 @@ const char *h_msg_usage[] =
    "  /nocursor                doelj markoer\n",
    "  /step                    enkelstega (single step)\n",
    "  /trace                   logga (trace)\n",
+#if defined(CONTINIOUS)
+   "  /reset                   fabriksaterstallning\n",
+#endif
    "  /version                 visa denna hjaelp och avsluta\n",
    "  /?, /help                visa versions-information och avsluta\n\n",
    NULL
@@ -463,7 +562,6 @@ const char *h_msg_usage[] =
 const char *h_err_invalid_operand = "Felaktig(a) parameter(ar)\n";
 const char *h_err_invalid_option = "Felaktig option %s\n";
 #endif /* Unix */
-
 
 #else /* Language defaults to English */
 
@@ -480,6 +578,7 @@ const char *h_err_display_properties = "Unable to get display properties\n";
 const char *h_err_display_colour = "Requires a %d-bit colour display\n";
 const char *h_err_pixmap = "Can't create pixmap\n";
 const char *h_err_font = "Cannot load font '%s' (x11 base bitmap fonts required)\n";
+const char *h_err_geometry = "Invalid geometry: %s (expected: WxH[+X+Y])\n";
 
 #if defined(HEXADECIMAL)
 const char *h_err_unexpected_opcode = "Unexpected opcode (%03x) at %1x-%03x in %s line : %d\n";
@@ -537,6 +636,9 @@ const char *h_msg_usage[] =
    "  /cursor                  show cursor (default)\n",
    "  /nocursor                hide cursor\n",
    "  /step                    single step\n",
+#if defined(CONTINIOUS)
+   "  /reset                   do not restore saved state (factory reset)\n",
+#endif
    "  /trace                   trace execution\n",
    "  /version                 show version and exit\n\n",
    "  /?, /help                show this help and exit\n",
