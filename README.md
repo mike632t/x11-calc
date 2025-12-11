@@ -492,6 +492,7 @@ managed to get as far as I have.
 - Keyboard shortcuts are only available on UNIX like systems.
 - For best results you need to have the X windows core fonts installed.
 - Parallel make only works on Linux, NetBSD and FreeBSD.
+- The timer on the HP55 isn't very accurate (no crystal oscillator!)
 
 ##### HP 67
 
