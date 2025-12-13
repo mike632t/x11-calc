@@ -31,7 +31,7 @@
 #                    - Suppress error message if pkg-config not found - MT
 #
 
-CFLAGS	+= -I/opt/X11/include/
+CFLAGS	+= -I/opt/X11/include/ -D__unix__
 LDFLAGS += -L/opt/X11/lib/
 LDLIBS	?=
 
