@@ -34,6 +34,7 @@
 #                         running on Darwin - MT
 #  01 Dec 25            - Checks the software version command exists - MT
 #  02 Dec 25            - Fixed MacOS version detection - MT
+#  14 Dec 25            - Added release names to MacOS versions - MT
 #
 
 #
@@ -122,7 +123,39 @@ elif [ -f /etc/os-release ]; then
 elif [ -f /etc/redhat-release ]; then
    _system=`cat /etc/redhat-release`
 elif [ "`lower $_os`" = "darwin" ] && command -v sw_vers 2>&1 >/dev/null; then  # Only exists on Mac OS
-      _system="`sw_vers -productName 2>/dev/null` `sw_vers -productVersion 2>/dev/null`"
+      _version=`sw_vers -productVersion 2>/dev/null`
+      _major=`echo "$_version" | cut -d. -f1`
+      _minor=`echo "$_version" | cut -d. -f2`
+      _name=""
+      case "$_major.$_minor" in
+         10.0)  _name="Cheetah" ;;
+         10.1)  _name="Puma" ;;
+         10.2)  _name="Jaguar" ;;
+         10.3)  _name="Panther" ;;
+         10.4)  _name="Tiger" ;;
+         10.5)  _name="Leopard" ;;
+         10.6)  _name="Snow Leopard" ;;
+         10.7)  _name="Lion" ;;
+         10.8)  _name="Mountain Lion" ;;
+         10.9)  _name="Mavericks" ;;
+         10.10) _name="Yosemite" ;;
+         10.11) _name="El Capitan" ;;
+         10.12) _name="Sierra" ;;
+         10.13) _name="High Sierra" ;;
+         10.14) _name="Mojave" ;;
+         10.15) _name="Catalina" ;;
+         11.*)  _name="Big Sur" ;;
+         12.*)  _name="Monterey" ;;
+         13.*)  _name="Ventura" ;;
+         14.*)  _name="Sonoma" ;;
+         15.*)  _name="Sequoia" ;;
+         26.*)  _name="Tahoe" ;;
+      esac
+      if [ -n "$_name" ]; then
+         _system="`sw_vers -productName 2>/dev/null` $_version ($_name)"
+      else
+         _system="`sw_vers -productName 2>/dev/null` $_version"
+      fi
 else
    _system="$_os $_kernel"
 fi
