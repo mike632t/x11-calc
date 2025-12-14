@@ -402,7 +402,9 @@ can be obtained from the 'legacy' branch.
 
    - MacOS 13.4.1 (Ventura), clang 14.0.3, arm64  (0.19.0195)
 
-   - MacOS 14.4.1 (Sonoma), clang 15.0.0, arm46 (0.19.0195)
+   - MacOS 14.4.1 (Sonoma), clang 15.0.0, arm46  (0.19.0195)
+
+   - MacOS 25.1.0 (Tahoe), clang 17.0.0, x86_64  (0.19.0195)
 
    - Minix 3.4.0, clang 3.6, x86  (0.19.0195)
 
