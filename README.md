@@ -44,7 +44,7 @@ MacOS, VMS, Solaris and Tru64 Unix.
 
 Details of the latest/important changes.
 
-11 Dec 25  (0.23.0224)
+14 Dec 25  (0.23.0224)
 
    - HP67 program card files can include text labels.
    - Added Portuguese language support for help text and error messages.
@@ -137,9 +137,9 @@ Details of the latest/important changes.
 You can either download the source code from GitHub and compile it yourself
 or you can use a pre-compiled package.
 
-   - [Using binary package](#packages)
-
    - [Building from the source](#building)
+
+   - [Using binary package](#packages)
 
 
 <a id="packages"></a>
@@ -424,11 +424,11 @@ can be obtained from the 'legacy' branch.
 
    - VMS 5.4-3, VAX C 3.2, VAX
 
-   - VMS 7.3-2, C 6.5-001, alpha
+   - VMS 7.3, C 6.5, VAX
 
-   - VMS 7.3, C 6.5-005, VAX
+   - VMS 7.3-2, C 6.5, alpha
 
-   - VMS 9.2-1, C 7.4-726, x86_64
+   - VMS 9.2-1, C 7.4, x86_64
 
    - Windows 11 + WSL2, gcc 12.2.0, x86_64 + arm64
 
