@@ -61,14 +61,15 @@
  *                     ratio - MT
  * 23 Apr 24         - Separated out prototypes for error handlers - MT
  * 16 Jun 25         - Tidied up comments - MT
+ * 01 Nov 25         - Added cards - MT
  *
  * To Do             - Add a new style to handle the type of button used by
  *                     the classic series.
  */
 
 #define NAME           "x11-calc-button"
-#define BUILD          "0023"
-#define DATE           "16 Jun 25"
+#define BUILD          "0024"
+#define DATE           "01 Nov 25"
 #define AUTHOR         "MT"
 
 #include <errno.h>     /* errno */
@@ -83,6 +84,7 @@
 #include "x11-calc-messages.h"
 #include "x11-calc-errors.h"
 
+#include "x11-calc-card.h"
 #include "x11-calc-label.h"
 #include "x11-calc-switch.h"
 #include "x11-calc-button.h"

@@ -3,37 +3,25 @@
 
 ### Planned changes
 
-- [ ] Use a fixed window, display and key sizes (don't use scale with for CLASSIC or  KISS)
-
-- [ ] Fix window resizing.  Using window hints to resize the window doesn't work in every environment
-
-  [https://tronche.com/gui/x/xlib/window/XMoveResizeWindow.html]::
+- [ ] Update help text
 
 - [ ] Allow user to resize the window at runtime (scroll wheel?).
 
+- [ ] Add a graphical printer display to the HP10
+
+- [ ] Update non UNIX command line parser
+
 - [ ] Formatted program listings (using a separate python script)
 
-- [ ] Add a graphical printer display to the HP10
+- [ ] Move VMS make script to top level directory
 
 - [ ] Reorganize x11-calc and simplify the switch handling
 
 - [ ] Add HP65
 
-- [ ] Add proper card reader to HP67
-
 - [ ] Draw switches showing position (and not just labels)
 
 - [ ] Select default zoom based on screen resolution?
-
-- [ ] Better segregation of common code (switch, label and keyboard)
-
-- [ ] Translate README - Volunteers needed!
-
-- [ ] Move VMS make script to top level directory
-
-- [ ] Expand tilde (~) in filenames
-
-  [https://stackoverflow.com/questions/40128376/how-to-expand-tilde-in-path]::
 
 - [ ] Add HP19C
 
@@ -43,7 +31,28 @@
 
 - [ ] Add HP41C
 
+- [ ] Better segregation of common code (switch, label and keyboard)
+
+- [ ] Translate README - Volunteers needed!
+
+- [ ] Expand tilde (~) in filenames
+
+  [https://stackoverflow.com/questions/40128376/how-to-expand-tilde-in-path]::
+
+
 ### Completed changes
+
+- [X] Can specify the number of memory registers on the command line
+
+- [X] Allow pre-recorded program cards to include labels
+
+- [X] Breakpoint and instruction traps can now be specified in octal or hex
+
+- [X] Allow user to specify window position
+
+  [https://tronche.com/gui/x/xlib/window/XMoveResizeWindow.html]::
+
+- [X] Add card reader to HP67
 
 - [X] Added HP55 with timer mode
 
@@ -77,6 +86,8 @@ point positions, and number of segments etc)
   [https://superuser.com/questions/392439/lang-and-language-environment-variable-in-debian-based-systems]::
 
 ### Rejected changes
+
+- [ ] Allow a program card to be loaded from the command line - Need a way to load multiple cards
 
 - [ ] Allow any _programmable_ model to load a saved program - Not possible without modifying the firmware
 

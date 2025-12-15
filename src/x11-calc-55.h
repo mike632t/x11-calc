@@ -22,10 +22,11 @@
  * 08 Sep 25         - Increased number of registers - MT
  * 11 Oct 25         - Modified key layout - MT
  * 13 Oct 25         - Modified key layout (again) - MT
+ * 09 Nov 25         - Another tweak to the keyboard layout - MT
  *
  */
 
-#define HEIGHT             450 * SCALE_HEIGHT
+#define HEIGHT             440 * SCALE_HEIGHT
 #define WIDTH              230 * SCALE_WIDTH
 #define BUTTONS            35
 #define SWITCHES           2
@@ -49,12 +50,13 @@
 
 #define KBD_LEFT           12 * SCALE_WIDTH
 #define KBD_TOP            67 * SCALE_HEIGHT
-#define KBD_ROW            44 * SCALE_HEIGHT
+#define KBD_ROW            43 * SCALE_HEIGHT
 
 #define KEY_HEIGHT         25 * SCALE_HEIGHT
 #define KEY_WIDTH          39 * SCALE_WIDTH
 #define KEY_NUMERIC        48 * SCALE_WIDTH
 #define KEY_SMALL          27 * SCALE_WIDTH
+
 #define KEY_GAP            3 * SCALE_WIDTH
 #define SWITCH_HEIGHT      10 * SCALE_HEIGHT
 

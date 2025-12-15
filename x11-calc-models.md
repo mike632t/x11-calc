@@ -177,10 +177,10 @@ HP-22    1975-1978      ACT            Working
 HP-91    1976-1979      ACT            No
 HP-27    1976-1978      ACT            Working
 HP-25C   1976-1978      ACT            Working
-HP-67    1976-1984      ACT            No card reader
+HP-67    1976-1984      ACT            Working
 HP-97    1976-1984      ACT            No
 HP-10    1977-1979      ACT            No
-HP-29C   1977-1979      ACT            Yes
+HP-29C   1977-1979      ACT            Working
 HP-19C   1977-1979      ACT            No
 HP-92    1977-1980      ACT            No
 HP-95C   Cancelled      ACT            No
@@ -195,7 +195,7 @@ HP-38E   1978-1981      ACT            Working
 HP-38C   1979-1983      ACT            Working
 HP-32E   1978-1983      ACT            Working
 HP-34C   1979-1983      ACT            Working
-HP-37E   1978-1983      ACT            Working - fails self test
+HP-37E   1978-1983      ACT            Working
 
 HP-41C   1979-1985      NUT            No
 HP-41CV  1980-1990      NUT            No
@@ -209,26 +209,27 @@ HP-10C   1982-1984      NUT            Working
 
 HP-75C   1982-1984      NUT            No
 HP-75D   1984-1986      NUT            No
+```
 
-HP-71    1984-1989      Saturn         No
-
-HP-18C   1986-1988      Saturn         No
-HP-28C   1987-1988      Saturn         No
-HP-20S   1989-1990      Saturn         No
-HP-28S   1988-1992      Saturn         No
-HP-14B   1988-1995      Saturn         No
-HP-17B   1988-1990      Saturn         No
-HP-19B   1988-1990      Saturn         No
-HP-27S   1988-1991      Saturn         No
-HP-22S   1988-1991      Saturn         No
-HP-32S   1988-1991      Saturn         No
-HP-42S   1988-1995      Saturn         No
-HP-10B   1989-2000      Saturn         No
-HP-48SX  1990-1993      Saturn         No
-HP-17BII 1990-2001      Saturn         No
-HP-19BII 1990-2001      Saturn         No
-HP-32SII 1991-2001      Saturn         No
-HP-48S   1991-1993      Saturn         No
-HP-48GX  1993-2003      Saturn         No
-HP-48G   1993-2003      Saturn         No
+```
+HP-71    1984-1989      Saturn
+HP-18C   1986-1988      Saturn
+HP-28C   1987-1988      Saturn
+HP-20S   1989-1990      Saturn
+HP-28S   1988-1992      Saturn
+HP-14B   1988-1995      Saturn
+HP-17B   1988-1990      Saturn
+HP-19B   1988-1990      Saturn
+HP-27S   1988-1991      Saturn
+HP-22S   1988-1991      Saturn
+HP-32S   1988-1991      Saturn
+HP-42S   1988-1995      Saturn
+HP-10B   1989-2000      Saturn
+HP-48SX  1990-1993      Saturn
+HP-17BII 1990-2001      Saturn
+HP-19BII 1990-2001      Saturn
+HP-32SII 1991-2001      Saturn
+HP-48S   1991-1993      Saturn
+HP-48GX  1993-2003      Saturn
+HP-48G   1993-2003      Saturn
 ```

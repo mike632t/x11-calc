@@ -24,7 +24,7 @@
  *                     type definition - MT
  * 24 Dec 21         - Standard key width now defined as KEY WIDTH - MT
  * 11 Jan 22         - Removed ROM_BANKS - MT
- * 15 jan 22         - Corrected MEMORY_SIZE - MT
+ * 15 Jan 22         - Corrected MEMORY_SIZE - MT
  * 20 Jan 22         - Fixed compilation warnings on VAXC by defining i_rom
  *                     as external - MT
  * 29 Jan 22         - Added an optional bezel to the display - MT
@@ -32,23 +32,26 @@
  *                     for buttons and switches into two functions - MT
  * 20 May 25         - Tidied up data structure definitions - MT
  * 11 Oct 25         - Modified key layout - MT
+ * 18 Oct 25         - Added card reader support - KJC
+ * 27 Oct 25         - Added function key labels - MT
+ * 01 Nov 25         - Added cards replace the function key labels - MT
+ * 12 Nov 25         - Updated card layout and window size - MT
+ * 16 Nov 25         - Revert to standard memory size - MT
  *
  */
 
-#define HEIGHT             450 * SCALE_HEIGHT
+#define HEIGHT             470 * SCALE_HEIGHT
 #define WIDTH              230 * SCALE_WIDTH
 #define BUTTONS            35
 #define SWITCHES           2
 #define DIGITS             15
 
+#define LABELS             6
+
 #define DIGIT_COLOUR       RED
 #define DIGIT_BACKGROUND   DARK_RED
 #define DISPLAY_BACKGROUND RED_BACKGROUND
 #define BEZEL_COLOUR       LIGHT_GREY
-
-#define KBD_LEFT           12 * SCALE_WIDTH
-#define KBD_TOP            67 * SCALE_HEIGHT
-#define KBD_ROW            43 * SCALE_HEIGHT /** Was 43 / 49 */
 
 #define BEZEL_LEFT         0 * SCALE_WIDTH
 #define BEZEL_TOP          4 * SCALE_HEIGHT
@@ -73,11 +76,14 @@
 
 #define ROM_SIZE           020000
 #define MEMORY_SIZE        64
+
 #define CONTINIOUS
 
 extern int i_rom [ROM_SIZE];
 
 void v_init_labels(struct olabel *h_label[]);
+
+void v_init_card(struct ocard **h_card);  /* Not passing an array */
 
 void v_init_switches(struct oswitch *h_label[]);
 

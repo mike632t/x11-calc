@@ -69,49 +69,60 @@
 #  07 Jul 25         - Modified changed '_f_conf' to '_configfile' - MT
 #                    - Additional command line options are always passed to
 #                      the emulator (even when running setup) - MT
+#  23 Oct 25         - Adds a symbolic link to a shared library of programs
+#                      in /usr/share/x11-calc/prg if it exists - macmpi/MT
+#  24 Oct 25         - Checks for broken symbolic links - MT
+#  25 Oct 25         - Tidied up comments - MT
 #
 
 SUCCESS=0
 ENOENT=2
 EINVAL=22
 ENODATA=61
-ENOACC=126 # Permission denied (not official)
-ENOCMD=127 # Executable file not found (not official)
-ENOFNT=192 # No font (not official)
+ENOACC=126  # Permission denied (not official)
+ENOCMD=127  # Executable file not found (not official)
+ENOFNT=192  # No font (not official)
 
-# Prototype model list: is to be filled-in by makefile
-# e.g _models="hp35|hp80|hp45|hp70|hp21|hp22|hp25|hp25c|hp27|hp29c|hp31e|hp32e|hp33e|hp33c|hp34c|hp37e|hp38c|hp38e|hp67|hp10c|hp11c|hp12c|hp15c|hp16c"
-_models=""
+LIBRARY="lib"  # Name of symbolic link to the shared program library
 
-#- launch()
+_models=""  # List of emulator models (will be populated by make)
+
+
+#
+#  launch()
+#
+#  Launches the default emulator
+#
 
 _launch() {
-
    [ -z "$MODEL" ] && exit 0
    [ -n "$CMD_OPTS" ] && OPTIONS="$CMD_OPTS" # Allow command line to override options
 
    MODEL="`echo "$MODEL" | sed 's/^hp//'`"
-   _core_app="`dirname "$0"`/x11-calc-$MODEL"
-   #echo "`basename $0`: Executing '`echo $_core_app $OPTIONS`'."
+   _emulator="`dirname "$0"`/x11-calc-$MODEL"
 
-   if [ -f "$_core_app" ]; then
-      "$_core_app" $OPTIONS # Assume script is in the same directory as the executable files
+   #echo "`basename $0`: Executing '`echo $_emulator $OPTIONS`'."
+
+   if [ -f "$_emulator" ]; then  # Check emulator exists (assume script is in the same directory)
+      "$_emulator" $OPTIONS
    else
       `exit $ENOCMD`
    fi
 
    _err=$?
    case $_err in
-      # NOTE: * characters in messages below are intended for seach & replace by newline for zenity
+      # NOTE: The error messages may be displayed on a dialog box in  which
+      # case  the '*' characters will be replaced by newlines of printed on
+      # the console in which case they will be replaced by a space
       $SUCCESS)
          ;;
       $EINVAL)
          _errmsg="Invalid operand or parameter:**'$OPTIONS'"
          ;;
-      $ENOFNT)
+      $ENOFNT)  # Emulator couldn't load a font so try to suggest which package should be installed
          _fonts="'xfonts-base' or equivalent"
          _f_os_release="/etc/os-release"
-         grep -sq "freedesktop" "${_f_os_release}" && _f_os_release="/run/host/os-release" # we are in flatpak
+         grep -sq "freedesktop" "${_f_os_release}" && _f_os_release="/run/host/os-release"  #  Flatpak
          grep -sqE "ubuntu|debian" "${_f_os_release}" && _fonts="'xfonts-base'"
          grep -sq "fedora" "${_f_os_release}" && _fonts="'xorg-x11-fonts-base' or 'xorg-x11-fonts-misc'"
          grep -sq "gentoo" "${_f_os_release}" && _fonts="'font-misc-misc'"
@@ -130,24 +141,43 @@ _launch() {
       $ENOCMD)
          _errmsg="Emulator not found."
          ;;
-      *)
+      *)  # Something else went wrong!
          _errmsg="An unhandled error occurred!"
    esac
 
    if [ -n "$_errmsg" ]; then
       if _has_zenity; then
-         zenity --height=100 --width=400 --error --text="` echo "$_errmsg" | tr '*' '\n'`" #  Replace * by newline
+         zenity --height=100 --width=400 --error --text="` echo "$_errmsg" | tr '*' '\n'`"  # Replace * by newline
       fi
-      printf '%s\n' "`basename $0`: `echo "$_errmsg" | tr '*' ' ' | tr -s ' '`" >&2 # Remove multiple spaces
+      printf '%s\n' "`basename $0`: `echo "$_errmsg" | tr '*' ' ' | tr -s ' '`" >&2  # Replace * by a space and remove multiple spaces
    fi
 
    return $_err
 }
 
-#- config()
+
+#
+#  help()
+#
+
+_help() {
+   if _has_zenity; then
+      _launch | zenity --title="x11-calc Help" --text-info --font="courier" --height=320 --width=640  # Run the emulator using '--help' and redirect help text to zenity
+   else
+      _launch  # Just run the emulator using '--help'
+   fi
+}
+
+
+#
+#  config()
+#
+#  Presents a dialog box that allows the user to update the default options
+#
+#  Note: Depends on 'zenity'
+#
 
 _config (){
-
    if [ "$DROPDOWN" ]
    then
       _selection="$(zenity --forms --title="x11-calc Setup" \
@@ -166,7 +196,7 @@ _config (){
    case $? in
       0)
          _tmpfile="$(mktemp)"
-         if [ "$DROPDOWN" ] # The seperator used by different forms is different!
+         if [ "$DROPDOWN" ]  # The separator used by different forms is different!
          then
             sed "s|^MODEL=.*|MODEL=\"${_selection%|*}\"|" "$_configfile" > $_tmpfile
             sed "s|^OPTIONS=.*|OPTIONS=\"${_selection#*|}\"|" $_tmpfile > "$_configfile"
@@ -183,51 +213,32 @@ _config (){
          echo "`basename $0`: An unexpected zenity error ($?) has occurred."
       ;;
    esac
-
 }
 
-#- setup()
 
-_setup() {
-   if _has_zenity
-   then
-      _config
-   else
-      if command -v nano >/dev/null 2>&1
-      then
-         nano "$_configfile"
-      else
-         vi "$_configfile"
-      fi
+#
+#  create_symlink()
+#
+#  Create a symbolic link to shared program library in the application data
+#  directory if none exists
+#
+
+_create_symlink() {
+   _link="${XDG_DATA_HOME}/x11-calc/$LIBRARY"
+   if ! ([ -e "$_link" ] || [ -L "$_link" ]); then  # Check NOTHING with the same name exists (even broken link)
+      [ -d /usr/share/x11-calc/prg ] && ln -s /usr/share/x11-calc/prg "$_link"
+      [ -d /app/share/x11-calc/prg ] && ln -s /app/share/x11-calc/prg "$_link"
    fi
-
-   . "$_configfile" # Reload modified settings from config file
 }
 
-#- main()
 
-: "${XDG_CONFIG_HOME:="$HOME/.config"}" # Define default path for XDG_CONFIG_HOME if not defined
-: "${XDG_DATA_HOME:="$HOME/.local/share"}" # Define default path for XDG_DATA_HOME if not defined
+#
+#  create_config()
+#
+#  creates the configuration file in the application config directory
+#
 
-if [ -d "$XDG_DATA_HOME" ] # Does XDG_DATA_HOME exist
-then
-   mkdir -p "${XDG_DATA_HOME}/x11-calc" # If it does create the application data directory
-fi
-
-if [ -d "$XDG_CONFIG_HOME" ] # Does XDG_CONFIG_HOME exist
-then
-   mkdir -p "${XDG_CONFIG_HOME}/x11-calc" # If it does create the application conf directory
-   _configfile="${XDG_CONFIG_HOME}/x11-calc/x11-calc.conf" # If it does use it
-else
-   _configfile="${HOME}/.x11-calc.conf" # Otherwise use a hidden file in the home folder
-fi
-
-command -v zenity >/dev/null 2>&1
-has_zenity=$?
-_has_zenity() { return "$has_zenity"; }
-
-if [ ! -f "$_configfile" ]
-then
+_create_config() {
    ! _has_zenity && echo "`basename $0`: Did you know that installing 'zenity' will give you a graphical setup interface?"
    mkdir -p "`dirname "${_configfile}"`"
    cat <<-EOF >"$_configfile"
@@ -250,11 +261,64 @@ OPTIONS=""
 #
 
 EOF
+}
+
+
+#
+#  setup()
+#
+#  Allows the user to update the default configuration in one of three ways
+#  depending on the features available.
+#
+
+_setup() {
+   if _has_zenity
+   then
+      _config
+   else
+      if command -v nano >/dev/null 2>&1
+      then
+         nano "$_configfile"
+      else
+         vi "$_configfile"
+      fi
+   fi
+   . "$_configfile"  # Reload modified settings from config file
+}
+
+
+#
+#  main()
+#
+
+command -v zenity >/dev/null 2>&1  # Tests if 'zenity' installed
+_zenity=$?  # Saves the result
+
+_has_zenity() { return "$_zenity"; }  # Defines a 'dummy' function that allows the saved result to be tested
+
+: "${XDG_CONFIG_HOME:="$HOME/.config"}"  # Define default path for XDG_CONFIG_HOME if not defined
+: "${XDG_DATA_HOME:="$HOME/.local/share"}"  # Define default path for XDG_DATA_HOME if not defined
+
+if [ -d "$XDG_DATA_HOME" ]  # Does XDG_DATA_HOME exist
+then
+   mkdir -p "${XDG_DATA_HOME}/x11-calc"  # If it does create the application specific data directory
+fi
+
+if [ -d "$XDG_CONFIG_HOME" ]  # Does XDG_CONFIG_HOME exist
+then
+   mkdir -p "${XDG_CONFIG_HOME}/x11-calc"  # If it does create an application specific config directory
+   _configfile="${XDG_CONFIG_HOME}/x11-calc/x11-calc.conf" # If it does use it
+else
+   _configfile="${HOME}/.x11-calc.conf"  # Otherwise use a hidden file in the home folder
+fi
+
+if [ ! -f "$_configfile" ]; then  # If the config file does not exist
+   _create_config  # Create it
+   _create_symlink  # and add a symbolic link to the shared program library in the application data directory
 fi
 
 echo "`basename $0`: Using '$_configfile'"
-
-. "$_configfile"
+. "$_configfile"  # Use configuration
 
 if [ -z "$MODEL" ]; then
    echo "`basename $0`: Default model not defined - running '$0 --setup'"
@@ -273,12 +337,7 @@ case $1 in
    --help)
       [ -z "$MODEL" ] && _setup
       CMD_OPTS="--help"
-      if _has_zenity
-      then
-         _launch | zenity --title="x11-calc Help" --text-info --font="courier" --height=320 --width=640
-      else
-         _launch
-      fi
+      _help
       ;;
    --setup)
       _setup
@@ -292,5 +351,3 @@ case $1 in
       _launch
       ;;
 esac
-
-

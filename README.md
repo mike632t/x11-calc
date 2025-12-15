@@ -2,9 +2,9 @@
 
 [![latest packaged version(s)](https://repology.org/badge/latest-versions/x11-calc.svg)](https://repology.org/project/x11-calc/versions)
 
-## x11-calc - Another RPN (Reverse Polish) calculator.
+## x11-calc - Another RPN (Reverse Polish) calculator
 
-Simulators for  the HP 35, HP 80, HP 45, HP 70, HP 55, HP 21, HP 22, HP 25,
+Emulators  for  the HP 35, HP 80, HP 45, HP 70, HP 55, HP 21, HP 22, HP 25,
 HP 25C,  HP 27,  HP 29C, HP 31E, HP 32E, HP 33E,  HP 33C,  HP 34C,  HP 37E,
 HP 38C, HP 38E, HP10, HP 67, HP 10C, HP 11C, HP 12C, HP 15C, and HP 16C.
 
@@ -14,18 +14,22 @@ Use  of any language extensions or non standard language features has  been
 avoided in order to try to make the code as portable as possible.
 
 The  aim  is to have the same source code compile without  modification  on
-as  many systems and architectures as possible including Linux, VAX/VMS and
-Tru64 Unix.
+as  many  systems  and architectures as possible including  Linux,  NetBSD,
+MacOS, VMS, Solaris and Tru64 Unix.
 
-![HP10](./img/x11-calc-10c.png) ![HP11](./img/x11-calc-11c.png)
+ ![HP27](./img/x11-calc-27.png) ![HP33](./img/x11-calc-33c.png) ![HP67](./img/x11-calc-67-diag-a.png)
+
+ ![HP11](./img/x11-calc-11c.png) ![HP12](./img/x11-calc-12c.png)
+
+### Contents <sup><sup>[Back to Top](#top)</sup></sup>
 
 - [Changes](#changes)
 
-- [What will it run on](#tested)
+- [Installing/Building](#obtaining)
 
-- [How to get it](#obtaining)
+- [Tested Systems](#tested)
 
-- [Using it](#using)
+- [User Guide](./GUIDE.md#top)
 
 - [Known issues](#issues)
 
@@ -40,16 +44,31 @@ Tru64 Unix.
 
 Details of the latest/important changes.
 
-14 Sep 25
+14 Dec 25  (0.23.0224)
+
+   - HP67 program card files can include text labels.
+   - Added Portuguese language support for help text and error messages.
+
+19 Nov 25
+
+   - Allows the memory size to be increased from the command line. This can
+     then be used by modified firmware versions to provide extra  registers
+     and additional program steps.
+
+18 Oct 25
+
+   - Added support for the HP67 card reader (requires GTK).
+
+14 Sep 25  (0.19.0194)
 
    - Added the HP55 complete with timer.
 
-05 Sep 25
+05 Sep 25  (0.18.0188)
 
    - Fixed issues that prevented the file selection dialog from being shown
      when using Flatpak.
 
-24 Aug 25
+24 Aug 25  (0.18.0187)
 
    - HP37E now passes self test.
    - Loading  or saving the current state can now be done by right clicking
@@ -57,7 +76,7 @@ Details of the latest/important changes.
      load the state from a previously saved `.dat` (data) file, while in `prgm`
      mode the user will be prompted to save the current state.
 
-09 Aug 25
+09 Aug 25  (0.17.0181)
 
    - Improved display updates (using double buffering).
    - Minor changes to fix compilation issues on VAX and DEC Windows.
@@ -112,107 +131,8 @@ Details of the latest/important changes.
 
    - Initial version can draw the application window using X11!
 
-<a id="tested"></a>
-### Tested platforms <sup><sup>[Back to Top](#top)</sup></sup>
-
-The simulator has been successfully compiled and tested on:
-
-   - Alpine 3.20, gcc 13.2.1, x64 + arm64 **
-
-   - Alpine 3.19, gcc 13.2.1, x64 + arm64 ***
-
-   - Debian 12 (Bookworm), clang 14.0.6, x64 + arm64
-
-   - Debian 12 (Bookworm), tcc 0.9.27, x64 + arm64
-
-   - Debian 12 (Bookworm), gcc 12.2.0, x64 + arm64
-
-   - Debian 11 (Bullseye), clang 11.0.1-2, x64 ***
-
-   - Debian 11 (Bullseye), gcc 10.2.1, x64 ***
-
-   - Debian 10 (Buster), gcc 8.3.0, arm **
-
-   - Debian 10 (Buster), gcc 8.3.0, x64
-
-   - Debian 10 (Buster), clang 7.0.1, x64
-
-   - Debian 10 (Buster), tcc 0.9.27, x64
-
-   - Debian 9 (Stretch), gcc 6.3.0, arm ***
-
-   - Debian 5 (Lenny), gcc 4.2.4, alpha
-
-   - Debian 5 (Lenny), gcc 4.3.2, i686
-
-   - Fedora 35, gcc 11.3.1, x64
-
-   - Fedora 35, clang 13.0.1, x64
-
-   - Fedora 39, gcc 13.2.1, x64
-
-   - Fedora 39, clang 17.0.6, x64
-
-   - Fedora 41, gcc 14.3.1, x64
-
-   - Fedora 41, clang 19.1.7, x64
-
-   - Fedora 42, gcc 15.2.1, x64
-
-   - Fedora 42, clang 20.1.8, x64
-
-   - FreeBSD 14.0, clang 16.0.6, x64 **
-
-   - Gentoo, gcc 11.2.0, x64 **
-
-   - MacOS 10.1.15 (Catalina), clang 12.0.0, x64 **
-
-   - MacOS 12.7.6 (Monterey), clang 14.0.0, x64
-
-   - MacOS 13.4.1 (Ventura), clang 14.0.3, arm64 **
-
-   - MacOS 14.4.1 (Sonoma), clang 15.0.0, arm46 **
-
-   - Minix 3.4.0, clang 3.6, x86
-
-   - NetBSD 9.2, gcc 7.5.0, x86
-
-   - NetBSD 9.2, clang 16.0.6, x86
-
-   - SunOS 5.10, gcc 3.4.3, x86
-
-   - SUSE 15.4, clang 13. 0.1, x64
-
-   - SUSE 15.4, gcc 7.5.0, x64
-
-   - Tru64 5.1, cc 6.5-011, alpha
-
-   - Ubuntu 20.04, gcc 9.4.0, x64 + aarch64
-
-   - Ubuntu 20.04, clang 10.0.0, x64 + aarch64
-
-   - Ubuntu 20.04, tcc 0.9.27, x64 + aarch64
-
-   - Ubuntu 22.04, gcc 11.4.0, x64
-
-   - Ubuntu 24.04, gcc 13.3.0, x64
-
-   - VMS 5.4-3, VAX C 3.2, VAX (simh)
-
-   - VMS 7.3-2, C 6.5-001, alpha
-
-   - VMS 9.2-1, C 7.4-726, x64 ***
-
-   - Windows 11 + WSL2, gcc 12.2.0, x64 + arm64 **
-
-** Not yet retested with this build.
-
-*** Previously tested but no plans to retest.
-
-**** Compiles with warnings
-
 <a id="obtaining"></a>
-### How to get it <sup><sup>[Back to Top](#top)</sup></sup>
+### Building/Installing <sup><sup>[Back to Top](#top)</sup></sup>
 
 You can either download the source code from GitHub and compile it yourself
 or you can use a pre-compiled package.
@@ -221,205 +141,129 @@ or you can use a pre-compiled package.
 
    - [Using binary package](#packages)
 
-<a id="using"></a>
-### Using the simulator <sup><sup>[Back to Top](#top)</sup></sup>
 
-If you install the simulator on most modern desktops it should create a new
-menu entry that will start the launcher script by default. When invoked for
-the first time this will prompt you to select the default simulator as well
-as any additional command line options.  These selections will be saved and
-the selected simulator will become the new default.
+<a id="packages"></a>
+### Using a pre-compiled package <sup><sup>[Back to Top](#top)</sup></sup>
 
-When using some desktop environments (like GNOME and KDE) it is possible to
-access a sub-menu that will allow you to select a specific model as well as
-change the default settings by right clicking on the menu icon.
+#### Alpine Linux
+A binary package is available for Alpine Linux 3.20 and later.
 
-#### Keyboard Shortcuts
+If  X11 is not already installed, either add it using `setup-xorg-base`  or
+install it together with a standard desktop using `setup-desktop`.
 
-The following keyboard shortcuts should work on Linux:
+Make  sure `community` repo is enabled and then install x11-calc by running
+the command `apk add x11-calc` as root.
 
-'0' - '9', '+'. '-'. '*'. '/' and 'Enter' should do what you expect them to
-(when using numeric key pad you need to use numlock as usual).
+Additional programs may be installed with `apk add x11-calc-prg`.
 
-'f' and where applicable 'g' and 'h' correspond to the shift keys.
+#### Flatpak
+If  you  don't  want  to compile the application yourself  you  can  use  a
+flatpak.
 
-'Esc' or 'Backspace' corresponds to 'Clx', 'c' to CHS, 'e' to 'EEX', and on
-financial models 'n' and 'i' correspond to 'n' and 'i' if not shifted.
+Follow the instructions for your distribution to install Flatpak.
 
-'A' - 'E' , 'A' - 'F' , or 'A' - 'B' correspond to program labels  (whether
-shifted or not).
+Logout and Login again.
 
-'Space' maps to 'SST' (if not shifted.
-
-The following control keys can also be used.
-
-Note - Only models with continuous memory can load or save state.
-
-'Ctrl-C' Resets the simulator to its last saved or initial state.
-
-'Ctrl-L' Load a saved data file.
-
-'Ctrl-R' Prints the register contents.
-
-'Ctrl-S' Enable tracing and executes a single instruction.
-
-'Ctrl-T' Toggles tracing of the simulator code execution.
-
-'Ctrl-Q' Resumes execution (does not disable trace).
-
-'Ctrl-Z' Exits the simulator.
-
-#### Command line options
-
-The following command line options are available:
-
+Add the Flathub repository.
 ```
-  -b  ADDR                 set break-point (octal)
-  -i  OPCODE               set instruction trap (octal)
-  -r  FILE                 read ROM from FILE
-  -s                       single step
-  -t                       trace
-  -c, --comma              use a comma instead of a decimal point
-      --cursor             display cursor
-      --no-cursor          hide cursor
-      --zoom ZOOM          enlarge window size
-      --help               display this help and exit
-      --version            output version information and exit
+flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+```
+Install the emulator.
+
+Note - Although the application only requires less then 2MB of storage this
+will  also install the run-time environment needed by Flatpak (if it is not
+already installed) which could require up to 925 MB of disk space!  However
+even  if  the run-time is not installed the disk space used is usually only
+about half that.
+```
+flatpak install flathub io.github.mike632t.x11-calc
+```
+Start it
+```
+flatpak run io.github.mike632t.x11-calc
+```
+The  first time the application runs you will be prompted to select  which
+model calculator you want to use.
+
+If later you want to use a different calculator model you can specify it on
+the command line.
+```
+flatpak run io.github.mike632t.x11-calc hp21
 ```
 
-#### Loading and saving
-
-For  models with continuous memory the contents of program memory and  data
-registers  are saved automatically when the calculator is switched  off  or
-the  window is closed.  The current state of the simulator will be saved in
-either `$HOME/.local/share/x11-calc/` or in a hidden file in the user's  HOME
-directory if `$HOME/.local/` does not exist.
-
-Where  an on/off slide switch exists switching the calculator off will save
-the current state.
-
-When  starting the simulator the name of the data file used to restore  the
-saved state can be specified on the command line, allowing previously saved
-copies of programs to be loaded automatically when the simulator starts  or
-the  simulator is reset using `Ctrl-C`.
-
-To load or save a program right click anywhere in the application window to
-open  a dialog box.  This will prompt for the name of an existing data file
-in `run` mode and allow the current simulator state to be saved in `prgm` mode.
-
-Resetting the simulator using `Ctrl-C` will restore it to it's initial state.
-
-#### Exiting
-
-For  models with a 'sliding' On/Off switch clicking on the switch will turn
-the simulator on or off, but if when switching off you hold down the switch
-down for two seconds the program will exit.
-
-#### Window Size
-
-The size of the simulator window can be adjusted from the command line with
-the `--zoom ZOOM` option, where the value for ZOOM can be in the range zero
-to four (0-4).
-
-#### Debugging
-
-You  can  start the simulation in trace mode using '-t', or in single  step
-mode using '-s', and set a break-point using '-b &lt;octal address&gt;'.
-
-'Ctrl-T'  also toggles trace mode when running, 'Ctrl-S' executes the  next
-instruction, 'Ctrl-Q' resumes execution, and 'Ctrl-R' displays the contents
-of the CPU registers.
-
-When in trace mode a jump to the same instruction produces no output.
-
-#### ROM Images
-
-The '-r <filename>' command line option provides the ability to use the ROM
-contents from a separate file.  The contents of the ROM are stored as pairs
-values separated by a colon containing the memory address and the opcode.
-
-Anything appearing after a semi colon on each line is ignored.
-
-For the HP10C, HP11C, HP12C, HP15C and HP16C the ROM file contains pairs of
-_hexadecimal_ values.
-```
-0000:107
-0001:04e
-0002:270
-0003:238
-0004:2ee
-0005:13f
-```
-For other models the ROM file contains pairs of _octal_ values.
-```
-00000:00255
-00001:01420
-00002:00451
-00003:01456
-00004:01746
-00005:00472
-```
-When loading a ROM from file any gaps between the memory addresses will not
-be filled with zeros, and the existing ROM contents will be left unchanged.
-
-ROM files can therefore be used to load alternative version of the firmware
-for a particular model or apply a patch to the existing firmware.
 
 <a id="building"></a>
 ### Building from the source <sup><sup>[Back to Top](#top)</sup></sup>
 
 #### Prerequisites
 
-If you want to compile the simulator from the source code yourself then the
+If you want to compile the emulators from the source code yourself then the
 following packages must be installed.
 
-   - Debian : gcc | clang | tcc  make libc6-dev libx11-dev xfonts-base
+   - Alpine   : gcc | clang | tcc make libx11-dev xorg-x11-fonts-base [gtk+3.0-dev]
 
-   - Fedora : gcc | clang  make glibc-devel libX11-devel xorg-x11-fonts-base | xorg-x11-fonts-misc
+   - Debian   : gcc | clang | tcc make libc6-dev libx11-dev xfonts-base [libgtk-3-dev | libgtk2.0-dev]
 
-   - Gentoo : gcc make libc6-dev libx11-dev font-misc-misc
+   - Fedora   : gcc | clang make glibc-devel libX11-devel xorg-x11-fonts-base | xorg-x11-fonts-misc [gtk3-devel]
 
-   - MacOS  : [Xcode](https://developer.apple.com/xcode/)  [Xquartz](https://www.xquartz.org/)
+   - Gentoo   : gcc make libc6-dev libx11-dev font-misc-misc [x11-libs/gtk+]
 
-   - NetBSD : clang | gcc pmake
+   - MacOS    : [Xcode](https://developer.apple.com/xcode/) [Xquartz](https://www.xquartz.org/)
 
-   - SUSE   : gcc | clang make libX11-devel
+   - NetBSD   : clang | gcc pmake
 
-   - Ubuntu : gcc make libc6-dev libx11-dev xfonts-base
+   - SUSE     : gcc | clang make libX11-devel
+
+   - Solaris 10 : SUNWgcc SUNWgccruntime SUNWtoo SUNWhea SUNWxwhl SUNWgmake
+
+   - Ubuntu : gcc | clang make libc6-dev libx11-dev xfonts-base [libgtk-3-dev]
 
    - Windows 11 + WSL2 : gcc make libc6-dev libx11-dev xfonts-base
 
-When all the prerequisites are available, you should be able to [compile](#Compiling) the
-program using make if it is in the list of tested platforms.
+When all the prerequisites are available, you should be able to compile the
+application using make (or gmake).
+
+Note - GTK is an optional dependency and is only required to allow users to
+load or save programs.  The emulator will still compile but without the GTK
+libraries  the ability to right click on the application window and load or
+save  programs won't be available.
 
 #### Compiling
 
-To  build the simulator check that you have all the [prerequisites](#Prerequisites) installed
+To  build the emulators check that you have all the [prerequisites](#Prerequisites) installed
 then download the source code from github and unzip it (this will created a
 new directory automatically).
 
-e.g:
+##### Linux/NetBSD
+
 ```
 $ wget https://github.com/mike632t/x11-calc/archive/refs/heads/stable.zip
-$ unzip x11-calc-stable.zip
+$ unzip stable.zip
 ```
 Then change directory to the new folder.
 ```
 $ cd x11-calc-stable
 ```
-The to compile all the simulators you just need to invoke make.
+To compile all the emulators you just need to invoke make.
 ```
 $ make clean; make all
 ```
-You can also compile a single simulator by specifying the model number.
+You can also compile an emulator by specifying the model number.
 ```
-$ make hp29c
+$ make hp67
+```
+To build a version with support for a different locale specify the language
+before invoking make.  (This only changes the message text displayed by the
+emulator on the console not they way it behaves).
+```
+LANG=pt_BR make clean hp21
 ```
 By default the executable files will be created in the `bin` directory.
 ```
-$ ./bin/x11-calc-29c
-x11-calc-29c: Version 0.10 [Commit ID: 399d546] 01 Nov 23 23:53:00 (Build: 0114)
-ROM Size : 4096 words
+$ bin/x11-calc-67
+x11-calc-67: Version 0.19.0198 [Commit Id : 751ab27] gcc version 8.3.0 19 Oct 25 20:51:51
+ROM Size: 8192 words
+Loading '/home/system/.local/share/x11-calc/x11-calc-67.dat'
 ```
 OR
 ```
@@ -433,27 +277,55 @@ $ make CC=clang hp11c
 $ make CC=tcc
 ```
 
+##### Tru64 UNIX
+
+To compile all the emulators you just need to invoke make.
+```
+$ make clean; make all
+```
+You can also compile a single emulator by specifying the model number.
+```
+$ make hp29c
+```
+By default the executable files will be created in the `bin` directory.
+```
+$ bin/x11-calc-29c
+```
+
 ##### Solaris 10
 
-In order to use the GNU tools you need to add their location to your path.
-
+You  need to be able to use the GNU tools so you have need to include their
+location in your PATH.
 ```
 $ PATH=$PATH:/usr/sfw/bin/
+```
+Download the source code, unzip it, and change to the new directory.
+```
+$ wget https://github.com/mike632t/x11-calc/archive/refs/heads/stable.zip
+$ unzip stable.zip
+$ cd x11-calc-stable
+```
+Since `gcc` isn't the default compiler you need to specify it when invoking
+`gmake`.
+```
 $ gmake CC=gcc clean hp21
 ```
 ```
-$ PATH=$PATH:/usr/sfw/bin/
 $ gmake CC=gcc clean all
+```
+By default the executable files will be created in the `bin` directory.
+```
+$ ./bin/x11-calc-33c
+x11-calc-33c: Version 0.19.0198 [Commit ID: 992cf145] gcc version 3.4.3 19 Oct 25 20:32:48
+ROM Size: 4096 words
 ```
 
 ##### VMS
 
 On VMS unzip the source code archive, change the default directory and then
 run `make.com`.
-
-e.g:
 ```
-$ unzip x11-calc-stable.zip
+$ unzip stable.zip
 $ set def [.x11-calc-stable.src]
 $ @make all
 
@@ -465,7 +337,7 @@ ROM Size : 4096 words
 #### Installing
 
 On Linux systems after the compilation is complete you can use the makefile
-to install the simulators locally.
+to install the emulators locally.
 
 By default the installer will use `$HOME/.local` if it exists, but it is
 possible to specify another directory by setting the directory `prefix`.
@@ -482,77 +354,118 @@ DESTDIR.
 make DESTDIR=/tmp/staging install
 ```
 
-<a id="packages"></a>
-### Using a pre-compiled package <sup><sup>[Back to Top](#top)</sup></sup>
 
-If you don't want to download an compile the sources yourself you can use a
-pre-compiled binary package compatible with most distros from [Flathub](https://flathub.org/apps/io.github.mike632t.x11-calc) using Flatpak.
+<a id="tested"></a>
+### Tested Systems<sup><sup>[Back to Top](#top)</sup></sup>
 
-A native binary package is also available on Alpine Linux 3.20 release.\
-If x11 is not already installed, add it as standalone (`setup-xorg-base`) or together with a standard desktop (`setup-desktop`).\
-Make sure `community` repo is enabled and then install with `apk add x11-calc`.\
-To leverage GUI for setup, install `apk add zenity`. Optional program saves may be installed with `apk add x11-calc-prg`.
+Where it has not been possible to test the latest version the last working
+release is shown (if known).  The will be maintained in the repository and
+can be obtained from the 'legacy' branch.
 
-<a id="issues"></a>
-### Known Issues <sup><sup>[Back to Top](#top)</sup></sup>
+   - Alpine 3.20, gcc 13.2.1, x86_64 + arm64
 
-#### General issues
+   - Alpine 3.19, gcc 13.2.1, x86_64 + arm64  (0.16.0172)
 
-- A 24 bit colour display is required.
-- Keyboard shortcuts are not available on all systems.
-- For best results you need to have the X windows core fonts installed.
-- Parallel make only works on Linux, NetBSD and FreeBSD.
+   - Debian 13 (Trixie), gcc 14.2.0 | clang 19.1.7, x86_64
 
-##### HP 11C + HP 12C + HP 15C + HP 16C
+   - Debian 12 (Bookworm), gcc 12.2.0 | clang 14.0.6 | tcc 0.9.27, x86_64 + arm64
 
-- Keyboard test is successful but these models do not pass the self-test.
+   - Debian 11 (Bullseye), gcc 10.2.1 | clang 11.0.1-2, i686 + x86_64  (0.19.0195)
 
-##### HP 67
+   - Debian 10 (Buster), gcc 8.3.0, arm  (0.16.0172)
 
-- Cannot read or write to magnetic cards.
-- Has  continuous memory (which allows saved programs to be loaded from the
-command line).
+   - Debian 10 (Buster), gcc 8.3.0 | clang 7.0.1 | tcc 0.9.27, x86_64
 
-#### Wayland
+   - Debian 9 (Stretch), gcc 6.3.0, arm  (0.16.0172)
 
-- On some systems the Xwayland display server can consume a lot of the  CPU
-resources making the whole system unresponsive.
-- The application window should be a fixed size (this can be modified using
-'--zoom'), but Xwayland does not handle this correctly.
+   - Debian 5 (Lenny), gcc 4.2.4, alpha
 
-#### VMS
+   - Debian 5 (Lenny), gcc 4.3.2, i686
 
-- Colour palette assumes a black and white display (simh with QVSS). If the
-system's  colour depth is different you must modify COLOUR_DEPTH to  match.
-Note that the display will still only use two colours!
-(You can modify x11-calc-colour.h and x11-calc.h to change `vms` to `oldvms` if
-you do have a 24-bit colour display).
-- Not all text is visible if not using 24-bit colour.
-- Not all key legends are shown as the font is missing some characters.
+   - Fedora 35, gcc 11.3.1 | clang 13.0.1, x86_64
+
+   - Fedora 39, gcc 13.2.1 | clang 17.0.6, x86_64  (0.19.0195)
+
+   - Fedora 41, gcc 14.3.1 | clang 19.1.7, x86_64  (0.19.0195)
+
+   - Fedora 42, gcc 15.2.1 | clang 20.1.8, x86_64  (0.19.0195)
+
+   - Fedora 43, gcc 15.2.1 | clang 21.1.5, x86_64
+
+   - FreeBSD 14.0, clang 16.0.6, x86_64  (0.19.0195)
+
+   - Gentoo, gcc 11.2.0, x86_64  (0.19.0195)
+
+   - MacOS 10.1.15 (Catalina), clang 12.0.0, x86_64  (0.19.0195)
+
+   - MacOS 12.7.6 (Monterey), clang 14.0.0, x86_64
+
+   - MacOS 13.4.1 (Ventura), clang 14.0.3, arm64  (0.19.0195)
+
+   - MacOS 14.4.1 (Sonoma), clang 15.0.0, arm46  (0.19.0195)
+
+   - MacOS 25.1.0 (Tahoe), clang 17.0.0, x86_64  (0.19.0195)
+
+   - Minix 3.4.0, clang 3.6, x86  (0.19.0195)
+
+   - NetBSD 9.2, gcc 7.5.0 | clang 16.0.6, x86  (0.19.0195)
+
+   - SunOS 5.10, gcc 3.4.3, x86
+
+   - SUSE 15.4, gcc 7.5.0 | clang 13. 0.1, x86_64  (0.19.0195)
+
+   - Tru64 5.1, cc 6.5-011, alpha
+
+   - Ubuntu 20.04, gcc 9.4.0 | clang 10.0.0 | tcc 0.9.27, x86_64 + aarch64
+
+   - Ubuntu 22.04, gcc 11.4.0 | clang 14.0.0 | tcc 0.9.27, x86_64 + aarch64
+
+   - Ubuntu 24.04, gcc 13.3.0 | clang 14.0.6 | tcc 0.9.27, x86_64 + aarch64
+
+   - VMS 5.4-3, VAX C 3.2, VAX
+
+   - VMS 7.3, C 6.5, VAX
+
+   - VMS 7.3-2, C 6.5, alpha
+
+   - VMS 9.2-1, C 7.4, x86_64
+
+   - Windows 11 + WSL2, gcc 12.2.0, x86_64 + arm64
+
+   - Windows 11 + WSL2 (Ubuntu 24.04 LTS), gcc 13.3.0, x86_64
+
+   - Windows 11 + WSL2 (Debian 13), clang 19.1.7 | gcc 14.2.0, x86_64
+
+The last tested release is shown if this release has not yet been tested on
+a particular system.
 
 <a id="acknowledgements"></a>
 ### Acknowledgements <sup><sup>[Back to Top](#top)</sup></sup>
 
 There are almost certainly some names I've missed off this list but without
-the help and encouragement from several members of the calculator community
-it is unlikely that this project would have happened at all or that I would
-have managed to get as far as I have.
+the  help and encouragement from members of the calculator community it  is
+unlikely that this project would have happened at all or that I would  have
+managed to get as far as I have.
 
 - `Teenix` for convincing me that it was possible in the first place.
 
-- `Teenix`  and `Panamatik` for their excellent simulators from which I was
-able  to  figure out most of what should happen when  each  instruction  is
-executed.
+   Though he omitted to warn that the once I got one working I would get an
+   overwhelming urge to add as many many models as possible (including some
+   I didn't think were possible!)
+
+- `Teenix`  and `Panamatik` for their excellent emulators from which I  was
+   able to figure out most of what should happen when each  instruction  is
+   is executed.
 
 - `Agarza` for providing the details of the voyager displays.
 
-- `Macmpi` for completely rewriting the makefiles and all while maintaining
-backward compatibility with Tru64 UNIX!
+- `Macmpi` for completely rewriting the make files and maintaining backward
+   compatibility with Tru64 UNIX while doing so!
 
-- `Macmpi` for packaging the simulator for Flatpak and setting up the build
-so new releases are built automatically.
+- `Macmpi` for packaging the emulators for Flatpak and setting up the build
+   so new releases are built automatically.
 
-- `Macmpi` for packaging and testing the simulators on Alpine Linux.
+- `Macmpi` for packaging and testing the emulators on Alpine Linux.
 
 - `Agarza` and `Martin HEPPERLE` for helping to translate the help text.
 
@@ -562,40 +475,65 @@ so new releases are built automatically.
 
 - `Mark SHIN` for testing on MacOS.
 
-- `Jonakeys` for getting the simulators working on FreeBSD.
+- `Jonakeys` for getting the emulators working on FreeBSD.
 
 - `Quozl` for helping with double buffering display changes.
 
-- `Kjellc for reasons that may not yet be obvious.
+- `Kjellc` for adding support for the HP67 card reader.
 
-- 'Vttoth` for allowing me to include some of his example programs.
+- `Vttoth` for allowing me to include some of his example programs.
 
-- `Kjellc for translating the help text (into Swedish).
+- `Kjellc` for translating the help text (into Swedish).
+
+<a id="issues"></a>
+### Known Issues <sup><sup>[Back to Top](#top)</sup></sup>
+
+#### General
+
+- A 24 bit colour display is required.
+- Keyboard shortcuts are only available on UNIX like systems.
+- For best results you need to have the X windows core fonts installed.
+- Parallel make only works on Linux, NetBSD and FreeBSD.
+- The timer on the HP55 isn't very accurate (no crystal oscillator!)
+
+##### HP 67
+
+- Has continuous memory by default.  Use the '--reset' option to disable it
+  when starting the emulator.
+
+##### HP 11C + HP 12C + HP 15C + HP 16C
+
+- Keyboard test is successful but these models do not pass the self-test.
+
+#### Wayland Issues
+
+- The application window should be a fixed size (this can be modified using
+  '--zoom'), but Wayland does not allow applications to be a fixed size.
+
+#### VMS
+
+- Colour palette assumes a black and white display. If the system's  colour
+  depth is different you will have to modify COLOUR_DEPTH to match, however
+  the display will still only use two colours.
+  (You can modify x11-calc-colour.h and x11-calc.h to change `vms` to `oldvms`
+  if you do have a 24-bit colour display).
+- Not all text is visible if not using 24-bit colour.
+- Not all key labels are shown as the DEC fonts are missing some characters.
 
 <a id="problems"></a>
 ### Problem Reports <sup><sup>[Back to Top](#top)</sup></sup>
 
-If you find problems or have suggestions relating to these simulators, then
-please create a new [issue](https://github.com/mike632t/x11-calc/issues).
+If  you encounter an issue or have suggestions for future changes to  these
+emulators, then please create a new [issue](https://github.com/mike632t/x11-calc/issues).
 
 Your problem report should contain:
 
-- Computer model (or hypervisor);
+- Whether you are using a pre-built binary (Alpine / Flatpak);
 
-- Processor architecture;
-
-- Operating System and version;
-
-- Desktop Environment and version;
-
-- Window Manager and version;
-
-- If you are using a pre-built binary (Alpine / Flatpak);
-
-- Compiler and version used (if applicable);
+- Output from `sh-get-environment.sh`;
 
 - Commit ID;
 
-- A description of the problem.
+- Description of the problem.
 
 Thank you.

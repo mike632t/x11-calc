@@ -180,7 +180,7 @@
  * 20 Dec 21         - Changed all #ifdef to #if defined() - MT
  * 22 Dec 21         - Uses model numbers for conditional compilation - MT
  * 26 Dec 21         - Checks the on/off switch state at startup - MT
- * 03 jan 22         - Added ability to trap execution of an opcode - MT
+ * 03 Jan 22         - Added ability to trap execution of an opcode - MT
  * 03 Jan 22         - Changed debug() macro so that debug code is executed
  *                     when DEBUG is defined (doesn't need to be true) - MT
  * 04 Jan 22         - Updated help text - MT
@@ -364,11 +364,62 @@
  * 15 Sep 25         - Fixed errors when compiling on MacOS - MT
  * 20 Sep 25         - Explicitly include X11 keyboard symbols - MT
  *            (0194) - Enable keyboard shortcuts on any UNIX - MT
+ * 17 Oct 25         - Added reset option - MT
+ * 18 Oct 25         - Added card reader support - KJC
+ *                   - Extended breakpoint address range - KJC
+ *                   - Retained the (inaccurate) 'continious' memory on the
+ *                     HP67 but right click now prompts the user to  insert
+ *                     a card file - MT
+ *                   - Ignore right click if GTK isn't available - MT
+ * 27 Oct 25         - Added  function key labels for HP67 (only shown when
+ *                     function keys are enabled) - MT
+ * 30 Oct 25  (0201) - Update function key labels and redraw them when  the
+ *                     function state changes - MT
+ *                   - Window geometry can be specified on the command line
+ *                     (size is ignored) - MT
+ *                   - Reworked  the window hints.  By default  the  window
+ *                     will centred on the screen, but this will usually be
+ *                     ignored by the window manager unless the position is
+ *                     specified on the command line - MT
+ *                   - HP67 will display default function keys labels if no
+ *                     program is loaded - MT
+ * 01 Nov 25         - Added program card to HP67 - MT
+ *                   - Replace all non alphabetic characters with spaces on
+ *                     program cards - MT
+ * 04 Nov 25         - Program card defined as part of the processor (makes
+ *                     it easier to use in the processor code) - MT
+ *                   - Initialize fonts early allowing them to be used when
+ *                     creating a program card - MT
+ * 08 Nov 25         - Can now read the card colours and text labels from a
+ *                     card  file if available (both are optional) - MT
+ *                   - Changed  command line parser to use strtol() for any
+ *                     numeric arguments and allow breakpoints and traps to
+ *                     be set using octal or hexadecimal - MT
+ * 11 Nov 25  (0211) - Card text ignores any characters after a '.' - MT
+ * 12 Nov 25         - Use a label to display program name - MT
+ * 16 Nov 25         - The card reader register addresses are now mapped to
+ *                     a buffer register allowing the size of the memory to
+ *                     be restored to its original value - MT
+ * 19 Nov 25   0.22  - Allocates memory registers dynamically - MT
+ *                   - The memory size can be specified on the command line
+ *                     (very useful when using modified firmware to provide
+ *                     enhanced features) - MT
+ *                   - Maintain  compatibility with earlier versions of the
+ *                     HP67 emulators and versions without extended  memory
+ *                     when loading or saving state - MT
+ * 22 Nov 25         - Don't use string concatenation to print the compiler
+ *                     version - MT
+ * 29 Nov 25         - Don't print compiler version if not defined - MT
+ * 06 Dec 25   0.23  - Fixed compilation warnings on VAX/VMS - MT
+ * 07 Dec 25         - Use int for boolean types instead of char - MT
+ *                   - Fixed regression bug affecting card display - MT
+ *                   - Saves program card details when exiting - MT
+ * 09 Dec 25         - Use MEMORY_MAX to define the maximum memory size -MT
+ * 11 Dec 25  (0224) - Implemented /RESET command line option - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
- *                     of switches
- *                   - Add verbose option.
+ *                     of switches.
  *                   - Allow VMS users to set breakpoints?
  *                   - Free up allocated memory on exit.
  *                   - Sort out colour mapping.
@@ -376,9 +427,9 @@
  */
 
 #define  NAME          "x11-calc"
-#define  VERSION       "0.19"
-#define  BUILD         "0194"
-#define  DATE          "12 Oct 25"
+#define  VERSION       "0.23"
+#define  BUILD         "0224"
+#define  DATE          "07 Dec 25"
 #define  AUTHOR        "MT"
 
 #define  INTERVAL 48   /* Number of ticks to execute before updating the display */
@@ -391,7 +442,7 @@
 #include <stdio.h>     /* fprintf(), etc */
 #include <stdlib.h>    /* getenv(), etc */
 
-#include <ctype.h>     /* isprint(), etc */
+#include <ctype.h>     /* isalpha(), etc */
 
 #include <X11/Xlib.h>  /* XOpenDisplay(), True/False etc */
 #include <X11/Xutil.h> /* XSizeHints etc */
@@ -401,11 +452,12 @@
 #include "x11-calc-messages.h"
 #include "x11-calc-errors.h"
 
+#include "x11-calc-colour.h"
 #include "x11-calc-font.h"
 #include "x11-calc-button.h"
 #include "x11-calc-switch.h"
 #include "x11-calc-label.h"
-#include "x11-calc-colour.h"
+#include "x11-calc-card.h"
 
 #include "x11-calc.h"
 
@@ -423,30 +475,12 @@
 void v_version(void)  /* Display version information */
 {
    fprintf(stdout, "%s: Version %s.%s %s", FILENAME, VERSION, BUILD, COMMIT_ID);
-   if (strlen(__compiler__)) fprintf(stdout, " "__compiler__);  /* Include compiler version if defined */
+#if defined(__compiler__)
+   if (strlen(__compiler__)) fprintf(stdout, " %s", __compiler__);  /* Include compiler version if defined - it could be defined as a null string */
+#endif
    if (__DATE__[4] == ' ') fprintf(stdout, " 0"); else fprintf(stdout, " %c", __DATE__[4]);
    fprintf(stdout, "%c %c%c%c %s %s\n", __DATE__[5],
       __DATE__[0], __DATE__[1], __DATE__[2], &__DATE__[9], __TIME__ );
-}
-
-void v_warning(const char *s_format, ...)  /* Print formatted warning message */
-{
-   va_list t_args;
-   va_start(t_args, s_format);
-   fprintf(stderr, "%s: ", FILENAME);
-   vfprintf(stderr, s_format, t_args);
-   va_end(t_args);
-}
-
-void v_error(int i_errno, const char *s_format, ...)  /* Print formatted error message and exit returning errno */
-{
-   va_list t_args;
-   if (!(i_errno)) i_errno = -1;  /* If errno not set return -1 */
-   va_start(t_args, s_format);
-   fprintf(stderr, "%s: ", FILENAME);
-   vfprintf(stderr, s_format, t_args);
-   va_end(t_args);
-   exit(i_errno);
 }
 
 void v_set_blank_cursor(Display *x_display, Window x_window, Cursor *x_cursor)
@@ -459,11 +493,11 @@ void v_set_blank_cursor(Display *x_display, Window x_window, Cursor *x_cursor)
    XFreePixmap (x_display, x_blank);  /* Free up pixmap */
 }
 
-char b_search(int *a, int m, int n) /* Linear search. */
+int b_search(int *a, int m, int n) /* Linear search. */
 {
-   int i;
-   for (i = 0; i < n; i++)
-      if (a[i] == m)
+   int i_count;
+   for (i_count = 0; i_count < n; i_count++)
+      if (a[i_count] == m)
          return True;
    return False;
 }
@@ -488,41 +522,42 @@ int main(int argc, char *argv[])
 
    char *s_display_name = "";          /* Just use the default display */
    char *s_title = TITLE;              /* Windows title */
+   char *s_text;                       /* Temporary pointer */
 
    float f_scale = 1.0;
 
-   unsigned int i_screen_width;        /* Screen width */
-   unsigned int i_screen_height;       /* Screen height */
+   unsigned int i_screen_width = 0;    /* Screen width */
+   unsigned int i_screen_height = 0;   /* Screen height */
 
-   int i_window_top;                   /* Window top */
-   int i_window_left;                  /* Window left */
-   unsigned int i_window_width;        /* Window width */
-   unsigned int i_window_height;       /* Window height */
+   int i_window_top = 0;               /* Window top */
+   int i_window_left = 0;              /* Window left */
+   unsigned int i_window_width = 0;    /* Window width */
+   unsigned int i_window_height = 0;   /* Window height */
 
    unsigned int i_window_border = 4;   /* Window's border width */
    unsigned int i_colour_depth;        /* Window's colour depth */
    int i_screen;                       /* Default screen number */
 
-   char b_trace = False;               /* Trace flag */
-   char b_step = False;                /* Single step flag flag */
-   char b_cursor = True;               /* Draw a cursor */
-   char b_run = True;                  /* Run flag controls CPU instruction execution in main loop */
-   char b_abort = False;               /* Abort flag controls execution of main loop */
+   int b_trace = False;               /* Trace flag */
+   int b_step = False;                /* Single step flag flag */
+   int b_cursor = True;               /* Draw a cursor */
+   int b_run = True;                  /* Run flag controls CPU instruction execution in main loop */
+   int b_abort = False;               /* Abort flag controls execution of main loop */
+   int b_geometry = False;            /* User specified window position */
 #if defined (__unix__)
-   char b_numlock = False;             /* Use number pad - even if numlock is off */
+   int b_numlock = False;             /* Use number pad - even if numlock is off */
 #endif
 #if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
-   char b_euro = False;
+   int b_euro = False;
 #endif
-
+   unsigned int i_memory_size = MEMORY_SIZE;
    int i_breakpoints[] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};  /* Array to hold breakpoints */
-
    int i_offset, i_count, i_index, i_value, i_size;
-   int i_zoom = 0;                     /* Zoom level */
    int i_trap = -1;                    /* Trap instruction */
    int i_ticks = -1;
 
 #if defined(CONTINIOUS)
+   int b_reset = False;               /* Do not restore state (reset) */
    char *s_pathname = NULL;
 #endif
 
@@ -538,7 +573,12 @@ int main(int argc, char *argv[])
    okeyboard *h_keyboard;
 #endif
 
-   h_processor = h_processor_create(i_rom);
+   if (!(x_display = XOpenDisplay(s_display_name))) v_error (errno, h_err_display, s_display_name);  /* Open the default display */
+
+   if (!(h_normal_font = h_get_font(x_display, s_normal_fonts))) v_error(errno, h_err_font, s_normal_fonts[0]);
+   if (!(h_small_font = h_get_font(x_display, s_small_fonts))) v_error(errno, h_err_font, s_small_fonts[0]);
+   if (!(h_alternate_font = h_get_font(x_display, s_alternate_fonts))) v_error(errno, h_err_font, s_alternate_fonts[0]);
+   if (!(h_large_font = h_get_font(x_display, s_large_fonts))) v_error(errno, h_err_font, s_large_fonts[0]);
 
 #if defined(unix) || defined(__unix__) || defined(__APPLE__)  /* Parse UNIX style command line options */
    b_abort = False;  /* Stop processing command line */
@@ -557,15 +597,13 @@ int main(int argc, char *argv[])
                else
                   if (i_count + 1 < argc)
                   {
-                     i_value = 0;
-                     for (i_offset = 0; i_offset < strlen(argv[i_count + 1]); i_offset++)  /* Parse octal number */
-                     {
-                        if ((argv[i_count + 1][i_offset] < '0') || (argv[i_count + 1][i_offset] > '7'))
-                           v_error(EINVAL, h_err_invalid_number, argv[i_count + 1]);
-                        else
-                           i_value = i_value * 8 + argv[i_count + 1][i_offset] - '0';
-                     }
-                     if ((i_value < 0)  || (i_value > ROM_SIZE) || (i_value > 07777))  /* Check address range */
+                     if (strncmp(argv[i_count + 1], "0x", 2) == 0 || strncmp(argv[i_count + 1], "0X", 2) == 0 )  /* Check for a hexadecimal value */
+                        i_value = strtol(argv[i_count + 1], &s_text, 16);
+                     else
+                        i_value = strtol(argv[i_count + 1], &s_text, 8);
+                     if (*s_text != '\0')
+                        v_error(EINVAL, h_err_invalid_number, argv[i_count + 1]);
+                     if ((i_value < 0) || (i_value > ROM_SIZE) || (i_value > 017777) || (errno == ERANGE))  /* Check address range, allow bank - KJC */
                         v_error(EINVAL, h_err_numeric_range, argv[i_count + 1]);
                      else
                      {
@@ -591,15 +629,13 @@ int main(int argc, char *argv[])
                else
                   if (i_count + 1 < argc)
                   {
-                     i_value = 0;
-                     for (i_offset = 0; i_offset < strlen(argv[i_count + 1]); i_offset++)  /* Parse octal number */
-                     {
-                        if ((argv[i_count + 1][i_offset] < '0') || (argv[i_count + 1][i_offset] > '7'))
-                           v_error(EINVAL, h_err_invalid_number, argv[i_count + 1]);
-                        else
-                           i_value = i_value * 8 + argv[i_count + 1][i_offset] - '0';
-                     }
-                     if ((i_value < 0)  || (i_value > ROM_SIZE) || (i_value > 07777))  /* Check address range */
+                     if (strncmp(argv[i_count + 1], "0x", 2) == 0 || strncmp(argv[i_count + 1], "0X", 2) == 0 )  /* Check for a hexadecimal value */
+                        i_value = strtol(argv[i_count + 1], &s_text, 16);
+                     else
+                        i_value = strtol(argv[i_count + 1], &s_text, 8);
+                     if (*s_text != '\0')
+                        v_error(EINVAL, h_err_invalid_number, argv[i_count + 1]);
+                     if ((i_value < 0) || (i_value > 01777) || (errno == ERANGE))  /* Check range */
                         v_error(EINVAL, h_err_numeric_range, argv[i_count + 1]);
                      else
                      {
@@ -617,13 +653,37 @@ int main(int argc, char *argv[])
                      v_error(EINVAL, h_err_missing_argument, argv[i_count]);
                i_index = strlen(argv[i_count]) - 1;
                break;
+            case 'm':  /* Memory registers */
+               if (argv[i_count][i_index + 1] != 0)
+                  v_error(EINVAL, h_err_invalid_argument, argv[i_count][i_index + 1]);
+               else
+                  if (i_count + 1 < argc)
+                  {
+                     i_value = strtol(argv[i_count + 1], &s_text, 0);  /* Auto detect base allow octal, decimal or hexadecimal */
+                     if (*s_text != '\0')
+                        v_error(EINVAL, h_err_invalid_number, argv[i_count + 1]);
+                     if ((i_value < 0) || (i_value < MEMORY_SIZE) || (i_value > MEMORY_MAX) || (errno == ERANGE))  /* Check range */
+                        v_error(EINVAL, h_err_numeric_range, argv[i_count + 1]);
+                     else
+                     {
+                        i_memory_size = (unsigned int)i_value;
+                        if (i_count + 2 < argc)  /* Remove the parameter from the arguments */
+                           for (i_offset = i_count + 1; i_offset < argc - 1; i_offset++)
+                              argv[i_offset] = argv[i_offset + 1];
+                        argc--;
+                     }
+                  }
+                  else
+                     v_error(EINVAL, h_err_missing_argument, argv[i_count]);
+               i_index = strlen(argv[i_count]) - 1;
+               break;
             case 'r':  /* Read ROM contents  */
                if (argv[i_count][i_index + 1] != 0)
                   v_error(EINVAL, h_err_invalid_argument, argv[i_count][i_index + 1]);
                else
                   if (i_count + 1 < argc)
                   {
-                     v_read_rom(h_processor, argv[i_count + 1]);  /* Load user specified settings */
+                     v_read_rom(i_rom, argv[i_count + 1]);  /* Load user specified ROM */
                      if (i_count + 2 < argc)  /* Remove the parameter from the arguments */
                         for (i_offset = i_count + 1; i_offset < argc - 1; i_offset++)
                            argv[i_offset] = argv[i_offset + 1];
@@ -654,8 +714,11 @@ int main(int argc, char *argv[])
                      b_cursor = True;  /* Draw cursor */
                   else if (!strncmp(argv[i_count], "--no-cursor", i_index))
                      b_cursor = False;  /* Don't draw a cursor - unless drawn by the window manager */
-
-#if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
+#if defined(CONTINIOUS)
+                  else if (!strncmp(argv[i_count], "--reset", i_index))
+                     b_reset = True;  /* Reset state */
+#endif
+#if defined(SPICE)
                   else if (!strncmp(argv[i_count], "--comma", i_index))
                      b_euro = True; /* Use european display format */
                   else if (!strncmp(argv[i_count], "--no-comma", i_index))
@@ -669,16 +732,11 @@ int main(int argc, char *argv[])
                   {
                      if (i_count + 1 < argc)
                      {
-                        i_zoom = 0;
-                        for (i_offset = 0; i_offset < strlen(argv[i_count + 1]); i_offset++)  /* Parse decimal number */
-                        {
-                           if ((argv[i_count + 1][i_offset] < '0') || (argv[i_count + 1][i_offset] > '9'))
-                              v_error(EINVAL, h_err_numeric_range, argv[i_count + 1]);
-                           else
-                              i_zoom = i_zoom * 10 + argv[i_count + 1][i_offset] - '0';
-                        }
-                        if ((i_zoom < 0) || (i_zoom > 4))  /* Check range */
-                           v_error(EINVAL, h_err_numeric_range, argv[i_count + 1]);  /** TODO: Add new error message */
+                        i_value = strtol(argv[i_count + 1], &s_text, 10);
+                        if (*s_text != '\0')
+                           v_error(EINVAL, h_err_invalid_number, argv[i_count + 1]);
+                        if ((i_value < 0) || (i_value > 4) || (errno == ERANGE))  /* Check range */
+                           v_error(EINVAL, h_err_numeric_range, argv[i_count + 1]);
                         else
                         {
                            if (i_count + 2 < argc)  /* Remove the parameter from the arguments */
@@ -686,7 +744,48 @@ int main(int argc, char *argv[])
                                  argv[i_offset] = argv[i_offset + 1];
                            argc--;
                         }
-                        f_scale = 1 + (0.125 * i_zoom);
+                        f_scale = 1 + (0.125 * i_value);
+                     }
+                     else
+                        v_error(EINVAL, h_err_missing_argument, argv[i_count]);
+                  }
+                  else if (!strncmp(argv[i_count], "--geometry=", 11)) /* Just check the first 11 characters match */
+                  {
+                     char *c_geometry = argv[i_count] + 11;
+                     char *c_char;
+
+                     for (c_char = c_geometry; *c_char; c_char++) /* Convert to lowercase before parsing */
+                        *c_char = (char)tolower((unsigned char)*c_char);
+                     if (XParseGeometry(c_geometry,  &i_window_left, &i_window_top, &i_window_width, &i_window_height))
+                     {
+                        if (i_count + 1 < argc)  /* Remove the parameter from the arguments */
+                           for (int i_offset = i_count + 1; i_offset < argc - 1; i_offset++)
+                              argv[i_offset] = argv[i_offset + 1];
+                        argc--;
+                        b_geometry = True;
+                     }
+                     else
+                        v_error(EINVAL, h_err_geometry, c_geometry);
+                  }
+                  else if (!strncmp(argv[i_count], "--geometry", i_index))
+                  {
+                     if (i_count + 1 < argc)
+                     {
+                        char *c_geometry = argv[i_count + 1];
+                        char *c_char;
+
+                        for (c_char = c_geometry; *c_char; c_char++) /* Convert to lowercase before parsing */
+                           *c_char = (char)tolower((unsigned char)*c_char);
+                        if (XParseGeometry(c_geometry,  &i_window_left, &i_window_top, &i_window_width, &i_window_height))
+                        {
+                           if (i_count + 2 < argc)  /* Remove the parameter from the arguments */
+                              for (int i_offset = i_count + 1; i_offset < argc - 1; i_offset++)
+                                 argv[i_offset] = argv[i_offset + 1];
+                           argc--;
+                           b_geometry = True;
+                        }
+                        else
+                           v_error(EINVAL, h_err_geometry, c_geometry);
                      }
                      else
                         v_error(EINVAL, h_err_missing_argument, argv[i_count]);
@@ -694,12 +793,12 @@ int main(int argc, char *argv[])
                   else if (!strncmp(argv[i_count], "--version", i_index))
                   {
                      v_version();  /* Display version information */
-                     fprintf(stdout, h_msg_licence, &__DATE__[7], AUTHOR);
+                     v_usage(stdout, h_msg_licence, &__DATE__[7], AUTHOR);
                      exit(EXIT_SUCCESS);
                   }
                   else if (!strncmp(argv[i_count], "--help", i_index))
                   {
-                     fprintf(stdout, h_msg_usage, FILENAME);
+                     v_usage(stdout, h_msg_usage, FILENAME);
                      exit(EXIT_SUCCESS);
                   }
                   else  /* If we get here then the we have an invalid long option */
@@ -735,11 +834,13 @@ int main(int argc, char *argv[])
             b_trace = False;  /* Enable tracing */
          else if (!strncmp(argv[i_count], "/TRACE", i_index))
             b_trace = True;  /* Enable tracing */
+         else if (!strncmp(argv[i_count], "/RESET", i_index))
+            b_reset = True;  /* Enable tracing */
          else if (!strncmp(argv[i_count], "/ROM", i_index))
          {
             if (i_count + 1 < argc)
             {
-               v_read_rom(h_processor, argv[i_count + 1]);  /* Load user specified settings */
+               v_read_rom(i_rom, argv[i_count + 1]);  /* Load user specified ROM */
                if (i_count + 2 < argc)  /* Remove the parameter from the arguments */
                   for (i_offset = i_count + 1; i_offset < argc - 1; i_offset++)
                      argv[i_offset] = argv[i_offset + 1];
@@ -751,12 +852,12 @@ int main(int argc, char *argv[])
          else if (!strncmp(argv[i_count], "/VERSION", i_index))
          {
             v_version();  /* Display version information */
-            fprintf(stdout, h_msg_licence, &__DATE__[7], AUTHOR);
+            v_usage(stdout, h_msg_licence, &__DATE__[7], AUTHOR);
             exit(EXIT_SUCCESS);
          }
          else if ((!strncmp(argv[i_count], "/HELP", i_index)) | (!strncmp(argv[i_count], "/?", i_index)))
          {
-            fprintf(stdout, h_msg_usage, FILENAME);
+            v_usage(stdout, h_msg_usage, FILENAME);
             exit(EXIT_SUCCESS);
          }
          else /* If we get here then the we have an invalid option */
@@ -782,12 +883,11 @@ int main(int argc, char *argv[])
    fprintf(stdout, "ROM Size: %4u words \n", ROM_SIZE);
    i_wait(200);  /* Sleep for 200 milliseconds to 'debounce' keyboard! */
 
-   i_count = ROM_SIZE;
+   h_processor = h_processor_create(i_rom, i_memory_size);
 
+   i_count = ROM_SIZE;
    while ((i_count > 0) && (i_rom[--i_count] == 0));  /* Check that the ROM isn't empty */
    if (i_count == 0) v_error (ENODATA, h_err_ROM);
-
-   if (!(x_display = XOpenDisplay(s_display_name))) v_error (errno, h_err_display, s_display_name);  /* Open the default display */
 
    i_screen = DefaultScreen(x_display);  /* Get the default screen for our X server */
    i_screen_width = DisplayWidth(x_display, i_screen);
@@ -795,9 +895,14 @@ int main(int argc, char *argv[])
 
    o_window_position.width = (int)(WIDTH * f_scale);  /* Window width in pixels */
    o_window_position.height = (int)(HEIGHT * f_scale);  /* Window height in pixels */
-   o_window_position.x = (i_screen_width - o_window_position.width) / 2 ;  /* Centre window on screen - ignored by most window managers but useful in kiosk mode */
-   o_window_position.y = (i_screen_height - o_window_position.height) / 2;
-
+   if (!i_window_left)  /* If the window position wasn't specified just centre it on the screen - ignored by most window managers but useful in kiosk mode */
+      o_window_position.x = (i_screen_width - o_window_position.width) / 2;  /* Centre window on screen  */
+   else
+      o_window_position.x = i_window_left;  /* User specified position */
+   if (!i_window_top)
+      o_window_position.y = (i_screen_height - o_window_position.height) / 2;  /* Centre window on screen  */
+   else
+      o_window_position.y = i_window_top;  /* User specified position */
    o_window_geometry = o_window_position;  /* Save window position */
 
    x_window = XCreateSimpleWindow(x_display, /* Create the application window, as a child of the root window */
@@ -819,14 +924,11 @@ int main(int argc, char *argv[])
          &i_colour_depth) == False)
       v_error(errno, h_err_display_properties);
 
+   /** debug(printf("%dx%d%+d%+d\n", i_window_width, i_window_height, i_window_left, i_window_top));  /* Display window geometry */
+
    if (i_colour_depth != COLOUR_DEPTH) v_error(errno, h_err_display_colour, COLOUR_DEPTH);  /* Check colour depth */
 
    if  (!(x_logo = XCreateBitmapFromData(x_display, x_window, (char*) logo_bits, logo_width, logo_height))) v_error(errno, h_err_pixmap);  /* Check colour depth */
-
-   if (!(h_normal_font = h_get_font(x_display, s_normal_fonts))) v_error(errno, h_err_font, s_normal_fonts[0]);
-   if (!(h_small_font = h_get_font(x_display, s_small_fonts))) v_error(errno, h_err_font, s_small_fonts[0]);
-   if (!(h_alternate_font = h_get_font(x_display, s_alternate_fonts))) v_error(errno, h_err_font, s_alternate_fonts[0]);
-   if (!(h_large_font = h_get_font(x_display, s_large_fonts))) v_error(errno, h_err_font, s_large_fonts[0]);
 
    if (b_cursor)
       x_cursor = XCreateFontCursor(x_display, XC_arrow);  /* Create a 'default' cursor */
@@ -852,19 +954,25 @@ int main(int argc, char *argv[])
 #endif
 
 #if defined(LABELS)
-   v_init_labels(h_label);
+   v_init_labels(h_label);  /* Passes the address of the array */
 #endif
 
    /* Resize application window */
-   o_window_position.x = o_window_geometry.x * f_scale;
-   o_window_position.y = o_window_geometry.y * f_scale;
+   o_window_position.x = o_window_geometry.x;
+   o_window_position.y = o_window_geometry.y;
    o_window_position.width = o_window_geometry.width;
    o_window_position.height = o_window_geometry.height;
 
    h_size_hint = XAllocSizeHints();  /* Set application window size */
    h_size_hint->flags = PMinSize | PMaxSize;
-   h_size_hint->height = o_window_position.height;  /* Obsolete but used by some oli_window_leftder windows managers */
-   h_size_hint->width = o_window_position.width;  /* Obsolete but used by some older windows managers */
+   if (b_geometry)
+   {
+      h_size_hint->flags = h_size_hint->flags | USPosition;  /* Update flags */
+      h_size_hint->x = o_window_position.x;
+      h_size_hint->y = o_window_position.y;
+   }
+   h_size_hint->height = o_window_position.height;
+   h_size_hint->width = o_window_position.width;
    h_size_hint->min_height = o_window_position.height;
    h_size_hint->min_width = o_window_position.width;
    h_size_hint->max_height = o_window_position.height;
@@ -887,6 +995,10 @@ int main(int argc, char *argv[])
       i_label_resize(h_label[i_count], f_scale);
 #endif
 
+#if defined(HP67)
+   i_card_resize(h_processor->card, f_scale);  /* Resize card */
+#endif
+
 #if defined (__unix__)
    h_keyboard = h_keyboard_create(x_display);  /* Only works with Linux */
 #endif
@@ -906,10 +1018,13 @@ int main(int argc, char *argv[])
    h_processor->step = b_step;
 
 #if defined(CONTINIOUS)
-   if (s_pathname == NULL)
-      v_restore_state(h_processor);
-   else
-      v_read_state(h_processor, s_pathname);  /* Load user specified settings */
+   if (!b_reset)  /* Don't restore state if user selects reset */
+   {
+      if (s_pathname == NULL)
+         v_restore_state(h_processor);
+      else
+         v_read_state(h_processor, s_pathname);  /* Load user specified settings */
+   }
 #endif
 
 #if defined(SWITCHES)
@@ -953,7 +1068,6 @@ int main(int argc, char *argv[])
 #endif
    }
 #endif
-
    b_abort = False;
    i_count = 0;
    while (!b_abort)  /* Main program event loop */
@@ -962,6 +1076,21 @@ int main(int argc, char *argv[])
       if (i_count < 0)
       {
          i_display_update(h_display, h_processor);
+#if defined(HP67)
+         if (h_processor->crc[FUNCTION])
+         {
+            h_processor->card->state = False;  /* Hide the program card */
+            for (i_count = 0; i_count < LABELS; i_count++)  /* Update label state */
+               h_label[i_count]->state = h_processor->crc[FUNCTION];
+            for (i_count = 0; i_count < LABELS; i_count++)  /* Draw labels */
+               i_label_draw(x_display, x_buffer, i_screen, h_label[i_count]);
+         }
+         else
+         {
+            h_processor->card->state = True;  /* Display the program card */
+            i_card_draw(x_display, x_buffer, i_screen, h_processor->card);  /* Update display */
+         }
+#endif
          i_display_draw(x_display, x_buffer, i_screen, h_display);  /* Redraw display */
          XCopyArea(x_display, x_buffer, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
          i_count = INTERVAL;
@@ -977,7 +1106,7 @@ int main(int argc, char *argv[])
          if (i_ticks > 0) i_ticks -= 1;
          if (i_ticks == 0) b_abort = True;
       }
-      if ( (b_search(i_breakpoints, (h_processor->pc & 0xfff), sizeof(i_breakpoints) / sizeof(i_breakpoints[0]))) || (h_processor->rom[h_processor->pc] == i_trap))  /* Check for Breakpoint or Instruction Trap */
+      if ( (b_search(i_breakpoints, (h_processor->pc & 0x1fff), sizeof(i_breakpoints) / sizeof(i_breakpoints[0]))) || (h_processor->rom[h_processor->pc] == i_trap))  /* Check for Breakpoint or Instruction Trap */
       {
          if (!h_processor->trace || !h_processor->step) fprintf(stderr, "** break **\n");
          h_processor->trace = h_processor->step = True;
@@ -1100,10 +1229,10 @@ int main(int argc, char *argv[])
                      }
                      else
                      {
+                        h_processor->enabled = False;  /* Disable the processor */
 #if defined(CONTINIOUS)
                         v_backup_state(h_processor);  /* Save current settings */
 #endif
-                        h_processor->enabled = False;  /* Disable the processor */
 #if defined(HP67)
                         i_ticks = DELAY * 4;  /* Set count down */
 #elif defined(VOYAGER)
@@ -1154,7 +1283,6 @@ int main(int argc, char *argv[])
 #endif
                         i_switch_draw(x_display, x_buffer, i_screen, h_switch[1]);
                         XCopyArea(x_display, x_buffer, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
-
                      }
                }
 #endif
@@ -1176,8 +1304,15 @@ int main(int argc, char *argv[])
                      i_ticks = -1;
 #endif
             }
-#if defined(CONTINIOUS)
+#if defined(__GTK__)  /* Don't attempt to load/save if GTK isn't available */
+#if defined(CONTINIOUS) || defined(HP67)
             if (x_event.xbutton.button == 3)  /* Right mouse button */
+#if defined(HP67)
+            {
+               h_processor->crc[CARD] = True;               /* Clear at motor start & stop - KJC */
+               h_processor->flags[DISPLAY_ENABLE] = False;  /* Disable display while reading card - KJC */
+            }
+#else
             {
                if (h_processor->mode)
                   v_load_state(h_processor);  /* Load saved state (resets calculator unless cancelled) */
@@ -1187,6 +1322,8 @@ int main(int argc, char *argv[])
                while (XPending(x_display))
                   XNextEvent(x_display, &x_event);  /* Clear the event queue */
             }
+#endif
+#endif
 #endif
             break;
          case Expose :  /* Draw or redraw the window */

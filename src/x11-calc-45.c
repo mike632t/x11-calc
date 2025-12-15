@@ -34,12 +34,13 @@
  * 06 Sep 25         - Updated key positions to match HP55 - MT
  * 07 Sep 25         - Changed key code for ENTER - MT
  * 11 Oct 25         - Modified key layout - MT
+ * 09 Nov 25         - Another tweak to the keyboard layout - MT
  *
  */
 
 #define NAME           "x11-calc-45"
-#define BUILD          "0011"
-#define DATE           "206 Sep 25"
+#define BUILD          "0013"
+#define DATE           "09 Nov 25"
 #define AUTHOR         "MT"
 
 #include <stdarg.h>    /* strlen(), etc. */
@@ -72,7 +73,7 @@ void v_init_buttons(struct obutton *h_button[]) {
    int i_left, i_top, i_count = 0;
 
    /* Define top row of keys. */
-   i_top = KBD_TOP + 3* (SWITCH_HEIGHT + 1); /* Assumes the function label and switch text use the same font */
+   i_top = KBD_TOP + 3 * SWITCH_HEIGHT + 1 * SCALE_HEIGHT; /* Assumes the function label and switch text use the same font */
    i_left = KBD_LEFT;
    h_button[i_count++] = h_button_create(00006, 000, "1/x", "yX", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, True, DIM_GREY, YELLOW, BACKGROUND, BACKGROUND);
    i_left += (KEY_WIDTH + KEY_GAP);

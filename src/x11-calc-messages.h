@@ -32,14 +32,33 @@
  *                     and instruction traps - MT
  *                   - Defined messages as string constants - MT
  * 10 Sep 25         - Changed message variable names - MT
+ * 30 Oct 25         - Added invalid window geometry message - MT
+ * 05 Nov 25         - Use arrays to hold multiple lines as this allows pre
+ *                     processor directives to modify output - MT
+ *                   - Moved error(), warning() and usage() routines - MT
+ * 22 Nov 25         - Added read and write error messages - MT
+ * 02 Dec 25         - Added text for file overwrite dialog - MT
+ * 06 Dec 25         - Added string concatenation function - MT
  *
  */
+
+
+extern const char *h_err_file_exists;
+extern const char *h_err_confirm_file_replace;
+extern const char *h_err_creating_file;
+extern const char *h_err_memmory_alloc;
+extern const char *h_err_ROM;
+extern const char *h_err_abort;
+
+extern const char *h_err_geometry;
 
 extern const char *h_msg_loading;
 extern const char *h_msg_saving;
 
 extern const char *h_err_register_alloc;
 extern const char *h_err_opening_file;
+extern const char *h_err_reading_file;
+extern const char *h_err_writing_file;
 
 extern const char *h_err_unexpected_opcode;
 extern const char *h_err_unexpected_error;
@@ -53,7 +72,7 @@ extern const char *h_msg_negative_offset;
 extern const char *h_msg_positive_offset;
 extern const char *h_msg_rom;
 
-extern const char *h_msg_usage;
+extern const char *h_msg_usage[];
 extern const char *h_err_invalid_operand;
 extern const char *h_err_invalid_option;
 extern const char *h_err_duplicate_option;
@@ -66,13 +85,16 @@ extern const char *h_err_max_breakpoints;
 extern const char *h_err_invalid_argument;
 #endif
 
-extern const char *h_msg_licence;
+extern const char *h_msg_licence[];
 extern const char *h_err_display;
 extern const char *h_err_display_properties;
 extern const char *h_err_display_colour;
 extern const char *h_err_pixmap;
 extern const char *h_err_font;
 
-extern const char *h_err_creating_file;
-extern const char *h_err_memmory_alloc;
-extern const char *h_err_ROM;
+void v_version(void);  /* Display version information */
+void v_error(int i_errno, const char *s_fmt, ...);  /* Print formatted error message */
+void v_warning(const char *s_fmt, ...);  /* Print formatted warning message */
+void v_usage(FILE *h_file, const char **s_text, ...);
+
+char *s_concatinate(const char *s_base, const char *s_suffix);  /* Concatenate strings */

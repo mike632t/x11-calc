@@ -3,7 +3,7 @@
  *
  * Copyright(C) 2018   MT
  *
- * Prototypes for error handlers.
+ * Define error codes.
  *
  * This  program is free software: you can redistribute it and/or modify it
  * under  the terms of the GNU General Public License as published  by  the
@@ -19,7 +19,8 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * 23 Apr 24         - Initial version - MT
- * 14 Aug 25  (0820) - Fixed compiler warnings with clang 17.0.6 - MT
+ * 14 Aug 25  (0802) - Fixed compiler warnings with clang 17.0.6 - MT
+ * 05 Nov 25         - Moved function prototypes to messages - MT
  *
  * TO DO :           -
  */
@@ -55,9 +56,3 @@
 #if !defined(ENOFNT)
 #define ENOFNT      192
 #endif
-
-void v_version(void);  /* Display version information */
-
-void v_error(int i_errno, const char *s_fmt, ...);  /* Print formatted error message */
-
-void v_warning(const char *s_fmt, ...);  /* Print formatted warning message */

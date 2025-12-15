@@ -65,16 +65,17 @@
  * 24 Jun 25         - Debug messages go to stdout - MT
  *  3 Aug 25         - Temporarily  changed to draw the background to  each
  *                     segment on all systems for testing - MT
- * 14 Sep 25         - HP55 now displays the timer using colons to seperate 
+ * 14 Sep 25         - HP55 now displays the timer using colons to seperate
  *                     hours, minutes and seconds - MT
+ * 01 Nov 25         - Added cards - MT
  *
  * TO DO :           - Optimise drawing of display digits.
  ^
  */
 
 #define NAME           "x11-calc-digit"
-#define BUILD          "0019"
-#define DATE           "14 Sep 25"
+#define BUILD          "0020"
+#define DATE           "01 Nov 25"
 #define AUTHOR         "MT"
 
 #include <errno.h>     /* errno */
@@ -91,6 +92,7 @@
 #include "x11-calc-switch.h"
 #include "x11-calc-button.h"
 #include "x11-calc-label.h"
+#include "x11-calc-card.h"
 #include "x11-calc-digit.h"
 
 #include "x11-calc-colour.h"

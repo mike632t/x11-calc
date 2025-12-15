@@ -110,9 +110,15 @@
 #  17 Aug 25         - Added makefile.sunos to files - MT
 #  15 Oct 25         - Added makefile.minix to files - MT
 #                    - Modified backup and included '.crd' files - MT
+#  19 Oct 25         - Check if git is available before trying to determine
+#                      the current branch - MT
+#  17 Nov 25         - Only  build models in known family by default  other
+#                      models must be specified explicitly - MT
+#  22 Nove 25        - Moved branch detection into the backup recipe to fix
+#                      compatibility issues with Tru64 UNIX - MT
 #
 
-PROGRAM		=  x11-calc
+PROGRAM		= x11-calc
 
 BIN		= bin
 SRC		= src
@@ -128,17 +134,7 @@ _data			= `ls $(ROM)/$(PROGRAM)*.rom $(ROM)/$(PROGRAM)*.rom.[0-9] $(PRG)/$(PROGR
 _images		= `ls $(SRC)/*.ico $(SRC)/*.ico.[0-9] $(SRC)/*.png $(SRC)/*.png.[0-9] $(SRC)/*.svg $(SRC)/*.svg.[0-9] $(IMG)/*.png $(IMG)/*.png.[0-9] 2>/dev/null || true`
 _other		= `ls $(SRC)/make.com  $(SRC)/make.com.[0-9] *.md *.md.[0-9] $(SRC)/*.md $(SRC)/*.md.[0-9] $(IMG)/*.md $(IMG)/*.md.[0-9] .gitignore .gitattributes 2>/dev/null || true`
 
-_date			= `date +'%Y%m%d%H%M'`
-
-# Archive name
-
-_branch		=  $(shell git rev-parse --abbrev-ref HEAD > /dev/null 2>&1 && echo `git rev-parse --abbrev-ref HEAD 2>/dev/null` || true)
-
-ifeq ($(_branch),)
-_archive		= $(PROGRAM)-$(_date).tar.gz
-else
-_archive		= $(PROGRAM)-$(_branch)-$(_date).tar.gz
-endif
+_date		= `date +'%Y%m%d%H%M'`
 
 # Calculator models available in the emulator.
 
@@ -164,7 +160,7 @@ MENU		= hp35 hp45 hp21 hp25c hp29c hp31e hp32e hp33c hp34c hp10c hp11c hp12c hp1
 
 .PHONY: backup clean install
 
-all: $(MODELS) $(PROGRAM)
+all: $(_classic) $(_woodstock) $(_topcat) $(_spice) $(_voyager) $(_kiss) $(PROGRAM)
 
 classic: $(_classic) $(PROGRAM)
 
@@ -304,11 +300,15 @@ do_env: do_copy $(SRC)/$(PROGRAM).desktop.in $(SRC)/$(PROGRAM).svg
 	@chmod 644 "$(DESTDIR)$(prefix)"/share/icons/hicolor/scalable/apps/$(PROGRAM).svg
 
 backup:
-# Backup known files to a tar archive (with multiple workarounds to accommodate
-# tar limitations and maximum line length on Tru64 UNIX)
-	@tar -cf ..\/$(_archive) $(_files)
-	@tar -rf ..\/$(_archive) $(_source)
-	@tar -rf ..\/$(_archive) $(_data)
-	@tar -rf ..\/$(_archive) $(_images)
-	@tar -rf ..\/$(_archive) $(_other)
-	@cd .. && ls --color $(_archive) 2>/dev/null || ls $(_archive) || true
+	@branch="`command -v git >/dev/null 2>&1 && git rev-parse --abbrev-ref HEAD 2>/dev/null || echo ""`"; \
+	if [ -z "$$branch" ]; then \
+	archive="$(PROGRAM)-$(_date).tar"; \
+	else \
+	archive="$(PROGRAM)-$$branch-$(_date).tar"; \
+	fi; \
+	tar -cf ../$$archive $(_files); \
+	tar -rf ../$$archive $(_source); \
+	tar -rf ../$$archive $(_data); \
+	tar -rf ../$$archive $(_images); \
+	tar -rf ../$$archive $(_other); \
+	cd .. && ls --color $$archive 2>/dev/null || ls $$archive || true

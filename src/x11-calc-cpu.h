@@ -65,15 +65,24 @@
  *                     file - MT
  * 15 Sep 25         - Fixed errors when compiling on MacOS - MT
  * 13 Oct 25         - Fixed get_datafile() function declaration -MT
+ * 18 Oct 25         - Added card reader support - KJC
+ * 04 Nov 25         - Program card defined as part of the processor (makes
+ *                     it easier to use in the processor code) - MT
+ * 14 Nov 25         - Moved register defination to a seperate file - MT
+ * 19 Nov 25         - Allocate memory registers dynamically - MT
+ * 09 Dec 25         - Use MEMORY_MAX to define the maximum memory size -MT
+ *
+ * To Do             -
  *
  */
 
-#ifndef REGISTERS
-#include "x11-calc.h"
+#include "x11-calc-register.h"         /* CPU Register definitions */
+#include "x11-calc.h"                  /* Model specific constants */
+
+#ifndef X11_CALC_CPU_H
+#define X11_CALC_CPU_H
 
 #define REGISTERS       8              /* A, B, C(X), D(Y), E(Z), F(T), M, N(M2) */
-#define REG_SIZE        14
-#define EXP_SIZE        3              /* Two digit exponent plus a sign digit */
 #define STATUS_BITS     16
 #define FLAGS           9
 
@@ -101,6 +110,8 @@
 #define DISPLAY_ENABLE  5
 #define TIMER           8
 
+#define MEMORY_MAX      512
+
 #if defined(HP67)
 #define MERGE           0              /* Merge flag (F0) */
 #define PAUSE           1
@@ -111,8 +122,10 @@
 #define MOTOR           5              /* Motor on */
 #define FUNCTION        6              /* Default function flag */
 #define READY           7
+#define WRITE           8              /* Write Mode (false = Read Mode) - KJC */
+#define BUFFER          9              /* Card R/W buffer state (true = Ready) - KJC */
 
-#define STATES          8
+#define STATES          10             /* Added two new states - KJC */
 #endif
 
 #if defined(HP10)
@@ -124,20 +137,17 @@
 #endif
 
 typedef struct {
-   int id;
-   unsigned char nibble[REG_SIZE];
-} oregister;
-
-typedef struct {
    oregister *reg[REGISTERS];          /* Registers */
-   oregister *mem[MEMORY_SIZE];        /* Memory registers */
+   oregister **mem;                    /* Pointer to array of registers */
    int *rom;
    int first;
    int last;
+   unsigned int memory_size;
    unsigned int stack[STACK_SIZE];     /* Call stack */
    unsigned char flags[FLAGS];         /* Processor flags*/
    unsigned char status[STATUS_BITS];  /* Status (S0 - S15) */
 #if defined(HP67)
+   struct ocard *card;
    unsigned char crc[STATES];          /* Card reader states */
 #endif
    unsigned int opcode;                /* Last opcode */
@@ -170,17 +180,21 @@ typedef struct {
 #endif
 } oprocessor;
 
-oprocessor *h_processor_create(int *h_rom);
+oprocessor* h_processor_create(int *h_rom, int i_size);
 
 void v_processor_reset(oprocessor *h_processor);
 
-void v_read_rom(oprocessor *h_processor, char *s_pathname);
+void v_read_rom(int *i_rom, const char *s_pathname);
 
 void v_fprint_registers(FILE *h_file, oprocessor *h_procesor);
 
 void v_fprint_memory(FILE *h_file, oprocessor *h_procesor);
 
 void v_processor_tick(oprocessor *h_procesor);
+
+#if defined(CONTINIOUS) || defined(HP67)
+char *s_get_filename(char *s_path, char c_mode, char *s_filter, char *s_name);
+#endif
 
 #if defined(CONTINIOUS)
 char *s_get_datafile(void);

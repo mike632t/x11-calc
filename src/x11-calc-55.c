@@ -21,12 +21,13 @@
  * 08 Sep 25         - Initial version derived from HP45 - MT
  * 12 Sep 25         - Don't set the default switch state twice - MT
  * 11 Oct 25         - Modified key layout - MT
+ * 09 Nov 25         - Another tweak to the keyboard layout - MT
  *
  */
 
 #define NAME           "x11-calc-55"
-#define BUILD          "0003"
-#define DATE           "06 Sep 25"
+#define BUILD          "0004"
+#define DATE           "09 Nov 25"
 #define AUTHOR         "MT"
 
 #include <stdarg.h>    /* strlen(), etc. */
@@ -60,7 +61,7 @@ void v_init_buttons(struct obutton *h_button[]) {
    int i_left, i_top, i_count = 0;
 
    /* Define top row of keys. */
-   i_top = KBD_TOP + 3* (SWITCH_HEIGHT + 1); /* Assumes the function label and switch text use the same font */
+   i_top = KBD_TOP + 3 * SWITCH_HEIGHT + 1 * SCALE_HEIGHT; /* Assumes the function label and switch text use the same font */
    i_left = KBD_LEFT;
    h_button[i_count++] = h_button_create(00006, 000, "E+", "E-", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, True, MID_GREY, YELLOW, BACKGROUND, BACKGROUND);
    i_left += (KEY_WIDTH + KEY_GAP);
