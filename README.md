@@ -197,15 +197,13 @@ The simulator has been successfully compiled and tested on:
 
    - Ubuntu 24.04, gcc 13.3.0, x64
 
-   - VMS 5.4-3, VAX C 3.2, VAX
-
-   - VMS 7.3, C 6.5-005, VAX
+   - VMS 5.4-3, VAX C 3.2, VAX (simh)
 
    - VMS 7.3-2, C 6.5-001, alpha
 
-   - VMS 9.2-1, C 7.4-726, x64
+   - VMS 9.2-1, C 7.4-726, x64 ***
 
-   - Windows 11 + WSL2, gcc 12.2.0, x64 + arm64
+   - Windows 11 + WSL2, gcc 12.2.0, x64 + arm64 **
 
 ** Not yet retested with this build.
 

@@ -434,8 +434,7 @@
  *                     group' instructions are in effect - MT
  * 15 Sep 25         - Detects either GTK 2.0 or GTK 3.0 if available - MT
  *                   - Removed 'zenity' fallback - MT
- * 13 Oct 25         - Fixed get_datafile() function declaration - MT
- * 01 Dec 25         - Fixed compiler warning - MT
+ * 13 Oct 25         - Fixed get_datafile() function declaration -MT
  *
  * To Do             - Finish adding code to display any modified registers
  *                     to every instruction.
@@ -448,8 +447,8 @@
  */
 
 #define  NAME          "x11-calc-cpu"
-#define  BUILD         "0230"
-#define  DATE          "01 Dec 25"
+#define  BUILD         "0229"
+#define  DATE          "13 Oct 25"
 #define  AUTHOR        "MT"
 
 #define  NODEBUG
@@ -1907,7 +1906,7 @@ void v_processor_tick(oprocessor *h_processor) /* Decode and execute a single in
                   {
                      int i_counter = 0;
                      int i_count;
-                     for (i_count = 0; i_count < REG_SIZE - 1; i_count++)
+                     for (i_count = 0; (i_count < REG_SIZE - 1) && (h_processor->position >= 0); i_count++)
                      {
                         h_processor->position--;
                         if((i_counter & 1) == 0) /* Even numbered nibble */

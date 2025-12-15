@@ -364,7 +364,6 @@
  * 15 Sep 25         - Fixed errors when compiling on MacOS - MT
  * 20 Sep 25         - Explicitly include X11 keyboard symbols - MT
  *            (0194) - Enable keyboard shortcuts on any UNIX - MT
- * 01 Dec 25         - Don't display compiler version if not defined - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -378,8 +377,8 @@
 
 #define  NAME          "x11-calc"
 #define  VERSION       "0.19"
-#define  BUILD         "0195"
-#define  DATE          "01 Dec 25"
+#define  BUILD         "0194"
+#define  DATE          "12 Oct 25"
 #define  AUTHOR        "MT"
 
 #define  INTERVAL 48   /* Number of ticks to execute before updating the display */
@@ -424,9 +423,7 @@
 void v_version(void)  /* Display version information */
 {
    fprintf(stdout, "%s: Version %s.%s %s", FILENAME, VERSION, BUILD, COMMIT_ID);
-#if defined(__compiler__)
    if (strlen(__compiler__)) fprintf(stdout, " "__compiler__);  /* Include compiler version if defined */
-#endif
    if (__DATE__[4] == ' ') fprintf(stdout, " 0"); else fprintf(stdout, " %c", __DATE__[4]);
    fprintf(stdout, "%c %c%c%c %s %s\n", __DATE__[5],
       __DATE__[0], __DATE__[1], __DATE__[2], &__DATE__[9], __TIME__ );
