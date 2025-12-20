@@ -35,6 +35,7 @@
 #  01 Dec 25            - Checks the software version command exists - MT
 #  02 Dec 25            - Fixed MacOS version detection - MT
 #  14 Dec 25            - Added release names to MacOS versions - MT
+#  20 Dec 25            - Updated window manager list to include xfwm4 - MT
 #
 
 #
@@ -286,7 +287,7 @@ echo ""
 # Window Manager
 _window_manager=""
 for _process in awesome blackbox fluxbox fvwm gnome-shell icewm i3 kwin marco \
-   metacity mutter mwm openbox sawfish twm wmaker xfwm; do
+   metacity mutter mwm openbox sawfish twm wmaker xfwm xfwm4; do
       if ps -e 2>/dev/null | grep -w "$_process" | grep -v grep >/dev/null 2>&1; then
          _window_manager="$_process"
          break
