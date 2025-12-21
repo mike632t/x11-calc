@@ -4,9 +4,9 @@
 
 ## x11-calc - Another RPN (Reverse Polish) calculator
 
-Emulators  for  the HP 35, HP 80, HP 45, HP 70, HP 55, HP 21, HP 22, HP 25,
-HP 25C,  HP 27,  HP 29C, HP 31E, HP 32E, HP 33E,  HP 33C,  HP 34C,  HP 37E,
-HP 38C, HP 38E, HP10, HP 67, HP 10C, HP 11C, HP 12C, HP 15C, and HP 16C.
+Includes emulators for the HP35, HP80, HP45, HP70, HP55, HP21, HP22,  HP25,
+HP25C, HP27, HP29C, HP31E, HP32E, HP33E, HP33C, HP34C, HP37E, HP38C, HP38E,
+HP10, HP67, HP10C, HP11C, HP12C,  HP15C, and HP16C calculators.
 
 All written in C using X11.
 
@@ -530,10 +530,10 @@ Your problem report should contain:
 
 - Whether you are using a pre-built binary (Alpine / Flatpak);
 
-- Output from `sh-get-environment.sh`;
+- The output from `sh-get-environment.sh`;
 
-- Commit ID;
+- The commit ID;
 
-- Description of the problem.
+- A description of the problem.
 
 Thank you.
