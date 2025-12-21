@@ -366,7 +366,7 @@ can be obtained from the 'legacy' branch.
 
    - Alpine 3.19, gcc 13.2.1, x86_64 + arm64  (0.16.0172)
 
-   - Debian 13 (Trixie), gcc 14.2.0 | clang 19.1.7, x86_64
+   - Debian 13 (Trixie), gcc 14.2.0 | clang 19.1.7 | tcc 0.9.27, x86_64
 
    - Debian 12 (Bookworm), gcc 12.2.0 | clang 14.0.6 | tcc 0.9.27, x86_64 + arm64
 
