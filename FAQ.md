@@ -23,7 +23,39 @@ Polish Notation (RPN) when solving problems.
 <a id="Q1"></a>
 ### How to use Reverse Polish Notation (RPN) <sup><sup>[Back to Top](#top)</sup></sup>
 
+Algebraic expressions are written using infix notation, which requires  the
+operator to know the order in which an expression should be evaluated.
 
+```
+7 * (4 + 5) + 3
+```
+
+Postfix  notation places the operators after the arguments which allows the
+expression above to be rewritten as
+
+```
+4 5 + 7 * 3 +
+```
+
+This is now known as Reverse Polish Notation in honour of Jan Lukasiewicz.
+
+To use RPN you key in an argument and enter it onto the stack before keying
+in the second argument and selecting the operation.
+
+So you would use the following keystrokes to evaluate the expression above.
+
+```
+4
+Enter
+5
++
+7
+*
+3
++
+```
+
+Further details can be found in the [Owners Guides](https://literature.hpcalc.org/).
 
 <a id="Q2"></a>
 ### How to run X11-calc on Windows <sup><sup>[Back to Top](#top)</sup></sup>
