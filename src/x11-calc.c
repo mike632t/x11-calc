@@ -416,6 +416,8 @@
  *                   - Saves program card details when exiting - MT
  * 09 Dec 25         - Use MEMORY_MAX to define the maximum memory size -MT
  * 11 Dec 25  (0224) - Implemented /RESET command line option - MT
+ * 22 Dec 25         - Fixed  bug that caused the geometry to be ignored if
+ *                     the value was zero - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -895,14 +897,15 @@ int main(int argc, char *argv[])
 
    o_window_position.width = (int)(WIDTH * f_scale);  /* Window width in pixels */
    o_window_position.height = (int)(HEIGHT * f_scale);  /* Window height in pixels */
-   if (!i_window_left)  /* If the window position wasn't specified just centre it on the screen - ignored by most window managers but useful in kiosk mode */
-      o_window_position.x = (i_screen_width - o_window_position.width) / 2;  /* Centre window on screen  */
-   else
+   /* If the window position wasn't specified just centre it on the screen - ignored by most window managers but useful in kiosk mode */
+   if (i_window_left || b_geometry )  /* Fixed bug that caused position to be ignored if value was zero */
       o_window_position.x = i_window_left;  /* User specified position */
-   if (!i_window_top)
-      o_window_position.y = (i_screen_height - o_window_position.height) / 2;  /* Centre window on screen  */
    else
+      o_window_position.x = (i_screen_width - o_window_position.width) / 2;  /* Centre window on screen  */
+   if (i_window_top || b_geometry)  /* Fixed bug that caused position to be ignored if value was zero */
       o_window_position.y = i_window_top;  /* User specified position */
+   else
+      o_window_position.y = (i_screen_height - o_window_position.height) / 2;  /* Centre window on screen  */
    o_window_geometry = o_window_position;  /* Save window position */
 
    x_window = XCreateSimpleWindow(x_display, /* Create the application window, as a child of the root window */
@@ -923,8 +926,6 @@ int main(int argc, char *argv[])
          &i_window_border,
          &i_colour_depth) == False)
       v_error(errno, h_err_display_properties);
-
-   /** debug(printf("%dx%d%+d%+d\n", i_window_width, i_window_height, i_window_left, i_window_top));  /* Display window geometry */
 
    if (i_colour_depth != COLOUR_DEPTH) v_error(errno, h_err_display_colour, COLOUR_DEPTH);  /* Check colour depth */
 
@@ -965,18 +966,18 @@ int main(int argc, char *argv[])
 
    h_size_hint = XAllocSizeHints();  /* Set application window size */
    h_size_hint->flags = PMinSize | PMaxSize;
-   if (b_geometry)
+   if (b_geometry)  /* Update flags if geometry specified on command line otherwise let window manager position window */
    {
       h_size_hint->flags = h_size_hint->flags | USPosition;  /* Update flags */
       h_size_hint->x = o_window_position.x;
       h_size_hint->y = o_window_position.y;
    }
-   h_size_hint->height = o_window_position.height;
    h_size_hint->width = o_window_position.width;
-   h_size_hint->min_height = o_window_position.height;
+   h_size_hint->height = o_window_position.height;
    h_size_hint->min_width = o_window_position.width;
-   h_size_hint->max_height = o_window_position.height;
+   h_size_hint->min_height = o_window_position.height;
    h_size_hint->max_width = o_window_position.width;
+   h_size_hint->max_height = o_window_position.height;
 
    XSetStandardProperties(x_display, x_window, s_title, s_title, x_logo, argv, argc, h_size_hint);  /* Set the window title and icon */
 
