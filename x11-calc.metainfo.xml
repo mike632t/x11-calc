@@ -25,7 +25,7 @@
   <content_rating type="oars-1.1" />
 
   <url type="homepage">https://github.com/mike632t/x11-calc</url>
-  <url type="faq">https://www.hpmuseum.org</url>
+  <url type="faq">https://github.com/mike632t/x11-calc/blob/stable/FAQ.md</url>
   <url type="bugtracker">https://github.com/mike632t/x11-calc/issues</url>
   <url type="vcs-browser">https://github.com/mike632t/x11-calc</url>
 
@@ -54,6 +54,11 @@
   </screenshots>
 
   <releases>
+  <release version="0.23.0225" date="2025-12-22">
+    <description>
+      <p>Fixed bug that caused the geometry to be ignored if value was zero</p>
+    </description>
+  </release>
   <release version="0.23.0224" date="2025-12-14">
     <description>
       <p>Updated and improved HP67</p>

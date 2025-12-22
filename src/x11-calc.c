@@ -430,7 +430,7 @@
 
 #define  NAME          "x11-calc"
 #define  VERSION       "0.23"
-#define  BUILD         "0224"
+#define  BUILD         "0225"
 #define  DATE          "07 Dec 25"
 #define  AUTHOR        "MT"
 
