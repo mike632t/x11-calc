@@ -17,6 +17,8 @@ Polish Notation (RPN) when solving problems.
 
 - [How to run x11-calc on Windows](#Q2)
 
+- [How to set the window position at start up](#Q3)
+
 - [Submitting a problem report](#problems)
 
 
@@ -27,33 +29,54 @@ Algebraic expressions are written using infix notation, which requires  the
 operator to know the order in which an expression should be evaluated.
 
 ```
-7 * (4 + 5) + 3
+2 * (3 + 7 * 6) / 3
 ```
 
 Postfix  notation places the operators after the arguments which allows the
 expression above to be rewritten as
 
 ```
-4 5 + 7 * 3 +
+7 6 * 3 + 2 * 3 /
 ```
 
-This is now known as Reverse Polish Notation in honour of Jan Lukasiewicz.
+Postfix notation was adopted by Hewlett Packard for their calculators as it
+simplified the evaluation of complex expressions and called Reverse  Polish
+Notation in honour of Jan Lukasiewicz.
 
 To use RPN you key in an argument and enter it onto the stack before keying
-in the second argument and selecting the operation.
+in the second argument and performing an operation.
 
-So you would use the following keystrokes to evaluate the expression above.
+So to evaluate the expression above you would use the following keystrokes.
 
 ```
-4
-Enter
-5
-+
 7
+Enter
+6
 *
 3
 +
+2
+*
+3
+/
 ```
+
+You do not need to enter it on to the stack if the operation only takes one
+argument.
+
+```
+tan(45) / 3
+```
+
+Is evaluated using the following keystrokes
+
+```
+45
+tan
+3
+/
+```
+
 
 Further details can be found in the [Owners Guides](https://literature.hpcalc.org/).
 
@@ -63,6 +86,20 @@ Further details can be found in the [Owners Guides](https://literature.hpcalc.or
 Installing Windows Subsystem for Linux on Windows 11 will allow x11-calc to
 be run on Windows.  First install WSL2 and then follow the instructions for
 Ubuntu to download and compile the program.
+
+
+<a id="Q3"></a>
+### How to set the window position at start up <sup><sup>[Back to Top](#top)</sup></sup>
+
+The position of the window at startup can be defined using the `--geometry`
+command line option.
+
+To position the window 120 pixels from the top and 960 pixels from the left
+hand side of the screen use the following
+
+```
+x11-calc --geometry=+960+120
+```
 
 
 <a id="problems"></a>
