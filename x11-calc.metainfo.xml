@@ -16,7 +16,7 @@
 
   <description>
     <p>Includes emulators for the HP 35, HP 80, HP 45, HP 70, HP 55, HP 21, HP 22, HP 25, HP 25C,  HP 27,  HP 29C, HP 31E, HP 32E, HP 33E,  HP 33C,  HP 34C,  HP 37E, HP 38C, HP 38E, HP10, HP 67, HP 10C, HP 11C, HP 12C, HP 15C, and HP 16C.</p>
-    <p>If GTK is available then on models with continuous memory or a card reader, right-clicking on the application window will open a dialog window allowing the user to load a saved program in 'run' mode or save it in 'prgm' mode.
+    <p>If GTK is available then on models with continuous memory or a card reader, right-clicking on the application window will open a dialog window allowing the user to load a saved program in 'run' mode or save it in 'prgm' mode.</p>
     <p>The default model can be changed either by right-clicking on desktop icon, or if this isn't supported on your system you can access the configuration dialog from a terminal window using the command <code>flatpak run io.github.mike632t.x11-calc --setup</code></p>
     <p><em>Note - The following fonts should be installed <code>xfonts-base</code> (Debian/Ubuntu), <code>xorg-x11-fonts-base</code> or <code>xorg-x11-fonts-misc</code> (Fedora), <code>font-misc-misc</code> (Gentoo).</em> </p>
   </description>
