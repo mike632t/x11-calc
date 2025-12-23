@@ -44,6 +44,10 @@ MacOS, VMS, Solaris and Tru64 Unix.
 
 Details of the latest/important changes.
 
+23 Dec 25  (0.23.0226)
+
+   - Fixed bug that caused the geometry to be ignored if a value was zero.
+
 14 Dec 25  (0.23.0224)
 
    - HP67 program card files can include text labels.
