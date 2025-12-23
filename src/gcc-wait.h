@@ -19,9 +19,14 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * 16 Aug 20         - Initial version - MT
+ * 12 Dec 25         - Added now() to return the current time and elapsed()
+ *                     to return the number of miliseconds since a previous
+ *                     time - MT
  *
  */
 
 int i_wait(long l_delay);
+long l_now(void);
+long l_since(long l_start);
 
 

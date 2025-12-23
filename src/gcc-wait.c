@@ -40,6 +40,11 @@
  * 18 Aug 25         - So can Tru64 UNIX - MT
  * 12 Oct 25         - Added Minix (generic busy loop doesn't work) - MT
  * 05 Dec 25         - Calls to LIB$WAIT on VMS 9.x use milliseconds - MT
+ * 12 Dec 25         - Added now() to return the current time and elapsed()
+ *                     to return the number of miliseconds since a previous
+ *                     time - MT
+ * 14 Dec 25         - Negative wait times are ignored - MT
+ *                   - Tidied up includes - MT
  *
  */
 
@@ -50,10 +55,13 @@
 
 #define  False          0
 #define  True           !(False)
+
 #if defined(linux) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__solaris__) || defined(__osf__) || defined(__minix__)
-#include <unistd.h>
-#include <sys/types.h>
-#elif defined(VMS)
+#include <ctype.h>     /* isalpha(), etc */
+#include <unistd.h>    /* usleep(), sleep() */
+#endif
+
+#if defined(VMS)
 #include <timeb.h>
 #include <lib$routines.h>
 #else
@@ -77,28 +85,58 @@
  */
 int i_wait(long l_delay)
 {
-#if defined(linux) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__solaris__) || defined(__osf__) || defined(__minix__)
-return (usleep(l_delay * 1000)); /* Use usleep() function */
-#elif defined(VMS)
-float f_seconds;
-#if defined(__x86_64__)
-f_seconds = l_delay;
-#else
-f_seconds = l_delay / 1000.0;
-#endif
-return (lib$wait(&f_seconds)); /* Use VMS LIB$WAIT */
-#else
-/** #define _DEFAULT_SOURCE /* Possibly required for busy loop more testing needed */
-/** #define _BSD_SOURCE /* Possibly required for busy loop more testing needed */
-struct timeb o_start, o_end;
-static int b_busy = True;
-if (b_busy) b_busy = !(printf("Busy loop in use..!\n"));
-ftime(&o_start);
-ftime(&o_end);
-while ((1000 * (o_end.time - o_start.time) + o_end.millitm - o_start.millitm) < l_delay) /* Use a portable but very inefficient busy loop */
-{
-   ftime(&o_end);
+   if (l_delay > 0)  /* Don't delay if duration is negative */
+   {
+#  if defined(linux) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__solaris__) || defined(__osf__) || defined(__minix__)
+      return (usleep(l_delay * 1000)); /* Use usleep() function */
+#  elif defined(VMS)
+      float f_seconds;
+#     if defined(__x86_64__)
+         f_seconds = l_delay;  /* On z86_64 platforms LIB$WAIT waits for the specified number of milliseconds */
+#     else
+         f_seconds = l_delay / 1000.0;  /* On other platforms LIB$WAIT waits for the specified number of seconds */
+#     endif
+      return (lib$wait(&f_seconds)); /* Use VMS LIB$WAIT - 20 ms resolution timer on VMS*/
+#  else
+      struct timeb o_start, o_end;
+      static int b_busy = True;
+      if (b_busy) b_busy = !(printf("Busy loop in use..!\n"));
+      ftime(&o_start);
+      ftime(&o_end);
+      while ((1000 * (o_end.time - o_start.time) + o_end.millitm - o_start.millitm) < l_delay) /* Use a portable but very inefficient busy loop */
+      {
+         ftime(&o_end);
+      }
+#  endif
+   }
+   return(0);
 }
-return(0);
-#endif
+
+/*
+ * elapsed (time)
+ *
+ * Return current time in milliseconds.
+ *
+ * 12 Dec 25         - Initial version - MT
+ *
+ */
+long l_now(void)
+{
+    struct timeb t_now;
+    ftime(&t_now);
+
+    return (long)t_now.time * 1000L + (long)t_now.millitm;
+}
+
+/*
+ * elapsed (time)
+ *
+ * Determines the number of milliseconds since the specified time.
+ *
+ * 12 Dec 25         - Initial version - MT
+ *
+ */
+long l_since(long l_start)
+{
+    return l_now() - l_start;
 }

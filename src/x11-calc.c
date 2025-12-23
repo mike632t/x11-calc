@@ -416,9 +416,13 @@
  *                   - Saves program card details when exiting - MT
  * 09 Dec 25         - Use MEMORY_MAX to define the maximum memory size -MT
  * 11 Dec 25  (0224) - Implemented /RESET command line option - MT
+ * 12 Dec 25         - Attempt to keep the interval between display updates
+ *                     constant.  This should ensure that emulation runs at
+ *                     the same speed is the same on different systems, but
+ *                     this depends on the resolution of the delay routines
+ *                     to correctly handle very short delay times - MT
  * 22 Dec 25         - Fixed  bug that caused the geometry to be ignored if
  *                     the value was zero - MT
- * 25 Dev 25         - Fixed build number - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -431,12 +435,11 @@
 
 #define  NAME          "x11-calc"
 #define  VERSION       "0.23"
-#define  BUILD         "0226"
+#define  BUILD         "0227"
 #define  DATE          "25 Dec 25"
 #define  AUTHOR        "MT"
 
-#define  INTERVAL 48   /* Number of ticks to execute before updating the display */
-#define  DELAY 44      /* Number of intervals to wait before exiting */
+#define  TICKS         48  /* Number of ticks to execute before updating the display */
 
 #include <errno.h>     /* errno */
 
@@ -474,6 +477,17 @@
 
 #include "gcc-debug.h" /* debug() */
 #include "gcc-wait.h"  /* i_wait() */
+
+#if defined(HP67)
+#define  TIMEOUT        TICKS * 4
+#define  INTERVAL       TICKS / 4
+#elif defined(VOYAGER) || defined(SPICE) || defined(CLASSIC)
+#define  TIMEOUT        TICKS * 3
+#define  INTERVAL       TICKS / 3
+#else
+#define  TIMEOUT        TICKS * 2
+#define  INTERVAL       TICKS / 2
+#endif
 
 void v_version(void)  /* Display version information */
 {
@@ -541,14 +555,17 @@ int main(int argc, char *argv[])
    unsigned int i_colour_depth;        /* Window's colour depth */
    int i_screen;                       /* Default screen number */
 
-   int b_trace = False;               /* Trace flag */
-   int b_step = False;                /* Single step flag flag */
-   int b_cursor = True;               /* Draw a cursor */
-   int b_run = True;                  /* Run flag controls CPU instruction execution in main loop */
-   int b_abort = False;               /* Abort flag controls execution of main loop */
-   int b_geometry = False;            /* User specified window position */
+   long l_start;                       /* Start time */
+   long l_elapsed;                     /* Elapsed time */
+
+   int b_trace = False;                /* Trace flag */
+   int b_step = False;                 /* Single step flag flag */
+   int b_cursor = True;                /* Draw a cursor */
+   int b_run = True;                   /* Run flag controls CPU instruction execution in main loop */
+   int b_abort = False;                /* Abort flag controls execution of main loop */
+   int b_geometry = False;             /* User specified window position */
 #if defined (__unix__)
-   int b_numlock = False;             /* Use number pad - even if numlock is off */
+   int b_numlock = False;              /* Use number pad - even if numlock is off */
 #endif
 #if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
    int b_euro = False;
@@ -556,11 +573,12 @@ int main(int argc, char *argv[])
    unsigned int i_memory_size = MEMORY_SIZE;
    int i_breakpoints[] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};  /* Array to hold breakpoints */
    int i_offset, i_count, i_index, i_value, i_size;
+   int i_delay = -1;                   /* Delay timer - used to work out when switch has been held off for 2 seconds */
+   int i_ticks = 0;
    int i_trap = -1;                    /* Trap instruction */
-   int i_ticks = -1;
 
 #if defined(CONTINIOUS)
-   int b_reset = False;               /* Do not restore state (reset) */
+   int b_reset = False;                /* Do not restore state (reset) */
    char *s_pathname = NULL;
 #endif
 
@@ -837,8 +855,10 @@ int main(int argc, char *argv[])
             b_trace = False;  /* Enable tracing */
          else if (!strncmp(argv[i_count], "/TRACE", i_index))
             b_trace = True;  /* Enable tracing */
+#if defined(CONTINIOUS)
          else if (!strncmp(argv[i_count], "/RESET", i_index))
             b_reset = True;  /* Enable tracing */
+#endif
          else if (!strncmp(argv[i_count], "/ROM", i_index))
          {
             if (i_count + 1 < argc)
@@ -1071,16 +1091,18 @@ int main(int argc, char *argv[])
    }
 #endif
    b_abort = False;
-   i_count = 0;
+   l_start = l_now();  /* Get current time */
+   i_ticks = 0;
    while (!b_abort)  /* Main program event loop */
    {
-      i_count--;
-      if (i_count < 0)
+      i_ticks--;
+      if (i_ticks < 0)
       {
          i_display_update(h_display, h_processor);
 #if defined(HP67)
          if (h_processor->crc[FUNCTION])
          {
+            int i_count = 0;
             h_processor->card->state = False;  /* Hide the program card */
             for (i_count = 0; i_count < LABELS; i_count++)  /* Update label state */
                h_label[i_count]->state = h_processor->crc[FUNCTION];
@@ -1095,18 +1117,11 @@ int main(int argc, char *argv[])
 #endif
          i_display_draw(x_display, x_buffer, i_screen, h_display);  /* Redraw display */
          XCopyArea(x_display, x_buffer, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
-         i_count = INTERVAL;
-#if defined(HP67)
-         i_wait(INTERVAL / 4);   /* Sleep for ~6.25 ms per tick */
-#elif defined(HP55)
-         i_wait(INTERVAL / 3.1); /* Sleep for ~???? ms per tick */
-#elif defined(VOYAGER) || defined(SPICE)
-         i_wait(INTERVAL / 3);   /* Sleep for ~8.33 ms per tick */
-#else
-         i_wait(INTERVAL / 2);   /* Sleep for ~12.5 ms per tick */
-#endif
-         if (i_ticks > 0) i_ticks -= 1;
-         if (i_ticks == 0) b_abort = True;
+         l_elapsed = (l_now() - l_start + 1);
+         i_wait((INTERVAL - l_elapsed));  /* Sleep */
+         l_start = l_now();  /* Get current time */
+         i_ticks = TICKS;  /* Reset timer */
+         if (--i_delay == 0) b_abort = True;  /* Delay timer reached zero so exit */
       }
       if ( (b_search(i_breakpoints, (h_processor->pc & 0x1fff), sizeof(i_breakpoints) / sizeof(i_breakpoints[0]))) || (h_processor->rom[h_processor->pc] == i_trap))  /* Check for Breakpoint or Instruction Trap */
       {
@@ -1235,15 +1250,7 @@ int main(int argc, char *argv[])
 #if defined(CONTINIOUS)
                         v_backup_state(h_processor);  /* Save current settings */
 #endif
-#if defined(HP67)
-                        i_ticks = DELAY * 4;  /* Set count down */
-#elif defined(VOYAGER)
-                        i_ticks = DELAY * 3;
-#elif defined(SPICE)
-                        i_ticks = DELAY * 3;
-#else
-                        i_ticks = DELAY * 2;
-#endif
+                        i_delay = TIMEOUT;  /* Set count down */
                      }
                   }
                   if (SWITCHES == 2) /** To Do - Must be a better way of handling an arbitrary number of switches */
@@ -1303,7 +1310,7 @@ int main(int argc, char *argv[])
 #if defined(SWITCHES)
                if (h_pressed == NULL)  /* It wasn't a button that was released so check the switches */
                   if (!(h_switch_pressed(h_switch[0], x_event.xbutton.x, x_event.xbutton.y) == NULL))
-                     i_ticks = -1;
+                     i_delay = -1;  /* Decrement delay timer if switch is held down */
 #endif
             }
 #if defined(__GTK__)  /* Don't attempt to load/save if GTK isn't available */
