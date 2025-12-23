@@ -54,7 +54,7 @@
   </screenshots>
 
   <releases>
-  <release version="0.23.0225" date="2025-12-22">
+  <release version="0.23.0226" date="2025-12-23">
     <description>
       <p>Fixed bug that caused the geometry to be ignored if value was zero</p>
     </description>
