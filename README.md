@@ -1,6 +1,9 @@
 <a id="top"></a>
 
+[![flathub](https://img.shields.io/flathub/v/io.github.mike632t.x11-calc)](https://flathub.org/en-GB/apps/io.github.mike632t.x11-calc)
 [![latest packaged version(s)](https://repology.org/badge/latest-versions/x11-calc.svg)](https://repology.org/project/x11-calc/versions)
+
+![Stars](https://img.shields.io/github/stars/mike632t/x11-calc)
 
 ## x11-calc - Another RPN (Reverse Polish) calculator
 
