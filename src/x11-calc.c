@@ -418,6 +418,7 @@
  * 11 Dec 25  (0224) - Implemented /RESET command line option - MT
  * 22 Dec 25         - Fixed  bug that caused the geometry to be ignored if
  *                     the value was zero - MT
+ * 25 Dev 25         - Fixed build number - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -430,8 +431,8 @@
 
 #define  NAME          "x11-calc"
 #define  VERSION       "0.23"
-#define  BUILD         "0225"
-#define  DATE          "07 Dec 25"
+#define  BUILD         "0226"
+#define  DATE          "25 Dec 25"
 #define  AUTHOR        "MT"
 
 #define  INTERVAL 48   /* Number of ticks to execute before updating the display */
