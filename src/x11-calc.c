@@ -423,6 +423,7 @@
  *                     to correctly handle very short delay times - MT
  * 22 Dec 25         - Fixed  bug that caused the geometry to be ignored if
  *                     the value was zero - MT
+ * 25 Dec 25         - Tidied up comments and updated build - MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -433,25 +434,25 @@
  *
  */
 
-#define  NAME          "x11-calc"
-#define  VERSION       "0.23"
-#define  BUILD         "0227"
-#define  DATE          "25 Dec 25"
-#define  AUTHOR        "MT"
+#define  NAME        "x11-calc"
+#define  VERSION     "0.23"
+#define  BUILD       "0227"
+#define  DATE        "25 Dec 25"
+#define  AUTHOR      "MT"
 
-#define  TICKS         48  /* Number of ticks to execute before updating the display */
+#define  TICKS       48 /* Number of ticks to execute before updating the display */
 
-#include <errno.h>     /* errno */
+#include <errno.h>      /* errno */
 
-#include <stdarg.h>    /* vargs(), etc */
-#include <string.h>    /* strlen(), etc */
-#include <stdio.h>     /* fprintf(), etc */
-#include <stdlib.h>    /* getenv(), etc */
+#include <stdarg.h>     /* vargs(), etc */
+#include <string.h>     /* strlen(), etc */
+#include <stdio.h>      /* fprintf(), etc */
+#include <stdlib.h>     /* getenv(), etc */
 
-#include <ctype.h>     /* isalpha(), etc */
+#include <ctype.h>      /* isalpha(), etc */
 
-#include <X11/Xlib.h>  /* XOpenDisplay(), True/False etc */
-#include <X11/Xutil.h> /* XSizeHints etc */
+#include <X11/Xlib.h>   /* XOpenDisplay(), True/False etc */
+#include <X11/Xutil.h>  /* XSizeHints etc */
 #include <X11/keysym.h>
 #include <X11/cursorfont.h>
 
