@@ -434,6 +434,8 @@
  * 03 Jan 26         - Resize the window using the mouse wheel - MT
  *                   - Maximum zoom level defined by MAX_ZOOM - MT
  *            (0233) - Use the same code to handle mouse wheel events - MT
+ *                   - Ignores mouse wheel events unless the control key is
+ *                     active - MT
  *
  *
  * To Do             - Parse command line in a separate routine.
@@ -1343,27 +1345,30 @@ int main(int argc, char *argv[])
                case Button5:
                {
                   int i_value;
-                  i_value = (f_scale - 1.0) * 8;
-                  if (x_event.xbutton.button == Button5)
-                     i_value--;
-                  else
-                     i_value++;
-                  if ((i_value >= 0) && (i_value < MAX_ZOOM))
+                  if (x_event.xkey.state & ControlMask)  /* Ignore mouse wheel events unless Ctrl key is pressed */
                   {
-                     f_scale = 1 + (0.125 * i_value);
-                     o_window_position.width = (int)(WIDTH * f_scale);  /* Window width in pixels */
-                     o_window_position.height = (int)(HEIGHT * f_scale);  /* Window height in pixels */
+                     i_value = (f_scale - 1.0) * 8;
+                     if (x_event.xbutton.button == Button5)
+                        i_value--;
+                     else
+                        i_value++;
+                     if ((i_value >= 0) && (i_value < MAX_ZOOM))
+                     {
+                        f_scale = 1 + (0.125 * i_value);
+                        o_window_position.width = (int)(WIDTH * f_scale);  /* Window width in pixels */
+                        o_window_position.height = (int)(HEIGHT * f_scale);  /* Window height in pixels */
 
-                     h_size_hint->width = o_window_position.width;
-                     h_size_hint->height = o_window_position.height;
-                     h_size_hint->min_width = o_window_position.width;
-                     h_size_hint->min_height = o_window_position.height;
-                     h_size_hint->max_width = o_window_position.width;
-                     h_size_hint->max_height = o_window_position.height;
+                        h_size_hint->width = o_window_position.width;
+                        h_size_hint->height = o_window_position.height;
+                        h_size_hint->min_width = o_window_position.width;
+                        h_size_hint->min_height = o_window_position.height;
+                        h_size_hint->max_width = o_window_position.width;
+                        h_size_hint->max_height = o_window_position.height;
 
-                     XSetWMNormalHints(x_display, x_window, h_size_hint);
-                     /** XResizeWindow(x_display, x_window, o_window_position.width, o_window_position.height); /* Resize window */
-                     /** XFlush(x_display); /* Update display */
+                        XSetWMNormalHints(x_display, x_window, h_size_hint);
+                        /** XResizeWindow(x_display, x_window, o_window_position.width, o_window_position.height); /* Resize window */
+                        /** XFlush(x_display); /* Update display */
+                     }
                   }
                }
                break;
