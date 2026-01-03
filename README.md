@@ -47,10 +47,12 @@ MacOS, VMS, Solaris and Tru64 Unix.
 
 Details of the latest/important changes.
 
-02 Jan 25  (0.24.0229)
+03 Jan 25  (0.24.0234)
 
    - Changed  the  way the display is drawn and increased range  of  values
      allowed by '--zoom'.
+   - To change the window size you can also hold down the Ctrl key and  use
+     the mouse wheel to zoom in or out.
 
 23 Dec 25  (0.23.0226)
 
