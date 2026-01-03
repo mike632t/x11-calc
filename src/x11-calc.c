@@ -449,7 +449,7 @@
 
 #define  NAME           "x11-calc"
 #define  VERSION        "0.24"
-#define  BUILD          "0233"
+#define  BUILD          "0234"
 #define  DATE           "03 Jan 25"
 #define  AUTHOR         "MT"
 
