@@ -376,7 +376,7 @@ Where it has not been possible to test the latest version the last working
 release is shown (if known).  The will be maintained in the repository and
 can be obtained from the 'legacy' branch.
 
-   - Alpine 3.20, gcc 13.2.1, x86_64 + arm64
+   - Alpine 3.20, gcc 13.2.1, x86_64 + arm64  (0.23.0226)
 
    - Alpine 3.19, gcc 13.2.1, x86_64 + arm64  (0.16.0172)
 
@@ -388,15 +388,15 @@ can be obtained from the 'legacy' branch.
 
    - Debian 10 (Buster), gcc 8.3.0, arm  (0.16.0172)
 
-   - Debian 10 (Buster), gcc 8.3.0 | clang 7.0.1 | tcc 0.9.27, x86_64
+   - Debian 10 (Buster), gcc 8.3.0 | clang 7.0.1 | tcc 0.9.27, x86_64  (0.23.0226)
 
    - Debian 9 (Stretch), gcc 6.3.0, arm  (0.16.0172)
 
-   - Debian 5 (Lenny), gcc 4.2.4, alpha
+   - Debian 5 (Lenny), gcc 4.2.4, alpha  (0.23.0226)
 
-   - Debian 5 (Lenny), gcc 4.3.2, i686
+   - Debian 5 (Lenny), gcc 4.3.2, i686  (0.23.0226)
 
-   - Fedora 35, gcc 11.3.1 | clang 13.0.1, x86_64
+   - Fedora 35, gcc 11.3.1 | clang 13.0.1, x86_64  (0.23.0226)
 
    - Fedora 39, gcc 13.2.1 | clang 17.0.6, x86_64  (0.19.0195)
 
@@ -412,7 +412,7 @@ can be obtained from the 'legacy' branch.
 
    - MacOS 10.1.15 (Catalina), clang 12.0.0, x86_64  (0.19.0195)
 
-   - MacOS 12.7.6 (Monterey), clang 14.0.0, x86_64
+   - MacOS 12.7.6 (Monterey), clang 14.0.0, x86_64  (0.23.0226)
 
    - MacOS 13.4.1 (Ventura), clang 14.0.3, arm64  (0.19.0195)
 
@@ -424,34 +424,34 @@ can be obtained from the 'legacy' branch.
 
    - NetBSD 9.2, gcc 7.5.0 | clang 16.0.6, x86  (0.19.0195)
 
-   - SunOS 5.10, gcc 3.4.3, x86
+   - SunOS 5.10, gcc 3.4.3, x86  (0.23.0226)
 
    - SUSE 15.4, gcc 7.5.0 | clang 13. 0.1, x86_64  (0.19.0195)
 
-   - Tru64 5.1, cc 6.5-011, alpha
+   - Tru64 5.1, cc 6.5-011, alpha  (0.23.0226)
 
    - Ubuntu 20.04, gcc 9.4.0 | clang 10.0.0 | tcc 0.9.27, x86_64 + aarch64
 
-   - Ubuntu 22.04, gcc 11.4.0 | clang 14.0.0 | tcc 0.9.27, x86_64 + aarch64
+   - Ubuntu 22.04, gcc 11.4.0 | clang 14.0.0 | tcc 0.9.27, x86_64 + aarch64  (0.23.0226)
 
-   - Ubuntu 24.04, gcc 13.3.0 | clang 14.0.6 | tcc 0.9.27, x86_64 + aarch64
+   - Ubuntu 24.04, gcc 13.3.0 | clang 14.0.6 | tcc 0.9.27, x86_64 + aarch64  (0.23.0226)
 
-   - VMS 5.4-3, VAX C 3.2, VAX
+   - VMS 5.4-3, VAX C 3.2, VAX  (0.23.0226)
 
-   - VMS 7.3, C 6.5, VAX
+   - VMS 7.3, C 6.5, VAX  (0.23.0226)
 
-   - VMS 7.3-2, C 6.5, alpha
+   - VMS 7.3-2, C 6.5, alpha  (0.23.0226)
 
-   - VMS 9.2-1, C 7.4, x86_64
+   - VMS 9.2-1, C 7.4, x86_64  (0.23.0226)
 
-   - Windows 11 + WSL2, gcc 12.2.0, x86_64 + arm64
+   - Windows 11 + WSL2, gcc 12.2.0, x86_64 + arm64  (0.23.0226)
 
-   - Windows 11 + WSL2 (Ubuntu 24.04 LTS), gcc 13.3.0, x86_64
+   - Windows 11 + WSL2 (Ubuntu 24.04 LTS), gcc 13.3.0, x86_64  (0.23.0226)
 
-   - Windows 11 + WSL2 (Debian 13), clang 19.1.7 | gcc 14.2.0, x86_64
+   - Windows 11 + WSL2 (Debian 13), clang 19.1.7 | gcc 14.2.0, x86_64  (0.23.0226)
 
-The last tested release is shown if this release has not yet been tested on
-a particular system.
+The  last tested release is shown if the current version hasn't been tested
+on a particular system.
 
 <a id="acknowledgements"></a>
 ### Acknowledgements <sup><sup>[Back to Top](#top)</sup></sup>
