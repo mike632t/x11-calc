@@ -1275,7 +1275,7 @@ int main(int argc, char *argv[])
                               h_processor->mode = True;
                               break;
                            case 2:
-                              h_processor->timer = False;f_scale
+                              h_processor->timer = False;
                               h_processor->mode = False;
                               break;
                         }
@@ -1346,7 +1346,7 @@ int main(int argc, char *argv[])
             }
             break;
          case ClientMessage :  /* Message from window manager */
-            if (x_event.xclient.data.l[0] == wm_delete) b_abort = True;f_scale
+            if (x_event.xclient.data.l[0] == wm_delete) b_abort = True;
             break;
          }
       }
