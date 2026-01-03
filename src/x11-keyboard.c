@@ -33,12 +33,13 @@
  * 20 Sep 25         - Explicitly include X11 keyboard symbols - MT
  *                   - Enable keyboard on any UNIX - MT
  * 07 Dec 25         - Use int for boolean types instead of char - MT
+ * 03 Jan 26         - Checks for illegal control key combinations - MT
  *
  */
 
 #define NAME           "x11-calc-keyboard"
-#define BUILD          "0008"
-#define DATE           "15 Sep 25"
+#define BUILD          "0012"
+#define DATE           "03 Jan 26"
 #define AUTHOR         "MT"
 
 #include <ctype.h>     /* is alpha(), etc. */
@@ -56,7 +57,13 @@
 
 #if defined (__unix__)
 
-/* Attempts to translate a key code into a character. */
+/*
+ * key_decode(keyboard, display, keycode, keystate, numlock)
+ *
+ * Attempts to translate a key code into an ASCII character.
+ *
+ */
+
 static void v_key_decode(okeyboard *h_keyboard, Display *x_display, KeyCode x_keycode, unsigned int i_keystate, int b_numlock)
 {
    h_keyboard->keysym = XKeycodeToKeysym(x_display, x_keycode, 0);
@@ -85,9 +92,9 @@ static void v_key_decode(okeyboard *h_keyboard, Display *x_display, KeyCode x_ke
       case XK_Scroll_Lock:
       case XK_Sys_Req:
       case XK_Delete:
-         h_keyboard->key = (char)(h_keyboard->keysym & 0x1f); /* Map to ASCII value (see keysymdef.h) */
+         h_keyboard->key = (char)(h_keyboard->keysym & 0x1f);  /* Map to ASCII value (see keysymdef.h) */
          break;
-      case  XK_KP_F1: /* Numeric keypad */
+      case  XK_KP_F1:  /* Numeric keypad */
       case  XK_KP_F2:
       case  XK_KP_F3:
       case  XK_KP_F4:
@@ -126,7 +133,7 @@ static void v_key_decode(okeyboard *h_keyboard, Display *x_display, KeyCode x_ke
                case  XK_KP_7:
                case  XK_KP_8:
                case  XK_KP_9:
-                  h_keyboard->key = (char)(h_keyboard->keysym & 0x7f); /* Map to ASCII value (see keysymdef.h) */
+                  h_keyboard->key = (char)(h_keyboard->keysym & 0x7f);  /* Map to ASCII value (see keysymdef.h) */
                   break;
             }
          }
@@ -139,7 +146,7 @@ static void v_key_decode(okeyboard *h_keyboard, Display *x_display, KeyCode x_ke
       case  XK_KP_Subtract:
       case  XK_KP_Decimal:
       case  XK_KP_Divide:
-         h_keyboard->key = (char)(h_keyboard->keysym & 0x7f); /* Map to ASCII value (see keysymdef.h) */
+         h_keyboard->key = (char)(h_keyboard->keysym & 0x7f);  /* Map to ASCII value (see keysymdef.h) */
          break;
       default:  /* Everything else */
          h_keyboard->key = (char)(h_keyboard->keysym & 0xff);
@@ -158,12 +165,19 @@ static void v_key_decode(okeyboard *h_keyboard, Display *x_display, KeyCode x_ke
          {
             h_keyboard->key = (char)(XKeycodeToKeysym(x_display, x_keycode, 1));
             if (((h_keyboard->key >= '@') && (h_keyboard->key <= '_')) || ((h_keyboard->key >= 'a') && (h_keyboard->key <= 'z'))) /* Only modify valid control keys */
-               h_keyboard->key &= 0x1f; /* Map to ASCII value (see keysymdef.h) */
+               h_keyboard->key &= 0x1f;  /* Map to ASCII value (see keysymdef.h) */
+            else
+               h_keyboard->key &= 0x00;  /* Anything else is an invalid control key */
          }
    }
 }
 
-/* Update the keyboard state */
+/*
+ * key_pressed(keyboard, display, keycode, keystate, numlock)
+ *
+ * Calls key_decode() to update keycode when key is pressed.
+ *
+ */
 
 void h_key_pressed(okeyboard *h_keyboard, Display *x_display, KeyCode x_keycode, unsigned int i_keystate, int b_numlock)
 {
