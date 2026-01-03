@@ -429,9 +429,12 @@
  *                     the display buffer being the same size at the window
  *                     everything is drawn using at it's original size  and
  *                     the  contents of the display buffer are scaled up by
- *                     XScaleArea(). Increased range of values by  '--zoom'
- *                     to take advantage of thsi change- MT
+ *                     XScaleArea().
+ *                   - Increased range of values allowed by  '--zoom' - MT
  * 03 Jan 26         - Resize the window using the mouse wheel - MT
+ *                   - Maximum zoom level defined by MAX_ZOOM - MT
+ *            (0233) - Use the same code to handle mouse wheel events - MT
+ *
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -444,11 +447,12 @@
 
 #define  NAME           "x11-calc"
 #define  VERSION        "0.24"
-#define  BUILD          "0230"
+#define  BUILD          "0233"
 #define  DATE           "03 Jan 25"
 #define  AUTHOR         "MT"
 
-#define  TICKS          48 /* Number of ticks to execute before updating the display */
+#define  TICKS          48  /* Number of ticks to execute before updating the display */
+#define  MAX_ZOOM       32
 
 #include <errno.h>      /* errno */
 
@@ -766,7 +770,7 @@ int main(int argc, char *argv[])
                         i_value = strtol(argv[i_count + 1], &s_text, 10);
                         if (*s_text != '\0')
                            v_error(EINVAL, h_err_invalid_number, argv[i_count + 1]);
-                        if ((i_value < 0) || (i_value > 16) || (errno == ERANGE))  /* Check range */
+                        if ((i_value < 0) || (i_value > (MAX_ZOOM - 1) / 2) || (errno == ERANGE))  /* Check range */
                            v_error(EINVAL, h_err_numeric_range, argv[i_count + 1]);
                         else
                         {
@@ -1335,38 +1339,16 @@ int main(int argc, char *argv[])
                break;
 #endif
 
-               case Button4:  /* Mouse wheel button */
+               case Button4:  /* Mouse wheel buttons */
+               case Button5:
                {
                   int i_value;
                   i_value = (f_scale - 1.0) * 8;
-                  i_value++;
-                  if (i_value < 32)
-                  {
-                     f_scale = 1 + (0.125 * i_value);
-                     o_window_position.width = (int)(WIDTH * f_scale);  /* Window width in pixels */
-                     o_window_position.height = (int)(HEIGHT * f_scale);  /* Window height in pixels */
-
-                     h_size_hint->width = o_window_position.width;  /* Set windows size hints */
-                     h_size_hint->height = o_window_position.height;
-                     h_size_hint->min_width = o_window_position.width;
-                     h_size_hint->min_height = o_window_position.height;
-                     h_size_hint->max_width = o_window_position.width;
-                     h_size_hint->max_height = o_window_position.height;
-                     XSetWMNormalHints(x_display, x_window, h_size_hint);
-                     //XResizeWindow(x_display, x_window, o_window_position.width, o_window_position.height);  /* Rezize window */
-                     XFlush(x_display);
-                  }
+                  if (x_event.xbutton.button == Button5)
+                     i_value--;
                   else
-                     i_value = 31;
-               }
-               break;
-
-               case Button5:  /* Mouse wheel button */
-               {
-                  int i_value;
-                  i_value = (f_scale - 1.0) * 8;
-                  i_value--;
-                  if (i_value >= 0)
+                     i_value++;
+                  if ((i_value >= 0) && (i_value < MAX_ZOOM))
                   {
                      f_scale = 1 + (0.125 * i_value);
                      o_window_position.width = (int)(WIDTH * f_scale);  /* Window width in pixels */
@@ -1380,11 +1362,9 @@ int main(int argc, char *argv[])
                      h_size_hint->max_height = o_window_position.height;
 
                      XSetWMNormalHints(x_display, x_window, h_size_hint);
-                     //XResizeWindow(x_display, x_window, o_window_position.width, o_window_position.height);
-                     XFlush(x_display);
+                     /** XResizeWindow(x_display, x_window, o_window_position.width, o_window_position.height); /* Resize window */
+                     /** XFlush(x_display); /* Update display */
                   }
-                  else
-                     i_value = 0;
                }
                break;
 
