@@ -415,7 +415,7 @@
  *                   - Fixed regression bug affecting card display - MT
  *                   - Saves program card details when exiting - MT
  * 09 Dec 25         - Use MEMORY_MAX to define the maximum memory size -MT
- * 11 Dec 25  (0224) - Implemented /RESET command line option - MT
+ * 11 Dec 25         - Implemented /RESET command line option - MT
  * 12 Dec 25         - Attempt to keep the interval between display updates
  *                     constant.  This should ensure that emulation runs at
  *                     the same speed is the same on different systems, but
@@ -424,6 +424,13 @@
  * 22 Dec 25         - Fixed  bug that caused the geometry to be ignored if
  *                     the value was zero - MT
  * 25 Dec 25         - Tidied up comments and updated build - MT
+ * 02 Jan 26  (0228) - Removed redundant calls to XCopyArea() - MT
+ *             0.24  - Changed the way the display is drawn. Instead of all
+ *                     the display buffer being the same size at the window
+ *                     everything is drawn using at it's original size  and
+ *                     the  contents of the display buffer are scaled up by
+ *                     XScaleArea(). Increased range of values by  '--zoom'
+ *                     to take advantage of thsi change- MT
  *
  * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
@@ -434,13 +441,13 @@
  *
  */
 
-#define  NAME        "x11-calc"
-#define  VERSION     "0.23"
-#define  BUILD       "0227"
-#define  DATE        "25 Dec 25"
-#define  AUTHOR      "MT"
+#define  NAME           "x11-calc"
+#define  VERSION        "0.24"
+#define  BUILD          "0229"
+#define  DATE           "25 Dec 25"
+#define  AUTHOR         "MT"
 
-#define  TICKS       48 /* Number of ticks to execute before updating the display */
+#define  TICKS          48 /* Number of ticks to execute before updating the display */
 
 #include <errno.h>      /* errno */
 
@@ -472,6 +479,7 @@
 #include "x11-calc-display.h"
 #include "x11-calc-cpu.h"
 
+#include "x11-scale-area.h"
 #include "x11-keyboard.h"
 
 #include "x11-logo.xbm"
@@ -757,7 +765,7 @@ int main(int argc, char *argv[])
                         i_value = strtol(argv[i_count + 1], &s_text, 10);
                         if (*s_text != '\0')
                            v_error(EINVAL, h_err_invalid_number, argv[i_count + 1]);
-                        if ((i_value < 0) || (i_value > 4) || (errno == ERANGE))  /* Check range */
+                        if ((i_value < 0) || (i_value > 16) || (errno == ERANGE))  /* Check range */
                            v_error(EINVAL, h_err_numeric_range, argv[i_count + 1]);
                         else
                         {
@@ -1003,25 +1011,6 @@ int main(int argc, char *argv[])
 
    XSetStandardProperties(x_display, x_window, s_title, s_title, x_logo, argv, argc, h_size_hint);  /* Set the window title and icon */
 
-   i_display_resize(h_display, f_scale);  /* Resize display */
-
-   for (i_count = 0; i_count < BUTTONS; i_count++)  /* Resize buttons */
-      i_button_resize(h_button[i_count], f_scale);
-
-#if defined(SWITCHES)
-   for (i_count = 0; i_count < SWITCHES; i_count++)  /* Resize labels */
-      i_switch_resize(h_switch[i_count], f_scale);
-#endif
-
-#if defined(LABELS)
-   for (i_count = 0; i_count < LABELS; i_count++)  /* Resize labels */
-      i_label_resize(h_label[i_count], f_scale);
-#endif
-
-#if defined(HP67)
-   i_card_resize(h_processor->card, f_scale);  /* Resize card */
-#endif
-
 #if defined (__unix__)
    h_keyboard = h_keyboard_create(x_display);  /* Only works with Linux */
 #endif
@@ -1117,7 +1106,10 @@ int main(int argc, char *argv[])
          }
 #endif
          i_display_draw(x_display, x_buffer, i_screen, h_display);  /* Redraw display */
-         XCopyArea(x_display, x_buffer, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
+         if (f_scale > 1.0)
+            XScaleArea(x_display, x_buffer, x_window, DefaultGC(x_display, i_screen), 0, 0, WIDTH, HEIGHT, 0, 0, o_window_position.width, o_window_position.height);
+         else
+            XCopyArea(x_display, x_buffer, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
          l_elapsed = (l_now() - l_start + 1);
          i_wait((INTERVAL - l_elapsed));  /* Sleep */
          l_start = l_now();  /* Get current time */
@@ -1142,7 +1134,6 @@ int main(int argc, char *argv[])
             {
                h_pressed->state = False;
                i_button_draw(x_display, x_buffer, i_screen, h_pressed);
-               XCopyArea(x_display, x_buffer, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
                h_processor->keypressed = False;  /* Don't clear the status bit here!! */
             }
             break;
@@ -1181,11 +1172,10 @@ int main(int argc, char *argv[])
                   {
                      h_pressed->state = True;
                      i_button_draw(x_display, x_buffer, i_screen, h_pressed);
-                     XCopyArea(x_display, x_buffer, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
                      h_processor->code = h_pressed->index;
                      h_processor->keypressed = True;
 #if !defined(SWITCHES)
-                     h_processor->enabled = True;  /* Any key press wil wake up the processor */
+                     h_processor->enabled = True;  /* Any key press will wake up the processor */
                      h_processor->sleep = False;
 #endif
                      break;
@@ -1202,7 +1192,6 @@ int main(int argc, char *argv[])
                {
                   h_pressed->state = False;
                   i_button_draw(x_display, x_buffer, i_screen, h_pressed);
-                  XCopyArea(x_display, x_buffer, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
                   h_processor->keypressed = False;  /* Don't clear the status bit here!! */
                }
             }
@@ -1210,6 +1199,10 @@ int main(int argc, char *argv[])
 #endif
          case ButtonPress :
             /** debug(printf("Mouse button [%d] pressed.\n", x_event.xbutton.button)); */
+
+            x_event.xbutton.x = (int)(x_event.xbutton.x / f_scale + 0.5f);  /* Scale the coordinate's */
+            x_event.xbutton.y = (int)(x_event.xbutton.y / f_scale + 0.5f);
+
             if (x_event.xbutton.button == 1)
             {
                int i_count;
@@ -1220,7 +1213,6 @@ int main(int argc, char *argv[])
                   {
                      h_pressed->state = True;
                      i_button_draw(x_display, x_buffer, i_screen, h_pressed);
-                     XCopyArea(x_display, x_buffer, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
                      h_processor->code = h_pressed->index;
                      h_processor->keypressed = True;
 #if !defined(SWITCHES)
@@ -1237,7 +1229,6 @@ int main(int argc, char *argv[])
                   {
                      h_switch[0]->state = !(h_switch[0]->state);  /* Toggle switch */
                      i_switch_draw(x_display, x_buffer, i_screen, h_switch[0]);
-                     XCopyArea(x_display, x_buffer, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
                      if (h_switch[0]->state)
                      {
                         v_processor_reset(h_processor);  /* Reset the processor */
@@ -1284,7 +1275,7 @@ int main(int argc, char *argv[])
                               h_processor->mode = True;
                               break;
                            case 2:
-                              h_processor->timer = False;
+                              h_processor->timer = False;f_scale
                               h_processor->mode = False;
                               break;
                         }
@@ -1292,20 +1283,22 @@ int main(int argc, char *argv[])
                         h_processor->mode = i_switch_click(h_switch[1]);  /* Update prgm/run switch */
 #endif
                         i_switch_draw(x_display, x_buffer, i_screen, h_switch[1]);
-                        XCopyArea(x_display, x_buffer, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
                      }
                }
 #endif
             }
             break;
          case ButtonRelease :
+
+            x_event.xbutton.x = (int)(x_event.xbutton.x / f_scale + 0.5f);  /* Scale the coordinate's */
+            x_event.xbutton.y = (int)(x_event.xbutton.y / f_scale + 0.5f);
+
             if (x_event.xbutton.button == 1)
             {
                if (!(h_pressed == NULL))
                {
                   h_pressed->state = False;
                   i_button_draw(x_display, x_buffer, i_screen, h_pressed);
-                  XCopyArea(x_display, x_buffer, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
                   h_processor->keypressed = False;  /* Don't clear the status bit here!! */
                }
 #if defined(SWITCHES)
@@ -1350,11 +1343,10 @@ int main(int argc, char *argv[])
 #endif
                for (i_count = 0; i_count < BUTTONS; i_count++)  /* Draw buttons */
                   i_button_draw(x_display, x_buffer, i_screen, h_button[i_count]);
-               XCopyArea(x_display, x_buffer, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
             }
             break;
          case ClientMessage :  /* Message from window manager */
-            if (x_event.xclient.data.l[0] == wm_delete) b_abort = True;
+            if (x_event.xclient.data.l[0] == wm_delete) b_abort = True;f_scale
             break;
          }
       }
