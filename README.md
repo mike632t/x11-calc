@@ -390,7 +390,7 @@ can be obtained from the 'legacy' branch.
 
    - Debian 10 (Buster), gcc 8.3.0 | clang 7.0.1 | tcc 0.9.27, x86_64  (0.23.0226)
 
-   - Debian 9 (Stretch), gcc 6.3.0, arm  (0.16.0172)
+   - Debian 9 (Stretch), gcc 6.3.0 | clang 3.8.1 | tcc 0.9.27, armv7l  (0.24.0234)
 
    - Debian 5 (Lenny), gcc 4.2.4, alpha  (0.23.0226)
 
@@ -494,7 +494,7 @@ managed to get as far as I have.
 - `Quozl` for helping with double buffering display changes.
 
 - `Kjellc` for adding support for the HP67 card reader.
-
+armv7l
 - `Vttoth` for allowing me to include some of his example programs.
 
 - `Kjellc` for translating the help text (into Swedish).
