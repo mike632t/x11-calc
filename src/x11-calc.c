@@ -435,10 +435,12 @@
  *                   - Maximum zoom level defined by MAX_ZOOM - MT
  *            (0233) - Use the same code to handle mouse wheel events - MT
  *                   - Ignores mouse wheel events unless the control key is
- *                     active - MT
+ *                     pressed - MT
+ * 06 Jan 26         - Uses separate functions to zoom in and out - MT
  *
  *
- * To Do             - Parse command line in a separate routine.
+ * To Do             - Fix zoom in and out!
+ *                   - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
  *                     of switches.
  *                   - Allow VMS users to set breakpoints?
@@ -449,8 +451,8 @@
 
 #define  NAME           "x11-calc"
 #define  VERSION        "0.24"
-#define  BUILD          "0234"
-#define  DATE           "03 Jan 25"
+#define  BUILD          "0235"
+#define  DATE           "06 Jan 25"
 #define  AUTHOR         "MT"
 
 #define  TICKS          48  /* Number of ticks to execute before updating the display */
@@ -524,6 +526,57 @@ void v_set_blank_cursor(Display *x_display, Window x_window, Cursor *x_cursor)
    x_blank = XCreateBitmapFromData (x_display, x_window, h_pixmap_data, 1, 1);  /* Create an empty bitmap */
    (*x_cursor) = XCreatePixmapCursor(x_display, x_blank, x_blank, &x_Color, &x_Color, 0, 0);  /* Use the empty pixmap to create a blank cursor */
    XFreePixmap (x_display, x_blank);  /* Free up pixmap */
+}
+
+void v_zoom_in(Display *x_display, Window x_window, XSizeHints *h_size_hint, XRectangle *o_window_position)
+{
+   float f_scale;
+   int i_value;
+
+   f_scale = (float)o_window_position->width / (float)WIDTH;
+   f_scale += 0.125f;  /* zoom in step */
+
+   i_value = (int)((f_scale - 1.0f) / 0.125f);
+
+   if (i_value < MAX_ZOOM)
+   {
+      o_window_position->width  = (int)(WIDTH  * f_scale);
+      o_window_position->height = (int)(HEIGHT * f_scale);
+
+      h_size_hint->width     = o_window_position->width;
+      h_size_hint->height    = o_window_position->height;
+      h_size_hint->min_width  = o_window_position->width;
+      h_size_hint->min_height = o_window_position->height;
+      h_size_hint->max_width  = o_window_position->width;
+      h_size_hint->max_height = o_window_position->height;
+
+      XSetWMNormalHints(x_display, x_window, h_size_hint);
+   }
+}
+
+
+void v_zoom_out(Display *x_display, Window x_window, XSizeHints *h_size_hint, XRectangle *o_window_position)
+{
+   float f_scale;
+   int i_value;
+
+   f_scale = (float)o_window_position->width / (float)WIDTH;
+   f_scale -= 0.125;
+   i_value = (f_scale - 1.0 ) / 0.125;
+   if (i_value >= 0 )
+   {
+      o_window_position->width = (int)(WIDTH * f_scale);  /* Window width in pixels */
+      o_window_position->height = (int)(HEIGHT * f_scale);  /* Window height in pixels */
+
+      h_size_hint->width = o_window_position->width;
+      h_size_hint->height = o_window_position->height;
+      h_size_hint->min_width = o_window_position->width;
+      h_size_hint->min_height = o_window_position->height;
+      h_size_hint->max_width = o_window_position->width;
+      h_size_hint->max_height = o_window_position->height;
+
+      XSetWMNormalHints(x_display, x_window, h_size_hint);
+   }
 }
 
 int b_search(int *a, int m, int n) /* Linear search. */
@@ -954,7 +1007,6 @@ int main(int argc, char *argv[])
       BlackPixel(x_display, i_screen), /* Border colour - ignored ? */
       WhitePixel(x_display, i_screen)); /* Background colour */
 
-
    if (XGetGeometry(x_display, x_window,    /* Get window geometry */
          &RootWindow(x_display, i_screen),
          &i_window_left, &i_window_top,
@@ -1147,6 +1199,9 @@ int main(int argc, char *argv[])
 #if defined (__unix__)
          case KeyPress :
             h_key_pressed(h_keyboard, x_display, x_event.xkey.keycode, x_event.xkey.state, b_numlock);  /* Attempts to translate a key code into a character */
+            printf("%03x ", h_keyboard->key);  /** DEBUG */
+            if (isprint(h_keyboard->key)) printf("%c", h_keyboard->key);  /** DEBUG */
+            printf("\n");  /** DEBUG */
             if (h_keyboard->key == (XK_BackSpace & 0x1f)) h_keyboard->key = XK_Escape & 0x1f;  /* Map backspace to escape */
             if (h_keyboard->key == (XK_Z & 0x1f))  /* Ctrl-Z to exit */
                b_abort = True;
@@ -1154,11 +1209,15 @@ int main(int argc, char *argv[])
                h_processor->trace = !h_processor->trace;
             else if (h_keyboard->key == (XK_S & 0x1f))  /* Ctrl-S or space to single step */
                h_processor->trace = h_processor->step = b_run = True;
-            else if (h_keyboard->key == (XK_R & 0x1f))  /* Ctrl-R to display internal CPU registers */
+            else if (h_keyboard->key == (XK_D & 0x1f))  /* Ctrl-D to display internal CPU registers */
                v_fprint_registers(stdout, h_processor);
             else if (h_keyboard->key == (XK_Q & 0x1f))  /* Ctrl-Q to resume */
                h_processor->step = !(b_run  = True);
-            else if (h_keyboard->key == (XK_C & 0x1f))  /* Ctrl-C to reset */
+            else if (h_keyboard->key == (XK_C & 0x1f))  /* Ctrl-C to copy to clipboard */
+            {
+               /** ToDo - Handle copy */
+            }
+            else if (h_keyboard->key == (XK_R & 0x1f))  /* Ctrl-R to reset */
             {
                v_processor_reset(h_processor);
 #if defined(CONTINIOUS)
@@ -1344,31 +1403,14 @@ int main(int argc, char *argv[])
                case Button4:  /* Mouse wheel buttons */
                case Button5:
                {
-                  int i_value;
                   if (x_event.xkey.state & ControlMask)  /* Ignore mouse wheel events unless Ctrl key is pressed */
                   {
-                     i_value = (f_scale - 1.0) * 8;
                      if (x_event.xbutton.button == Button5)
-                        i_value--;
+                        v_zoom_in(x_display, x_window, h_size_hint, &o_window_position);
                      else
-                        i_value++;
-                     if ((i_value >= 0) && (i_value < MAX_ZOOM))
-                     {
-                        f_scale = 1 + (0.125 * i_value);
-                        o_window_position.width = (int)(WIDTH * f_scale);  /* Window width in pixels */
-                        o_window_position.height = (int)(HEIGHT * f_scale);  /* Window height in pixels */
-
-                        h_size_hint->width = o_window_position.width;
-                        h_size_hint->height = o_window_position.height;
-                        h_size_hint->min_width = o_window_position.width;
-                        h_size_hint->min_height = o_window_position.height;
-                        h_size_hint->max_width = o_window_position.width;
-                        h_size_hint->max_height = o_window_position.height;
-
-                        XSetWMNormalHints(x_display, x_window, h_size_hint);
-                        /** XResizeWindow(x_display, x_window, o_window_position.width, o_window_position.height); /* Resize window */
-                        /** XFlush(x_display); /* Update display */
-                     }
+                        v_zoom_out(x_display, x_window, h_size_hint, &o_window_position);
+                     printf("*** %03d\n", o_window_position.width); /** DEBUG */
+                     XSetWMNormalHints(x_display, x_window, h_size_hint);
                   }
                }
                break;
