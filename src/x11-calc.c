@@ -455,8 +455,8 @@
 
 #define  NAME           "x11-calc"
 #define  VERSION        "0.24"
-#define  BUILD          "0235"
-#define  DATE           "06 Jan 25"
+#define  BUILD          "0237"
+#define  DATE           "07 Jan 25"
 #define  AUTHOR         "MT"
 
 #define  TICKS          48  /* Number of ticks to execute before updating the display */
