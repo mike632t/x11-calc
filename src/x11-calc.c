@@ -437,10 +437,14 @@
  *                   - Ignores mouse wheel events unless the control key is
  *                     pressed - MT
  * 06 Jan 26         - Uses separate functions to zoom in and out - MT
+ * 07 Jan 26         - Added keyboard shortcuts to zoom in and out - MT
+ *                   - Modified keyboard shortcuts - MT
+ *                      Ctrl-C  - Reserved for copy
+ *                      Ctrl-R  - Reset
+ *                      Ctrl-D  - Display registers
  *
  *
- * To Do             - Fix zoom in and out!
- *                   - Parse command line in a separate routine.
+ * To Do             - Parse command line in a separate routine.
  *                   - Must be a better way of handling an arbitrary number
  *                     of switches.
  *                   - Allow VMS users to set breakpoints?
@@ -1199,11 +1203,18 @@ int main(int argc, char *argv[])
 #if defined (__unix__)
          case KeyPress :
             h_key_pressed(h_keyboard, x_display, x_event.xkey.keycode, x_event.xkey.state, b_numlock);  /* Attempts to translate a key code into a character */
-            printf("%03x ", h_keyboard->key);  /** DEBUG */
-            if (isprint(h_keyboard->key)) printf("%c", h_keyboard->key);  /** DEBUG */
-            printf("\n");  /** DEBUG */
             if (h_keyboard->key == (XK_BackSpace & 0x1f)) h_keyboard->key = XK_Escape & 0x1f;  /* Map backspace to escape */
-            if (h_keyboard->key == (XK_Z & 0x1f))  /* Ctrl-Z to exit */
+            if (XLookupKeysym(&x_event.xkey, 0) == XK_equal && (x_event.xkey.state & (ControlMask | ShiftMask)) == (ControlMask | ShiftMask))  /* Explicitly test for Ctrl-Shift-Plus */
+            {
+               v_zoom_in(x_display, x_window, h_size_hint, &o_window_position);  /* Zoom in */
+               f_scale = (float)o_window_position.width / (float)WIDTH;  /* Update display scale */
+            }
+            else if ((XLookupKeysym(&x_event.xkey, 0) == XK_minus) && (x_event.xkey.state & ControlMask) && !(x_event.xkey.state & ShiftMask))  /* Explicitly test for Ctrl-Minus */
+            {
+               v_zoom_out(x_display, x_window, h_size_hint, &o_window_position);  /* Zoom out */
+               f_scale = (float)o_window_position.width / (float)WIDTH;  /* Update display scale */
+            }
+            else if (h_keyboard->key == (XK_Z & 0x1f))  /* Ctrl-Z to exit */
                b_abort = True;
             else if (h_keyboard->key == (XK_T & 0x1f))  /* Ctrl-T to toggle tracing */
                h_processor->trace = !h_processor->trace;
@@ -1409,7 +1420,7 @@ int main(int argc, char *argv[])
                         v_zoom_in(x_display, x_window, h_size_hint, &o_window_position);
                      else
                         v_zoom_out(x_display, x_window, h_size_hint, &o_window_position);
-                     printf("*** %03d\n", o_window_position.width); /** DEBUG */
+                     f_scale = (float)o_window_position.width / (float)WIDTH;
                      XSetWMNormalHints(x_display, x_window, h_size_hint);
                   }
                }
