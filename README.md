@@ -380,9 +380,9 @@ can be obtained from the 'legacy' branch.
 
    - Alpine 3.19, gcc 13.2.1, x86_64 + arm64  (0.16.0172)
 
-   - Debian 13 (Trixie), gcc 14.2.0 | clang 19.1.7 | tcc 0.9.27, x86_64
+   - Debian 13 (Trixie), gcc 14.2.0 | clang 19.1.7 | tcc 0.9.27, x86_64  (0.24.0234)
 
-   - Debian 12 (Bookworm), gcc 12.2.0 | clang 14.0.6 | tcc 0.9.27, x86_64 + arm64
+   - Debian 12 (Bookworm), gcc 12.2.0 | clang 14.0.6 | tcc 0.9.27, x86_64 + arm64  (0.24.0234)
 
    - Debian 11 (Bullseye), gcc 10.2.1 | clang 11.0.1-2, i686 + x86_64  (0.19.0195)
 
@@ -430,7 +430,7 @@ can be obtained from the 'legacy' branch.
 
    - Tru64 5.1, cc 6.5-011, alpha  (0.23.0226)
 
-   - Ubuntu 20.04, gcc 9.4.0 | clang 10.0.0 | tcc 0.9.27, x86_64 + aarch64
+   - Ubuntu 20.04, gcc 9.4.0 | clang 10.0.0 | tcc 0.9.27, x86_64 + aarch64  (0.24.0234)
 
    - Ubuntu 22.04, gcc 11.4.0 | clang 14.0.0 | tcc 0.9.27, x86_64 + aarch64  (0.23.0226)
 
@@ -450,8 +450,7 @@ can be obtained from the 'legacy' branch.
 
    - Windows 11 + WSL2 (Debian 13), clang 19.1.7 | gcc 14.2.0, x86_64  (0.23.0226)
 
-The  last tested release is shown if the current version hasn't been tested
-on a particular system.
+Only the last tested version is shown for each platform.
 
 <a id="acknowledgements"></a>
 ### Acknowledgements <sup><sup>[Back to Top](#top)</sup></sup>
