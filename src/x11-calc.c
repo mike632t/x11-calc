@@ -435,7 +435,18 @@
  *                   - Maximum zoom level defined by MAX_ZOOM - MT
  *            (0233) - Use the same code to handle mouse wheel events - MT
  *                   - Ignores mouse wheel events unless the control key is
- *                     active - MT
+ *                     pressed - MT
+ * 06 Jan 26         - Uses separate functions to zoom in and out - MT
+ * 07 Jan 26         - Added keyboard shortcuts to zoom in and out - MT
+ *                   - Modified keyboard shortcuts - MT
+ *                      Ctrl-C  - Reserved for copy
+ *                      Ctrl-R  - Reset
+ *                      Ctrl-D  - Display registers
+ * 09 Jan 26   0.25  - Allows the user to copy the current display contents
+ *                     to the clipboard (they way this actually works under
+ *                     X Windows is that the application saves a  temporary
+ *                     copy of the data locally ready to be sent to another
+ *                     process when it requests it) - MT
  *
  *
  * To Do             - Parse command line in a separate routine.
@@ -448,9 +459,9 @@
  */
 
 #define  NAME           "x11-calc"
-#define  VERSION        "0.24"
-#define  BUILD          "0234"
-#define  DATE           "03 Jan 25"
+#define  VERSION        "0.25"
+#define  BUILD          "0238"
+#define  DATE           "09 Jan 25"
 #define  AUTHOR         "MT"
 
 #define  TICKS          48  /* Number of ticks to execute before updating the display */
@@ -467,6 +478,7 @@
 
 #include <X11/Xlib.h>   /* XOpenDisplay(), True/False etc */
 #include <X11/Xutil.h>  /* XSizeHints etc */
+#include <X11/Xatom.h>  /* Atom definitions */
 #include <X11/keysym.h>
 #include <X11/cursorfont.h>
 
@@ -526,6 +538,61 @@ void v_set_blank_cursor(Display *x_display, Window x_window, Cursor *x_cursor)
    XFreePixmap (x_display, x_blank);  /* Free up pixmap */
 }
 
+void v_zoom_in(Display *x_display, Window x_window, XSizeHints *h_size_hint, XRectangle *o_window_position)
+{
+   float f_scale;
+   int i_value;
+
+   f_scale = (float)o_window_position->width / (float)WIDTH;
+   f_scale += 0.125f;  /* zoom in step */
+
+   i_value = (int)((f_scale - 1.0f) / 0.125f);
+
+   if (i_value < MAX_ZOOM)
+   {
+      o_window_position->width  = (int)(WIDTH  * f_scale);
+      o_window_position->height = (int)(HEIGHT * f_scale);
+
+      h_size_hint->width     = o_window_position->width;
+      h_size_hint->height    = o_window_position->height;
+      h_size_hint->min_width  = o_window_position->width;
+      h_size_hint->min_height = o_window_position->height;
+      h_size_hint->max_width  = o_window_position->width;
+      h_size_hint->max_height = o_window_position->height;
+
+      XSetWMNormalHints(x_display, x_window, h_size_hint);
+      /** XResizeWindow(x_display, x_window, o_window_position.width, o_window_position.height); /* Resize window */
+      /** XFlush(x_display); /* Update display */
+   }
+}
+
+
+void v_zoom_out(Display *x_display, Window x_window, XSizeHints *h_size_hint, XRectangle *o_window_position)
+{
+   float f_scale;
+   int i_value;
+
+   f_scale = (float)o_window_position->width / (float)WIDTH;
+   f_scale -= 0.125;
+   i_value = (f_scale - 1.0 ) / 0.125;
+   if (i_value >= 0 )
+   {
+      o_window_position->width = (int)(WIDTH * f_scale);  /* Window width in pixels */
+      o_window_position->height = (int)(HEIGHT * f_scale);  /* Window height in pixels */
+
+      h_size_hint->width = o_window_position->width;
+      h_size_hint->height = o_window_position->height;
+      h_size_hint->min_width = o_window_position->width;
+      h_size_hint->min_height = o_window_position->height;
+      h_size_hint->max_width = o_window_position->width;
+      h_size_hint->max_height = o_window_position->height;
+
+      XSetWMNormalHints(x_display, x_window, h_size_hint);
+      /** XResizeWindow(x_display, x_window, o_window_position.width, o_window_position.height); /* Resize window */
+      /** XFlush(x_display); /* Update display */
+   }
+}
+
 int b_search(int *a, int m, int n) /* Linear search. */
 {
    int i_count;
@@ -543,8 +610,17 @@ int main(int argc, char *argv[])
    Cursor x_cursor;                    /* Application cursor */
    Pixmap x_logo;                      /* Application icon */
    XEvent x_event;
-   XSizeHints *h_size_hint;
+
    Atom wm_delete;
+   Atom x_clipboard;                   /* CLIPBOARD atom */
+   Atom x_targets;                     /* TARGETS atom */
+   Atom x_types[1];                    /* Array to hold list of supported data types (only one entry as we only support strings)*/
+
+   XSelectionRequestEvent *x_request;  /* Request event */
+   XSelectionEvent x_selection;        /* Reply event */
+
+   XSizeHints *h_size_hint;
+
    XRectangle o_window_position;
    XRectangle o_window_geometry;
 
@@ -954,7 +1030,6 @@ int main(int argc, char *argv[])
       BlackPixel(x_display, i_screen), /* Border colour - ignored ? */
       WhitePixel(x_display, i_screen)); /* Background colour */
 
-
    if (XGetGeometry(x_display, x_window,    /* Get window geometry */
          &RootWindow(x_display, i_screen),
          &i_window_left, &i_window_top,
@@ -1026,11 +1101,15 @@ int main(int argc, char *argv[])
       KeyPressMask | KeyReleaseMask | ButtonPressMask |
       ButtonReleaseMask | StructureNotifyMask | SubstructureNotifyMask);
 
+   x_clipboard = XInternAtom(x_display, "CLIPBOARD", False);  /* get CLIPBOARD atom */
+   x_targets   = XInternAtom(x_display, "TARGETS", False);    /* get TARGETS atom */
    wm_delete = XInternAtom(x_display, "WM_DELETE_WINDOW", False);  /* Create a windows delete message 'atom'. */
+
    XSetWMProtocols(x_display, x_window, &wm_delete, 1);  /* Tell the display to pass wm_delete messages to the application window */
 
    XMapWindow(x_display, x_window);  /* Show window on display */
    XRaiseWindow(x_display, x_window);  /* Raise window - ensures expose event is raised? */
+
 
    v_processor_reset(h_processor);
    h_processor->trace = b_trace;
@@ -1145,20 +1224,58 @@ int main(int argc, char *argv[])
             }
             break;
 #if defined (__unix__)
+         case SelectionRequest:
+            x_request = &x_event.xselectionrequest;         /* Get pointer to request event detail */
+
+            x_selection.type      = SelectionNotify;        /* Set reply type */
+            x_selection.display   = x_request->display;     /* Copy display */
+            x_selection.requestor = x_request->requestor;   /* Copy requester window */
+            x_selection.selection = x_request->selection;   /* Copy selection */
+            x_selection.time      = x_request->time;        /* Timestamp */
+            x_selection.target    = x_request->target;      /* Requested target */
+            x_selection.property  = x_request->property;    /* Property to store data */
+
+            x_types[0] = XA_STRING;  /* Only support strings - we don't attempt to return a numeric value */
+
+            if (x_request->target == x_targets)  /* Requester has asked for a 'list' of the supported target data types available */
+               XChangeProperty(x_display, x_request->requestor, x_request->property, XA_ATOM, 32, PropModeReplace, (unsigned char*) x_types, 1);  /* Send list of supported types */
+            else if (x_request->target == XA_STRING)  /* Requester has asked for a string (supported type) */
+               XChangeProperty(x_display, x_request->requestor, x_request->property, XA_STRING, 8, PropModeReplace, (unsigned char*)s_text, strlen(s_text));  /* Send text */
+            else
+               x_selection.property = None;  /* Target data type not supported - do nothing */
+
+            XSendEvent(x_display, x_request->requestor, False, 0, (XEvent*)&x_selection);  /* Send reply */
+            XFlush(x_display);  /* flush output */
+            break;
          case KeyPress :
             h_key_pressed(h_keyboard, x_display, x_event.xkey.keycode, x_event.xkey.state, b_numlock);  /* Attempts to translate a key code into a character */
             if (h_keyboard->key == (XK_BackSpace & 0x1f)) h_keyboard->key = XK_Escape & 0x1f;  /* Map backspace to escape */
-            if (h_keyboard->key == (XK_Z & 0x1f))  /* Ctrl-Z to exit */
+            if (XLookupKeysym(&x_event.xkey, 0) == XK_equal && (x_event.xkey.state & (ControlMask | ShiftMask)) == (ControlMask | ShiftMask))  /* Explicitly test for Ctrl-Shift-Plus */
+            {
+               v_zoom_in(x_display, x_window, h_size_hint, &o_window_position);  /* Zoom in */
+               f_scale = (float)o_window_position.width / (float)WIDTH;  /* Update display scale */
+            }
+            else if ((XLookupKeysym(&x_event.xkey, 0) == XK_minus) && (x_event.xkey.state & ControlMask) && !(x_event.xkey.state & ShiftMask))  /* Explicitly test for Ctrl-Minus */
+            {
+               v_zoom_out(x_display, x_window, h_size_hint, &o_window_position);  /* Zoom out */
+               f_scale = (float)o_window_position.width / (float)WIDTH;  /* Update display scale */
+            }
+            else if (h_keyboard->key == (XK_Z & 0x1f))  /* Ctrl-Z to exit */
                b_abort = True;
             else if (h_keyboard->key == (XK_T & 0x1f))  /* Ctrl-T to toggle tracing */
                h_processor->trace = !h_processor->trace;
             else if (h_keyboard->key == (XK_S & 0x1f))  /* Ctrl-S or space to single step */
                h_processor->trace = h_processor->step = b_run = True;
-            else if (h_keyboard->key == (XK_R & 0x1f))  /* Ctrl-R to display internal CPU registers */
+            else if (h_keyboard->key == (XK_D & 0x1f))  /* Ctrl-D to display internal CPU registers */
                v_fprint_registers(stdout, h_processor);
             else if (h_keyboard->key == (XK_Q & 0x1f))  /* Ctrl-Q to resume */
                h_processor->step = !(b_run  = True);
-            else if (h_keyboard->key == (XK_C & 0x1f))  /* Ctrl-C to reset */
+            else if (h_keyboard->key == (XK_C & 0x1f))  /* Ctrl-C to copy to clipboard */
+            {
+               s_text = s_display_string(h_display);  /* Get current contents of the display */
+               XSetSelectionOwner(x_display, x_clipboard, x_window, CurrentTime);  /* Claim ownership of the clipboard */
+            }
+            else if (h_keyboard->key == (XK_R & 0x1f))  /* Ctrl-R to reset */
             {
                v_processor_reset(h_processor);
 #if defined(CONTINIOUS)
@@ -1264,7 +1381,7 @@ int main(int argc, char *argv[])
                         case 3:
                         case 1:
                            h_processor->print = NORMAL;
-                           break;
+                           break;XSetSelectionOwner(x_display, x_clipboard, x_window, CurrentTime);  /* claim CLIPBOARD ownership */
                         case 2:
                            h_processor->print = TRACE;
                            break;
@@ -1344,31 +1461,16 @@ int main(int argc, char *argv[])
                case Button4:  /* Mouse wheel buttons */
                case Button5:
                {
-                  int i_value;
                   if (x_event.xkey.state & ControlMask)  /* Ignore mouse wheel events unless Ctrl key is pressed */
                   {
-                     i_value = (f_scale - 1.0) * 8;
                      if (x_event.xbutton.button == Button5)
-                        i_value--;
+                        v_zoom_in(x_display, x_window, h_size_hint, &o_window_position);
                      else
-                        i_value++;
-                     if ((i_value >= 0) && (i_value < MAX_ZOOM))
-                     {
-                        f_scale = 1 + (0.125 * i_value);
-                        o_window_position.width = (int)(WIDTH * f_scale);  /* Window width in pixels */
-                        o_window_position.height = (int)(HEIGHT * f_scale);  /* Window height in pixels */
-
-                        h_size_hint->width = o_window_position.width;
-                        h_size_hint->height = o_window_position.height;
-                        h_size_hint->min_width = o_window_position.width;
-                        h_size_hint->min_height = o_window_position.height;
-                        h_size_hint->max_width = o_window_position.width;
-                        h_size_hint->max_height = o_window_position.height;
-
-                        XSetWMNormalHints(x_display, x_window, h_size_hint);
-                        /** XResizeWindow(x_display, x_window, o_window_position.width, o_window_position.height); /* Resize window */
-                        /** XFlush(x_display); /* Update display */
-                     }
+                        v_zoom_out(x_display, x_window, h_size_hint, &o_window_position);
+                     f_scale = (float)o_window_position.width / (float)WIDTH;
+                     XSetWMNormalHints(x_display, x_window, h_size_hint);
+                     /** XResizeWindow(x_display, x_window, o_window_position.width, o_window_position.height); /* Resize window */
+                     /** XFlush(x_display); /* Update display */
                   }
                }
                break;
