@@ -105,6 +105,8 @@
  *                     hours, minutes and seconds - MT
  * 01 Nov 25         - Added cards - MT
  *                   - Fixed label properties - MT
+ * 08 Jan 26         - Defined  display_string() to return a string showing
+ *                     the display - MT
  *
  */
 
@@ -668,3 +670,83 @@ int i_display_update(struct odisplay *h_display, oprocessor *h_processor)
 #endif
    return (True);
 }
+
+/*
+ * s_display_string(display, processor)
+ *
+ * Returns a pointer to a string showing the display contents.
+ *
+ */
+
+char *s_display_string(struct odisplay *h_display)
+{
+   int i_count, i_index, i_offset;
+   static char s_buffer[24];
+
+   typedef struct  /* A structure to hold a mask value and associated letter */
+   {
+      int  value;
+      char letter;
+   } pair;
+
+   static const pair a_digits[] =
+   {
+      { DISPLAY_SPACE, ' ' },
+      { DISPLAY_ONE,   '1' },
+      { DISPLAY_TWO,   '2' },
+      { DISPLAY_THREE, '3' },
+      { DISPLAY_FOUR,  '4' },
+      { DISPLAY_FIVE,  '5' },
+      { DISPLAY_SIX,   '6' },
+      { DISPLAY_SEVEN, '7' },
+      { DISPLAY_EIGHT, '8' },
+      { DISPLAY_NINE,  '9' },
+      { DISPLAY_ZERO,  '0' },
+      { DISPLAY_MINUS, '-' },
+      { DISPLAY_r,     'r' },
+      { DISPLAY_c,     'c' },
+      { DISPLAY_C,     'C' },
+      { DISPLAY_o,     'o' },
+      { DISPLAY_d,     'd' },
+      { DISPLAY_P,     'P' },
+      { DISPLAY_E,     'E' },
+      { DISPLAY_F,     'F' }
+   };
+
+   static const pair a_special[] =
+   {
+      { DISPLAY_DECIMAL, '.' },
+      { DISPLAY_COMMA,   ';' },
+      { DISPLAY_COLON,   ':' }
+   };
+
+   i_offset = 0;
+   for (i_count = 0; i_count < DIGITS; i_count++)
+   {
+      if (h_display->digit[i_count] != NULL)  /* Check digit is defined */
+      {
+         for (i_index = 0; i_index < (sizeof(a_digits)/sizeof(a_digits[0])); i_index++)  /* Search for matching digit */
+         {
+            if ((h_display->digit[i_count]->mask & 0x7f) == a_digits[i_index].value)
+            {
+               s_buffer[i_offset] = a_digits[i_index].letter;
+               break;
+            }
+         }
+
+         for (i_index = 0; i_index < (sizeof(a_special)/sizeof(a_special[0])); i_index++)  /* Search for matching special character */
+         {
+            if ((h_display->digit[i_count]->mask & 0x0380) == a_special[i_index].value)
+            {
+               if (h_display->digit[i_count]->mask != a_special[i_index].value) i_offset++;  /* If a special character is part of digit increment offset before inserting into string */
+               s_buffer[i_offset] = a_special[i_index].letter;
+               break;
+            }
+         }
+         i_offset++;  /* Next character */
+      }
+   }
+   s_buffer[i_offset] = '\0';   /* Terminate string */
+   return s_buffer;
+}
+
