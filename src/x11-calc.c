@@ -448,6 +448,9 @@
  *                     copy of the data locally ready to be sent to another
  *                     process when it requests it) - MT
  * 10 Jan 26         - Swapped mouse buttons for zoom in and zoom out - MT
+ *                   - Disabled  resizing on MacOS because XQuartz does not
+ *                     support the mouse wheel or modifying the window size
+ *                     using XSetWMNormalHints() - MT
  *
  *
  * To Do             - Parse command line in a separate routine.
@@ -461,7 +464,7 @@
 
 #define  NAME           "x11-calc"
 #define  VERSION        "0.25"
-#define  BUILD          "0239"
+#define  BUILD          "0240"
 #define  DATE           "10 Jan 25"
 #define  AUTHOR         "MT"
 
@@ -539,6 +542,7 @@ void v_set_blank_cursor(Display *x_display, Window x_window, Cursor *x_cursor)
    XFreePixmap (x_display, x_blank);  /* Free up pixmap */
 }
 
+#if !defined(__apple__)
 void v_zoom_in(Display *x_display, Window x_window, XSizeHints *h_size_hint, XRectangle *o_window_position)
 {
    float f_scale;
@@ -589,6 +593,7 @@ void v_zoom_out(Display *x_display, Window x_window, XSizeHints *h_size_hint, XR
       XSetWMNormalHints(x_display, x_window, h_size_hint);
    }
 }
+#endif
 
 int b_search(int *a, int m, int n) /* Linear search. */
 {
@@ -1098,15 +1103,14 @@ int main(int argc, char *argv[])
       KeyPressMask | KeyReleaseMask | ButtonPressMask |
       ButtonReleaseMask | StructureNotifyMask | SubstructureNotifyMask);
 
-   x_clipboard = XInternAtom(x_display, "CLIPBOARD", False);  /* get CLIPBOARD atom */
-   x_targets   = XInternAtom(x_display, "TARGETS", False);    /* get TARGETS atom */
+   x_clipboard = XInternAtom(x_display, "CLIPBOARD", False);  /* Get clipboard atom */
+   x_targets = XInternAtom(x_display, "TARGETS", False);  /* Get targets atom */
    wm_delete = XInternAtom(x_display, "WM_DELETE_WINDOW", False);  /* Create a windows delete message 'atom'. */
 
    XSetWMProtocols(x_display, x_window, &wm_delete, 1);  /* Tell the display to pass wm_delete messages to the application window */
 
    XMapWindow(x_display, x_window);  /* Show window on display */
    XRaiseWindow(x_display, x_window);  /* Raise window - ensures expose event is raised? */
-
 
    v_processor_reset(h_processor);
    h_processor->trace = b_trace;
@@ -1247,6 +1251,7 @@ int main(int argc, char *argv[])
          case KeyPress :
             h_key_pressed(h_keyboard, x_display, x_event.xkey.keycode, x_event.xkey.state, b_numlock);  /* Attempts to translate a key code into a character */
             if (h_keyboard->key == (XK_BackSpace & 0x1f)) h_keyboard->key = XK_Escape & 0x1f;  /* Map backspace to escape */
+#if !defined(__apple__)
             if (XLookupKeysym(&x_event.xkey, 0) == XK_equal && (x_event.xkey.state & (ControlMask | ShiftMask)) == (ControlMask | ShiftMask))  /* Explicitly test for Ctrl-Shift-Plus */
             {
                v_zoom_in(x_display, x_window, h_size_hint, &o_window_position);  /* Zoom in */
@@ -1257,7 +1262,9 @@ int main(int argc, char *argv[])
                v_zoom_out(x_display, x_window, h_size_hint, &o_window_position);  /* Zoom out */
                f_scale = (float)o_window_position.width / (float)WIDTH;  /* Update display scale */
             }
-            else if (h_keyboard->key == (XK_Z & 0x1f))  /* Ctrl-Z to exit */
+            else
+#endif
+            if (h_keyboard->key == (XK_Z & 0x1f))  /* Ctrl-Z to exit */
                b_abort = True;
             else if (h_keyboard->key == (XK_T & 0x1f))  /* Ctrl-T to toggle tracing */
                h_processor->trace = !h_processor->trace;
@@ -1454,7 +1461,7 @@ int main(int argc, char *argv[])
 #endif
                break;
 #endif
-
+#if !defined(__apple__)
                case Button4:  /* Mouse wheel buttons */
                case Button5:
                {
@@ -1468,7 +1475,7 @@ int main(int argc, char *argv[])
                   }
                }
                break;
-
+#endif
             }
             break;
          case Expose :  /* Draw or redraw the window */
