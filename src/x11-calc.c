@@ -447,6 +447,7 @@
  *                     X Windows is that the application saves a  temporary
  *                     copy of the data locally ready to be sent to another
  *                     process when it requests it) - MT
+ * 10 Jan 26         - Swapped mouse buttons for zoom in and zoom out - MT
  *
  *
  * To Do             - Parse command line in a separate routine.
@@ -460,8 +461,8 @@
 
 #define  NAME           "x11-calc"
 #define  VERSION        "0.25"
-#define  BUILD          "0238"
-#define  DATE           "09 Jan 25"
+#define  BUILD          "0239"
+#define  DATE           "10 Jan 25"
 #define  AUTHOR         "MT"
 
 #define  TICKS          48  /* Number of ticks to execute before updating the display */
@@ -561,8 +562,6 @@ void v_zoom_in(Display *x_display, Window x_window, XSizeHints *h_size_hint, XRe
       h_size_hint->max_height = o_window_position->height;
 
       XSetWMNormalHints(x_display, x_window, h_size_hint);
-      /** XResizeWindow(x_display, x_window, o_window_position.width, o_window_position.height); /* Resize window */
-      /** XFlush(x_display); /* Update display */
    }
 }
 
@@ -588,8 +587,6 @@ void v_zoom_out(Display *x_display, Window x_window, XSizeHints *h_size_hint, XR
       h_size_hint->max_height = o_window_position->height;
 
       XSetWMNormalHints(x_display, x_window, h_size_hint);
-      /** XResizeWindow(x_display, x_window, o_window_position.width, o_window_position.height); /* Resize window */
-      /** XFlush(x_display); /* Update display */
    }
 }
 
@@ -1464,13 +1461,10 @@ int main(int argc, char *argv[])
                   if (x_event.xkey.state & ControlMask)  /* Ignore mouse wheel events unless Ctrl key is pressed */
                   {
                      if (x_event.xbutton.button == Button5)
-                        v_zoom_in(x_display, x_window, h_size_hint, &o_window_position);
-                     else
                         v_zoom_out(x_display, x_window, h_size_hint, &o_window_position);
+                     else
+                        v_zoom_in(x_display, x_window, h_size_hint, &o_window_position);
                      f_scale = (float)o_window_position.width / (float)WIDTH;
-                     XSetWMNormalHints(x_display, x_window, h_size_hint);
-                     /** XResizeWindow(x_display, x_window, o_window_position.width, o_window_position.height); /* Resize window */
-                     /** XFlush(x_display); /* Update display */
                   }
                }
                break;
