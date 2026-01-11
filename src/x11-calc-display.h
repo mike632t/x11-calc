@@ -51,11 +51,40 @@
  * 08 Jan 26         - Always define display mask values - MT
  *                   - Defined  display_string() to return a string showing
  *                     the display - MT
+ * 11 Jan 26         - Fixed display masks on voyagers - MT
  *
  */
 
 #include "x11-calc-cpu.h"
 
+#if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c)
+#define DISPLAY_SPACE      0x0000
+#define DISPLAY_ONE        0x0030
+#define DISPLAY_TWO        0x006d
+#define DISPLAY_THREE      0x0079
+#define DISPLAY_FOUR       0x0072
+#define DISPLAY_FIVE       0x005b
+#define DISPLAY_SIX        0x005f
+#define DISPLAY_SEVEN      0x0031
+#define DISPLAY_EIGHT      0x007f
+#define DISPLAY_NINE       0x007b
+#define DISPLAY_ZERO       0x003f
+#define DISPLAY_MINUS      0x0040
+#define DISPLAY_DECIMAL    0x0080
+#define DISPLAY_COMMA      0x0100
+#define DISPLAY_COLON      0x0200
+#define DISPLAY_R          0x0003
+#define DISPLAY_U          0x0062
+#define DISPLAY_N          0x0023
+#define DISPLAY_I          0x0020
+#define DISPLAY_G          0x007b
+#define DISPLAY_P          0x0067
+#define DISPLAY_E          0x004f
+#define DISPLAY_r          0x0044
+#define DISPLAY_o          0x005c
+#define DISPLAY_F          0x0047
+#define DISPLAY_TEST       0x01ff
+#else
 #define DISPLAY_SPACE      0x0000
 #define DISPLAY_ONE        0x0030
 #define DISPLAY_TWO        0x006d
@@ -80,6 +109,7 @@
 #define DISPLAY_E          0x004f
 #define DISPLAY_F          0x0047
 #define DISPLAY_TEST       0x01ff
+#endif
 
 struct odisplay/* Calculator display structure. */
 {
