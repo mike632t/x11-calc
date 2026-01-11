@@ -48,15 +48,15 @@
  * 29 Jun 25         - Added support for European display formats for SPICE
  *                     series - MT
  * 23 Aug 25         - Deleted 'Enabled' property as it isn't needed - MT
+ * 08 Jan 26         - Always define display mask values - MT
+ *                   - Defined  display_string() to return a string showing
+ *                     the display - MT
  *
  */
 
 #include "x11-calc-cpu.h"
 
 #define DISPLAY_SPACE      0x0000
-
-#if !(defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c))
-
 #define DISPLAY_ONE        0x0030
 #define DISPLAY_TWO        0x006d
 #define DISPLAY_THREE      0x0079
@@ -80,9 +80,6 @@
 #define DISPLAY_E          0x004f
 #define DISPLAY_F          0x0047
 #define DISPLAY_TEST       0x01ff
-
-#endif
-
 
 struct odisplay/* Calculator display structure. */
 {
@@ -114,3 +111,5 @@ int i_display_draw(Display *x_display, int x_application_window, int i_screen, s
 int i_display_resize(struct odisplay *h_display, float f_scale);
 
 int i_display_update(struct odisplay *h_display, oprocessor *h_processor);
+
+char *s_display_string(struct odisplay *h_display);

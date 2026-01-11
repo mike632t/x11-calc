@@ -442,6 +442,11 @@
  *                      Ctrl-C  - Reserved for copy
  *                      Ctrl-R  - Reset
  *                      Ctrl-D  - Display registers
+ * 09 Jan 26   0.25  - Allows the user to copy the current display contents
+ *                     to the clipboard (they way this actually works under
+ *                     X Windows is that the application saves a  temporary
+ *                     copy of the data locally ready to be sent to another
+ *                     process when it requests it) - MT
  *
  *
  * To Do             - Parse command line in a separate routine.
@@ -454,9 +459,9 @@
  */
 
 #define  NAME           "x11-calc"
-#define  VERSION        "0.24"
-#define  BUILD          "0237"
-#define  DATE           "07 Jan 25"
+#define  VERSION        "0.25"
+#define  BUILD          "0238"
+#define  DATE           "09 Jan 25"
 #define  AUTHOR         "MT"
 
 #define  TICKS          48  /* Number of ticks to execute before updating the display */
@@ -473,6 +478,7 @@
 
 #include <X11/Xlib.h>   /* XOpenDisplay(), True/False etc */
 #include <X11/Xutil.h>  /* XSizeHints etc */
+#include <X11/Xatom.h>  /* Atom definitions */
 #include <X11/keysym.h>
 #include <X11/cursorfont.h>
 
@@ -604,8 +610,17 @@ int main(int argc, char *argv[])
    Cursor x_cursor;                    /* Application cursor */
    Pixmap x_logo;                      /* Application icon */
    XEvent x_event;
-   XSizeHints *h_size_hint;
+
    Atom wm_delete;
+   Atom x_clipboard;                   /* CLIPBOARD atom */
+   Atom x_targets;                     /* TARGETS atom */
+   Atom x_types[1];                    /* Array to hold list of supported data types (only one entry as we only support strings)*/
+
+   XSelectionRequestEvent *x_request;  /* Request event */
+   XSelectionEvent x_selection;        /* Reply event */
+
+   XSizeHints *h_size_hint;
+
    XRectangle o_window_position;
    XRectangle o_window_geometry;
 
@@ -1086,11 +1101,15 @@ int main(int argc, char *argv[])
       KeyPressMask | KeyReleaseMask | ButtonPressMask |
       ButtonReleaseMask | StructureNotifyMask | SubstructureNotifyMask);
 
+   x_clipboard = XInternAtom(x_display, "CLIPBOARD", False);  /* get CLIPBOARD atom */
+   x_targets   = XInternAtom(x_display, "TARGETS", False);    /* get TARGETS atom */
    wm_delete = XInternAtom(x_display, "WM_DELETE_WINDOW", False);  /* Create a windows delete message 'atom'. */
+
    XSetWMProtocols(x_display, x_window, &wm_delete, 1);  /* Tell the display to pass wm_delete messages to the application window */
 
    XMapWindow(x_display, x_window);  /* Show window on display */
    XRaiseWindow(x_display, x_window);  /* Raise window - ensures expose event is raised? */
+
 
    v_processor_reset(h_processor);
    h_processor->trace = b_trace;
@@ -1205,6 +1224,29 @@ int main(int argc, char *argv[])
             }
             break;
 #if defined (__unix__)
+         case SelectionRequest:
+            x_request = &x_event.xselectionrequest;         /* Get pointer to request event detail */
+
+            x_selection.type      = SelectionNotify;        /* Set reply type */
+            x_selection.display   = x_request->display;     /* Copy display */
+            x_selection.requestor = x_request->requestor;   /* Copy requester window */
+            x_selection.selection = x_request->selection;   /* Copy selection */
+            x_selection.time      = x_request->time;        /* Timestamp */
+            x_selection.target    = x_request->target;      /* Requested target */
+            x_selection.property  = x_request->property;    /* Property to store data */
+
+            x_types[0] = XA_STRING;  /* Only support strings - we don't attempt to return a numeric value */
+
+            if (x_request->target == x_targets)  /* Requester has asked for a 'list' of the supported target data types available */
+               XChangeProperty(x_display, x_request->requestor, x_request->property, XA_ATOM, 32, PropModeReplace, (unsigned char*) x_types, 1);  /* Send list of supported types */
+            else if (x_request->target == XA_STRING)  /* Requester has asked for a string (supported type) */
+               XChangeProperty(x_display, x_request->requestor, x_request->property, XA_STRING, 8, PropModeReplace, (unsigned char*)s_text, strlen(s_text));  /* Send text */
+            else
+               x_selection.property = None;  /* Target data type not supported - do nothing */
+
+            XSendEvent(x_display, x_request->requestor, False, 0, (XEvent*)&x_selection);  /* Send reply */
+            XFlush(x_display);  /* flush output */
+            break;
          case KeyPress :
             h_key_pressed(h_keyboard, x_display, x_event.xkey.keycode, x_event.xkey.state, b_numlock);  /* Attempts to translate a key code into a character */
             if (h_keyboard->key == (XK_BackSpace & 0x1f)) h_keyboard->key = XK_Escape & 0x1f;  /* Map backspace to escape */
@@ -1230,7 +1272,8 @@ int main(int argc, char *argv[])
                h_processor->step = !(b_run  = True);
             else if (h_keyboard->key == (XK_C & 0x1f))  /* Ctrl-C to copy to clipboard */
             {
-               /** ToDo - Handle copy */
+               s_text = s_display_string(h_display);  /* Get current contents of the display */
+               XSetSelectionOwner(x_display, x_clipboard, x_window, CurrentTime);  /* Claim ownership of the clipboard */
             }
             else if (h_keyboard->key == (XK_R & 0x1f))  /* Ctrl-R to reset */
             {
@@ -1338,7 +1381,7 @@ int main(int argc, char *argv[])
                         case 3:
                         case 1:
                            h_processor->print = NORMAL;
-                           break;
+                           break;XSetSelectionOwner(x_display, x_clipboard, x_window, CurrentTime);  /* claim CLIPBOARD ownership */
                         case 2:
                            h_processor->print = TRACE;
                            break;
@@ -1426,6 +1469,8 @@ int main(int argc, char *argv[])
                         v_zoom_out(x_display, x_window, h_size_hint, &o_window_position);
                      f_scale = (float)o_window_position.width / (float)WIDTH;
                      XSetWMNormalHints(x_display, x_window, h_size_hint);
+                     /** XResizeWindow(x_display, x_window, o_window_position.width, o_window_position.height); /* Resize window */
+                     /** XFlush(x_display); /* Update display */
                   }
                }
                break;
