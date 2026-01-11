@@ -544,7 +544,6 @@ void v_set_blank_cursor(Display *x_display, Window x_window, Cursor *x_cursor)
    XFreePixmap (x_display, x_blank);  /* Free up pixmap */
 }
 
-#if !defined(__apple__)
 void v_zoom_in(Display *x_display, Window x_window, XSizeHints *h_size_hint, XRectangle *o_window_position, int *p_scale)
 {
    if (*p_scale < MAX_ZOOM)
@@ -589,7 +588,6 @@ void v_zoom_out(Display *x_display, Window x_window, XSizeHints *h_size_hint, XR
       XFlush(x_display); /* Update display */
    }
 }
-#endif
 
 int b_search(int *a, int m, int n) /* Linear search. */
 {
@@ -1247,13 +1245,11 @@ int main(int argc, char *argv[])
          case KeyPress :
             h_key_pressed(h_keyboard, x_display, x_event.xkey.keycode, x_event.xkey.state, b_numlock);  /* Attempts to translate a key code into a character */
             if (h_keyboard->key == (XK_BackSpace & 0x1f)) h_keyboard->key = XK_Escape & 0x1f;  /* Map backspace to escape */
-#if !defined(__apple__)
             if (XLookupKeysym(&x_event.xkey, 0) == XK_equal && (x_event.xkey.state & (ControlMask | ShiftMask)) == (ControlMask | ShiftMask))  /* Explicitly test for Ctrl-Shift-Plus */
                v_zoom_in(x_display, x_window, h_size_hint, &o_window_position, &i_scale);  /* Zoom in */
             else if ((XLookupKeysym(&x_event.xkey, 0) == XK_minus) && (x_event.xkey.state & ControlMask) && !(x_event.xkey.state & ShiftMask))  /* Explicitly test for Ctrl-Minus */
                v_zoom_out(x_display, x_window, h_size_hint, &o_window_position, &i_scale);  /* Zoom out */
             else
-#endif
             if (h_keyboard->key == (XK_Z & 0x1f))  /* Ctrl-Z to exit */
                b_abort = True;
             else if (h_keyboard->key == (XK_T & 0x1f))  /* Ctrl-T to toggle tracing */
@@ -1450,7 +1446,7 @@ int main(int argc, char *argv[])
 #endif
                break;
 #endif
-#if !defined(__apple__)
+#if !defined(__apple__)  /* No support for mouse wheel on XQuartz */
                case Button4:  /* Mouse wheel buttons */
                case Button5:
                {
