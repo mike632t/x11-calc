@@ -223,9 +223,11 @@ shifted or not).
 
 The following control keys can also be used.
 
-`Ctrl-C` Resets the emulator to its initial or last saved state.
+`Ctrl-C` Copies the contents of the display to the clipboard.
 
-`Ctrl-R` Prints the register contents.
+`Ctrl-D` Prints the register contents.
+
+`Ctrl-R` Resets the emulator to its initial or last saved state.
 
 `Ctrl-S` Enable tracing and executes a single instruction.
 
