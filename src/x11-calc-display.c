@@ -101,12 +101,14 @@
  * 14 Sep 25         - Display  decoder for HP35, HP45, HP70, HP80 and HP55
  *                     completely rewritten to handle the timer and program
  *                     modes - MT
- *                   - HP55 now displays the timer using colons to seperate
+ *                   - HP55 now displays the timer using colons to separate
  *                     hours, minutes and seconds - MT
  * 01 Nov 25         - Added cards - MT
  *                   - Fixed label properties - MT
  * 08 Jan 26         - Defined  display_string() to return a string showing
  *                     the display - MT
+ * 11 Jan 26         - Fixed issues with copying text (display masks parsed
+ *                     correctly on voyager models) - MT
  *
  */
 
@@ -681,6 +683,7 @@ int i_display_update(struct odisplay *h_display, oprocessor *h_processor)
 char *s_display_string(struct odisplay *h_display)
 {
    int i_count, i_index, i_offset;
+   int b_alpha = False;
    static char s_buffer[24];
 
    typedef struct  /* A structure to hold a mask value and associated letter */
@@ -702,7 +705,26 @@ char *s_display_string(struct odisplay *h_display)
       { DISPLAY_EIGHT, '8' },
       { DISPLAY_NINE,  '9' },
       { DISPLAY_ZERO,  '0' },
-      { DISPLAY_MINUS, '-' },
+      { DISPLAY_MINUS, '-' }
+   };
+
+#if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c)
+   static const pair a_letters[] =
+   {
+      { DISPLAY_R,     'r' },
+      { DISPLAY_U,     'u' },
+      { DISPLAY_N,     'n' },
+      { DISPLAY_I,     'i' },
+      { DISPLAY_G,     'g' },
+      { DISPLAY_P,     'P' },
+      { DISPLAY_E,     'E' },
+      { DISPLAY_F,     'F' },
+      { DISPLAY_r,     'r' },
+      { DISPLAY_o,     'o' }
+   };
+#else
+   static const pair a_letters[] =
+   {
       { DISPLAY_r,     'r' },
       { DISPLAY_c,     'c' },
       { DISPLAY_C,     'C' },
@@ -712,7 +734,7 @@ char *s_display_string(struct odisplay *h_display)
       { DISPLAY_E,     'E' },
       { DISPLAY_F,     'F' }
    };
-
+#endif
    static const pair a_special[] =
    {
       { DISPLAY_DECIMAL, '.' },
@@ -723,18 +745,29 @@ char *s_display_string(struct odisplay *h_display)
    i_offset = 0;
    for (i_count = 0; i_count < DIGITS; i_count++)
    {
-      if (h_display->digit[i_count] != NULL)  /* Check digit is defined */
+      s_buffer[i_offset] = ' ';  /* Default to a space */
+      if (h_display->digit[i_count] != NULL)  /* Check if digit is defined */
       {
-         for (i_index = 0; i_index < (sizeof(a_digits)/sizeof(a_digits[0])); i_index++)  /* Search for matching digit */
+         for (i_index = 0; i_index < (sizeof(a_letters)/sizeof(a_letters[0])); i_index++)  /* Search for letters that match the mask */
          {
-            if ((h_display->digit[i_count]->mask & 0x7f) == a_digits[i_index].value)
+            if ((h_display->digit[i_count]->mask & 0x7f) == a_letters[i_index].value)  /* Check for known letters */
             {
-               s_buffer[i_offset] = a_digits[i_index].letter;
+               if (a_letters[i_index].letter == 'i') b_alpha = True;  /* Bit if a fudge but if the message contains an 'i' (as in 'running') don't parse any numbers */
+               s_buffer[i_offset] = a_letters[i_index].letter;
                break;
             }
          }
+         if (!b_alpha)  /* Check for digits only if display isn't all alphabetic - otherwise a 'g' will be interpreted as a '9' as the mask is the same */
+            for (i_index = 0; i_index < (sizeof(a_digits)/sizeof(a_digits[0])); i_index++)  /* Search for digits that match the mask */
+            {
+               if ((h_display->digit[i_count]->mask & 0x7f) == a_digits[i_index].value)
+               {
+                  s_buffer[i_offset] = a_digits[i_index].letter;
+                  break;
+               }
+            }
 
-         for (i_index = 0; i_index < (sizeof(a_special)/sizeof(a_special[0])); i_index++)  /* Search for matching special character */
+         for (i_index = 0; i_index < (sizeof(a_special)/sizeof(a_special[0])); i_index++)  /* Search for special characters that match the mask */
          {
             if ((h_display->digit[i_count]->mask & 0x0380) == a_special[i_index].value)
             {
