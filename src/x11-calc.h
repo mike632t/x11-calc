@@ -241,6 +241,12 @@
 #define VOYAGER
 #include "x11-calc-16c.h"
 
+#elif defined(HP41c)
+#define FILENAME     "x11-calc-41c"
+#define TITLE        "RPN calc 41C"
+#define VOYAGER
+#include "x11-calc-41c.h"
+
 #endif
 
 #if !defined(SCALE_WIDTH)
