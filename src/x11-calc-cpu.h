@@ -86,7 +86,7 @@
 #define STATUS_BITS     16
 #define FLAGS           9
 
-#if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c)
+#if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c) || defined(HP41c)
 #define STACK_SIZE      4
 #else
 #define STACK_SIZE      2
@@ -165,12 +165,16 @@ typedef struct {
    unsigned char step;                 /* Step flag */
    unsigned char sleep;                /* Sleep */
    unsigned char enabled;              /* Enabled */
+#if defined(HP41c)
+   unsigned char fo[8];                /* Flag out */
+   unsigned char fi[8];                /* Flag in */
+#endif
 #if defined(HP10)
    unsigned char print;                /* Save print mode */
    unsigned int position;              /* Position of next char in buffer */
    unsigned char buffer[BUFSIZE];      /* Printer output buffer */
 #endif
-#if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c)
+#if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c) || defined(HP41c)
    unsigned char kyf;                  /* Keyboard flag */
    unsigned char g[2];                 /* G register */
    unsigned char q;                    /* Q register */
