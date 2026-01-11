@@ -451,6 +451,8 @@
  *                   - Disabled  resizing on MacOS because XQuartz does not
  *                     support the mouse wheel or modifying the window size
  *                     using XSetWMNormalHints() - MT
+ *                   - Scale display using only the integer scale factor to
+ *                     avoid floating point rounding errors - MT
  *
  *
  * To Do             - Parse command line in a separate routine.
@@ -543,20 +545,14 @@ void v_set_blank_cursor(Display *x_display, Window x_window, Cursor *x_cursor)
 }
 
 #if !defined(__apple__)
-void v_zoom_in(Display *x_display, Window x_window, XSizeHints *h_size_hint, XRectangle *o_window_position)
+void v_zoom_in(Display *x_display, Window x_window, XSizeHints *h_size_hint, XRectangle *o_window_position, int *p_scale)
 {
-   float f_scale;
-   int i_value;
-
-   f_scale = (float)o_window_position->width / (float)WIDTH;
-   f_scale += 0.125f;  /* zoom in step */
-
-   i_value = (int)((f_scale - 1.0f) / 0.125f);
-
-   if (i_value < MAX_ZOOM)
+   if (*p_scale < MAX_ZOOM)
    {
-      o_window_position->width  = (int)(WIDTH  * f_scale);
-      o_window_position->height = (int)(HEIGHT * f_scale);
+      (*p_scale)++;  /* Increment scale factor */
+
+      o_window_position->width  = (int)(WIDTH + WIDTH / 8 * *p_scale);
+      o_window_position->height = (int)(HEIGHT + HEIGHT / 8 * *p_scale);
 
       h_size_hint->width     = o_window_position->width;
       h_size_hint->height    = o_window_position->height;
@@ -570,18 +566,14 @@ void v_zoom_in(Display *x_display, Window x_window, XSizeHints *h_size_hint, XRe
 }
 
 
-void v_zoom_out(Display *x_display, Window x_window, XSizeHints *h_size_hint, XRectangle *o_window_position)
+void v_zoom_out(Display *x_display, Window x_window, XSizeHints *h_size_hint, XRectangle *o_window_position, int *p_scale)
 {
-   float f_scale;
-   int i_value;
-
-   f_scale = (float)o_window_position->width / (float)WIDTH;
-   f_scale -= 0.125;
-   i_value = (f_scale - 1.0 ) / 0.125;
-   if (i_value >= 0 )
+   if (*p_scale > 0 )
    {
-      o_window_position->width = (int)(WIDTH * f_scale);  /* Window width in pixels */
-      o_window_position->height = (int)(HEIGHT * f_scale);  /* Window height in pixels */
+      (*p_scale)--;  /* Decrement scale factor */
+
+      o_window_position->width  = (int)(WIDTH + WIDTH / 8 * *p_scale);
+      o_window_position->height = (int)(HEIGHT + HEIGHT / 8 * *p_scale);
 
       h_size_hint->width = o_window_position->width;
       h_size_hint->height = o_window_position->height;
@@ -635,8 +627,6 @@ int main(int argc, char *argv[])
    char *s_title = TITLE;              /* Windows title */
    char *s_text;                       /* Temporary pointer */
 
-   float f_scale = 1.0;
-
    unsigned int i_screen_width = 0;    /* Screen width */
    unsigned int i_screen_height = 0;   /* Screen height */
 
@@ -644,6 +634,7 @@ int main(int argc, char *argv[])
    int i_window_left = 0;              /* Window left */
    unsigned int i_window_width = 0;    /* Window width */
    unsigned int i_window_height = 0;   /* Window height */
+   int i_scale = 0;                    /* Integer value used to scale window size */
 
    unsigned int i_window_border = 4;   /* Window's border width */
    unsigned int i_colour_depth;        /* Window's colour depth */
@@ -859,7 +850,7 @@ int main(int argc, char *argv[])
                                  argv[i_offset] = argv[i_offset + 1];
                            argc--;
                         }
-                        f_scale = 1 + (0.125 * i_value);
+                        i_scale = i_value;
                      }
                      else
                         v_error(EINVAL, h_err_missing_argument, argv[i_count]);
@@ -1010,8 +1001,9 @@ int main(int argc, char *argv[])
    i_screen_width = DisplayWidth(x_display, i_screen);
    i_screen_height = DisplayHeight(x_display, i_screen);
 
-   o_window_position.width = (int)(WIDTH * f_scale);  /* Window width in pixels */
-   o_window_position.height = (int)(HEIGHT * f_scale);  /* Window height in pixels */
+   o_window_position.width = (WIDTH + (WIDTH * i_scale) / 8);
+   o_window_position.height = (HEIGHT + (HEIGHT * i_scale) / 8);
+
    /* If the window position wasn't specified just centre it on the screen - ignored by most window managers but useful in kiosk mode */
    if (i_window_left || b_geometry )  /* Fixed bug that caused position to be ignored if value was zero */
       o_window_position.x = i_window_left;  /* User specified position */
@@ -1193,10 +1185,10 @@ int main(int argc, char *argv[])
          }
 #endif
          i_display_draw(x_display, x_buffer, i_screen, h_display);  /* Redraw display */
-         if (f_scale > 1.0)
+         if (i_scale > 0)
             XScaleArea(x_display, x_buffer, x_window, DefaultGC(x_display, i_screen), 0, 0, WIDTH, HEIGHT, 0, 0, o_window_position.width, o_window_position.height);
          else
-            XCopyArea(x_display, x_buffer, x_window, DefaultGC(x_display, i_screen), 0, 0, o_window_position.width, o_window_position.height, 0, 0);
+            XCopyArea(x_display, x_buffer, x_window, DefaultGC(x_display, i_screen), 0, 0, WIDTH, HEIGHT, 0, 0);
          l_elapsed = (l_now() - l_start + 1);
          i_wait((INTERVAL - l_elapsed));  /* Sleep */
          l_start = l_now();  /* Get current time */
@@ -1253,15 +1245,9 @@ int main(int argc, char *argv[])
             if (h_keyboard->key == (XK_BackSpace & 0x1f)) h_keyboard->key = XK_Escape & 0x1f;  /* Map backspace to escape */
 #if !defined(__apple__)
             if (XLookupKeysym(&x_event.xkey, 0) == XK_equal && (x_event.xkey.state & (ControlMask | ShiftMask)) == (ControlMask | ShiftMask))  /* Explicitly test for Ctrl-Shift-Plus */
-            {
-               v_zoom_in(x_display, x_window, h_size_hint, &o_window_position);  /* Zoom in */
-               f_scale = (float)o_window_position.width / (float)WIDTH;  /* Update display scale */
-            }
+               v_zoom_in(x_display, x_window, h_size_hint, &o_window_position, &i_scale);  /* Zoom in */
             else if ((XLookupKeysym(&x_event.xkey, 0) == XK_minus) && (x_event.xkey.state & ControlMask) && !(x_event.xkey.state & ShiftMask))  /* Explicitly test for Ctrl-Minus */
-            {
-               v_zoom_out(x_display, x_window, h_size_hint, &o_window_position);  /* Zoom out */
-               f_scale = (float)o_window_position.width / (float)WIDTH;  /* Update display scale */
-            }
+               v_zoom_out(x_display, x_window, h_size_hint, &o_window_position, &i_scale);  /* Zoom out */
             else
 #endif
             if (h_keyboard->key == (XK_Z & 0x1f))  /* Ctrl-Z to exit */
@@ -1326,10 +1312,9 @@ int main(int argc, char *argv[])
             break;
 #endif
          case ButtonPress :
-            /** debug(printf("Mouse button [%d] pressed.\n", x_event.xbutton.button)); */
-
-            x_event.xbutton.x = (int)(x_event.xbutton.x / f_scale + 0.5f);  /* Scale the coordinate's */
-            x_event.xbutton.y = (int)(x_event.xbutton.y / f_scale + 0.5f);
+            i_value = 8 + i_scale;
+            x_event.xbutton.x = (x_event.xbutton.x * 8 + i_value / 2) / i_value;  /* Scale both coordinates with rounding */
+            x_event.xbutton.y = (x_event.xbutton.y * 8 + i_value / 2) / i_value;
 
             if (x_event.xbutton.button == Button1)
             {
@@ -1417,9 +1402,9 @@ int main(int argc, char *argv[])
             }
             break;
          case ButtonRelease :
-
-            x_event.xbutton.x = (int)(x_event.xbutton.x / f_scale + 0.5f);  /* Scale the coordinate's */
-            x_event.xbutton.y = (int)(x_event.xbutton.y / f_scale + 0.5f);
+            i_value = 8 + i_scale;
+            x_event.xbutton.x = (x_event.xbutton.x * 8 + i_value / 2) / i_value;  /* Scale both coordinates with rounding */
+            x_event.xbutton.y = (x_event.xbutton.y * 8 + i_value / 2) / i_value;
 
             switch (x_event.xbutton.button)
             {
@@ -1468,10 +1453,9 @@ int main(int argc, char *argv[])
                   if (x_event.xkey.state & ControlMask)  /* Ignore mouse wheel events unless Ctrl key is pressed */
                   {
                      if (x_event.xbutton.button == Button5)
-                        v_zoom_out(x_display, x_window, h_size_hint, &o_window_position);
+                        v_zoom_out(x_display, x_window, h_size_hint, &o_window_position, &i_scale);
                      else
-                        v_zoom_in(x_display, x_window, h_size_hint, &o_window_position);
-                     f_scale = (float)o_window_position.width / (float)WIDTH;
+                        v_zoom_in(x_display, x_window, h_size_hint, &o_window_position, &i_scale);
                   }
                }
                break;
