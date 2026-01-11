@@ -555,6 +555,8 @@ void v_zoom_in(Display *x_display, Window x_window, XSizeHints *h_size_hint, XRe
       h_size_hint->max_height = o_window_position->height;
 
       XSetWMNormalHints(x_display, x_window, h_size_hint);
+      XResizeWindow(x_display, x_window, o_window_position->width, o_window_position->height); /* Resize window */
+      XFlush(x_display); /* Update display */
    }
 }
 
@@ -580,6 +582,8 @@ void v_zoom_out(Display *x_display, Window x_window, XSizeHints *h_size_hint, XR
       h_size_hint->max_height = o_window_position->height;
 
       XSetWMNormalHints(x_display, x_window, h_size_hint);
+      XResizeWindow(x_display, x_window, o_window_position->width, o_window_position->height); /* Resize window */
+      XFlush(x_display); /* Update display */
    }
 }
 
