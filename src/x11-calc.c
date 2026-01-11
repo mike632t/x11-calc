@@ -453,6 +453,9 @@
  *                     using XSetWMNormalHints() - MT
  *                   - Scale display using only the integer scale factor to
  *                     avoid floating point rounding errors - MT
+ * 11 Jam 26  (0242) - Fixed  resizing on MacOS (by adding an explicit call
+ *                     XResizeWindow()) - NA
+ *                   - Added keyboard shortcut to reset windows size - MT
  *
  *
  * To Do             - Parse command line in a separate routine.
@@ -466,8 +469,8 @@
 
 #define  NAME           "x11-calc"
 #define  VERSION        "0.25"
-#define  BUILD          "0240"
-#define  DATE           "10 Jan 25"
+#define  BUILD          "0243"
+#define  DATE           "11 Jan 25"
 #define  AUTHOR         "MT"
 
 #define  TICKS          48  /* Number of ticks to execute before updating the display */
@@ -544,14 +547,14 @@ void v_set_blank_cursor(Display *x_display, Window x_window, Cursor *x_cursor)
    XFreePixmap (x_display, x_blank);  /* Free up pixmap */
 }
 
-void v_zoom_in(Display *x_display, Window x_window, XSizeHints *h_size_hint, XRectangle *o_window_position, int *p_scale)
+int v_zoom_in(Display *x_display, Window x_window, XSizeHints *h_size_hint, XRectangle *o_window_position, int i_scale)
 {
-   if (*p_scale < MAX_ZOOM)
+   if (i_scale < MAX_ZOOM)
    {
-      (*p_scale)++;  /* Increment scale factor */
+      i_scale++;  /* Increment scale factor */
 
-      o_window_position->width  = (int)(WIDTH + WIDTH / 8 * *p_scale);
-      o_window_position->height = (int)(HEIGHT + HEIGHT / 8 * *p_scale);
+      o_window_position->width  = (int)(WIDTH + WIDTH / 8 * i_scale);
+      o_window_position->height = (int)(HEIGHT + HEIGHT / 8 * i_scale);
 
       h_size_hint->width     = o_window_position->width;
       h_size_hint->height    = o_window_position->height;
@@ -564,17 +567,17 @@ void v_zoom_in(Display *x_display, Window x_window, XSizeHints *h_size_hint, XRe
       XResizeWindow(x_display, x_window, o_window_position->width, o_window_position->height); /* Resize window */
       XFlush(x_display); /* Update display */
    }
+   return (i_scale);
 }
 
-
-void v_zoom_out(Display *x_display, Window x_window, XSizeHints *h_size_hint, XRectangle *o_window_position, int *p_scale)
+int v_zoom_out(Display *x_display, Window x_window, XSizeHints *h_size_hint, XRectangle *o_window_position, int i_scale)
 {
-   if (*p_scale > 0 )
+   if (i_scale > 0 )
    {
-      (*p_scale)--;  /* Decrement scale factor */
+      i_scale--;  /* Decrement scale factor */
 
-      o_window_position->width  = (int)(WIDTH + WIDTH / 8 * *p_scale);
-      o_window_position->height = (int)(HEIGHT + HEIGHT / 8 * *p_scale);
+      o_window_position->width  = (int)(WIDTH + WIDTH / 8 * i_scale);
+      o_window_position->height = (int)(HEIGHT + HEIGHT / 8 * i_scale);
 
       h_size_hint->width = o_window_position->width;
       h_size_hint->height = o_window_position->height;
@@ -587,6 +590,7 @@ void v_zoom_out(Display *x_display, Window x_window, XSizeHints *h_size_hint, XR
       XResizeWindow(x_display, x_window, o_window_position->width, o_window_position->height); /* Resize window */
       XFlush(x_display); /* Update display */
    }
+   return (i_scale);
 }
 
 int b_search(int *a, int m, int n) /* Linear search. */
@@ -1246,11 +1250,12 @@ int main(int argc, char *argv[])
             h_key_pressed(h_keyboard, x_display, x_event.xkey.keycode, x_event.xkey.state, b_numlock);  /* Attempts to translate a key code into a character */
             if (h_keyboard->key == (XK_BackSpace & 0x1f)) h_keyboard->key = XK_Escape & 0x1f;  /* Map backspace to escape */
             if (XLookupKeysym(&x_event.xkey, 0) == XK_equal && (x_event.xkey.state & (ControlMask | ShiftMask)) == (ControlMask | ShiftMask))  /* Explicitly test for Ctrl-Shift-Plus */
-               v_zoom_in(x_display, x_window, h_size_hint, &o_window_position, &i_scale);  /* Zoom in */
+               i_scale = v_zoom_in(x_display, x_window, h_size_hint, &o_window_position, i_scale);  /* Zoom in */
             else if ((XLookupKeysym(&x_event.xkey, 0) == XK_minus) && (x_event.xkey.state & ControlMask) && !(x_event.xkey.state & ShiftMask))  /* Explicitly test for Ctrl-Minus */
-               v_zoom_out(x_display, x_window, h_size_hint, &o_window_position, &i_scale);  /* Zoom out */
-            else
-            if (h_keyboard->key == (XK_Z & 0x1f))  /* Ctrl-Z to exit */
+               i_scale = v_zoom_out(x_display, x_window, h_size_hint, &o_window_position, i_scale);  /* Zoom out */
+            else if ((XLookupKeysym(&x_event.xkey, 0) == XK_0) && (x_event.xkey.state & ControlMask) && !(x_event.xkey.state & ShiftMask))  /* Explicitly test for Ctrl-Zero */
+               i_scale = v_zoom_out(x_display, x_window, h_size_hint, &o_window_position, 1);  /* Reset zoom */
+            else if (h_keyboard->key == (XK_Z & 0x1f))  /* Ctrl-Z to exit */
                b_abort = True;
             else if (h_keyboard->key == (XK_T & 0x1f))  /* Ctrl-T to toggle tracing */
                h_processor->trace = !h_processor->trace;
@@ -1453,9 +1458,9 @@ int main(int argc, char *argv[])
                   if (x_event.xkey.state & ControlMask)  /* Ignore mouse wheel events unless Ctrl key is pressed */
                   {
                      if (x_event.xbutton.button == Button5)
-                        v_zoom_out(x_display, x_window, h_size_hint, &o_window_position, &i_scale);
+                        i_scale = v_zoom_out(x_display, x_window, h_size_hint, &o_window_position, i_scale);
                      else
-                        v_zoom_in(x_display, x_window, h_size_hint, &o_window_position, &i_scale);
+                        i_scale = v_zoom_in(x_display, x_window, h_size_hint, &o_window_position, i_scale);
                   }
                }
                break;

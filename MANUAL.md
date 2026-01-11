@@ -237,6 +237,12 @@ The following control keys can also be used.
 
 `Ctrl-Z` Exits the emulator.
 
+`Ctrl-+` Zoom in (enlarge window).
+
+`Ctrl--` Zoom out (reduce windows size).
+
+`Ctrl-0` Reset zoom.
+
 #### Firmware Debugging
 
 You  can  start the emulation in trace mode using `-t`, or in  single  step
