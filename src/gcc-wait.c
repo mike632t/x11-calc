@@ -46,6 +46,9 @@
  * 14 Dec 25         - Negative wait times are ignored - MT
  *                   - Tidied up includes - MT
  *
+ * Note              - '__solaris__', '__osf__' etc are defined in makefile
+ *                     and are (not standard).
+ *
  */
 
 #define NAME           "gcc-wait"
