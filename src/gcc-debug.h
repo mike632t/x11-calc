@@ -26,22 +26,44 @@
  * 03 Jan 22         - Changed both macros to allow DEBUG and VERBOSE to be
  *                     defined from the command line - MT
  * 09 Jun 25         - Changed to use stdout instead of stderr - MT
+ * 25 Jul 25         - Added profile and error macros - MT
+ *  1 Aug 25         - All macro definitions are now guarded by debug - MT
  *
  */
 
 /* Execute code if DEBUG is True */
 #ifndef debug /* Don't redefine macro if already defined. */
+
 #if defined(DEBUG)
-#define debug(code) do {fprintf(stdout, "\nDebug\t: %s line : %d : ", \
-            __FILE__, __LINE__); code;} while(0)
+#define debug(code) do {fprintf(stdout, "Debug\t: %s line : %d : ", \
+            __FILE__, __LINE__); code; fprintf(stdout, "\n");} while(0)
 #else
 #define debug(code)
-#endif
 #endif
 
 #if defined(VERBOSE)
 #define verbose(code) do {fprintf(stdout, "Verbose\t: %s line : %d : ", \
-            __FILE__, __LINE__); code;} while(0)
+            __FILE__, __LINE__); code; fprintf(stdout, "\n");} while(0)
 #else
 #define verbose(code)
+#endif
+
+#if defined(DEBUG)  /* Execute code if DEBUG is True */ 
+#include <time.h>
+#define profile(__code) do { /* Time how long code takes to execute */  \
+   struct timespec __t_start, __t_end; \
+   double __d_elapsed; \
+   clock_gettime(CLOCK_MONOTONIC, &__t_start); \
+   __code; \
+   clock_gettime(CLOCK_MONOTONIC, &__t_end); \
+   __d_elapsed = (__t_end.tv_sec - __t_start.tv_sec) + \
+                    (__t_end.tv_nsec - __t_start.tv_nsec) / 1e9; \
+   fprintf(stdout, "%0.9fs\n", __d_elapsed); \
+} while(0)
+#else
+#define profile(__code) do { /* Just run it */ \
+   __code; \
+} while(0)
+#endif
+
 #endif
