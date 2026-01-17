@@ -36,6 +36,8 @@
 #  02 Dec 25            - Fixed MacOS version detection - MT
 #  14 Dec 25            - Added release names to MacOS versions - MT
 #  20 Dec 25            - Updated window manager list to include xfwm4 - MT
+#  16 Jan 26            - If cinnamon is running then the window manager is
+#                         muffin - MT
 #
 
 #
@@ -286,8 +288,8 @@ echo ""
 
 # Window Manager
 _window_manager=""
-for _process in awesome blackbox fluxbox fvwm gnome-shell icewm i3 kwin marco \
-   metacity mutter mwm openbox sawfish twm wmaker xfwm xfwm4; do
+for _process in awesome blackbox cinnamon fluxbox fvwm gnome-shell icewm i3 kwin marco \
+   metacity mutter muffin mwm openbox sawfish twm wmaker xfwm xfwm4; do
       if ps -e 2>/dev/null | grep -w "$_process" | grep -v grep >/dev/null 2>&1; then
          _window_manager="$_process"
          break
@@ -297,6 +299,9 @@ for _process in awesome blackbox fluxbox fvwm gnome-shell icewm i3 kwin marco \
          break
       fi
 done
+if [ "$_window_manager" = "cinnamon"  ]; then  # Bit of a fudge as cinnamon implies muffin
+   _window_manager="muffin"
+fi
 if [ -z "$_window_manager" ]; then
    _window_manager="unknown"
 fi
@@ -411,4 +416,3 @@ else
    echo "Make: none"
 fi
 #echo ""
-
