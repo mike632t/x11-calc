@@ -224,6 +224,8 @@ following packages must be installed.
 
    - MacOS    : [Xcode](https://developer.apple.com/xcode/) [Xquartz](https://www.xquartz.org/)
 
+   - Mint     : gcc | clang | tcc make libc6-dev libx11-dev xfonts-base [libgtk-3-dev | libgtk2.0-dev]
+
    - NetBSD   : clang | gcc pmake
 
    - SUSE     : gcc | clang make libX11-devel
@@ -422,6 +424,8 @@ can be obtained from the 'legacy' branch.
 
    - Minix 3.4.0, clang 3.6, x86  (0.19.0195)
 
+   - Mint 22.3, gcc 13.3.0 | clang 18.1.3 | tcc 0.9.27, x86_64  (0.25.0243)
+
    - NetBSD 9.2, gcc 7.5.0 | clang 16.0.6, x86  (0.19.0195)
 
    - SunOS 5.10, gcc 3.4.3, x86  (0.23.0226)
@@ -514,14 +518,14 @@ armv7l
 - Has continuous memory by default.  Use the '--reset' option to disable it
   when starting the emulator.
 
-##### HP 11C + HP 12C + HP 15C + HP 16C
+##### HP 15C
 
-- Keyboard test is successful but these models do not pass the self-test.
+- Keyboard test is successful but this model does not pass self-test.
 
 #### Wayland Issues
 
 - The application window should be a fixed size (this can be modified using
-  '--zoom'), but Wayland does not allow applications to be a fixed size.
+  '--zoom') but this depends on the compositor used.
 
 #### VMS
 
