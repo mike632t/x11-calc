@@ -5,6 +5,9 @@
  *
  * Model specific functions.
  *
+ * This  emulation would not be possible without the efforts of Eric  SMITH
+ * who was able to dump the original ROMs.
+ *
  * This  program is free software: you can redistribute it and/or modify it
  * under  the terms of the GNU General Public License as published  by  the
  * Free  Software Foundation, either version 3 of the License, or (at  your
@@ -25,6 +28,7 @@
  * 18 Mar 24         - Embedded firmware - MT
  * 22 Apr 24         - Removed duplicate definition - MT
  * 29 Oct 25         - Updated labels to add alignment and attribute - MT
+ * 18 Jan 26         - Updated firmware to use the original ROMs - MT
  *
  */
 
@@ -934,5 +938,5 @@ int i_rom[ROM_SIZE] = {
    0x0349, 0x0040, 0x00b0, 0x03a8, 0x0344, 0x0389, 0x0022, 0x01cd,
    0x0040, 0x02be, 0x0048, 0x0379, 0x0028, 0x035d, 0x004c, 0x0219,
    0x0050, 0x0148, 0x02a5, 0x0048, 0x03c1, 0x004c, 0x0219, 0x0050,
-   0x02fa, 0x01e9, 0x001f, 0x01cd, 0x0040, 0x01fd, 0x0042, 0x0280
+   0x02fa, 0x01e9, 0x001f, 0x01cd, 0x0040, 0x01fd, 0x0042, 0x0000
 };
