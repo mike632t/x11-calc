@@ -1573,7 +1573,7 @@ static void v_op_inc_p(oprocessor *h_processor)  /* Increment p register */
             h_processor->p++;  /* if 'P' should be incremented when it is zero is to check the previous opcode !! */
       }
    }
-#elif defined(CLASSIC)
+#elif defined(HP35) || defined(HP80) || defined(HP45) || defined(HP70) || defined(HP55)
    h_processor->p++;
    h_processor->p &= 15;
 #else
@@ -1583,7 +1583,7 @@ static void v_op_inc_p(oprocessor *h_processor)  /* Increment p register */
 
 static void v_op_dec_p(oprocessor *h_processor)  /* Decrement p register */
 {
-#if defined(CLASSIC)
+#if defined(HP35) || defined(HP80) || defined(HP45) || defined(HP70) || defined(HP55)
    h_processor->p--;
    h_processor->p &= 15;
 #else
@@ -1594,7 +1594,7 @@ static void v_op_dec_p(oprocessor *h_processor)  /* Decrement p register */
 
 static void v_op_inc_pc(oprocessor *h_processor)  /* Increment program counter */
 {
-#if defined(CLASSIC)
+#if defined(HP35) || defined(HP80) || defined(HP45) || defined(HP70) || defined(HP55)
    h_processor->pc = ((h_processor->pc >> 8) << 8) | ((h_processor->pc + 1) & 0xff);  /* Address wraps round at end of ROM */
 #else
    if (h_processor->pc >= (ROM_SIZE - 1))
@@ -1646,7 +1646,7 @@ void v_op_goto(oprocessor *h_processor)  /* Conditional go to */
    }
    h_processor->flags[PREV_CARRY] = h_processor->flags[CARRY];
    h_processor->flags[CARRY] = False;
-#if defined(CLASSIC)
+#if defined(HP35) || defined(HP80) || defined(HP45) || defined(HP70) || defined(HP55)
    if (h_processor->trace) fprintf(stdout, h_msg_number, (h_processor->pc & 0xf00) | (h_processor->rom[h_processor->pc]) >> 2);  /* Mask off the bank number and least significant 8 bits*/
    if (h_processor->flags[PREV_CARRY])  /* Do if True */
       h_processor->pc = (h_processor->pc & 0xff00) | h_processor->rom[h_processor->pc] >> 2;  /* Classic CPU uses a _eight_ bit address */
@@ -1678,7 +1678,7 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
    if (h_processor->enabled && !h_processor->sleep)
    {
 
-#if defined(CLASSIC)
+#if defined(HP35) || defined(HP80) || defined(HP45) || defined(HP70) || defined(HP55)
       /* TIMER : status[11] = 1, status[3] = 0
        * PRGM  : status[11] = 0, status[3] = 1
        * RUN   : status[11] = 0, status[3] = 0 */
@@ -1716,7 +1716,7 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
       switch (i_opcode & 03)
       {
 
-#if defined(CLASSIC)
+#if defined(HP35) || defined(HP80) || defined(HP45) || defined(HP70) || defined(HP55)
       case 00:  /* Type 0 - Special operations */
          switch ((i_opcode >> 2) & 03)
          {
@@ -3271,7 +3271,7 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
          break;
 #endif
 
-#if defined(CLASSIC)
+#if defined(HP35) || defined(HP80) || defined(HP45) || defined(HP70) || defined(HP55)
       case 02:  /* Type 2 - Arithmetic operations */
          i_field = (i_opcode >> 2) & 7;
          switch (i_field) /* Select field
