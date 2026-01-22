@@ -39,27 +39,27 @@
  * 17 Aug 25         - Solaris (and FreeBSD) can use usleep() - MT
  * 18 Aug 25         - So can Tru64 UNIX - MT
  * 12 Oct 25         - Added Minix (generic busy loop doesn't work) - MT
- * 05 Dec 25         - Calls to LIB$WAIT on VMS 9.x use milliseconds - MT
  * 12 Dec 25         - Added now() to return the current time and elapsed()
  *                     to return the number of miliseconds since a previous
  *                     time - MT
  * 14 Dec 25         - Negative wait times are ignored - MT
  *                   - Tidied up includes - MT
- *
- * Note              - '__solaris__', '__osf__' etc are defined in makefile
- *                     and are (not standard).
+ * 22 Jan 25         - Updated for VMS on Alpha, Itanium and x86, selecting
+ *                     the  correct floating point type needed for LIB$WAIT
+ *                     automatically (F_FLOAT, G_FLOAT or IEEE_FLOAT) - MT
  *
  */
 
-#define NAME           "gcc-wait"
-#define BUILD          "0011"
-#define DATE           "11 Aug 25"
-#define AUTHOR         "MT"
+#define  NAME          "gcc-wait"
+#define  BUILD         "0015"
+#define  DATE          "22 Jan 26"
+#define  AUTHOR        "MT"
 
 #define  False          0
 #define  True           !(False)
 
-#if defined(linux) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__solaris__) || defined(__osf__) || defined(__minix__)
+/* Note - '__solaris__', '__osf__' etc are defined in makefile and are (not standard) */
+#if defined(__linux__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__solaris__) || defined(__osf__) || defined(__minix__)
 #include <ctype.h>     /* isalpha(), etc */
 #include <unistd.h>    /* usleep(), sleep() */
 #endif
@@ -74,6 +74,8 @@
 
 #include <stdio.h>
 
+#include "gcc-debug.h"
+
 /*
  * wait (milliseconds)
  *
@@ -83,30 +85,40 @@
  * 04 Sep 21         - Fixed formatting in debug code - MT
  * 07 Feb 24         - Removed any windows specific or debug code - MT
  * 11 Aug 25         - Warn if busy loop used (requires stdio.h) - MT
- * 05 Dec 25         - Updated for VMS 9.x - MT
+ * 22 Jan 25         - Updated for VMS on Alpha, Itanium and x86 - MT
  *
  */
 int i_wait(long l_delay)
 {
    if (l_delay > 0)  /* Don't delay if duration is negative */
    {
-#  if defined(linux) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__solaris__) || defined(__osf__) || defined(__minix__)
+#  if defined(__linux__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__solaris__) || defined(__osf__) || defined(__minix__)
       return (usleep(l_delay * 1000)); /* Use usleep() function */
 #  elif defined(VMS)
       float f_seconds;
-#     if defined(__x86_64__)
-         f_seconds = l_delay;  /* On z86_64 platforms LIB$WAIT waits for the specified number of milliseconds */
-#     else
-         f_seconds = l_delay / 1000.0;  /* On other platforms LIB$WAIT waits for the specified number of seconds */
+#     if (__D_FLOAT)
+#        define FLOAT_TYPE 1
+#     elif (__G_FLOAT)
+#        define FLOAT_TYPE 1
+#     elif (__IEEE_FLOAT)
+#        define FLOAT_TYPE 4
+#     else  /* Use F_FLOAT */
+#        define FLOAT_TYPE 0
 #     endif
-      return (lib$wait(&f_seconds)); /* Use VMS LIB$WAIT - 20 ms resolution timer on VMS*/
+      unsigned int i_type = FLOAT_TYPE;
+
+      f_seconds = (float)l_delay /1000.0;
+      if (i_type)
+        lib$wait(&f_seconds, 0, &i_type);
+      else
+         lib$wait(&f_seconds);
 #  else
       struct timeb o_start, o_end;
       static int b_busy = True;
       if (b_busy) b_busy = !(printf("Busy loop in use..!\n"));
       ftime(&o_start);
       ftime(&o_end);
-      while ((1000 * (o_end.time - o_start.time) + o_end.millitm - o_start.millitm) < l_delay) /* Use a portable but very inefficient busy loop */
+      while ((1000 * (o_end.time - o_start.time) + o_end.millitm - o_start.millitm) < l_delay)  /* Use a portable but very inefficient busy loop */
       {
          ftime(&o_end);
       }
