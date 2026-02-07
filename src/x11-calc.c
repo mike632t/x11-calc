@@ -456,6 +456,8 @@
  * 11 Jam 26  (0242) - Fixed  resizing on MacOS (by adding an explicit call
  *                     XResizeWindow()) - NA
  *                   - Added keyboard shortcut to reset windows size - MT
+ *                   - Fixed issue with international keyboard layouts that
+ *                     affected some keyboard shortcuts - MT
  *
  *
  * To Do             - Parse command line in a separate routine.
@@ -469,9 +471,11 @@
 
 #define  NAME           "x11-calc"
 #define  VERSION        "0.25"
-#define  BUILD          "0243"
-#define  DATE           "11 Jan 25"
+#define  BUILD          "0244"
+#define  DATE           "07 Jan 26"
 #define  AUTHOR         "MT"
+
+#define  NODEBUG
 
 #define  TICKS          48  /* Number of ticks to execute before updating the display */
 #define  MAX_ZOOM       32
@@ -610,6 +614,9 @@ int main(int argc, char *argv[])
    Cursor x_cursor;                    /* Application cursor */
    Pixmap x_logo;                      /* Application icon */
    XEvent x_event;
+
+   KeySym x_key;
+   XComposeStatus x_key_state;
 
    Atom wm_delete;
    Atom x_clipboard;                   /* CLIPBOARD atom */
@@ -1247,15 +1254,18 @@ int main(int argc, char *argv[])
             XFlush(x_display);  /* flush output */
             break;
          case KeyPress :
+            XLookupString(&x_event.xkey, NULL, 0, &x_key, &x_key_state);
+            debug (
+               const char* s_name = XKeysymToString(x_key);
+               if (s_name) printf("Key = %s\t", s_name); else printf("Key = unknown\t");
+               if (x_key) printf("Key = %c\tKey = %d\t", (int)x_key, (int)x_key)
+               );
+            if (x_key == XK_0 && x_event.xkey.state & ControlMask) i_scale = v_zoom_out(x_display, x_window, h_size_hint, &o_window_position, 1);  /* Reset */
+            if (x_key == XK_plus && x_event.xkey.state & ControlMask) i_scale = v_zoom_in(x_display, x_window, h_size_hint, &o_window_position, i_scale);;  /* Grow by +12.5% */
+            if (x_key == XK_minus && x_event.xkey.state & ControlMask && i_scale > 1) i_scale = v_zoom_out(x_display, x_window, h_size_hint, &o_window_position, i_scale);;  /* Shrink by 12.5% */
             h_key_pressed(h_keyboard, x_display, x_event.xkey.keycode, x_event.xkey.state, b_numlock);  /* Attempts to translate a key code into a character */
             if (h_keyboard->key == (XK_BackSpace & 0x1f)) h_keyboard->key = XK_Escape & 0x1f;  /* Map backspace to escape */
-            if (XLookupKeysym(&x_event.xkey, 0) == XK_equal && (x_event.xkey.state & (ControlMask | ShiftMask)) == (ControlMask | ShiftMask))  /* Explicitly test for Ctrl-Shift-Plus */
-               i_scale = v_zoom_in(x_display, x_window, h_size_hint, &o_window_position, i_scale);  /* Zoom in */
-            else if ((XLookupKeysym(&x_event.xkey, 0) == XK_minus) && (x_event.xkey.state & ControlMask) && !(x_event.xkey.state & ShiftMask))  /* Explicitly test for Ctrl-Minus */
-               i_scale = v_zoom_out(x_display, x_window, h_size_hint, &o_window_position, i_scale);  /* Zoom out */
-            else if ((XLookupKeysym(&x_event.xkey, 0) == XK_0) && (x_event.xkey.state & ControlMask) && !(x_event.xkey.state & ShiftMask))  /* Explicitly test for Ctrl-Zero */
-               i_scale = v_zoom_out(x_display, x_window, h_size_hint, &o_window_position, 1);  /* Reset zoom */
-            else if (h_keyboard->key == (XK_Z & 0x1f))  /* Ctrl-Z to exit */
+            if (h_keyboard->key == (XK_Z & 0x1f))  /* Ctrl-Z to exit */
                b_abort = True;
             else if (h_keyboard->key == (XK_T & 0x1f))  /* Ctrl-T to toggle tracing */
                h_processor->trace = !h_processor->trace;
