@@ -1254,8 +1254,7 @@ int main(int argc, char *argv[])
             XFlush(x_display);  /* flush output */
             break;
          case KeyPress :
-            XLookupString(&x_event.xkey, x_key_buffer,sizeof(x_key_buffer), &x_key, &x_compose_status);  /* Get key and key state but don't return the name string */
-
+            XLookupString(&x_event.xkey, NULL, 0, &x_key, &x_compose_status);
             if (x_key == XK_0 && x_event.xkey.state & ControlMask) i_scale = v_zoom_out(x_display, x_window, h_size_hint, &o_window_position, 1);  /* Reset window size */
             if (x_key == XK_plus && x_event.xkey.state & ControlMask) i_scale = v_zoom_in(x_display, x_window, h_size_hint, &o_window_position, i_scale);;  /* Increase window size */
             if (x_key == XK_minus && x_event.xkey.state & ControlMask) i_scale = v_zoom_out(x_display, x_window, h_size_hint, &o_window_position, i_scale);;  /* Decrease windows size */
