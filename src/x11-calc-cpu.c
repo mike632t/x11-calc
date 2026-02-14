@@ -896,7 +896,8 @@ void v_card_read_write_record(oprocessor* h_processor)
  *                     a buffer register allowing the size of the memory to
  *                     be restored to its original value - MT
  * 22 Nov 25         - Check for read errors - MT
- *
+ * 13 Feb 26         - If write mode, and buffer is full: Write buffer to file
+ *                     If read mode and buffer is empty: Read file to buffer
  */
 {
    unsigned char* p_buffer_pointer;
@@ -905,9 +906,7 @@ void v_card_read_write_record(oprocessor* h_processor)
 
    if (h_processor->card->file)  /* Check if card file was opened successfully */
    {
-      if (h_processor->crc[BUFFER])  /* Check if buffer is ready */
-      {
-         if (h_processor->crc[WRITE] && h_processor->addr == 0x99) /* Write a card-record if the buffer address is 0x99 */
+         if (h_processor->crc[WRITE] && h_processor->crc[BUFFER]) /* write mode and buffer is full */
          {
             p_buffer_pointer = &(h_processor->card->buffer->nibble[REG_SIZE - 1]);
 
@@ -916,26 +915,35 @@ void v_card_read_write_record(oprocessor* h_processor)
                i_record <<= 4;
                i_record += *p_buffer_pointer--;
             }
+            if (h_processor->trace)
+               printf("\t\t(wr rec=0x%07x, pc=0x%x)", i_record, h_processor->pc);
             if (fprintf(h_processor->card->file, "%07x,", i_record) <0)  /* Write record to file */
-               v_warning(h_err_writing_file);  /* Error reading file */;
-            h_processor->card->records++;  /* Increment before testing to see if a newline is required */
+               v_warning(h_err_writing_file);  /* Error writing file */;
+            h_processor->card->records++;      /* Increment before testing to see if a newline is required */
             if (h_processor->card->records > 0 && h_processor->card->records  % 8 == 0) fprintf(h_processor->card->file, "\n");
+            h_processor->crc[BUFFER] = False;  /* buffer is empty now */
          }
-
-         else if (h_processor->crc[WRITE] == False && (h_processor->addr == 0x99 || h_processor->addr == 0x9b)) /* Read a card-record if the buffer address is 0x99/0x9b */
+         else if (h_processor->crc[WRITE] == False && h_processor->crc[BUFFER] == False) /* read mode and buffer is empty */
          {
             /* Read 7 nibbles from file to the most and least (duplicated) significant nibbles from the card */
-
-            if (fscanf(h_processor->card->file, "%x,", (unsigned int*)&i_record) != 1)  /* Read next record from file */
+            int rc = fscanf(h_processor->card->file, "%x,", (unsigned int*)&i_record);  /* Read next record from file */
+            if (rc == EOF)
+            {
+               if (h_processor->trace) fprintf(stdout, " [Card EOF]");
+            }
+            else if (rc != 1)
                v_warning(h_err_reading_file);  /* Error reading file */;
+
+            if (h_processor->trace)
+               printf("\t\t(rd rec=0x%07x, pc=0x%x)", i_record, h_processor->pc);
             p_buffer_pointer = &(h_processor->card->buffer->nibble[REG_SIZE - 1]);
             for (i_count = 6; i_count >= 0; i_count--)  /* Put record in upper 7 nibbles of the buffer */
                *p_buffer_pointer-- = (i_record >> i_count * 4) & 0xf;
             for (i_count = 6; i_count >= 0; i_count--)  /* Put record in lower 7 nibbles as well! */
                *p_buffer_pointer-- = (i_record >> i_count * 4) & 0xf;
             h_processor->card->records++;
+            h_processor->crc[BUFFER] = True; /* buffer is full now */
          }
-      }
    }
 }
 
@@ -1477,6 +1485,7 @@ void v_processor_reset(oprocessor *h_processor)  /* Reset processor */
    for (i_count = 0; i_count < STATES; i_count++)  /* Clear the processor flags */
       h_processor->crc[i_count] = False;
    h_processor->crc[READY] = -4;
+   h_processor->crc[CARD] = False;
    h_processor->card->state = False;
 #endif
 #if defined(HP10)
@@ -2063,10 +2072,12 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
                 * 01700   Read/Write data to/from card via RAM $99 and $9B
                 */
                case 00100:  /* test/clear motor on (crc buffer ready) */
+               {
                   if (h_processor->trace) fprintf(stdout, "test motor on (crc ready)");
-                  h_processor->status[3] = (h_processor->card->file != NULL);  /* device/buffer ready if not canceled */
-                  h_processor->crc[BUFFER] = True ;  /* Buffer is ready after test/clear */
+                  if (h_processor->card->file != NULL)
+                     h_processor->status[3] = True;  // if file is open, ready to r/w: set S3 = True
                   break;
+               }
                case 00300:  /* test mode flag */
                   if (h_processor->trace) fprintf(stdout, "test mode flag (%d)", !h_processor->flags[MODE] );
                   h_processor->status[3] = !h_processor->flags[MODE];  /* Test the PRGM/RUN switch */
@@ -2112,7 +2123,6 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
                   h_processor->status[3] = h_processor->crc[PAUSE];
                   if (h_processor->crc[PAUSE]) h_processor->crc[PAUSE] = False;
                   v_card_read_write_record(h_processor);  /* read or write one record to/from the buffer register */
-                  h_processor->crc[BUFFER] = False;       /* buffer empty now, must test before next r/w */
                   break;
 #endif
                default:
@@ -2258,7 +2268,7 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
                case 00260:  /* card reader motor on */
                   if (h_processor->trace) fprintf(stdout, "motor on");
                   v_card_open_file(h_processor);  /* Prompt user and open card read or save file  - KJC*/
-                  h_processor->crc[CARD] = False ;  /* Card removed immediately after starting - KJC */
+                  h_processor->crc[BUFFER] = False ; /* Buffer is empty at start */
                   break;
                case 00360:  /* card reader motor off */
                   if (h_processor->trace) fprintf(stdout, "motor off");
@@ -2297,7 +2307,7 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
                      }
 #else
 #if defined(HP67)
-                     if (i_addr == 0x99 || i_addr == 0x9b) /* Check buffer addresses */
+                     if (i_addr == 0x99 || i_addr == 0x9b) /* Check rd- and wr-buffer addresses */
                         h_processor->addr = i_addr;
                      else
 #endif
@@ -2345,13 +2355,16 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
                   if (h_processor->trace) fprintf(stdout, "c -> data\t\t");
                   h_processor->first = 0; h_processor->last = REG_SIZE - 1;
 #if defined(HP67)
-                  if (h_processor->addr == 0x99 || h_processor->addr == 0x9b) /* Check buffer addresses */
+                  if (h_processor->addr == 0x99) /* Check wr-buffer address */
                   {
                      v_reg_copy(h_processor, h_processor->card->buffer, h_processor->reg[C_REG]);
-                     if (h_processor->trace)
+                     if (h_processor->trace) {
+                        fprintf(stdout, "(buffer write)\t\t");
                         v_fprint_register(stdout, h_processor->card->buffer);
+                     }
+                     h_processor->crc[BUFFER] = True ;  /* Buffer is full, write to card ok */
+                     break;
                   }
-                  else
 #endif
                   if (h_processor->addr < h_processor->memory_size)
                   {
@@ -2598,13 +2611,16 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
                if (h_processor->trace) fprintf(stdout, "c -> data register(%d)\t", h_processor->addr);
                h_processor->first = 0; h_processor->last = REG_SIZE - 1;
 #if defined(HP67)
-               if (h_processor->addr == 0x99 || h_processor->addr == 0x9b) /* Check buffer addresses */
+               if (h_processor->addr == 0x99) /* Check wr-buffer address */
                {
                   v_reg_copy(h_processor, h_processor->card->buffer, h_processor->reg[C_REG]);  /* C -> buffer */
-                  if (h_processor->trace)
+                  if (h_processor->trace) {
+                     fprintf(stdout, "(buffer write)\t\t");
                      v_fprint_register(stdout, h_processor->card->buffer);
+                  }
+                  h_processor->crc[BUFFER] = True ;  /* Buffer is full, write to card OK */
+                  break;
                }
-               else
 #endif
                if ((h_processor->addr) < h_processor->memory_size)
                {
@@ -2620,9 +2636,18 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
                break;
             case 03:  /* data -> c or data register(n)-> c */
                h_processor->first = 0; h_processor->last = REG_SIZE - 1;
-               if ((i_opcode >> 6) == 0)
+               if ((i_opcode >> 6) == 0)  /* register 0 */
                {
                   if (h_processor->trace) fprintf(stdout, "data -> c\t\t");
+#if defined(HP67)
+                  if (h_processor->addr == 0x9b) /* Check rd-buffer address */
+                  {
+                     v_reg_copy(h_processor, h_processor->reg[C_REG], h_processor->card->buffer);
+                     if (h_processor->trace) fprintf(stdout, "(buffer read)\t\t");
+                     h_processor->crc[BUFFER] = False;  /* Buffer is empty, read from card OK */
+                  }
+                  else
+#endif
                   if ((h_processor->addr) < h_processor->memory_size)
                      v_reg_copy(h_processor, h_processor->reg[C_REG], h_processor->mem[h_processor->addr]);
                   else
@@ -2645,10 +2670,14 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
                {
                   h_processor->addr &= 0xfff0;
                   h_processor->addr += (i_opcode >> 6);
-                  if (h_processor->trace) fprintf(stdout, "data register(%d) -> c **", h_processor->addr);
+                  if (h_processor->trace) fprintf(stdout, "data register(%d) -> c\t", h_processor->addr);
 #if defined(HP67)
-                  if (h_processor->addr == 0x99 || h_processor->addr == 0x9b) /* Check buffer addresses */
+                  if (h_processor->addr == 0x9b) /* Check rd-buffer address */
+                  {
                      v_reg_copy(h_processor, h_processor->reg[C_REG], h_processor->card->buffer);
+                     if (h_processor->trace) fprintf(stdout, "(buffer read)\t\t");
+                     h_processor->crc[BUFFER] = False;  /* Buffer is empty, read from card OK */
+                  }
                   else
 #endif
                   if (h_processor->addr < h_processor->memory_size)
