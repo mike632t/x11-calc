@@ -65,6 +65,7 @@
  * 12 Sep 25         - Added HP55 - MT
  * 11 Oct 25         - No longer need to scale HP35, HP45, HP55, HP70, HP80
  *                     or HP67 - MT
+ * 15 Feb 26         - Use B/W on VAX only - MT
  *
  * TO DO :           -
  */
@@ -75,7 +76,7 @@
 
 /** #define __TIME__     "00:00:00" /* Release only */
 
-#if defined(vms)
+#if defined(vax)
 #define COLOUR_DEPTH 1
 #else
 #define COLOUR_DEPTH 24

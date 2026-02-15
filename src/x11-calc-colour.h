@@ -29,10 +29,11 @@
  * 05 Jan 21         - Tweaked mid blue shade a bit - MT
  * 31 Jan 22         - Added gold - MT
  * 24 Feb 22         - Added an alternate LCD background colour - MT
+ * 15 Feb 26         - Use B/W on VAX only - MT
  *
  */
 
-#if defined(vms)
+#if defined(vax)
 
 #define DARK_TEXT      0x000000 /* Dark grey text. */
 #define LIGHT_TEXT     0x000000 /* Off white text. */
