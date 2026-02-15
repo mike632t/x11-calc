@@ -32,6 +32,8 @@ $! 03 Aug 25         - Renamed x11-calc-segment to x11-calc-digit - MT
 $! 09 Aug 25         - Added DEBUG option temporarily - MT
 $!                   - Added HP10 - MT
 $! 05 Dec 25         - Added additional modules for registers etc - MT
+$! 15 Feb 26         - Enable  keyboard on all operating systems, not  just
+$!                     UNIX - MT
 $!
 $  _message_status = f$environment("MESSAGE")
 $  on error then goto _done
@@ -56,20 +58,24 @@ $!
 $! Compile with DEBUG enabled
 $!
 $! cc /debug/define="HP''_model'" x11-calc-'_model, x11-calc, x11-calc-register, x11-calc-cpu, -
-$! x11-calc-digit,x11-calc-display,x11-calc-button,x11-calc-colour, x11-calc-switch, -
-$! x11-calc-label, x11-calc-card, x11-calc-font, x11-calc-messages, gcc-wait
-$!  link /debug/exec=[-.bin]x11-calc-'_model x11-calc-'_model, x11-calc, x11-calc-register, x11-calc-cpu, -
-$! x11-calc-digit,x11-calc-display,x11-calc-button,x11-calc-colour, x11-calc-switch, -
-$! x11-calc-label, x11-calc-card, x11-calc-font, x11-calc-messages, gcc-wait, x11-lib.opt/opt
+$! x11-calc-digit, x11-calc-display, x11-calc-button, x11-calc-colour, x11-calc-switch, -
+$! x11-calc-label, x11-calc-card, x11-calc-font, x11-calc-messages, x11-keyboard, -
+$! gcc-wait
+$! link /debug/exec=[-.bin]x11-calc-'_model x11-calc-'_model, x11-calc, x11-calc-register, x11-calc-cpu, -
+$! x11-calc-digit, x11-calc-display, x11-calc-button, x11-calc-colour, x11-calc-switch, -
+$! x11-calc-label, x11-calc-card, x11-calc-font, x11-calc-messages, x11-keyboard, -
+$! gcc-wait, x11-lib.opt/opt
 $!
 $! Compile without DEBUG enabled
 $!
 $ cc /define="HP''_model'" x11-calc-'_model, x11-calc, x11-calc-register, x11-calc-cpu, -
-x11-calc-digit,x11-calc-display,x11-calc-button,x11-calc-colour, x11-calc-switch, -
-x11-calc-label, x11-calc-card, x11-calc-font, x11-calc-messages, gcc-wait
+x11-calc-digit, x11-calc-display, x11-calc-button, x11-calc-colour, x11-calc-switch, -
+x11-calc-label, x11-calc-card, x11-calc-font, x11-calc-messages, x11-keyboard, -
+gcc-wait
 $  link /exec=[-.bin]x11-calc-'_model x11-calc-'_model, x11-calc, x11-calc-register, x11-calc-cpu, -
-x11-calc-digit,x11-calc-display,x11-calc-button,x11-calc-colour, x11-calc-switch, -
-x11-calc-label, x11-calc-card, x11-calc-font, x11-calc-messages, gcc-wait, x11-lib.opt/opt
+x11-calc-digit, x11-calc-display, x11-calc-button, x11-calc-colour, x11-calc-switch, -
+x11-calc-label, x11-calc-card, x11-calc-font, x11-calc-messages, x11-keyboard, -
+gcc-wait, x11-lib.opt/opt
 $!
 $  if f$search("*.obj") .nes. "" then delete *.obj;* /nolog /noconfim
 $!

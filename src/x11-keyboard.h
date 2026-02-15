@@ -30,10 +30,10 @@
  *                     the key name - MT
  *                   - Added NumLock mask property - MT
  *                   - Define Keyboard mask - MT
+ * 15 Feb 26         - Enable  keyboard on all operating systems, not  just
+ *                     UNIX - MT
  *
  */
-
-#if defined(__unix__)
 
 #define KeyboardMask (ShiftMask | LockMask | ControlMask | Mod1Mask | Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask)  /* All keyboard event masks */
 
@@ -50,4 +50,3 @@ void h_key_released(okeyboard *h_keyboard, Display *x_display, XKeyEvent *x_even
 
 okeyboard *h_keyboard_create(Display *x_display);
 
-#endif

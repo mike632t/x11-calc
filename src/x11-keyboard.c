@@ -37,6 +37,8 @@
  * 14 Feb 26    0.2  - Rewritten to use XLookupString(). This should handle
  *                     multinational keyboard layouts properly - MT
  * 15 Feb 29         - Fixed key mapping - MT
+ *                   - Enable  keyboard on all operating systems, not  just
+ *                     UNIX - MT
  *
  */
 
@@ -58,8 +60,6 @@
 #include "x11-keyboard.h"
 
 #include "gcc-debug.h"
-
-#if defined (__unix__)
 
 /*
  * key_decode(keyboard, display, keycode, keystate, numlock)
@@ -206,5 +206,3 @@ okeyboard *h_keyboard_create(Display *x_display) {
       h_keyboard = NULL;
    return(h_keyboard);
 }
-
-#endif

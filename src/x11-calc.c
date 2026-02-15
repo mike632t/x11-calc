@@ -464,6 +464,10 @@
  *                     should  address  issues with multinational  keyboard
  *                     layouts - MT
  *            (0247) - Invalid key strokes are now ignored - MT
+ * 15 Feb 26         - Enable  keyboard on all operating systems, not  just
+ *                     UNIX - MT
+ *                   - Don't try to resize the window unless compiling on a
+ *                     64-bit processor - MT
  *
  *
  * To Do             - Parse command line in a separate routine.
@@ -477,7 +481,7 @@
 
 #define  NAME           "x11-calc"
 #define  VERSION        "0.26"
-#define  BUILD          "0247"
+#define  BUILD          "0249"
 #define  DATE           "14 Feb 26"
 #define  AUTHOR         "MT"
 
@@ -557,6 +561,7 @@ void v_set_blank_cursor(Display *x_display, Window x_window, Cursor *x_cursor)
 
 int v_zoom_in(Display *x_display, Window x_window, XSizeHints *h_size_hint, XRectangle *o_window_position, int i_scale)
 {
+#if defined(__x86_64__) || defined(__amd64__) || defined(__aarch64__) || defined(__arm64__)
    if (i_scale < MAX_ZOOM)
    {
       i_scale++;  /* Increment scale factor */
@@ -575,11 +580,13 @@ int v_zoom_in(Display *x_display, Window x_window, XSizeHints *h_size_hint, XRec
       XResizeWindow(x_display, x_window, o_window_position->width, o_window_position->height); /* Resize window */
       XFlush(x_display); /* Update display */
    }
+#endif
    return (i_scale);
 }
 
 int v_zoom_out(Display *x_display, Window x_window, XSizeHints *h_size_hint, XRectangle *o_window_position, int i_scale)
 {
+#if defined(__x86_64__) || defined(__amd64__) || defined(__aarch64__) || defined(__arm64__)
    if (i_scale > 0 )
    {
       i_scale--;  /* Decrement scale factor */
@@ -598,6 +605,7 @@ int v_zoom_out(Display *x_display, Window x_window, XSizeHints *h_size_hint, XRe
       XResizeWindow(x_display, x_window, o_window_position->width, o_window_position->height); /* Resize window */
       XFlush(x_display); /* Update display */
    }
+#endif
    return (i_scale);
 }
 
@@ -663,9 +671,7 @@ int main(int argc, char *argv[])
    int b_run = True;                   /* Run flag controls CPU instruction execution in main loop */
    int b_abort = False;                /* Abort flag controls execution of main loop */
    int b_geometry = False;             /* User specified window position */
-#if defined (__unix__)
    int b_numlock = False;              /* Use number pad - even if numlock is off */
-#endif
 #if defined(HP31e) || defined(HP32e) || defined(HP33e) || defined(HP33c) || defined(HP34c) || defined(HP37e) || defined(HP38e) || defined(HP38c)
    int b_euro = False;
 #endif
@@ -689,9 +695,7 @@ int main(int argc, char *argv[])
    struct olabel *h_label[LABELS];
 #endif
 
-#if defined (__unix__)
    okeyboard *h_keyboard;
-#endif
 
    if (!(x_display = XOpenDisplay(s_display_name))) v_error (errno, h_err_display, s_display_name);  /* Open the default display */
 
@@ -844,10 +848,9 @@ int main(int argc, char *argv[])
                   else if (!strncmp(argv[i_count], "--no-comma", i_index))
                      b_euro = False;  /* Don't use european display format */
 #endif
-#if defined (__unix__)
                   else if (!strncmp(argv[i_count], "--numlock", i_index))
                      b_numlock = True;  /* Use number pad - even if numlock is off */
-#endif
+#if defined(__x86_64__) || defined(__amd64__) || defined(__aarch64__) || defined(__arm64__)
                   else if (!strncmp(argv[i_count], "--zoom", i_index))
                   {
                      if (i_count + 1 < argc)
@@ -869,6 +872,7 @@ int main(int argc, char *argv[])
                      else
                         v_error(EINVAL, h_err_missing_argument, argv[i_count]);
                   }
+#endif
                   else if (!strncmp(argv[i_count], "--geometry=", 11)) /* Just check the first 11 characters match */
                   {
                      char *c_geometry = argv[i_count] + 11;
@@ -1101,9 +1105,7 @@ int main(int argc, char *argv[])
 
    XSetStandardProperties(x_display, x_window, s_title, s_title, x_logo, argv, argc, h_size_hint);  /* Set the window title and icon */
 
-#if defined (__unix__)
    h_keyboard = h_keyboard_create(x_display);  /* Only works with Linux */
-#endif
 
    XSelectInput(x_display, x_window, FocusChangeMask | ExposureMask | /* Select kind of events we are interested in */
       KeyPressMask | KeyReleaseMask | ButtonPressMask |
@@ -1199,9 +1201,11 @@ int main(int argc, char *argv[])
          }
 #endif
          i_display_draw(x_display, x_buffer, i_screen, h_display);  /* Redraw display */
+#if defined(__x86_64__) || defined(__amd64__) || defined(__aarch64__) || defined(__arm64__)
          if (i_scale > 0)
             XScaleArea(x_display, x_buffer, x_window, DefaultGC(x_display, i_screen), 0, 0, WIDTH, HEIGHT, 0, 0, o_window_position.width, o_window_position.height);
          else
+#endif
             XCopyArea(x_display, x_buffer, x_window, DefaultGC(x_display, i_screen), 0, 0, WIDTH, HEIGHT, 0, 0);
          l_elapsed = (l_now() - l_start + 1);
          i_wait((INTERVAL - l_elapsed));  /* Sleep */
@@ -1230,7 +1234,6 @@ int main(int argc, char *argv[])
                h_processor->keypressed = False;  /* Don't clear the status bit here!! */
             }
             break;
-#if defined (__unix__)
          case SelectionRequest:
             x_request = &x_event.xselectionrequest;         /* Get pointer to request event detail */
 
@@ -1263,17 +1266,19 @@ int main(int argc, char *argv[])
                {
                   switch (h_keyboard->key)
                   {
+#if defined(__x86_64__) || defined(__amd64__) || defined(__aarch64__) || defined(__arm64__)  /* Don't even try this on older processors */
                   case (XK_0 & 0x7f):  /* Ctrl-0 to reset window size */
                      i_scale = v_zoom_out(x_display, x_window, h_size_hint, &o_window_position, 1); break;
                   case (XK_plus & 0x7f):  /* Ctrl-Plus to increase window size */
                      i_scale = v_zoom_in(x_display, x_window, h_size_hint, &o_window_position, i_scale); break;
                   case (XK_minus & 0x7f):  /* Ctrl-Minus to decrease windows size */
                      i_scale = v_zoom_out(x_display, x_window, h_size_hint, &o_window_position, i_scale); break;
+#endif
                   case (XK_Z & 0x1f):  /* Ctrl-Z to exit */
                      b_abort = True; break;
                   case (XK_T & 0x1f):  /* Ctrl-T to toggle tracing */
                      h_processor->trace = !h_processor->trace; break;
-                  case (XK_S & 0x1f):  /* Ctrl-S or space to single step */
+                  case (XK_S & 0x1f):  /* Ctrl-S to single step */
                      h_processor->trace = h_processor->step = b_run = True; break;
                   case (XK_D & 0x1f):  /* Ctrl-D to display internal CPU registers */
                      v_fprint_registers(stdout, h_processor); break;;
@@ -1333,12 +1338,12 @@ int main(int argc, char *argv[])
                }
             }
             break;
-#endif
          case ButtonPress :
+#if defined(__x86_64__) || defined(__amd64__) || defined(__aarch64__) || defined(__arm64__)
             i_value = 8 + i_scale;
             x_event.xbutton.x = (x_event.xbutton.x * 8 + i_value / 2) / i_value;  /* Scale both coordinates with rounding */
             x_event.xbutton.y = (x_event.xbutton.y * 8 + i_value / 2) / i_value;
-
+#endif
             if (x_event.xbutton.button == Button1)
             {
                int i_count;
@@ -1425,10 +1430,11 @@ int main(int argc, char *argv[])
             }
             break;
          case ButtonRelease :
+#if defined(__x86_64__) || defined(__amd64__) || defined(__aarch64__) || defined(__arm64__)
             i_value = 8 + i_scale;
             x_event.xbutton.x = (x_event.xbutton.x * 8 + i_value / 2) / i_value;  /* Scale both coordinates with rounding */
             x_event.xbutton.y = (x_event.xbutton.y * 8 + i_value / 2) / i_value;
-
+#endif
             switch (x_event.xbutton.button)
             {
                case Button1:
@@ -1469,6 +1475,7 @@ int main(int argc, char *argv[])
 #endif
                break;
 #endif
+#if defined(__x86_64__) || defined(__amd64__) || defined(__aarch64__) || defined(__arm64__)
 #if !defined(__apple__)  /* No support for mouse wheel on XQuartz */
                case Button4:  /* Mouse wheel buttons */
                case Button5:
@@ -1482,6 +1489,7 @@ int main(int argc, char *argv[])
                   }
                }
                break;
+#endif
 #endif
             }
             break;
