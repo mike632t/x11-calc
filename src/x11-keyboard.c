@@ -39,6 +39,7 @@
  * 15 Feb 29         - Fixed key mapping - MT
  *                   - Enable  keyboard on all operating systems, not  just
  *                     UNIX - MT
+ *                   - Check keyboard macros exist before use - MT
  *
  */
 
@@ -76,6 +77,7 @@ static void v_key_decode(okeyboard *h_keyboard, Display *x_display, XKeyEvent *x
 
    XLookupString(x_event, x_key_buffer,sizeof(x_key_buffer), &x_keysym, &x_compose_status);  /* Get key and key state but don't return the name string */
 
+#if defined(XK_KP_Insert) && defined(XK_KP_Delete)
    if (b_numlock)  /* Remap keys if numlock flag is set */
    {
       switch (x_keysym)
@@ -93,6 +95,7 @@ static void v_key_decode(okeyboard *h_keyboard, Display *x_display, XKeyEvent *x
          case XK_KP_Delete: x_key_buffer[0] = '.'; x_keysym = XK_period; break;
       }
    }
+#endif
 
    h_keyboard->keysym = x_keysym;
    h_keyboard->key = x_key_buffer[0];
