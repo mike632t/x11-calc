@@ -19,7 +19,7 @@
  * You  should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * 19 Sep 21         - Initial version (Cheese House)- MT
+ * 19 Sep 21    0.1  - Initial version (Cheese House)- MT
  * 03 Jan 21         - Changed debug() macro so that debug code is executed
  *                     when DEBUG is defined (doesn't need to be true) - MT
  * 01 Apr 24         - Only attempt to define the keyboard functions if the
@@ -33,14 +33,18 @@
  * 20 Sep 25         - Explicitly include X11 keyboard symbols - MT
  *                   - Enable keyboard on any UNIX - MT
  * 07 Dec 25         - Use int for boolean types instead of char - MT
- * 03 Jan 26         - Checks for illegal control key combinations - MT
+ * 03 Jan 26  (0012) - Checks for illegal control key combinations - MT
+ * 14 Feb 26    0.2  - Rewritten to use XLookupString(). This should handle
+ *                     multinational keyboard layouts properly - MT
+ * 15 Feb 29         - Fixed key mapping - MT
  *
  */
 
-#define NAME           "x11-calc-keyboard"
-#define BUILD          "0012"
-#define DATE           "03 Jan 26"
-#define AUTHOR         "MT"
+#define  NAME           "x11-calc-keyboard"
+#define  VERSION        "0.25"
+#define  BUILD          "0013"
+#define  DATE           "14 Feb 26"
+#define  AUTHOR         "MT"
 
 #include <ctype.h>     /* is alpha(), etc. */
 #include <string.h>    /* strlen(), etc. */
@@ -64,112 +68,98 @@
  *
  */
 
-static void v_key_decode(okeyboard *h_keyboard, Display *x_display, KeyCode x_keycode, unsigned int i_keystate, int b_numlock)
+static void v_key_decode(okeyboard *h_keyboard, Display *x_display, XKeyEvent *x_event, int b_numlock)  /* An internal function (not exposed when linking) */
 {
-   h_keyboard->keysym = XKeycodeToKeysym(x_display, x_keycode, 0);
-   h_keyboard->key = '\000';
-   switch (h_keyboard->keysym)
+   XComposeStatus x_compose_status;
+   KeySym x_keysym;
+   char x_key_buffer[4];
+
+   XLookupString(x_event, x_key_buffer,sizeof(x_key_buffer), &x_keysym, &x_compose_status);  /* Get key and key state but don't return the name string */
+
+   if (b_numlock)  /* Remap keys if numlock flag is set */
    {
-      case XK_Control_L:  /* Modifier keys */
-      case XK_Control_R:
-      case XK_Shift_L:
-      case XK_Shift_R:
-      case XK_Alt_L:  /* Alt */
-      case XK_ISO_Level3_Shift: /* Alt Gr */
-      case XK_Super_L:  /* Left windows key */
-      case XK_Super_R:  /* Right windows key */
-      case XK_Menu:  /* Menu key */
-      case XK_Num_Lock:
-      case XK_Caps_Lock:
-         break;  /* Do nothing - Ignore all Keyboard Modifier keys */
-      case XK_Escape:  /* Control keys */
-      case XK_BackSpace:
-      case XK_Tab:
-      case XK_Linefeed:
-      case XK_Clear:
-      case XK_Return:
-      case XK_Pause:
-      case XK_Scroll_Lock:
-      case XK_Sys_Req:
-      case XK_Delete:
-         h_keyboard->key = (char)(h_keyboard->keysym & 0x1f);  /* Map to ASCII value (see keysymdef.h) */
-         break;
-      case  XK_KP_F1:  /* Numeric keypad */
-      case  XK_KP_F2:
-      case  XK_KP_F3:
-      case  XK_KP_F4:
-      case  XK_KP_Home:
-      case  XK_KP_Left:
-      case  XK_KP_Up:
-      case  XK_KP_Right:
-      case  XK_KP_Down:
-      case  XK_KP_Page_Up:
-      case  XK_KP_Page_Down:
-      case  XK_KP_End:
-      case  XK_KP_Begin:
-      case  XK_KP_Insert:
-      case  XK_KP_Delete:
-      case  XK_KP_Equal:
-         if ((!(i_keystate & Mod2Mask) != !(i_keystate & ShiftMask)) || b_numlock)  /* If numlock flag is set or numlock or shift (but not both) are pressed check number */
+      switch (x_keysym)
+      {
+         case XK_KP_Insert: x_key_buffer[0] = '0'; x_keysym = XK_0; break;
+         case XK_KP_End:    x_key_buffer[0] = '1'; x_keysym = XK_1; break;
+         case XK_KP_Down:   x_key_buffer[0] = '2'; x_keysym = XK_2; break;
+         case XK_KP_Next:   x_key_buffer[0] = '3'; x_keysym = XK_3; break;
+         case XK_KP_Left:   x_key_buffer[0] = '4'; x_keysym = XK_4; break;
+         case XK_KP_Begin:  x_key_buffer[0] = '5'; x_keysym = XK_5; break;
+         case XK_KP_Right:  x_key_buffer[0] = '6'; x_keysym = XK_6; break;
+         case XK_KP_Home:   x_key_buffer[0] = '7'; x_keysym = XK_7; break;
+         case XK_KP_Up:     x_key_buffer[0] = '8'; x_keysym = XK_8; break;
+         case XK_KP_Prior:  x_key_buffer[0] = '9'; x_keysym = XK_9; break;
+         case XK_KP_Delete: x_key_buffer[0] = '.'; x_keysym = XK_period; break;
+      }
+   }
+
+   h_keyboard->keysym = x_keysym;
+   h_keyboard->key = x_key_buffer[0];
+   h_keyboard->name = XKeysymToString(x_keysym);
+   debug (
+      if (h_keyboard->name) printf("Name = %-12s ", h_keyboard->name); else printf("Key = %-24s  ", "Unknown");
+      if (isprint(h_keyboard->key)) printf("Char = `%c`  ", h_keyboard->key); else printf("Char = %-4d ", h_keyboard->key);
+      printf("State = %-6d", x_event->state);
+      printf("Key = %6d  ASCII = %-4d  Code = %-4d", (int)x_keysym, (int)x_keysym & 0x7f, (int)x_keysym & 0x1f);
+      if (x_keysym == XK_BackSpace) printf("Backspace")
+      );
+}
+
+/*
+ * get_numlock_mask(display)
+ *
+ * Since the mask used to represent the state of the NumLock key is not the
+ * same on every system we need to search the keyboard modifier map to find
+ * which one corresponds to the NumLock key.
+ *
+ */
+
+static unsigned int u_get_numlock_mask(Display *x_display)
+{
+   XModifierKeymap *h_modmap;
+   KeyCode u_keycode;
+   unsigned int u_mask = 0;
+   int i_count, i_counter, i_offset;
+
+   /* Get the keycode that represents XK_Num_Lock on this keyboard.
+    * This tells us which physical key is the NumLock key.
+    */
+   u_keycode = XKeysymToKeycode(x_display, XK_Num_Lock);
+
+   /* If the keyboard/layout has no NumLock key, we cannot map it. */
+   if (u_keycode != 0) {
+
+      /* Get  the key modifier map which contains 8 modifier slots (one for
+       * Shift, Lock, Control, and Mod1 - Mod5), with slot listing all  the
+       * keycodes that activate that modifier */
+
+      h_modmap = XGetModifierMapping(x_display);
+
+      if (h_modmap != NULL)
+      {
+         for (i_count = 0; i_count < 8; i_count++)  /* Search each slot */
          {
-            h_keyboard->keysym = XKeycodeToKeysym(x_display, x_keycode, 1);
-            switch (h_keyboard->keysym)
+            for (i_counter = 0; i_counter < h_modmap->max_keypermod; i_counter++)  /* Scan each key code in each modifier map */
             {
-               case  XK_KP_Tab:
-               case  XK_KP_Enter:
-               case  XK_KP_Multiply:
-               case  XK_KP_Add:
-               case  XK_KP_Separator:
-               case  XK_KP_Subtract:
-               case  XK_KP_Decimal:
-               case  XK_KP_Divide:
-               case  XK_KP_0:
-               case  XK_KP_1:
-               case  XK_KP_2:
-               case  XK_KP_3:
-               case  XK_KP_4:
-               case  XK_KP_5:
-               case  XK_KP_6:
-               case  XK_KP_7:
-               case  XK_KP_8:
-               case  XK_KP_9:
-                  h_keyboard->key = (char)(h_keyboard->keysym & 0x7f);  /* Map to ASCII value (see keysymdef.h) */
-                  break;
+               i_offset = i_count * h_modmap->max_keypermod + i_counter;  /* Find the offset into the flat modifier map */
+               if (h_modmap->modifiermap[i_offset] == u_keycode)  /* If we find an entry that matches the NumLock keycode, then we have found it */
+               {
+                  /* Convert slot index into the correct modifier mask bit
+                   * Slot 0 = ShiftMask,
+                   * Slot 1 = LockMask,
+                   * Slot 2 = ControlMask,
+                   * slot 3 = Mod1Mask,
+                   * Slot 4 = Mod2Mask, etc
+                   */
+                  u_mask = (unsigned int)(1u << i_count);  /* Set the mask */
+               }
             }
          }
-         break;
-      case  XK_KP_Tab:
-      case  XK_KP_Enter:
-      case  XK_KP_Multiply:
-      case  XK_KP_Add:
-      case  XK_KP_Separator:
-      case  XK_KP_Subtract:
-      case  XK_KP_Decimal:
-      case  XK_KP_Divide:
-         h_keyboard->key = (char)(h_keyboard->keysym & 0x7f);  /* Map to ASCII value (see keysymdef.h) */
-         break;
-      default:  /* Everything else */
-         h_keyboard->key = (char)(h_keyboard->keysym & 0xff);
-         if (isalpha(h_keyboard->keysym))  /* For alpha keys check both caps lock and shift */
-         {
-            if (!(i_keystate & ShiftMask) != !(i_keystate & LockMask))
-               h_keyboard->key = (char)(XKeycodeToKeysym(x_display, x_keycode, 1));
-         }
-         else
-         {
-            if (i_keystate & ShiftMask)
-               h_keyboard->key = (char)(XKeycodeToKeysym(x_display, x_keycode, 1));
-         }
-
-         if (i_keystate & ControlMask)
-         {
-            h_keyboard->key = (char)(XKeycodeToKeysym(x_display, x_keycode, 1));
-            if (((h_keyboard->key >= '@') && (h_keyboard->key <= '_')) || ((h_keyboard->key >= 'a') && (h_keyboard->key <= 'z'))) /* Only modify valid control keys */
-               h_keyboard->key &= 0x1f;  /* Map to ASCII value (see keysymdef.h) */
-            else
-               h_keyboard->key &= 0x00;  /* Anything else is an invalid control key */
-         }
+         XFreeModifiermap(h_modmap);  /* Free the modifier map */
+      }
    }
+   return u_mask;  /* Return the NumLockMask */
 }
 
 /*
@@ -179,10 +169,9 @@ static void v_key_decode(okeyboard *h_keyboard, Display *x_display, KeyCode x_ke
  *
  */
 
-void h_key_pressed(okeyboard *h_keyboard, Display *x_display, KeyCode x_keycode, unsigned int i_keystate, int b_numlock)
+void h_key_pressed(okeyboard *h_keyboard, Display *x_display, XKeyEvent *x_event, int b_numlock)
 {
-   v_key_decode(h_keyboard, x_display, x_keycode, i_keystate, b_numlock);
-   debug(fprintf(stderr, "Key pressed - '%s'.\n", XKeysymToString(h_keyboard->keysym)));
+   v_key_decode(h_keyboard, x_display, x_event, b_numlock);
 }
 
 /*
@@ -191,26 +180,27 @@ void h_key_pressed(okeyboard *h_keyboard, Display *x_display, KeyCode x_keycode,
  * Updates the keyboard state when a key is released.
  *
  */
-void h_key_released(okeyboard *h_keyboard, Display *x_display, KeyCode x_keycode, unsigned int i_keystate, int b_numlock)
+void h_key_released(okeyboard *h_keyboard, Display *x_display, XKeyEvent *x_event, int b_numlock)
 {
-   v_key_decode(h_keyboard, x_display, x_keycode, i_keystate, b_numlock);
-   debug(fprintf(stderr, "Key released - '%s'.\n", XKeysymToString(h_keyboard->keysym)));
+   v_key_decode(h_keyboard, x_display, x_event, b_numlock);
 }
+
 /*
  * keyboard_create (index)
  *
  * Allocates storage for a new keyboard object, sets the default key states
- * and  returns a pointer to the keyboard object (or NULL to indecate  that
- * an error occoured when allocating memory).
+ * and  returns a pointer to the keyboard object (or NULL to indicate  that
+ * an error occurred when allocating memory).
  *
  */
 
 okeyboard *h_keyboard_create(Display *x_display) {
-   okeyboard *h_keyboard; /* Ponter to keyboard structure. */
+   okeyboard *h_keyboard; /* Pointer to keyboard structure. */
    if ((h_keyboard = malloc (sizeof(*h_keyboard))) != NULL){
-      h_keyboard->display = x_display;
       h_keyboard->key = '\000';
+      h_keyboard->name = NULL;
       h_keyboard->keysym = 0x0000;
+      h_keyboard->NumLockMask = u_get_numlock_mask(x_display);
    }
    else
       h_keyboard = NULL;

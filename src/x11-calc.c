@@ -460,6 +460,10 @@
  *                     affected some keyboard shortcuts - MT
  *                   - Fixed bug that prevented Ctrl-minus from zooming all
  *                     the way out - MT
+ * 14 Feb 26   0.26  - Rewrote keyboard decoder using XLookupString() which
+ *                     should  address  issues with multinational  keyboard
+ *                     layouts - MT
+ *            (0247) - Invalid key strokes are now ignored - MT
  *
  *
  * To Do             - Parse command line in a separate routine.
@@ -472,9 +476,9 @@
  */
 
 #define  NAME           "x11-calc"
-#define  VERSION        "0.25"
-#define  BUILD          "0244"
-#define  DATE           "07 Jan 26"
+#define  VERSION        "0.26"
+#define  BUILD          "0247"
+#define  DATE           "14 Feb 26"
 #define  AUTHOR         "MT"
 
 #define  TICKS          48  /* Number of ticks to execute before updating the display */
@@ -614,9 +618,6 @@ int main(int argc, char *argv[])
    Cursor x_cursor;                    /* Application cursor */
    Pixmap x_logo;                      /* Application icon */
    XEvent x_event;
-
-   KeySym x_key;
-   XComposeStatus x_compose_status;
 
    Atom wm_delete;
    Atom x_clipboard;                   /* CLIPBOARD atom */
@@ -1251,72 +1252,84 @@ int main(int argc, char *argv[])
                x_selection.property = None;  /* Target data type not supported - do nothing */
 
             XSendEvent(x_display, x_request->requestor, False, 0, (XEvent*)&x_selection);  /* Send reply */
-            XFlush(x_display);  /* flush output */
+            XFlush(x_display);  /* Flush output */
             break;
          case KeyPress :
-            XLookupString(&x_event.xkey, NULL, 0, &x_key, &x_compose_status);
-            if (x_key == XK_0 && x_event.xkey.state & ControlMask) i_scale = v_zoom_out(x_display, x_window, h_size_hint, &o_window_position, 1);  /* Reset window size */
-            if (x_key == XK_plus && x_event.xkey.state & ControlMask) i_scale = v_zoom_in(x_display, x_window, h_size_hint, &o_window_position, i_scale);;  /* Increase window size */
-            if (x_key == XK_minus && x_event.xkey.state & ControlMask) i_scale = v_zoom_out(x_display, x_window, h_size_hint, &o_window_position, i_scale);;  /* Decrease windows size */
-            h_key_pressed(h_keyboard, x_display, x_event.xkey.keycode, x_event.xkey.state, b_numlock);  /* Attempts to translate a key code into a character */
-            if (h_keyboard->key == (XK_BackSpace & 0x1f)) h_keyboard->key = XK_Escape & 0x1f;  /* Map backspace to escape */
-            if (h_keyboard->key == (XK_Z & 0x1f))  /* Ctrl-Z to exit */
-               b_abort = True;
-            else if (h_keyboard->key == (XK_T & 0x1f))  /* Ctrl-T to toggle tracing */
-               h_processor->trace = !h_processor->trace;
-            else if (h_keyboard->key == (XK_S & 0x1f))  /* Ctrl-S or space to single step */
-               h_processor->trace = h_processor->step = b_run = True;
-            else if (h_keyboard->key == (XK_D & 0x1f))  /* Ctrl-D to display internal CPU registers */
-               v_fprint_registers(stdout, h_processor);
-            else if (h_keyboard->key == (XK_Q & 0x1f))  /* Ctrl-Q to resume */
-               h_processor->step = !(b_run  = True);
-            else if (h_keyboard->key == (XK_C & 0x1f))  /* Ctrl-C to copy to clipboard */
+            if (!((x_event.xkey.state & KeyboardMask) & ~(h_keyboard->NumLockMask | ShiftMask | ControlMask)))  /* Guard against invalid modifiers */
             {
-               s_text = s_display_string(h_display);  /* Get current contents of the display */
-               XSetSelectionOwner(x_display, x_clipboard, x_window, CurrentTime);  /* Claim ownership of the clipboard */
-            }
-            else if (h_keyboard->key == (XK_R & 0x1f))  /* Ctrl-R to reset */
-            {
-               v_processor_reset(h_processor);
-#if defined(CONTINIOUS)
-               if (s_pathname == NULL)
-                  v_restore_state(h_processor);  /* Load current saved settings */
-               else
-                  v_read_state(h_processor, s_pathname);  /* Load user specified settings */
-#endif
-               b_run = True;
-            }
-            else  /* Check for matching button */
-            {
-               int i_count;
-               for (i_count = 0; i_count < BUTTONS; i_count++)
+               h_key_pressed(h_keyboard, x_display, &x_event.xkey, b_numlock);  /* Translate a key code into a character */
+               if (h_keyboard->key == (XK_BackSpace & 0x1f)) h_keyboard->key = XK_Escape & 0x1f;  /* Map backspace to escape */
+               if (x_event.xkey.state & ControlMask)  /* Process any control keys */
                {
-                  h_pressed = h_button_key_pressed(h_button[i_count], h_keyboard->key);
-                  if (h_pressed != NULL)
+                  switch (h_keyboard->key)
                   {
-                     h_pressed->state = True;
-                     i_button_draw(x_display, x_buffer, i_screen, h_pressed);
-                     h_processor->code = h_pressed->index;
-                     h_processor->keypressed = True;
-#if !defined(SWITCHES)
-                     h_processor->enabled = True;  /* Any key press will wake up the processor */
-                     h_processor->sleep = False;
-#endif
+                  case (XK_0 & 0x7f):  /* Ctrl-0 to reset window size */
+                     i_scale = v_zoom_out(x_display, x_window, h_size_hint, &o_window_position, 1); break;
+                  case (XK_plus & 0x7f):  /* Ctrl-Plus to increase window size */
+                     i_scale = v_zoom_in(x_display, x_window, h_size_hint, &o_window_position, i_scale); break;
+                  case (XK_minus & 0x7f):  /* Ctrl-Minus to decrease windows size */
+                     i_scale = v_zoom_out(x_display, x_window, h_size_hint, &o_window_position, i_scale); break;
+                  case (XK_Z & 0x1f):  /* Ctrl-Z to exit */
+                     b_abort = True; break;
+                  case (XK_T & 0x1f):  /* Ctrl-T to toggle tracing */
+                     h_processor->trace = !h_processor->trace; break;
+                  case (XK_S & 0x1f):  /* Ctrl-S or space to single step */
+                     h_processor->trace = h_processor->step = b_run = True; break;
+                  case (XK_D & 0x1f):  /* Ctrl-D to display internal CPU registers */
+                     v_fprint_registers(stdout, h_processor); break;;
+                  case (XK_Q & 0x1f):  /* Ctrl-Q to resume */
+                     h_processor->step = !(b_run  = True); break;
+                  case (XK_C & 0x1f):  /* Ctrl-C to copy to clipboard */
+                     s_text = s_display_string(h_display);  /* Get current contents of the display */
+                     XSetSelectionOwner(x_display, x_clipboard, x_window, CurrentTime);  /* Claim ownership of the clipboard */
                      break;
+                  case (XK_R & 0x1f):  /* Ctrl-R to reset */
+                     v_processor_reset(h_processor);
+#if defined(CONTINIOUS)
+                     if (s_pathname == NULL)
+                        v_restore_state(h_processor);  /* Load current saved settings */
+                     else
+                        v_read_state(h_processor, s_pathname);  /* Load user specified settings */
+#endif
+                     b_run = True;
+                     break;
+                  }
+               }
+               else
+               {
+                  int i_count;
+                  for (i_count = 0; i_count < BUTTONS; i_count++)
+                  {
+                     h_pressed = h_button_key_pressed(h_button[i_count], h_keyboard->key);
+                     if (h_pressed != NULL)
+                     {
+                        h_pressed->state = True;
+                        i_button_draw(x_display, x_buffer, i_screen, h_pressed);
+                        h_processor->code = h_pressed->index;
+                        h_processor->keypressed = True;
+#if !defined(SWITCHES)
+                        h_processor->enabled = True;  /* Any key press will wake up the processor */
+                        h_processor->sleep = False;
+#endif
+                        break;
+                     }
                   }
                }
             }
             break;
          case KeyRelease :
-            h_key_released(h_keyboard, x_display, x_event.xkey.keycode, x_event.xkey.state, b_numlock);
-            if (h_keyboard->key == (XK_BackSpace & 0x1f)) h_keyboard->key = XK_Escape & 0x1f;  /* Map backspace to escape */
-            if (h_pressed != NULL)
+            if (!((x_event.xkey.state & KeyboardMask) & ~(h_keyboard->NumLockMask | ShiftMask)))  /* Note - Ignores control keys here */
             {
-               if (h_keyboard->key == h_pressed->key)
+               h_key_released(h_keyboard, x_display, &x_event.xkey, b_numlock);
+               if (h_keyboard->key == (XK_BackSpace & 0x1f)) h_keyboard->key = XK_Escape & 0x1f;  /* Map backspace to escape */
+               if (h_pressed != NULL)
                {
-                  h_pressed->state = False;
-                  i_button_draw(x_display, x_buffer, i_screen, h_pressed);
-                  h_processor->keypressed = False;  /* Don't clear the status bit here!! */
+                  if (h_keyboard->key == h_pressed->key)
+                  {
+                     h_pressed->state = False;
+                     i_button_draw(x_display, x_buffer, i_screen, h_pressed);
+                     h_processor->keypressed = False;  /* Don't clear the status bit here!! */
+                  }
                }
             }
             break;
