@@ -468,6 +468,8 @@
  *                     UNIX - MT
  *                   - Don't try to resize the window unless compiling on a
  *                     64-bit processor - MT
+ * 22 Feb 26         - Use toupper() on non-UNIX systems to convert command
+ *                     line arguments to uppercase - MT
  *
  *
  * To Do             - Parse command line in a separate routine.
@@ -731,9 +733,9 @@ int main(int argc, char *argv[])
                         v_error(EINVAL, h_err_numeric_range, argv[i_count + 1]);
                      else
                      {
-                        i_size = sizeof(i_breakpoints) / sizeof(i_breakpoints[0]); /* Find position in the array to store the breakpoint */
-                        for (i_offset = 0; i_offset < i_size && i_breakpoints[i_offset] != i_value && i_breakpoints[i_offset] != -1; i_offset++) {} /* Find the  position in the array */
-                        if (i_offset < i_size) /* Save it - if there is space! */
+                        i_size = sizeof(i_breakpoints) / sizeof(i_breakpoints[0]);  /* Find position in the array to store the breakpoint */
+                        for (i_offset = 0; i_offset < i_size && i_breakpoints[i_offset] != i_value && i_breakpoints[i_offset] != -1; i_offset++) {}  /* Find the  position in the array */
+                        if (i_offset < i_size)  /* Save it - if there is space! */
                            i_breakpoints[i_offset] = i_value;
                         else
                            v_error(EINVAL, h_err_max_breakpoints);
@@ -763,7 +765,7 @@ int main(int argc, char *argv[])
                         v_error(EINVAL, h_err_numeric_range, argv[i_count + 1]);
                      else
                      {
-                        if (i_trap == -1) /* Save it - if not already defined! */
+                        if (i_trap == -1)  /* Save it - if not already defined! */
                            i_trap = i_value;
                         else
                            v_error(EINVAL, h_err_duplicate_option, argv[i_count][i_index]);
@@ -834,6 +836,9 @@ int main(int argc, char *argv[])
                if (i_index == 2)
                  b_abort = True;  /* '--' terminates command line processing */
                else
+               {
+                  /** for (i_index = 0; argv[i_count][i_index]; i_index++)
+                     argv[i_count][i_index] = (char)tolower((unsigned char)argv[i_count][i_index]) ;  /* Convert all long options to lowercase before parsing - commented out as I'm not sure this is a good thing */
                   if (!strncmp(argv[i_count], "--cursor", i_index))
                      b_cursor = True;  /* Draw cursor */
                   else if (!strncmp(argv[i_count], "--no-cursor", i_index))
@@ -844,7 +849,7 @@ int main(int argc, char *argv[])
 #endif
 #if defined(SPICE)
                   else if (!strncmp(argv[i_count], "--comma", i_index))
-                     b_euro = True; /* Use european display format */
+                     b_euro = True;  /* Use european display format */
                   else if (!strncmp(argv[i_count], "--no-comma", i_index))
                      b_euro = False;  /* Don't use european display format */
 #endif
@@ -873,12 +878,12 @@ int main(int argc, char *argv[])
                         v_error(EINVAL, h_err_missing_argument, argv[i_count]);
                   }
 #endif
-                  else if (!strncmp(argv[i_count], "--geometry=", 11)) /* Just check the first 11 characters match */
+                  else if (!strncmp(argv[i_count], "--geometry=", 11))  /* Just check the first 11 characters match */
                   {
                      char *c_geometry = argv[i_count] + 11;
                      char *c_char;
 
-                     for (c_char = c_geometry; *c_char; c_char++) /* Convert to lowercase before parsing */
+                     for (c_char = c_geometry; *c_char; c_char++)  /* Convert to lowercase before parsing */
                         *c_char = (char)tolower((unsigned char)*c_char);
                      if (XParseGeometry(c_geometry,  &i_window_left, &i_window_top, &i_window_width, &i_window_height))
                      {
@@ -898,7 +903,7 @@ int main(int argc, char *argv[])
                         char *c_geometry = argv[i_count + 1];
                         char *c_char;
 
-                        for (c_char = c_geometry; *c_char; c_char++) /* Convert to lowercase before parsing */
+                        for (c_char = c_geometry; *c_char; c_char++)  /* Convert to lowercase before parsing */
                            *c_char = (char)tolower((unsigned char)*c_char);
                         if (XParseGeometry(c_geometry,  &i_window_left, &i_window_top, &i_window_width, &i_window_height))
                         {
@@ -927,6 +932,7 @@ int main(int argc, char *argv[])
                   }
                   else  /* If we get here then the we have an invalid long option */
                      v_error(EINVAL, h_err_unrecognised_option, argv[i_count]);
+               }
                i_index--;  /* Leave index pointing at end of string (so argv[i_count][i_index] = 0) */
                break;
             default:  /* If we get here the single letter option is unknown */
@@ -947,9 +953,8 @@ int main(int argc, char *argv[])
    {
       if (argv[i_count][0] == '/')
       {
-         for (i_index = 0; argv[i_count][i_index]; i_index++)  /* Convert option to uppercase */
-            if (argv[i_count][i_index] >= 'a' && argv[i_count][i_index] <= 'z')
-               argv[i_count][i_index] = argv[i_count][i_index] - 32;  /* TO DO - Assumes 8-bit ASCII encoding */
+         for (i_index = 0; argv[i_count][i_index]; i_index++)
+            argv[i_count][i_index] = (char)toupper((unsigned char)argv[i_count][i_index]) ;  /* Convert all options to uppercase before parsing */
          if (!strncmp(argv[i_count], "/STEP", i_index))
             b_trace = True;  /* Start in single step mode */
          else if (!strncmp(argv[i_count], "/CURSOR", i_index))
@@ -986,7 +991,7 @@ int main(int argc, char *argv[])
             v_usage(stdout, h_msg_usage, FILENAME);
             exit(EXIT_SUCCESS);
          }
-         else /* If we get here then the we have an invalid option */
+         else  /* If we get here then the we have an invalid option */
             v_error(EINVAL, h_err_invalid_option, argv[i_count]);
          if (argv[i_count][1] != 0)
          {
