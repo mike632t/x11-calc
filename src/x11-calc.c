@@ -463,13 +463,14 @@
  * 14 Feb 26   0.26  - Rewrote keyboard decoder using XLookupString() which
  *                     should  address  issues with multinational  keyboard
  *                     layouts - MT
- *            (0247) - Invalid key strokes are now ignored - MT
+ *                   - Invalid key strokes are now ignored - MT
  * 15 Feb 26         - Enable  keyboard on all operating systems, not  just
  *                     UNIX - MT
  *                   - Don't try to resize the window unless compiling on a
  *                     64-bit processor - MT
  * 22 Feb 26         - Use toupper() on non-UNIX systems to convert command
  *                     line arguments to uppercase - MT
+ * 24 Feb 26  (0251) - Fixed bug in command line parser - MT
  *
  *
  * To Do             - Parse command line in a separate routine.
@@ -483,7 +484,7 @@
 
 #define  NAME           "x11-calc"
 #define  VERSION        "0.26"
-#define  BUILD          "0249"
+#define  BUILD          "0251"
 #define  DATE           "14 Feb 26"
 #define  AUTHOR         "MT"
 
@@ -886,13 +887,7 @@ int main(int argc, char *argv[])
                      for (c_char = c_geometry; *c_char; c_char++)  /* Convert to lowercase before parsing */
                         *c_char = (char)tolower((unsigned char)*c_char);
                      if (XParseGeometry(c_geometry,  &i_window_left, &i_window_top, &i_window_width, &i_window_height))
-                     {
-                        if (i_count + 1 < argc)  /* Remove the parameter from the arguments */
-                           for (int i_offset = i_count + 1; i_offset < argc - 1; i_offset++)
-                              argv[i_offset] = argv[i_offset + 1];
-                        argc--;
                         b_geometry = True;
-                     }
                      else
                         v_error(EINVAL, h_err_geometry, c_geometry);
                   }
@@ -1110,7 +1105,7 @@ int main(int argc, char *argv[])
 
    XSetStandardProperties(x_display, x_window, s_title, s_title, x_logo, argv, argc, h_size_hint);  /* Set the window title and icon */
 
-   h_keyboard = h_keyboard_create(x_display);  /* Only works with Linux */
+   h_keyboard = h_keyboard_create(x_display);
 
    XSelectInput(x_display, x_window, FocusChangeMask | ExposureMask | /* Select kind of events we are interested in */
       KeyPressMask | KeyReleaseMask | ButtonPressMask |
@@ -1265,7 +1260,7 @@ int main(int argc, char *argv[])
          case KeyPress :
             if (!((x_event.xkey.state & KeyboardMask) & ~(h_keyboard->NumLockMask | ShiftMask | ControlMask)))  /* Guard against invalid modifiers */
             {
-               h_key_pressed(h_keyboard, x_display, &x_event.xkey, b_numlock);  /* Translate a key code into a character */
+               v_key_pressed(h_keyboard, x_display, &x_event.xkey, b_numlock);  /* Translate a key code into a character */
                if (h_keyboard->key == (XK_BackSpace & 0x1f)) h_keyboard->key = XK_Escape & 0x1f;  /* Map backspace to escape */
                if (x_event.xkey.state & ControlMask)  /* Process any control keys */
                {
@@ -1330,7 +1325,7 @@ int main(int argc, char *argv[])
          case KeyRelease :
             if (!((x_event.xkey.state & KeyboardMask) & ~(h_keyboard->NumLockMask | ShiftMask)))  /* Note - Ignores control keys here */
             {
-               h_key_released(h_keyboard, x_display, &x_event.xkey, b_numlock);
+               v_key_released(h_keyboard, x_display, &x_event.xkey, b_numlock);
                if (h_keyboard->key == (XK_BackSpace & 0x1f)) h_keyboard->key = XK_Escape & 0x1f;  /* Map backspace to escape */
                if (h_pressed != NULL)
                {
