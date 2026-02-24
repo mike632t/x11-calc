@@ -40,6 +40,7 @@
  *                   - Enable  keyboard on all operating systems, not  just
  *                     UNIX - MT
  *                   - Check keyboard macros exist before use - MT
+ * 24 Feb 26         - Corrected function names - MT
  *
  */
 
@@ -71,7 +72,7 @@
 
 static void v_key_decode(okeyboard *h_keyboard, Display *x_display, XKeyEvent *x_event, int b_numlock)  /* An internal function (not exposed when linking) */
 {
-   XComposeStatus x_compose_status;
+   static XComposeStatus x_compose_status;
    KeySym x_keysym;
    char x_key_buffer[4];
 
@@ -172,7 +173,7 @@ static unsigned int u_get_numlock_mask(Display *x_display)
  *
  */
 
-void h_key_pressed(okeyboard *h_keyboard, Display *x_display, XKeyEvent *x_event, int b_numlock)
+void v_key_pressed(okeyboard *h_keyboard, Display *x_display, XKeyEvent *x_event, int b_numlock)
 {
    v_key_decode(h_keyboard, x_display, x_event, b_numlock);
 }
@@ -183,7 +184,7 @@ void h_key_pressed(okeyboard *h_keyboard, Display *x_display, XKeyEvent *x_event
  * Updates the keyboard state when a key is released.
  *
  */
-void h_key_released(okeyboard *h_keyboard, Display *x_display, XKeyEvent *x_event, int b_numlock)
+void v_key_released(okeyboard *h_keyboard, Display *x_display, XKeyEvent *x_event, int b_numlock)
 {
    v_key_decode(h_keyboard, x_display, x_event, b_numlock);
 }

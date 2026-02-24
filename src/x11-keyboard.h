@@ -32,6 +32,7 @@
  *                   - Define Keyboard mask - MT
  * 15 Feb 26         - Enable  keyboard on all operating systems, not  just
  *                     UNIX - MT
+ * 24 Feb 26         - Corrected function names - MT
  *
  */
 
@@ -44,9 +45,9 @@ typedef struct { /* Calculator button structure. */
    unsigned int NumLockMask;
 } okeyboard;
 
-void h_key_pressed(okeyboard *h_keyboard, Display *x_display, XKeyEvent *x_event, int b_numlock);
+void v_key_pressed(okeyboard *h_keyboard, Display *x_display, XKeyEvent *x_event, int b_numlock);
 
-void h_key_released(okeyboard *h_keyboard, Display *x_display, XKeyEvent *x_event, int b_numlock);
+void v_key_released(okeyboard *h_keyboard, Display *x_display, XKeyEvent *x_event, int b_numlock);
 
 okeyboard *h_keyboard_create(Display *x_display);
 
