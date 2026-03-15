@@ -174,7 +174,8 @@ const char *h_err_invalid_register = "Registro inválido (REG[%03d]) en %1o-%04o
 
 const char *h_err_missing_argument = "opcion requiere un argumento -- '%s'\n";
 
-#if defined(unix) || defined(__unix__) || defined(__APPLE__)
+#if defined(unix) || defined(__unix) || defined(__unix__) || defined(__APPLE__)
+
 const char *h_msg_usage[] =
 {
    "Uso: %s [OPCION]... [ARCHIVO]\n",
@@ -258,7 +259,8 @@ const char *h_err_invalid_register = "Ungultiges register (REG[%03d]) an %1o-%04
 
 const char *h_err_missing_argument = "option benoetigt ein argument -- '%s'\n";
 
-#if defined(unix) || defined(__unix__) || defined(__APPLE__)
+#if defined(unix) || defined(__unix) || defined(__unix__) || defined(__APPLE__)
+
 const char * h_msg_usage[] =
 {
    "Verwendung: %s [OPTION]... [DATEI]\n",
@@ -342,7 +344,8 @@ const char *h_err_invalid_register = "Registre invalide (REG[%03d]) a %1o-%04o ,
 
 const char *h_err_missing_argument = "l'option necessite un argument -- '%s'\n";
 
-#if defined(unix) || defined(__unix__) || defined(__APPLE__)
+#if defined(unix) || defined(__unix) || defined(__unix__) || defined(__APPLE__)
+
 const char *h_msg_usage[] =
 {
    "Utilisation : %s [OPTION]... [FICHIER]\n",
@@ -425,7 +428,8 @@ const char *h_err_invalid_register = "Registrador invalido (REG[%03d]) em %1o-%0
 
 const char *h_err_missing_argument = "opcao requer um argumento -- '%s'\n";
 
-#if defined(unix) || defined(__unix__) || defined(__APPLE__)
+#if defined(unix) || defined(__unix) || defined(__unix__) || defined(__APPLE__)
+
 const char *h_msg_usage[] =
 {
    "Uso: %s [OPTION]... [FILE]\n",
@@ -510,7 +514,8 @@ const char *h_err_invalid_register = "Ogiltigt register (REG[%03d]) vid %1o-%04o
 
 const char *h_err_missing_argument = "option requires an argument -- '%s'\n";
 
-#if defined(unix) || defined(__unix__) || defined(__APPLE__)
+#if defined(unix) || defined(__unix) || defined(__unix__) || defined(__APPLE__)
+
 const char *h_msg_usage[] =
 {
    "Anvaendning: %s [OPTION]... [FILE]\n",
@@ -594,7 +599,8 @@ const char *h_err_invalid_register = "Invalid register (REG[%03d]) at %1o-%04o i
 
 const char *h_err_missing_argument = "option requires an argument -- '%s'\n";
 
-#if defined(unix) || defined(__unix__) || defined(__APPLE__)
+#if defined(unix) || defined(__unix) || defined(__unix__) || defined(__APPLE__)
+
 const char *h_msg_usage[] =
 {
    "Usage: %s [OPTION]... [FILE]\n",

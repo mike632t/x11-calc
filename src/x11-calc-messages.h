@@ -77,7 +77,8 @@ extern const char *h_err_invalid_operand;
 extern const char *h_err_invalid_option;
 extern const char *h_err_duplicate_option;
 extern const char *h_err_missing_argument;
-#if defined(unix) || defined(__unix__) || defined(__APPLE__)
+#if defined(unix) || defined(__unix) || defined(__unix__) || defined(__APPLE__)
+
 extern const char *h_err_unrecognised_option;
 extern const char *h_err_invalid_number;
 extern const char *h_err_numeric_range;

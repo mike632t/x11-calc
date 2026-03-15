@@ -707,7 +707,8 @@ int main(int argc, char *argv[])
    if (!(h_alternate_font = h_get_font(x_display, s_alternate_fonts))) v_error(errno, h_err_font, s_alternate_fonts[0]);
    if (!(h_large_font = h_get_font(x_display, s_large_fonts))) v_error(errno, h_err_font, s_large_fonts[0]);
 
-#if defined(unix) || defined(__unix__) || defined(__APPLE__)  /* Parse UNIX style command line options */
+#if defined(unix) || defined(__unix) || defined(__unix__) || defined(__APPLE__)
+  /* Parse UNIX style command line options */
    b_abort = False;  /* Stop processing command line */
    for (i_count = 1; i_count < argc && (b_abort != True); i_count++)
    {

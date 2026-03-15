@@ -517,7 +517,8 @@
 #include "gcc-debug.h"  /* debug() */
 #include "gcc-exists.h" /* i_isfile(), i_isdir(), i_exists() */
 
-#if defined(unix) || defined(__unix__) || defined(__APPLE__)
+#if defined(unix) || defined(__unix) || defined(__unix__) || defined(__APPLE__)
+
 #include <sys/stat.h>
 #endif
 
@@ -707,7 +708,8 @@ char *s_get_datafile(void)
    char *s_pathname;
 
    if (s_directory == NULL) s_directory = ""; /* Use current folder if HOME not defined */
-#if defined(unix) || defined(__unix__) || defined(__APPLE__)
+#if defined(unix) || defined(__unix) || defined(__unix__) || defined(__APPLE__)
+
    s_pathname = malloc((strlen(s_directory) + strlen(s_filename) + strlen(s_filetype) + 2) * sizeof(char*));
    strcpy(s_pathname, s_directory);
    strcat(s_pathname, "/.");
