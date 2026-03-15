@@ -109,12 +109,13 @@
  *                     the display - MT
  * 11 Jan 26         - Fixed issues with copying text (display masks parsed
  *                     correctly on voyager models) - MT
+ * 15 Mar 26         - Copy now includes commas for voyager models - MT
  *
  */
 
 #define NAME           "x11-calc-display"
-#define BUILD          "0049"
-#define DATE           "01 Nov 25"
+#define BUILD          "0053"
+#define DATE           "15 Mar 26"
 #define AUTHOR         "MT"
 
 #include <errno.h>     /* errno */
@@ -735,10 +736,10 @@ char *s_display_string(struct odisplay *h_display)
       { DISPLAY_F,     'F' }
    };
 #endif
-   static const pair a_special[] =
+   static pair a_special[] =
    {
       { DISPLAY_DECIMAL, '.' },
-      { DISPLAY_COMMA,   ';' },
+      { DISPLAY_COMMA,   ',' },
       { DISPLAY_COLON,   ':' }
    };
 

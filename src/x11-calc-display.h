@@ -52,6 +52,7 @@
  *                   - Defined  display_string() to return a string showing
  *                     the display - MT
  * 11 Jan 26         - Fixed display masks on voyagers - MT
+ * 15 Mar 26         - Display mask for comma on voyager models fixed - MT
  *
  */
 
@@ -71,7 +72,7 @@
 #define DISPLAY_ZERO       0x003f
 #define DISPLAY_MINUS      0x0040
 #define DISPLAY_DECIMAL    0x0080
-#define DISPLAY_COMMA      0x0100
+#define DISPLAY_COMMA      0x0180
 #define DISPLAY_COLON      0x0200
 #define DISPLAY_R          0x0003
 #define DISPLAY_U          0x0062
