@@ -470,6 +470,7 @@
  * 08 Dec 25         - Fixed buffer size and removed unused variable - MT
  * 09 Dec 25         - Modified  read_rom() to allow the addresses in a ROM
  *                     to be in any order - MT
+ * 17 Mar 26         - Modified card reader code slightly - MT
  *
  *
  * To Do             - Move register functions to separate source file.
@@ -2076,8 +2077,7 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
                case 00100:  /* test/clear motor on (crc buffer ready) */
                {
                   if (h_processor->trace) fprintf(stdout, "test motor on (crc ready)");
-                  if (h_processor->card->file != NULL)
-                     h_processor->status[3] = True;  // if file is open, ready to r/w: set S3 = True
+                  h_processor->status[3] = (h_processor->card->file != NULL);  /* Device/buffer ready if not cancelled - KJC */
                   break;
                }
                case 00300:  /* test mode flag */
