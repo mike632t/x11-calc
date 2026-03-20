@@ -47,7 +47,13 @@ MacOS, VMS, Solaris and Tru64 Unix.
 
 Details of the latest/important changes.
 
-03 Jan 25  (0.24.0234)
+20 Mar 26  (0.26.0251)
+
+   - Keyboard handler rewritten.
+   - Invalid key strokes are now ignored.
+   - Fixed bug in command line parser.
+
+03 Jan 26  (0.24.0234)
 
    - Changed  the  way the display is drawn and increased range  of  values
      allowed by '--zoom'.
