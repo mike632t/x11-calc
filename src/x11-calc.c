@@ -471,6 +471,8 @@
  * 22 Feb 26         - Use toupper() on non-UNIX systems to convert command
  *                     line arguments to uppercase - MT
  * 24 Feb 26  (0251) - Fixed bug in command line parser - MT
+ * 21 Mar 26         - Modified the scan code for the enter key to allow it
+ *                     to be used to enter the timer mode on the HP45 - MT
  *
  *
  * To Do             - Parse command line in a separate routine.
@@ -484,8 +486,8 @@
 
 #define  NAME           "x11-calc"
 #define  VERSION        "0.26"
-#define  BUILD          "0251"
-#define  DATE           "14 Feb 26"
+#define  BUILD          "0252"
+#define  DATE           "21 mar 26"
 #define  AUTHOR         "MT"
 
 #define  TICKS          48  /* Number of ticks to execute before updating the display */
