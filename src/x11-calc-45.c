@@ -35,6 +35,8 @@
  * 07 Sep 25         - Changed key code for ENTER - MT
  * 11 Oct 25         - Modified key layout - MT
  * 09 Nov 25         - Another tweak to the keyboard layout - MT
+ * 21 Mar 26         - Modified the scan code for the enter key to allow it
+ *                     to be used to enter the timer mode - MT
  *
  */
 
@@ -114,7 +116,7 @@ void v_init_buttons(struct obutton *h_button[]) {
    /* Define fourth row of keys. */
    i_top += KBD_ROW;
    i_left = KBD_LEFT;
-   h_button[i_count++] = h_button_create(00076, 015, "ENTER", "      ", "DEG", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, 2* KEY_WIDTH + KEY_GAP, KEY_HEIGHT, False, True, MID_GREY, BACKGROUND, YELLOW, BACKGROUND);
+   h_button[i_count++] = h_button_create(00074, 015, "ENTER", "      ", "DEG", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, 2* KEY_WIDTH + KEY_GAP, KEY_HEIGHT, False, True, MID_GREY, BACKGROUND, YELLOW, BACKGROUND);
    i_left += (2 * (KEY_WIDTH + KEY_GAP));
    h_button[i_count++] = h_button_create(00073, 'c', "CHS", "RAD", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_WIDTH, KEY_HEIGHT, False, True, MID_GREY, YELLOW, BACKGROUND, BACKGROUND);
    i_left += (KEY_WIDTH + KEY_GAP);
