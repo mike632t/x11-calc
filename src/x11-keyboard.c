@@ -41,13 +41,15 @@
  *                     UNIX - MT
  *                   - Check keyboard macros exist before use - MT
  * 24 Feb 26         - Corrected function names - MT
+ * 23 Mar 26         - Extended modifier mask detection to handle any named
+ *                     modifier key - MT
  *
  */
 
 #define  NAME           "x11-calc-keyboard"
-#define  VERSION        "0.25"
-#define  BUILD          "0013"
-#define  DATE           "14 Feb 26"
+#define  VERSION        "0.2"
+#define  BUILD          "0018"
+#define  DATE           "23 Mar 26"
 #define  AUTHOR         "MT"
 
 #include <ctype.h>     /* is alpha(), etc. */
@@ -111,32 +113,32 @@ static void v_key_decode(okeyboard *h_keyboard, Display *x_display, XKeyEvent *x
 }
 
 /*
- * get_numlock_mask(display)
+ * get_key_mask(display)
  *
- * Since the mask used to represent the state of the NumLock key is not the
+ * Since the bit mask used for each modifier key isn't guaranteed to be the
  * same on every system we need to search the keyboard modifier map to find
- * which one corresponds to the NumLock key.
+ * the correct mask.
  *
  */
 
-static unsigned int u_get_numlock_mask(Display *x_display)
+static unsigned int u_get_key_mask(Display *x_display, KeySym x_key)
 {
    XModifierKeymap *h_modmap;
    KeyCode u_keycode;
    unsigned int u_mask = 0;
    int i_count, i_counter, i_offset;
 
-   /* Get the keycode that represents XK_Num_Lock on this keyboard.
-    * This tells us which physical key is the NumLock key.
+   /* Get the keycode that represents matches the key on this keyboard.
+    * This tells us what the physical key is.
     */
-   u_keycode = XKeysymToKeycode(x_display, XK_Num_Lock);
+   u_keycode = XKeysymToKeycode(x_display, x_key);
 
-   /* If the keyboard/layout has no NumLock key, we cannot map it. */
+   /* If the keyboard/layout doesn't have the key, we cannot map it. */
    if (u_keycode != 0) {
 
       /* Get  the key modifier map which contains 8 modifier slots (one for
        * Shift, Lock, Control, and Mod1 - Mod5), with slot listing all  the
-       * keycodes that activate that modifier */
+       * key codes that activate that modifier */
 
       h_modmap = XGetModifierMapping(x_display);
 
@@ -204,7 +206,7 @@ okeyboard *h_keyboard_create(Display *x_display) {
       h_keyboard->key = '\000';
       h_keyboard->name = NULL;
       h_keyboard->keysym = 0x0000;
-      h_keyboard->NumLockMask = u_get_numlock_mask(x_display);
+      h_keyboard->NumLockMask = u_get_key_mask(x_display, XK_Num_Lock);  /* Save mask for NumLock */
    }
    else
       h_keyboard = NULL;
