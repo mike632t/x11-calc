@@ -114,8 +114,9 @@
 #                      the current branch - MT
 #  17 Nov 25         - Only  build models in known family by default  other
 #                      models must be specified explicitly - MT
-#  22 Nove 25        - Moved branch detection into the backup recipe to fix
+#  22 Nov 25         - Moved branch detection into the backup recipe to fix
 #                      compatibility issues with Tru64 UNIX - MT
+#  23 Mar 26         - Make clean deletes existing program files - MT
 #
 
 PROGRAM		= x11-calc
@@ -193,7 +194,7 @@ $(BIN)/$(PROGRAM): $(SRC)/$(PROGRAM).in
 
 clean:
 	@rm -f $(SRC)/*.o $(SRC)/*.o_*
-#	@[ -d "$(BIN)" ] && rm -rf $(BIN) || true
+	@[ -d "$(BIN)" ] && rm -f $(BIN)/* || true
 
 install:
 # Attempt to 'install' the application and data files to the correct target
