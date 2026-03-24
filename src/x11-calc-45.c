@@ -37,8 +37,8 @@
  * 09 Nov 25         - Another tweak to the keyboard layout - MT
  * 21 Mar 26         - Modified the scan code for the enter key to allow it
  *                     to be used to enter the timer mode - MT
- * 23 Mar 26         - Don't modify scan code her otherwise ENTER cannot be
- *                     used to exit the timer - MT
+ * 23 Mar 26         - Reverted modification to scan code to allow ENTER to
+ *                     be used to exit the timer as normal - MT
  *
  */
 
