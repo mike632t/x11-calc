@@ -471,8 +471,10 @@
  * 22 Feb 26         - Use toupper() on non-UNIX systems to convert command
  *                     line arguments to uppercase - MT
  * 24 Feb 26  (0251) - Fixed bug in command line parser - MT
- * 21 Mar 26         - Modified the scan code for the enter key to allow it
- *                     to be used to enter the timer mode on the HP45 - MT
+ * 23 Mar 26         - Holding down Ctrl when pressing ENTER can be used to
+ *                     modify the key code passed to the emulator, allowing
+ *                     users to access the HP45's timer mode by clicking on
+ *                     RCL, then pressing Ctrl and clicking on ENTER - MT
  *
  *
  * To Do             - Parse command line in a separate routine.
@@ -489,6 +491,8 @@
 #define  BUILD          "0252"
 #define  DATE           "21 mar 26"
 #define  AUTHOR         "MT"
+
+#define  DEBUG
 
 #define  TICKS          48  /* Number of ticks to execute before updating the display */
 #define  MAX_ZOOM       32
@@ -682,10 +686,11 @@ int main(int argc, char *argv[])
 #endif
    unsigned int i_memory_size = MEMORY_SIZE;
    int i_breakpoints[] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};  /* Array to hold breakpoints */
+   int i_trap = -1;                    /* Trap instruction */
+
    int i_offset, i_count, i_index, i_value, i_size;
    int i_delay = -1;                   /* Delay timer - used to work out when switch has been held off for 2 seconds */
    int i_ticks = 0;
-   int i_trap = -1;                    /* Trap instruction */
 
 #if defined(CONTINIOUS)
    int b_reset = False;                /* Do not restore state (reset) */
@@ -1358,6 +1363,10 @@ int main(int argc, char *argv[])
                      h_pressed->state = True;
                      i_button_draw(x_display, x_buffer, i_screen, h_pressed);
                      h_processor->code = h_pressed->index;
+#if defined(HP45)
+                     if (x_event.xkey.state & ControlMask)  /* Check to see if Ctrl key is pressed */
+                        if (h_processor->code == 076) h_processor->code = 074;  /* Modify processor code for the enter key if it is - allowing the user to invoke the HP45 timer */
+#endif
                      h_processor->keypressed = True;
 #if !defined(SWITCHES)
                      h_processor->enabled = True;  /* Any key press will wake up the processor */
