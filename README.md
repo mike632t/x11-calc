@@ -47,6 +47,10 @@ MacOS, VMS, Solaris and Tru64 Unix.
 
 Details of the latest/important changes.
 
+23 Mar 26  (0.26.0252)
+
+   - Users can now enable the HP45 timer using 'RCL' and Ctrl-'Enter'.
+
 20 Mar 26  (0.26.0251)
 
    - Keyboard handler rewritten.
