@@ -30,6 +30,7 @@
  * 31 Jan 22         - Added gold - MT
  * 24 Feb 22         - Added an alternate LCD background colour - MT
  * 15 Feb 26         - Use B/W on VAX only - MT
+ * 29 Mar 26         - Added light yellow - MT
  *
  */
 
@@ -82,6 +83,7 @@
 #define LIGHT_GRAY     0xcecfc6 /* Light grey numeric keys. */
 #define GREEN          0x948639 /* Green function keys. */
 #define YELLOW         0xf5a434 /* Yellow shift key. */
+#define LIGHT_YELLOW   0xf7c86a /* Alternate yellow (LightGoldenRodYellow). */
 #define ORANGE         0xe06900 /* Orange function keys. */
 #define MID_BLUE       0x4096aa /* Blue text and function keys (was 0x3784b0). */
 #define LIGHT_BLUE     0x4aa0b0 /* Blue shift key. */
