@@ -236,6 +236,12 @@
 #define VOYAGER
 #include "x11-calc-16c.h"
 
+#elif defined(HP58)
+#define FILENAME     "x11-calc-58"
+#define TITLE        "TI calc 58"
+#define VOYAGER
+#include "x11-calc-58.h"
+
 #endif
 
 #if !defined(SCALE_WIDTH)

@@ -145,8 +145,9 @@ _topcat		= hp67
 _kiss		= hp10
 _spice		= hp31e hp32e hp33e hp33c hp34c hp37e hp38e hp38c
 _voyager	= hp10c hp11c hp12c hp15c hp16c
+_ti		= ti58
 
-MODELS		= $(_classic) $(_woodstock) $(_topcat) $(_spice) $(_voyager) $(_kiss)
+MODELS		= $(_classic) $(_woodstock) $(_topcat) $(_spice) $(_voyager) $(_kiss) $(_ti)
 
 # The prefix will only be modified by the installer it it is NOT set on the
 # command  line.  If no prefix is defined on the command line then the most
@@ -175,7 +176,7 @@ voyager: $(_voyager) $(PROGRAM)
 
 # Base per-model compile target:
 $(MODELS): common
-	@_model="`echo "$@" | sed 's/hp//'`"; \
+	@_model="`echo "$@" | sed 's/hp//' | sed 's/ti//'`"; \
 	cd $(SRC); \
 	$(MAKE) -s MODEL=$$_model all
 
@@ -186,7 +187,7 @@ $(PROGRAM): $(BIN)/$(PROGRAM)
 
 $(BIN)/$(PROGRAM): $(SRC)/$(PROGRAM).in
 	@mkdir -p $(BIN)
-	@_mdls=`echo "$(MODELS)" | tr ' ' '|'` ; \
+	_mdls=`echo "$(MODELS)" | tr ' ' '|'` ; \
 		sed "s/^_models=\".*/_models=\"$$_mdls\"/" $(SRC)/$(PROGRAM).in > $@
 	@chmod +x $@
 	@if ls --color $@ > /dev/null 2>&1 ;then  ls --color $@ | sed "s:$(BIN)/::g"; else ls $@ | sed "s:$(BIN)/::g"; fi
