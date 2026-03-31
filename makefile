@@ -145,7 +145,7 @@ _topcat		= hp67
 _kiss		= hp10
 _spice		= hp31e hp32e hp33e hp33c hp34c hp37e hp38e hp38c
 _voyager	= hp10c hp11c hp12c hp15c hp16c
-_ti		= ti58
+_ti		= ti58 ti57
 
 MODELS		= $(_classic) $(_woodstock) $(_topcat) $(_spice) $(_voyager) $(_kiss) $(_ti)
 

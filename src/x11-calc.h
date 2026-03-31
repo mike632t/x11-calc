@@ -239,8 +239,12 @@
 #elif defined(HP58)
 #define FILENAME     "x11-calc-58"
 #define TITLE        "TI calc 58"
-#define VOYAGER
 #include "x11-calc-58.h"
+
+#elif defined(HP57)
+#define FILENAME     "x11-calc-57"
+#define TITLE        "TI calc 57"
+#include "x11-calc-57.h"
 
 #endif
 

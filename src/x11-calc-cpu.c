@@ -1719,15 +1719,29 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
 #if defined(HP10c) || defined(HP11c) || defined(HP12c) || defined(HP15c) || defined(HP16c)
       if (h_processor->keypressed) h_processor->kyf = True;  /* Set keyboard flag if key pressed */
 #endif
-
       i_opcode = h_processor->rom[h_processor->pc];  /* Get next instruction */
       i_last = h_processor->pc;
       if (h_processor->trace)
          fprintf(stdout, h_msg_opcode, (i_last >> 12), (i_last & 0x0fff), h_processor->rom[i_last]);
       v_op_inc_pc(h_processor);  /* Increment program counter _before_ decoding the opcode */
+#if defined(TI58)
+      int i_count;
+      for (i_count = 1; i_count < 7; i_count++)
+         h_processor->reg[A_REG]->nibble[REG_SIZE -1 -i_count] = 0x0F;
+      h_processor->reg[B_REG]->nibble[REG_SIZE - 1] = 0x02;
+      h_processor->reg[B_REG]->nibble[REG_SIZE - 8] = 0x01;
+      h_processor->flags[DISPLAY_ENABLE] = True;
+#elif defined(TI57)
+      int i_count;
+      for (i_count = 1; i_count < DIGITS; i_count++)
+         h_processor->reg[A_REG]->nibble[REG_SIZE -1 -i_count] = 0x0F;
+      h_processor->reg[B_REG]->nibble[REG_SIZE - 1] = 0x02;
+      h_processor->reg[B_REG]->nibble[REG_SIZE - 9] = 0x01;
+      h_processor->reg[A_REG]->nibble[REG_SIZE - 9] = 0x00;
+      h_processor->flags[DISPLAY_ENABLE] = True;
+#else
       switch (i_opcode & 03)
       {
-
 #if defined(HP35) || defined(HP80) || defined(HP45) || defined(HP70) || defined(HP55)
       case 00:  /* Type 0 - Special operations */
          switch ((i_opcode >> 2) & 03)
@@ -4114,6 +4128,7 @@ void v_processor_tick(oprocessor *h_processor)  /* Decode and execute a single i
          if (h_processor->trace) fprintf(stdout, "\n");
          v_error(errno, h_err_unexpected_error, (i_last >> 12), (i_last & 0xfff), __FILE__, __LINE__);
       }
+#endif
       if (h_processor->trace) fprintf(stdout, "\n");
       h_processor->opcode = i_opcode;  /* Keep track of the previous opcode so you know when to increment 'P' */
    }
