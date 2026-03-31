@@ -22,11 +22,12 @@
  *
  */
 
-#define HEIGHT             465 * SCALE_HEIGHT
+#define HEIGHT             483 * SCALE_HEIGHT
 #define WIDTH              230 * SCALE_WIDTH
 #define BUTTONS            45
+#define SWITCHES           1
 
-#define DIGITS             11
+#define DIGITS             12
 
 #define DIGIT_COLOUR       RED
 #define DIGIT_BACKGROUND   DARK_RED
@@ -52,9 +53,12 @@
 #define KEY_NUMERIC        48 * SCALE_WIDTH
 #define KEY_SMALL          27 * SCALE_WIDTH
 #define KEY_GAP            3 * SCALE_WIDTH
+#define SWITCH_HEIGHT      10 * SCALE_HEIGHT
 
 #define ROM_SIZE           010000
 #define MEMORY_SIZE        1
+
+#define TI58
 
 extern int i_rom [ROM_SIZE];
 
