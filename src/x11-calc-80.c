@@ -33,6 +33,7 @@
  * 06 Sep 25         - Updated key positions to match HP55 - MT
  * 11 Oct 25         - Modified key layout - MT
  * 09 Nov 25         - Another tweak to the keyboard layout - MT
+ * 19 Apr 26         - Fixed function colour for 'E-' - MT
  *
  */
 
@@ -162,7 +163,7 @@ void v_init_buttons(struct obutton *h_button[]) {
    i_left += (KEY_NUMERIC + 4 * KEY_GAP);
    h_button[i_count++] = h_button_create(00043, '.', ".", "", "", "", h_large_font, h_small_font, h_alternate_font, i_left, i_top, KEY_NUMERIC, KEY_HEIGHT, False, True, LIGHT_GRAY, BACKGROUND, BACKGROUND, BACKGROUND);
    i_left += (KEY_NUMERIC + 4 * KEY_GAP);
-   h_button[i_count++] = h_button_create(00042, 000, "E+", "E-", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_NUMERIC, KEY_HEIGHT, False, True, LIGHT_GRAY, BACKGROUND, BACKGROUND, BACKGROUND);
+   h_button[i_count++] = h_button_create(00042, 000, "E+", "E-", "", "", h_normal_font, h_small_font, h_alternate_font, i_left, i_top, KEY_NUMERIC, KEY_HEIGHT, False, True, LIGHT_GRAY, YELLOW, BACKGROUND, BACKGROUND);
 }
 int i_rom[ROM_SIZE] = {
 01311, 00563, 01752, 01752, 01752, 00223, 00650, 00220,
