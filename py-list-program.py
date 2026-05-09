@@ -48,19 +48,19 @@
 #                            program steps to display can be specified from
 #                            the command line (a starting address of one or
 #                            zero is treated the same way) - MT
-#  29 Aug 25  0.4 (0012)   - Added support for HP34C (currently I am unable
+#  29 Aug 25  0.4          - Added support for HP34C (currently I am unable
 #                            to determine which registers are used for data
 #                            storage) - MT
 #                          - Changed model numbers! - MT
 #                          - Automatically detects model number - MT
 #                          - Modified error handling - MT
 #                          - Explicitly check files exist - MT
-#  30 Aug 25      (0017)   - Removed markdown as it wasn't useful - MT
+#  30 Aug 25      (0018)   - Removed markdown as it wasn't useful - MT
 #                          - Fixed change history dates and release - MT
 #                          - Don't  skip the first program step if the  hex
 #                            code is zero - MT
 #                          - Tried to rationalize error routines - MT
-#             0.5 (0020)   - Added support for HP29C - MT
+#             0.5 (0022)   - Added support for HP29C - MT
 #                          - Added a command line option to substitute some
 #                            characters with their unicode equivalents - MT
 #                          - Markup implies unicode - MT
@@ -71,14 +71,14 @@
 #                            very unclear - MT
 #                          - Use a single dictionary for text substitutions
 #                            to make maintenance easier - MT
-#                 (0027)   - Updated HTML formatted output to look a little
+#                 (0029)   - Updated HTML formatted output to look a little
 #                            more like a printed listing - MT
-#  05 Sep 25  0.6 (0028)   - Added support for HP12C - MT
+#  05 Sep 25  0.6 (0030)   - Added support for HP12C - MT
 #  10 Nov 25               - Modified mnemonics to make them clearer - MT
 #  17 Nov 25               - Fixed issue with Python 3 - MT
 #  20 Nov 25               - Fixed spelling of 'substitutions' and included
 #                            some additional unicode mnemonics - MT
-#   8 May 26               - Markdown removed from the help text - MT
+#   8 May 26  0.7 (0034)   - Markdown removed from the help text - MT
 #   9 May 26               - Use dictionaries instead of lists to allow the
 #                            lookup tables to be sparsely populated - MT
 #
@@ -89,7 +89,7 @@
 
 import sys, os
 
-VERSION = "0.5.0031"
+VERSION = "0.7.0035"
 
 def _about():
   _path = os.path.basename(sys.argv[0])
