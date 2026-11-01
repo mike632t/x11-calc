@@ -5,7 +5,17 @@
 
 - [ ] Update help text
 
-- [ ] Allow user to resize the window at runtime (scroll wheel?).
+- [ ] Allow windows to be resized or maximized
+
+   - Draw calculator in the middle of the window
+
+   - Use a different background for the window to the calculator
+
+   - Resize to fit height or width (retaining aspect ratio)
+
+- [ ] Allow user to resize the window at runtime.
+
+- [ ] Update help text
 
 - [ ] Add a graphical printer display to the HP10
 
@@ -58,7 +68,7 @@
 
 - [X] Optional menu (load/save) if GTK is installed
 
-- [x] Optionally allow numeric keypad to be used if NumLock is off (`--numlock`)
+- [x] Optionally allow numeric keypad to be used if NumLock is off
 
 - [x] Added HP10
 
@@ -69,7 +79,7 @@
 - [x] Update screenshots
 
 - [x] Implement  different styles of digit (to allow for different  decimal
-point positions, and number of segments etc)
+      point positions, and number of segments etc)
 
 - [x] Implement display jumper setting in SPICE series
 
@@ -87,10 +97,12 @@ point positions, and number of segments etc)
 
 ### Rejected changes
 
-- [ ] Allow a program card to be loaded from the command line - Need a way to load multiple cards
+- [ ] Allow  a program card to be loaded from the command line - Need a way
+      to load multiple cards
 
-- [ ] Allow any _programmable_ model to load a saved program - Not possible without modifying the firmware
+- [ ] Allow any _programmable_ model to load a saved program - Not possible
+      without modifying the firmware
 
-- [ ] Add logic for a  separate 'PIK chip' and move printer code - Not worth the effort to separate chip functions (yet)
+- [ ] Add logic for a  separate 'PIK chip' and move printer code
 
-- [ ] Implement the display decoder as a separate 'chip' - Not worth the effort to separate chip functions (yet)
+- [ ] Implement the display decoder as a separate 'chip'
